@@ -58,7 +58,7 @@ export class AuditDoc extends DocumentView {
       );
       const fine = clues.find((c) => c.finePrint);
       this.addRow(this.lh + (fine ? this.lh : 0), (row) => {
-        row.add(this.text(8, 0, `${label}:`, { color: 'paperShadow' }));
+        row.add(this.text(8, 0, `${label}:`, { color: 'woodMid' }));
         row.add(this.text(80, 0, value.slice(0, 30), { color: 'shadow' }));
         for (const clue of clues) {
           let rect = { x: 6, y: 0, w: this.contentW - 12, h: this.lh };
@@ -77,7 +77,7 @@ export class AuditDoc extends DocumentView {
     );
 
     if (data.findings.length > 0) {
-      this.addRow(this.lh, (row) => row.add(this.text(8, 0, 'Findings', { color: 'paperShadow' })));
+      this.addRow(this.lh, (row) => row.add(this.text(8, 0, 'Findings', { color: 'woodMid' })));
       data.findings.forEach((f, i) => {
         const lines = wrapMono(`- ${f}`, maxChars);
         const clues = this.doc.clues.filter(

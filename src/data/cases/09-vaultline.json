@@ -1,0 +1,191 @@
+{
+  "id": "vaultline",
+  "title": "The Proxy",
+  "ticker": "$VLT",
+  "pitch": "Vaultline: audited, doxxed, renounced. A calm 0.5% daily yield, no drama.",
+  "difficulty": 5,
+  "verdict": "rug",
+  "timeLimitSec": 300,
+  "debrief": "Vaultline did everything right on the surface: a real audit, a doxxed lead, a renounced token. But the token was a proxy, and the proxy's admin was never renounced, so the audited code could be swapped for anything. A '0.5% daily yield' is a promise of guaranteed returns dressed in a cardigan, and the liquidity lock had two days left.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "VaultlineToken.sol",
+      "content": {
+        "fileName": "contracts/VaultlineToken.sol (proxy)",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.20;",
+          "// Deployed behind TransparentUpgradeableProxy",
+          "contract VaultlineToken is ERC20Upgradeable, OwnableUpgradeable {",
+          "  uint256 public dailyYieldBps;",
+          "",
+          "  function initialize() public initializer {",
+          "    __ERC20_init(\"Vaultline\", \"VLT\");",
+          "    __Ownable_init(msg.sender);",
+          "    dailyYieldBps = 50; // 0.5% / day",
+          "    _mint(msg.sender, 20_000_000e18);",
+          "    renounceOwnership();",
+          "  }",
+          "",
+          "  function _update(address from, address to, uint256 v)",
+          "    internal override {",
+          "    _beforeTransferHook(from, to, v);",
+          "    super._update(from, to, v);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "vl-proxy",
+          "label": "Proxy admin still live",
+          "flagId": "fake-renounce",
+          "finePrint": true,
+          "text": "// ProxyAdmin owner: 0x6a8...f40 (deployer). Can upgrade implementation.",
+          "anchor": { "kind": "line", "line": 2 }
+        },
+        {
+          "id": "vl-hook",
+          "label": "Hidden transfer hook",
+          "flagId": "honeypot",
+          "finePrint": true,
+          "text": "// hook lives in the implementation; current version reverts sells > 1% of pool",
+          "anchor": { "kind": "line", "line": 16 }
+        },
+        {
+          "id": "vl-renounce",
+          "label": "Ownership renounced",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": { "kind": "line", "line": 11 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "20,000,000 VLT",
+        "allocations": [
+          { "label": "Yield pool", "pct": 50, "vesting": "emissions" },
+          { "label": "Liquidity", "pct": 30, "vesting": "locked" },
+          { "label": "Team", "pct": 12, "vesting": "12 months" },
+          { "label": "Marketing", "pct": 8, "vesting": "12 months" }
+        ],
+        "notes": [
+          "Holders receive a fixed 0.5% daily yield, paid from the yield pool, guaranteed for 24 months.",
+          "Marketing spend reports posted quarterly."
+        ]
+      },
+      "clues": [
+        {
+          "id": "vl-yield",
+          "label": "'Fixed 0.5% daily'",
+          "flagId": "guaranteed-returns",
+          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+        },
+        {
+          "id": "vl-marketing",
+          "label": "8% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": { "kind": "row", "row": 3 }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Team",
+      "content": {
+        "members": [
+          {
+            "name": "Daniel Brecht",
+            "role": "Founder",
+            "bio": "Doxxed. Former fintech product manager, hosts weekly video calls with holders.",
+            "portraitSeed": "brecht",
+            "style": "normal"
+          },
+          {
+            "name": "vault_gremlin",
+            "role": "Contract dev",
+            "bio": "Anonymous. 'Security through obscurity, ironically.' Controls deployments.",
+            "portraitSeed": "gremlin",
+            "style": "anon"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "vl-anon",
+          "label": "Anon dev holds deploys",
+          "flagId": "anon-team-stock-photos",
+          "anchor": { "kind": "row", "row": 1 }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "VaultlineToken.sol impl v1 (0x93c...2d1)",
+        "date": "18 Jul",
+        "score": "Pass - 1 medium, 1 low",
+        "summary": "Scope: implementation contract v1 only. Proxy admin and upgrade process were out of scope at the client's request.",
+        "findings": [
+          "Yield accrual can be front-run at epoch boundary (medium) - mitigated.",
+          "Unbounded loop in claimAll (low)."
+        ]
+      },
+      "clues": [
+        {
+          "id": "vl-audit",
+          "label": "Audit lists findings",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "VLT / USDC",
+        "liquidityUsd": "$402,000",
+        "lock": { "locked": true, "provider": "SafeLock", "expires": "Fri (2 days)", "pct": 100 },
+        "holders": [
+          { "label": "Yield pool contract", "pct": 48, "tag": "contract" },
+          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
+          { "label": "Team vesting", "pct": 11, "tag": "vesting" },
+          { "label": "Everyone else", "pct": 11 }
+        ],
+        "transfers": [
+          {
+            "when": "3h ago",
+            "from": "0x6a8...f40",
+            "to": "Exchange deposit",
+            "amount": "60,000 USDC"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "vl-lock",
+          "label": "Lock ends in 2 days",
+          "flagId": "liquidity-unlocked",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "vl-pool",
+          "label": "Pool holds 30%",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+        }
+      ]
+    }
+  ]
+}

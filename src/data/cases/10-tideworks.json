@@ -1,0 +1,245 @@
+{
+  "id": "tideworks",
+  "title": "High Tide",
+  "ticker": "$TIDE",
+  "pitch": "TideWorks: real yield from real ports. Compliance-first, community-owned.",
+  "difficulty": 5,
+  "verdict": "rug",
+  "timeLimitSec": 300,
+  "debrief": "TideWorks buried its red flags under paperwork. The 'compliance list' was a blacklist; the fee cap was 100%; three 'independent' whales were funded by the deployer in the same block; and the whitepaper borrowed its risk section, typos included, from another project. The genuine parts, a vested marketing wallet, a doxxed ops lead, real jokes in chat, were there to make you stop looking.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "TideWorks.sol",
+      "content": {
+        "fileName": "contracts/TideWorks.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract TideWorks is ERC20, Ownable {",
+          "  uint256 public constant MAX_FEE_BPS = 10_000;",
+          "  uint256 public buyFeeBps = 100;",
+          "  uint256 public sellFeeBps = 100;",
+          "  mapping(address => bool) public complianceList;",
+          "",
+          "  function setFees(uint256 b, uint256 s) external onlyOwner {",
+          "    require(b <= MAX_FEE_BPS && s <= MAX_FEE_BPS, \"cap\");",
+          "    buyFeeBps = b; sellFeeBps = s;",
+          "  }",
+          "",
+          "  function setCompliance(address a, bool flagged)",
+          "    external onlyOwner { complianceList[a] = flagged; }",
+          "",
+          "  function _update(address from, address to, uint256 v)",
+          "    internal override {",
+          "    require(!complianceList[from], \"compliance hold\");",
+          "    uint256 fee = v * (to == pool ? sellFeeBps : buyFeeBps)",
+          "      / 10_000;",
+          "    super._update(from, treasury, fee);",
+          "    super._update(from, to, v - fee);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "td-cap",
+          "label": "Fee cap is 100%",
+          "flagId": "sell-tax-adjustable",
+          "finePrint": true,
+          "text": "// 10_000 bps = 100%. 'cap' is decorative.",
+          "anchor": { "kind": "line", "line": 3 }
+        },
+        {
+          "id": "td-compliance",
+          "label": "'Compliance' blacklist",
+          "flagId": "blacklist",
+          "anchor": { "kind": "line", "line": 13 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Whitepaper Extract",
+      "content": {
+        "totalSupply": "500,000,000 TIDE",
+        "allocations": [
+          { "label": "Port revenue pool", "pct": 40, "vesting": "protocol" },
+          { "label": "Liquidity", "pct": 24, "vesting": "locked 1y" },
+          { "label": "Ecosystem partners", "pct": 27, "vesting": "none" },
+          { "label": "Team", "pct": 6, "vesting": "18 months" },
+          { "label": "Marketing", "pct": 3, "vesting": "12 months" }
+        ],
+        "notes": [
+          "Risk disclosure: $HRBR tokens may fluctuate in value. The harbour co-op is not liable for loses.",
+          "Marketing wallet is a 2-of-3 multisig with quarterly reports."
+        ]
+      },
+      "clues": [
+        {
+          "id": "td-copied",
+          "label": "Risk text names $HRBR",
+          "flagId": "copied-whitepaper",
+          "finePrint": true,
+          "text": "same typo ('loses') as Harbor's whitepaper v0.2",
+          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+        },
+        {
+          "id": "td-partners",
+          "label": "27% partners, liquid",
+          "flagId": "team-allocation-unvested",
+          "anchor": { "kind": "row", "row": 2 }
+        },
+        {
+          "id": "td-marketing",
+          "label": "3% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": { "kind": "row", "row": 4 }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Team",
+      "content": {
+        "members": [
+          {
+            "name": "Hanna Berg",
+            "role": "Head of Ops",
+            "bio": "Doxxed. 12 years in port logistics, speaks at the regional shipping conference.",
+            "portraitSeed": "hanna",
+            "style": "normal"
+          },
+          {
+            "name": "Marcus Steel",
+            "role": "CEO",
+            "bio": "Serial founder. Previously exited two logistics startups.",
+            "portraitSeed": "steel",
+            "style": "stock"
+          },
+          {
+            "name": "Leo Park",
+            "role": "CTO",
+            "bio": "Blockchain architect. Led engineering at a top-10 exchange.",
+            "portraitSeed": "park",
+            "style": "stock"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "td-stock",
+          "label": "CEO is a stock photo",
+          "flagId": "anon-team-stock-photos",
+          "finePrint": true,
+          "text": "PHOTO ID 4471",
+          "anchor": { "kind": "row", "row": 1, "table": "photo" }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Discord: #tide-general",
+      "content": {
+        "channel": "tide-general",
+        "messages": [
+          {
+            "user": "Hanna_B",
+            "role": "admin",
+            "time": "10:02",
+            "text": "port partner #2 signed. announcement thursday."
+          },
+          {
+            "user": "ferryman",
+            "time": "10:05",
+            "text": "if this token is a port, I'm the harbourmaster of my bathtub"
+          },
+          {
+            "user": "quill",
+            "time": "10:11",
+            "text": "what does complianceList do? can the owner freeze me?"
+          },
+          {
+            "user": "Hanna_B",
+            "role": "admin",
+            "time": "10:14",
+            "text": "it's for regulatory holds only, required by our port partners. it has never been used."
+          },
+          {
+            "user": "quill",
+            "time": "10:15",
+            "text": "'never been used' isn't 'can't be used' but ok"
+          },
+          {
+            "user": "dockworker_9",
+            "time": "10:20",
+            "text": "ecosystem partner tokens are moving, three wallets got 45M each. who are they?"
+          },
+          {
+            "user": "Hanna_B",
+            "role": "admin",
+            "time": "10:24",
+            "text": "strategic partners under NDA. more soon."
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "td-q",
+          "label": "Quill asks re: freeze",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": { "kind": "message", "index": 2 }
+        },
+        {
+          "id": "td-joke",
+          "label": "Bathtub joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 1 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "TIDE / USDC",
+        "liquidityUsd": "$580,000",
+        "lock": { "locked": true, "provider": "LockBox", "expires": "Sep 2027 (1y)", "pct": 100 },
+        "holders": [
+          { "label": "Revenue pool contract", "pct": 39, "tag": "contract" },
+          { "label": "Liquidity pool", "pct": 24, "tag": "pool" },
+          { "label": "0xb3f...019", "pct": 9 },
+          { "label": "0x2ee...a77", "pct": 9 },
+          { "label": "0x8c1...5d5", "pct": 9 },
+          { "label": "Everyone else", "pct": 10 }
+        ],
+        "transfers": [
+          { "when": "6d ago", "from": "Deployer", "to": "0xb3f...019", "amount": "45,000,000" },
+          { "when": "6d ago", "from": "Deployer", "to": "0x2ee...a77", "amount": "45,000,000" },
+          { "when": "6d ago", "from": "Deployer", "to": "0x8c1...5d5", "amount": "45,000,000" }
+        ]
+      },
+      "clues": [
+        {
+          "id": "td-whales",
+          "label": "3 whales, one funder",
+          "flagId": "whale-concentration",
+          "finePrint": true,
+          "text": "all three funded in block 19,442,117 from the deployer",
+          "anchor": { "kind": "row", "row": 2, "table": "holders" }
+        },
+        {
+          "id": "td-pool",
+          "label": "Pool holds 24%",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+        }
+      ]
+    }
+  ]
+}

@@ -154,12 +154,9 @@ export class InvestigationScene extends Phaser.Scene {
     this.hint = addText(
       this,
       GAME_WIDTH / 2,
-      GAME_HEIGHT - 11,
+      GAME_HEIGHT - 12,
       'hover evidence with the lens  ·  click clues to pin  ·  stamp RUG or LEGIT  ·  Esc pause',
-      {
-        size: 8,
-        color: 'woodLight',
-      },
+      { size: 10, color: 'paperShadow' },
     )
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
@@ -329,7 +326,9 @@ export class InvestigationScene extends Phaser.Scene {
     on('PAGE_UP', () => inPlay() && this.currentDoc()?.scroll(-1));
     on('R', () => inPlay() && this.stamps[0]?.trigger((v) => this.onStamp(v)));
     on('L', () => inPlay() && this.stamps[1]?.trigger((v) => this.onStamp(v)));
-    for (let i = 1; i <= 6; i++) on(`${i}`, () => inPlay() && this.showDocument(i - 1));
+    ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX'].forEach((name, i) =>
+      on(name, () => inPlay() && this.showDocument(i)),
+    );
     on(
       'OPEN_BRACKET',
       () => inPlay() && this.showDocument((this.current - 1 + this.docs.length) % this.docs.length),

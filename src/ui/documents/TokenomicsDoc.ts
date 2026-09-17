@@ -76,9 +76,9 @@ export class TokenomicsDoc extends DocumentView {
     );
     // Table header.
     this.addRow(this.lh, (row) => {
-      row.add(this.text(0, 0, '#  Allocation', { color: 'paperShadow' }));
-      row.add(this.text(tableW - 58, 0, '%', { color: 'paperShadow' }));
-      row.add(this.text(tableW - 40, 0, 'Vesting', { color: 'paperShadow' }));
+      row.add(this.text(0, 0, '#  Allocation', { color: 'woodMid' }));
+      row.add(this.text(tableW - 58, 0, '%', { color: 'woodMid' }));
+      row.add(this.text(tableW - 40, 0, 'Vesting', { color: 'woodMid' }));
     });
     data.allocations.forEach((alloc, i) => {
       const clues = this.doc.clues.filter(
@@ -108,9 +108,7 @@ export class TokenomicsDoc extends DocumentView {
     });
     // Notes.
     if (data.notes.length > 0) {
-      this.addRow(this.lh + 4, (row) =>
-        row.add(this.text(0, 4, 'Notes', { color: 'paperShadow' })),
-      );
+      this.addRow(this.lh + 4, (row) => row.add(this.text(0, 4, 'Notes', { color: 'woodMid' })));
       const maxChars = Math.floor(this.contentW / cw) - 2;
       data.notes.forEach((note, i) => {
         const lines = wrapMono(`- ${note}`, maxChars);

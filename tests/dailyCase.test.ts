@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { currentStreak, localDateKey, pickDailyCaseId, recordDailyPlay, type DailyState } from '@/systems/dailyCase';
+import {
+  currentStreak,
+  localDateKey,
+  pickDailyCaseId,
+  recordDailyPlay,
+  type DailyState,
+} from '@/systems/dailyCase';
 import { hashString, mulberry32 } from '@/systems/rng';
 
 describe('rng', () => {

@@ -1,0 +1,202 @@
+{
+  "id": "harbor",
+  "title": "Slow Water",
+  "ticker": "$HRBR",
+  "pitch": "Harbor: a savings token for the harbour co-op. 2% fee funds the boat fund.",
+  "difficulty": 3,
+  "verdict": "legit",
+  "timeLimitSec": 240,
+  "debrief": "Harbor has a fee, a treasury and a named team, all of which can look alarming if you squint. But the fee is hard-capped in code, the treasury is a co-op multisig with published minutes, the audit found real (small) issues that were fixed, and the admin answered the awkward question instead of deleting it.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "HarborToken.sol",
+      "content": {
+        "fileName": "contracts/HarborToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract HarborToken is ERC20 {",
+          "  uint16 public constant FEE_BPS = 200;   // 2%, fixed",
+          "  address public immutable boatFund;       // co-op multisig",
+          "",
+          "  constructor(address fund) ERC20(\"Harbor\", \"HRBR\") {",
+          "    boatFund = fund;",
+          "    _mint(fund, 8_000_000e18);",
+          "  }",
+          "",
+          "  function _update(address from, address to, uint256 v)",
+          "    internal override {",
+          "    if (from == boatFund || to == boatFund) {",
+          "      super._update(from, to, v); return;",
+          "    }",
+          "    uint256 fee = v * FEE_BPS / 10_000;",
+          "    super._update(from, boatFund, fee);",
+          "    super._update(from, to, v - fee);",
+          "  }",
+          "  // No owner. No setters. Fee cannot change.",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "hb-fee",
+          "label": "2% fee, hard-coded",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": { "kind": "line", "line": 3 }
+        },
+        {
+          "id": "hb-noowner",
+          "label": "No owner at all",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": { "kind": "line", "line": 20 }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Co-op Board",
+      "content": {
+        "members": [
+          {
+            "name": "Ines Okafor",
+            "role": "Treasurer",
+            "bio": "Runs the harbour co-op's books since 2019. Publishes monthly treasury minutes on the co-op site.",
+            "portraitSeed": "ines",
+            "style": "normal"
+          },
+          {
+            "name": "salty_pete",
+            "role": "Contract dev",
+            "bio": "Peter Lindqvist. Fisherman turned developer. The handle predates the token by a decade.",
+            "portraitSeed": "pete",
+            "style": "normal"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "hb-handle",
+          "label": "'salty_pete' is doxxed",
+          "herring": true,
+          "herringId": "doxxed-meme-name",
+          "anchor": { "kind": "row", "row": 1 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Forum: #harbor",
+      "content": {
+        "channel": "harbor",
+        "messages": [
+          {
+            "user": "marcus",
+            "time": "07:40",
+            "text": "why does the boat fund get 2% of every trade? that's a tax by another name"
+          },
+          {
+            "user": "Ines_O",
+            "role": "admin",
+            "time": "07:52",
+            "text": "yes, it is a tax. it's fixed in the contract, can't be changed, and the fund's spending is voted on. if you don't like it, this token isn't for you, honestly"
+          },
+          { "user": "marcus", "time": "07:55", "text": "fair. blunt, but fair" },
+          {
+            "user": "gull_watcher",
+            "time": "08:10",
+            "text": "the new pontoon is in. photos in #boats"
+          },
+          {
+            "user": "tina",
+            "time": "08:12",
+            "text": "anyone else buying purely to fund the pontoon lol"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "hb-q",
+          "label": "Marcus grills admin",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": { "kind": "message", "index": 0 }
+        },
+        {
+          "id": "hb-joke",
+          "label": "Pontoon joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 4 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "HRBR / USDC",
+        "liquidityUsd": "$212,000",
+        "lock": { "locked": true, "provider": "LockBox", "expires": "Jan 2029 (2y+)", "pct": 100 },
+        "holders": [
+          { "label": "Boat fund multisig", "pct": 34, "tag": "multisig" },
+          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
+          { "label": "Co-op members", "pct": 28 },
+          { "label": "Everyone else", "pct": 8 }
+        ],
+        "transfers": [
+          {
+            "when": "5d ago",
+            "from": "Boat fund multisig",
+            "to": "Marine supplier",
+            "amount": "40,000"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "hb-lock",
+          "label": "LP locked 2+ years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "hb-pool",
+          "label": "Pool is #2 holder",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "HarborToken.sol (0x2c9...77e)",
+        "date": "3 Jun",
+        "score": "Pass - 1 medium, 2 low",
+        "summary": "Manual review of HarborToken.sol. One medium issue (fee rounding favours sender on tiny transfers) was fixed before deployment.",
+        "findings": [
+          "Fee rounding on dust transfers (medium) - fixed in v1.1.",
+          "Unused import (low).",
+          "Missing NatSpec on _update (low)."
+        ]
+      },
+      "clues": [
+        {
+          "id": "hb-findings",
+          "label": "Audit found a medium",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+        }
+      ]
+    }
+  ]
+}

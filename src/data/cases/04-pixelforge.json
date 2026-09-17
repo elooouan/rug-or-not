@@ -1,0 +1,187 @@
+{
+  "id": "pixelforge",
+  "title": "Indie Hours",
+  "ticker": "$PIXL",
+  "pitch": "PixelForge Studio's community token. Vote on the next game, earn early builds.",
+  "difficulty": 2,
+  "verdict": "legit",
+  "timeLimitSec": 240,
+  "debrief": "PixelForge looks scrappy but honest. Ownership was renounced with no back door, the big 'ecosystem' slice is locked behind a four-year schedule, the pool is the top holder because that's where liquidity lives, and the roadmap is refreshingly dull. A moderator asking people to chill is not a cover-up.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "PixlToken.sol",
+      "content": {
+        "fileName": "contracts/PixlToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract PixlToken is ERC20, Ownable {",
+          "  uint256 public constant MAX_SUPPLY = 50_000_000e18;",
+          "",
+          "  constructor() ERC20(\"PixelForge\", \"PIXL\") {",
+          "    _mint(msg.sender, MAX_SUPPLY);",
+          "    // Deployer distributed to vesting + pool, then:",
+          "    renounceOwnership();",
+          "  }",
+          "",
+          "  // No tax, no blacklist, no pause. Plain ERC20.",
+          "  function burn(uint256 amount) external {",
+          "    _burn(msg.sender, amount);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "px-renounce",
+          "label": "Renounced at deploy",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": { "kind": "line", "line": 8 }
+        },
+        {
+          "id": "px-supply",
+          "label": "Hard-capped supply",
+          "herring": true,
+          "herringId": "immutable-supply-note",
+          "anchor": { "kind": "line", "line": 6 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "50,000,000 PIXL",
+        "allocations": [
+          { "label": "Ecosystem", "pct": 45, "vesting": "4y linear" },
+          { "label": "Liquidity", "pct": 25, "vesting": "locked 3y" },
+          { "label": "Team (4)", "pct": 15, "vesting": "1y cliff+3y" },
+          { "label": "Playtesters", "pct": 10, "vesting": "6 months" },
+          { "label": "Marketing", "pct": 5, "vesting": "18 months" }
+        ],
+        "notes": [
+          "Roadmap: Q1 prototype build to holders. Q2 public demo. Q3 Steam page. Q4 we'll see.",
+          "Ecosystem tokens fund bounties and are released by the vesting contract only."
+        ]
+      },
+      "clues": [
+        {
+          "id": "px-roadmap",
+          "label": "Boring roadmap",
+          "herring": true,
+          "herringId": "boring-roadmap",
+          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+        },
+        {
+          "id": "px-marketing",
+          "label": "5% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": { "kind": "row", "row": 4 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Discord: #pixl-talk",
+      "content": {
+        "channel": "pixl-talk",
+        "messages": [
+          {
+            "user": "nadia_pf",
+            "role": "admin",
+            "time": "18:02",
+            "text": "build 0.3 is out for holders, link in #builds. it crashes on level 2, we know, fix tomorrow"
+          },
+          {
+            "user": "gooseman",
+            "time": "18:03",
+            "text": "level 2 crashed my toaster too. 10/10 would crash again"
+          },
+          {
+            "user": "vera",
+            "time": "18:05",
+            "text": "serious question: who controls the ecosystem wallet? 45% is a lot"
+          },
+          {
+            "user": "nadia_pf",
+            "role": "admin",
+            "time": "18:06",
+            "text": "nobody directly. it's a vesting contract, address is pinned, releases 1/48th per month to the bounty multisig"
+          },
+          { "user": "vera", "time": "18:07", "text": "ok that's fine then, thanks" },
+          { "user": "moonboi", "time": "18:08", "text": "WHEN 100X??? WHEN BINANCE???" },
+          {
+            "user": "tk_mod",
+            "role": "mod",
+            "time": "18:08",
+            "text": "moonboi please chill, this is a game studio not a casino"
+          },
+          {
+            "user": "gooseman",
+            "time": "18:09",
+            "text": "can we get a goose in the game. asking for a friend"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "px-question",
+          "label": "Vera asks hard Q",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": { "kind": "message", "index": 2 }
+        },
+        {
+          "id": "px-joke",
+          "label": "Toaster joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 1 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "PIXL / ETH",
+        "liquidityUsd": "$74,000",
+        "lock": { "locked": true, "provider": "LockBox", "expires": "Aug 2029 (3y)", "pct": 100 },
+        "holders": [
+          { "label": "Vesting contract", "pct": 58, "tag": "contract" },
+          { "label": "Liquidity pool", "pct": 25, "tag": "pool" },
+          { "label": "Playtester drop", "pct": 9, "tag": "contract" },
+          { "label": "Everyone else", "pct": 8 }
+        ],
+        "transfers": [
+          {
+            "when": "1d ago",
+            "from": "Vesting contract",
+            "to": "Bounty multisig",
+            "amount": "468,750"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "px-lock",
+          "label": "LP locked 3 years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "px-pool",
+          "label": "Pool holds 25%",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+        }
+      ]
+    }
+  ]
+}

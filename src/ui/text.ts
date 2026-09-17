@@ -10,6 +10,9 @@ export interface TextOpts {
   wrap?: number;
   lineSpacing?: number;
   resolution?: number;
+  /** Outline colour + thickness (e.g. for watermarks over images). */
+  stroke?: PaletteKey;
+  strokeThickness?: number;
 }
 
 export function textStyle(opts: TextOpts = {}): Phaser.Types.GameObjects.Text.TextStyle {
@@ -23,6 +26,10 @@ export function textStyle(opts: TextOpts = {}): Phaser.Types.GameObjects.Text.Te
   };
   if (opts.wrap) style.wordWrap = { width: opts.wrap, useAdvancedWrap: true };
   if (opts.lineSpacing !== undefined) style.lineSpacing = opts.lineSpacing;
+  if (opts.stroke) {
+    style.stroke = PALETTE[opts.stroke];
+    style.strokeThickness = opts.strokeThickness ?? 2;
+  }
   return style;
 }
 

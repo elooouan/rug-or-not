@@ -52,7 +52,7 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
       padding + 12,
       padding + 16,
       'pin clues on the\nevidence to list\nthem here',
-      { size: FONT.size.body, font: 'body', color: 'paperShadow' },
+      { size: FONT.size.body, font: 'body', color: 'woodLight' },
     );
     this.add(this.emptyText);
     for (let i = 0; i < NOTEBOOK.maxLines; i++) {

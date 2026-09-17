@@ -1,0 +1,216 @@
+{
+  "id": "kelp",
+  "title": "Nothing Happens Here",
+  "ticker": "$KELP",
+  "pitch": "Kelp DAO: a slow treasury for ocean cleanup grants. No hype, just kelp.",
+  "difficulty": 4,
+  "verdict": "legit",
+  "timeLimitSec": 300,
+  "debrief": "Kelp is a grant DAO with a treasury that looks like a whale until you read the tag. The immutable contract, the two-year lock, the audit that found things, and an admin who says 'no' in public instead of deleting questions: everything scary here has a boring explanation. The only trick was reading carefully.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "KelpToken.sol",
+      "content": {
+        "fileName": "contracts/KelpToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract KelpToken is ERC20Votes {",
+          "  constructor(address treasury, address pool)",
+          "    ERC20(\"Kelp\", \"KELP\") ERC20Permit(\"Kelp\") {",
+          "    _mint(treasury, 6_000_000e18);",
+          "    _mint(pool, 4_000_000e18);",
+          "  }",
+          "  // Governance token only. No fees, no admin,",
+          "  // no upgrade path. Treasury spends via DAO vote.",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-supply",
+          "label": "Minted once, no mint()",
+          "herring": true,
+          "herringId": "immutable-supply-note",
+          "anchor": { "kind": "line", "line": 5 }
+        },
+        {
+          "id": "kp-noadmin",
+          "label": "No admin, no upgrades",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": { "kind": "line", "line": 8 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "10,000,000 KELP",
+        "allocations": [
+          { "label": "DAO treasury", "pct": 60, "vesting": "by vote" },
+          { "label": "Liquidity", "pct": 40, "vesting": "locked 2y" }
+        ],
+        "notes": [
+          "No team allocation. Contributors are paid from grant votes like anyone else.",
+          "Roadmap: fund two cleanup crews this year. Publish receipts. That's it."
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-roadmap",
+          "label": "'That's it' roadmap",
+          "herring": true,
+          "herringId": "boring-roadmap",
+          "anchor": { "kind": "row", "row": 1, "table": "notes" }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Stewards",
+      "content": {
+        "members": [
+          {
+            "name": "Rosa Delacroix",
+            "role": "Steward",
+            "bio": "Marine biologist, runs the Northcove cleanup nonprofit. Signer 1 of 3 on the treasury.",
+            "portraitSeed": "rosa",
+            "style": "normal"
+          },
+          {
+            "name": "kelp_daddy",
+            "role": "Steward / dev",
+            "bio": "Ahmed Saleh, contract engineer, signer 2 of 3. Yes, the handle was a bet he lost.",
+            "portraitSeed": "ahmed",
+            "style": "normal"
+          },
+          {
+            "name": "Yuki Hamada",
+            "role": "Steward",
+            "bio": "Accountant. Signer 3 of 3. Publishes the monthly treasury report.",
+            "portraitSeed": "yuki",
+            "style": "normal"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-handle",
+          "label": "'kelp_daddy' is doxxed",
+          "herring": true,
+          "herringId": "doxxed-meme-name",
+          "anchor": { "kind": "row", "row": 1 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Forum: #kelp-general",
+      "content": {
+        "channel": "kelp-general",
+        "messages": [
+          {
+            "user": "ari",
+            "time": "14:20",
+            "text": "60% in one wallet is a rug waiting to happen. change my mind"
+          },
+          {
+            "user": "Rosa_D",
+            "role": "admin",
+            "time": "14:31",
+            "text": "it's a 2-of-3 multisig that can only send what a vote approves, and votes take 5 days. if that's still a rug to you, I can't change your mind and that's ok"
+          },
+          { "user": "ari", "time": "14:33", "text": "the 5 day delay actually helps. ok" },
+          {
+            "user": "seaweed_sam",
+            "time": "14:40",
+            "text": "grant #4 receipts are up. 2 boats, 1 skip, 400kg of nets"
+          },
+          { "user": "pete_r", "time": "14:41", "text": "can we airdrop to the crabs" }
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-q",
+          "label": "Ari challenges admin",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": { "kind": "message", "index": 0 }
+        },
+        {
+          "id": "kp-joke",
+          "label": "Crab airdrop",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 4 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "KELP / ETH",
+        "liquidityUsd": "$156,000",
+        "lock": { "locked": true, "provider": "LockBox", "expires": "Oct 2028 (2y)", "pct": 100 },
+        "holders": [
+          { "label": "DAO treasury 2-of-3", "pct": 57, "tag": "multisig" },
+          { "label": "Liquidity pool", "pct": 40, "tag": "pool" },
+          { "label": "Everyone else", "pct": 3 }
+        ],
+        "transfers": [
+          {
+            "when": "9d ago",
+            "from": "DAO treasury",
+            "to": "Northcove cleanup",
+            "amount": "120,000"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-lock",
+          "label": "LP locked 2 years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "kp-pool",
+          "label": "Pool holds 40%",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "KelpToken.sol (0x5e0...b19)",
+        "date": "22 Aug",
+        "score": "Pass - 2 low",
+        "summary": "Review of KelpToken.sol and the treasury multisig config. No privileged functions exist in the token.",
+        "findings": [
+          "Delegation event emitted twice (low) - fixed.",
+          "Permit deadline check uses block.timestamp (informational)."
+        ]
+      },
+      "clues": [
+        {
+          "id": "kp-findings",
+          "label": "Real audit findings",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+        }
+      ]
+    }
+  ]
+}

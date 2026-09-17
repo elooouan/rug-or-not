@@ -1,0 +1,194 @@
+{
+  "id": "grandma",
+  "title": "Cookies From a Stranger",
+  "ticker": "$GRNDMA",
+  "pitch": "GrandmaCoin: as safe as grandma's cookies. Bake profits with the family.",
+  "difficulty": 3,
+  "verdict": "rug",
+  "timeLimitSec": 240,
+  "debrief": "Grandma had a blacklist. The 'family' were stock photos with a watermark still on them, the roadmap was copied from another token (it forgot to change the name), and the chat was a chorus of identical cookie puns from accounts created the same hour. The 2% fixed tax was real and harmless, which is exactly why they advertised it.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "GrandmaCoin.sol",
+      "content": {
+        "fileName": "contracts/GrandmaCoin.sol",
+        "verified": true,
+        "lines": [
+          "pragma solidity ^0.8.0;",
+          "contract GrandmaCoin is ERC20, Ownable {",
+          "  uint256 public constant TAX_BPS = 200; // 2% fixed",
+          "  mapping(address => bool) private _naughty;",
+          "",
+          "  function setNaughty(address who, bool on) external onlyOwner {",
+          "    _naughty[who] = on;",
+          "  }",
+          "",
+          "  function _update(address from, address to, uint256 v)",
+          "    internal override {",
+          "    require(!_naughty[from], \"no cookies for you\");",
+          "    uint256 fee = v * TAX_BPS / 10_000;",
+          "    super._update(from, kitchen, fee);",
+          "    super._update(from, to, v - fee);",
+          "  }",
+          "",
+          "  function bakeMore() external onlyOwner {",
+          "    // reserved for future oven upgrades",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "gm-blacklist",
+          "label": "Owner freezes wallets",
+          "flagId": "blacklist",
+          "anchor": { "kind": "line", "line": 5 }
+        },
+        {
+          "id": "gm-tax",
+          "label": "2% tax (fixed)",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": { "kind": "line", "line": 2 }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "The Family",
+      "content": {
+        "members": [
+          {
+            "name": "Grandma Edith",
+            "role": "Head Baker (CEO)",
+            "bio": "40 years of baking experience. Loves her grandchildren and passive income.",
+            "portraitSeed": "edith",
+            "style": "stock"
+          },
+          {
+            "name": "Uncle Ron",
+            "role": "CTO",
+            "bio": "Built the oven (smart contract). Former senior engineer at a major tech company.",
+            "portraitSeed": "ron",
+            "style": "stock"
+          },
+          {
+            "name": "Cousin Kit",
+            "role": "Community",
+            "bio": "Keeps the kitchen chat warm and friendly. Available 24/7.",
+            "portraitSeed": "kit",
+            "style": "anon"
+          }
+        ],
+        "note": "Roadmap: Q1 launch $PUPCOIN on major exchanges. Q2 PupCoin merch. Q3 PupCoin metaverse bakery."
+      },
+      "clues": [
+        {
+          "id": "gm-stock",
+          "label": "Stock photo watermark",
+          "flagId": "anon-team-stock-photos",
+          "finePrint": true,
+          "text": "STOCK IMG",
+          "anchor": { "kind": "row", "row": 0, "table": "photo" }
+        },
+        {
+          "id": "gm-roadmap",
+          "label": "Roadmap names PupCoin",
+          "flagId": "copied-whitepaper",
+          "anchor": { "kind": "row", "row": 0, "table": "note" }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "1,000,000,000 GRNDMA",
+        "allocations": [
+          { "label": "Cookie jar (LP)", "pct": 35, "vesting": "locked 1y" },
+          { "label": "Family", "pct": 30, "vesting": "none" },
+          { "label": "Bake sale", "pct": 25, "vesting": "none" },
+          { "label": "Kitchen fund", "pct": 10, "vesting": "12 months" }
+        ],
+        "notes": ["Family tokens are held in Grandma's purse for safekeeping."]
+      },
+      "clues": [
+        {
+          "id": "gm-family",
+          "label": "30% family, no vesting",
+          "flagId": "team-allocation-unvested",
+          "anchor": { "kind": "row", "row": 1 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Telegram: Grandma's Kitchen",
+      "content": {
+        "channel": "grandmas-kitchen",
+        "messages": [
+          {
+            "user": "cookie_monster_44",
+            "time": "11:00",
+            "text": "just baked my bag bigger, grandma never rugs"
+          },
+          {
+            "user": "oven_mitts",
+            "time": "11:00",
+            "text": "just baked my bag bigger, grandma never rugs"
+          },
+          {
+            "user": "sugar_rush_x",
+            "time": "11:01",
+            "text": "just baked my bag bigger, grandma never rugs"
+          },
+          { "user": "priya", "time": "11:03", "text": "lol why is everyone saying the same thing" },
+          {
+            "user": "Cousin_Kit",
+            "role": "admin",
+            "time": "11:03",
+            "text": "family members share the same values priya :)"
+          },
+          {
+            "user": "priya",
+            "time": "11:04",
+            "text": "anyway what does setNaughty do in the contract"
+          },
+          {
+            "user": "Cousin_Kit",
+            "role": "admin",
+            "time": "11:04",
+            "text": "anti-bot protection, standard stuff. bake sale ends at midnight btw, don't be the one who missed it"
+          },
+          {
+            "user": "dough_boy",
+            "time": "11:06",
+            "text": "my grandma would never. this one might tho. buying anyway"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "gm-bots",
+          "label": "Same msg, 3 accounts",
+          "flagId": "bot-chat",
+          "anchor": { "kind": "message", "index": 1 }
+        },
+        {
+          "id": "gm-urgency",
+          "label": "'ends at midnight'",
+          "flagId": "urgency-pressure",
+          "anchor": { "kind": "message", "index": 6 }
+        },
+        {
+          "id": "gm-joke",
+          "label": "dough_boy joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 7 }
+        }
+      ]
+    }
+  ]
+}

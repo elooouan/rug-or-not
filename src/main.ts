@@ -9,6 +9,7 @@ import { InvestigationScene } from '@/scenes/InvestigationScene';
 import { ReportScene } from '@/scenes/ReportScene';
 import { NotebookScene } from '@/scenes/NotebookScene';
 import { SettingsScene } from '@/scenes/SettingsScene';
+import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -48,6 +49,19 @@ window.addEventListener('resize', fit);
 fit();
 
 if (import.meta.env.DEV) {
-  // Handy for poking at scenes from the devtools console.
-  (window as unknown as { __game: Phaser.Game }).__game = game;
+  // Handy for poking at scenes from the devtools console:
+  //   __debug.startCase('kelp')  jumps straight into a case.
+  const w = window as unknown as { __game: Phaser.Game; __debug: { startCase(id: string): void } };
+  w.__game = game;
+  w.__debug = {
+    startCase(id: string) {
+      const c = caseById(id);
+      if (!c) throw new Error(`unknown case ${id}`);
+      gameState.mode = 'campaign';
+      gameState.currentCase = c;
+      gameState.currentIndex = gameState.cases.indexOf(c);
+      const active = game.scene.getScenes(true).find((s) => s.scene.key !== 'CursorScene');
+      (active ?? game.scene.getScene('TitleScene')).scene.start('InvestigationScene');
+    },
+  };
 }

@@ -49,6 +49,8 @@ export class TeamDoc extends DocumentView {
               const t = this.text(PORTRAIT_SIZE / 2, PORTRAIT_SIZE / 2 + 2, clue.text ?? '', {
                 size: FONT.size.finePrint,
                 color: 'paper',
+                stroke: 'bg',
+                strokeThickness: 2,
                 resolution: 2,
               })
                 .setOrigin(0.5)

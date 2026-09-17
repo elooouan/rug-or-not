@@ -51,7 +51,7 @@ export class LiquidityDoc extends DocumentView {
 
     // Holders.
     this.addRow(this.lh + 4, (row) =>
-      row.add(this.text(0, 4, 'Top holders', { color: 'paperShadow' })),
+      row.add(this.text(0, 4, 'Top holders', { color: 'woodMid' })),
     );
     const barX = 150;
     const barW = this.contentW - barX - 34;
@@ -84,7 +84,7 @@ export class LiquidityDoc extends DocumentView {
 
     if (data.transfers.length > 0) {
       this.addRow(this.lh + 4, (row) =>
-        row.add(this.text(0, 4, 'Recent large transfers', { color: 'paperShadow' })),
+        row.add(this.text(0, 4, 'Recent large transfers', { color: 'woodMid' })),
       );
       data.transfers.forEach((t, i) => {
         const clues = cluesFor('transfers', i);
