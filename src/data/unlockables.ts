@@ -130,9 +130,25 @@ export const UNLOCKABLES: Unlockable[] = [
     id: 'rim-gold',
     category: 'rim',
     name: 'Gilded rim',
-    description: 'For coin holders.',
+    description: 'Holder tier 1.',
     source: { type: 'holder', value: TOKEN.holderMin },
     style: { rim: 'amber', rimDark: 'stampRed', handle: 'amber' },
+  },
+  {
+    id: 'wood-mahogany',
+    category: 'desk',
+    name: 'Mahogany desk',
+    description: 'Holder tier 2.',
+    source: { type: 'holder', value: TOKEN.holderMin * 5 },
+    style: { dark: 'bg', mid: 'stampRed', light: 'woodMid' },
+  },
+  {
+    id: 'lamp-gold',
+    category: 'lamp',
+    name: 'Coin-gold shade',
+    description: 'Holder tier 3.',
+    source: { type: 'holder', value: TOKEN.holderMin * 10 },
+    style: { shade: 'amber' },
   },
   // Stamp ink
   {

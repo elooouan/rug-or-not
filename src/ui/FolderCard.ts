@@ -5,6 +5,7 @@ import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
+import { gameState } from '@/systems/gameState';
 import { PixelButton } from './PixelButton';
 import { makeText } from './text';
 import { difficultyPips, rect } from '@/ui/shapes';
@@ -23,10 +24,16 @@ export class FolderCard extends Phaser.GameObjects.Container {
     this.add([shadow, folder, tab, edge, label, clip]);
 
     this.add(
-      makeText(scene, 6, 1, `CASE #${String(c.difficulty).padStart(2, '0')}`, {
-        size: FONT.size.tiny,
-        color: 'woodDark',
-      }),
+      makeText(
+        scene,
+        6,
+        1,
+        `${gameState.mode === 'daily' ? 'DAILY CASE' : `CASE #${String(gameState.currentIndex + 1).padStart(2, '0')}`}`,
+        {
+          size: FONT.size.tiny,
+          color: 'woodDark',
+        },
+      ),
     );
     this.add(makeText(scene, 28, 36, c.ticker, { size: FONT.size.heading, color: 'shadow' }));
     this.add(makeText(scene, 28, 60, c.title, { size: FONT.size.body, color: 'ink' }));

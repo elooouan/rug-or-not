@@ -15,6 +15,7 @@ import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
 import { awardBadge, noteSeen } from '@/systems/badges';
 import { BADGES } from '@/data/badges';
+import { UNLOCKABLES } from '@/data/unlockables';
 import { lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
@@ -372,6 +373,16 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           (d.wallet = { address: s.address, token: s.token, checkedAt: new Date().toISOString() }),
       );
       if (holder) awardBadge(ctx.scene, 'shareholder');
+      ctx.gap(4);
+      ctx.line('Holder tiers:', { color: 'woodMid' });
+      for (const u of UNLOCKABLES.filter((x) => x.source.type === 'holder')) {
+        const need = u.source.type === 'holder' ? u.source.value : 0;
+        const got = (s.token ?? 0) >= need;
+        ctx.line(
+          `${got ? '[x]' : '[ ]'} ${u.name.padEnd(16)} ${need.toLocaleString()}+ ${TOKEN.symbol}`,
+          { color: got ? 'lampGreen' : 'shadow' },
+        );
+      }
       ctx.button('Refresh balances', () => void wallet.refresh(), { sameLine: true });
       ctx.button('Disconnect', () => void wallet.disconnect(), { x: 130, variant: 'paper' });
     }
