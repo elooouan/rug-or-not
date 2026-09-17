@@ -7,13 +7,8 @@ import type { UnlockCategory } from '@/data/unlockables';
 import { audio } from '@/systems/audio';
 import { saveStore, type CosmeticSelection } from '@/systems/save';
 import type { Settings } from '@/systems/settings';
-import {
-  applyCosmetics,
-  byCategory,
-  contextFromSave,
-  describeSource,
-  isUnlocked,
-} from '@/systems/unlocks';
+import { applyCosmetics } from '@/systems/cosmetics';
+import { byCategory, contextFromSave, describeSource, isUnlocked } from '@/systems/unlocks';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';

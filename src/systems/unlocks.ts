@@ -1,5 +1,3 @@
-import type Phaser from 'phaser';
-import { makeLamp, makeMagnifier, makeStamps, makeWood, TEX } from '@/art';
 import type { Grade } from '@/config/gameConfig';
 import {
   UNLOCKABLES,
@@ -97,7 +95,7 @@ export function describeSource(s: UnlockSource): string {
   }
 }
 
-function find<C extends UnlockCategory>(
+export function findUnlockable<C extends UnlockCategory>(
   category: C,
   id: string,
 ): Extract<Unlockable, { category: C }> {
@@ -107,34 +105,8 @@ function find<C extends UnlockCategory>(
   return list.find((u) => u.id === id) ?? list[0];
 }
 
-/** Regenerate the cosmetic textures for the chosen selection. Purely visual. */
-export function applyCosmetics(scene: Phaser.Scene, sel: CosmeticSelection): void {
-  const wood = find('desk', sel.desk).style;
-  const lamp = find('lamp', sel.lamp).style;
-  const rim = find('rim', sel.rim).style;
-  const ink = find('ink', sel.ink).style;
-  const drop = (keys: string[]) =>
-    keys.forEach((k) => scene.textures.exists(k) && scene.textures.remove(k));
-  drop([
-    TEX.wood,
-    TEX.lamp,
-    TEX.cursor,
-    TEX.lensRim,
-    TEX.lensRimGlow,
-    TEX.lensVignette,
-    TEX.lensGlint,
-    TEX.stampRug,
-    TEX.stampLegit,
-    TEX.inkPad,
-  ]);
-  makeWood(scene, TEX.wood, wood);
-  makeLamp(scene, lamp.shade);
-  makeMagnifier(scene, rim);
-  makeStamps(scene, ink.rug, ink.legit);
-}
-
 /** Palette keys for the currently selected stamp ink (used by the impression). */
 export function stampInk(sel: CosmeticSelection): { rug: string; legit: string } {
-  const ink = find('ink', sel.ink).style;
+  const ink = findUnlockable('ink', sel.ink).style;
   return { rug: ink.rug, legit: ink.legit };
 }

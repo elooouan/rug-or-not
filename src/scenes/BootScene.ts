@@ -6,7 +6,7 @@ import { audio } from '@/systems/audio';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
-import { applyCosmetics } from '@/systems/unlocks';
+import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
 import { setupScene } from './sceneUtil';
