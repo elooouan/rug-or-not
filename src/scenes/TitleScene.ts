@@ -213,14 +213,19 @@ export class TitleScene extends Phaser.Scene {
             : 'Play',
         () => (allDone ? this.scene.start('CaseSelectScene') : play()),
       ),
-      mk(dailyDone ? 'Daily  (done)' : `Daily case${streak > 0 ? `  · ${streak}` : ''}`, () => {
-        const c = cases.find((x) => x.id === dailyId);
-        if (!c) return;
-        gameState.mode = 'daily';
-        gameState.currentCase = c;
-        gameState.currentIndex = cases.indexOf(c);
-        this.scene.start('InvestigationScene');
-      }),
+      mk(
+        dailyDone
+          ? `Daily ${cases.find((x) => x.id === dailyId)?.ticker ?? ''} (done)`
+          : `Daily ${cases.find((x) => x.id === dailyId)?.ticker ?? 'case'}${streak > 0 ? ` · ${streak}` : ''}`,
+        () => {
+          const c = cases.find((x) => x.id === dailyId);
+          if (!c) return;
+          gameState.mode = 'daily';
+          gameState.currentCase = c;
+          gameState.currentIndex = cases.indexOf(c);
+          this.scene.start('InvestigationScene');
+        },
+      ),
       mk('Case files', () => this.scene.start('CaseSelectScene')),
       mk('Notebook', () => this.scene.start('NotebookScene')),
       mk('Settings', () => this.scene.start('SettingsScene')),

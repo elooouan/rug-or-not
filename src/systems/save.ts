@@ -21,6 +21,8 @@ export interface SaveData {
   caseResults: Record<string, CaseResult>;
   /** Flag ids whose notebook entry has been unlocked. */
   unlockedFlags: string[];
+  /** Yellow herrings met in closed cases. */
+  unlockedHerrings: string[];
   /** How many campaign folders are open (daily plays don't count). */
   campaignUnlocked: number;
   daily: { lastPlayed: string | null; streak: number; bestStreak: number; played: string[] };
@@ -65,6 +67,7 @@ export function defaultSave(): SaveData {
     totalScore: 0,
     caseResults: {},
     unlockedFlags: [],
+    unlockedHerrings: [],
     campaignUnlocked: 1,
     daily: { lastPlayed: null, streak: 0, bestStreak: 0, played: [] },
     settings: { ...DEFAULT_SETTINGS },
@@ -119,6 +122,8 @@ export function sanitizeSave(raw: unknown): SaveData {
   if (typeof r.campaignUnlocked === 'number' && Number.isFinite(r.campaignUnlocked)) {
     d.campaignUnlocked = Math.max(1, Math.floor(r.campaignUnlocked));
   }
+  if (Array.isArray(r.unlockedHerrings))
+    d.unlockedHerrings = r.unlockedHerrings.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.unlockedFlags))
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())

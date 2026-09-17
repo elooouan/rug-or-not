@@ -500,6 +500,10 @@ export class InvestigationScene extends Phaser.Scene {
         lastVerdictCorrect: breakdown.verdictCorrect,
       };
       for (const id of newFlagIds) if (FLAGS[id as keyof typeof FLAGS]) d.unlockedFlags.push(id);
+      for (const doc of c.documents)
+        for (const clue of doc.clues)
+          if (!isFlagClue(clue) && !d.unlockedHerrings.includes(clue.herringId))
+            d.unlockedHerrings.push(clue.herringId);
       if (gameState.mode === 'daily') {
         const next = recordDailyPlay(d.daily, localDateKey());
         d.daily = { ...next, played: next.played ?? [] };
