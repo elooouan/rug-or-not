@@ -34,6 +34,36 @@ and run the workflow from the Actions tab, or change its trigger to `push` to de
 every commit. CI (`.github/workflows/ci.yml`) runs lint, typecheck, case validation, tests
 and a build on every push.
 
+## Meet Detective Lucien
+
+The mascot pops up Pokémon-trainer style with once-only guidance: the title intro, opening
+the first folder, using the lens, pinning, switching tabs, stamping, reading the report, the
+notebook, the daily case. Hints can be switched off or replayed in Settings. Source art lives
+in `assets/`; the transparent in-game PNGs are in `public/img/`.
+
+## The desk is alive
+
+Hover the coffee to take a sip. Click the lamp (it has feelings after ten clicks), the window
+(cycles the weather: rain, thunderstorm, snow, clear night, fog), the moon, the corkboard
+(real detective tips), the folder stack, the ink pad (inks your cursor), the clock, and
+Biscuit the cat on the sill. The title card has a few typed-word and Konami surprises, and the
+version number hides the credits. Twenty badges track all of it (NetScope > Badges).
+
+## NetScope (the phone)
+
+The phone on the desk opens an in-game browser:
+
+- **RugScan** - an explorer page for the current case (flavour only, never a verdict).
+- **The coin** - connect a Phantom wallet (read-only: public address, SOL and token balance
+  via public RPC). Holding `VITE_TOKEN_HOLDER_MIN`+ of the configured mint unlocks the gilded
+  magnifier rim. The game never requests signatures or transactions.
+- **Board** - Hall of Detectives. Local by default; set `VITE_LEADERBOARD_URL` to a JSON
+  endpoint (`GET ?limit=N` returns entries, `POST` accepts one) for a shared board. Pick your
+  arcade-style handle there.
+- **News**, **Badges**, **Help**, and a 404 with a cat.
+
+Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
+
 ## Modes
 
 - **Campaign**: the ten cases in order; each verdict unlocks the next folder.
@@ -53,7 +83,10 @@ and a build on every push.
   paper count as false accusations.
 - **Stamp** RUG or LEGIT by clicking a stamp or dragging it onto the paper.
 - Keyboard: `Tab`/arrows cycle clue spots, `Enter` pins, `R`/`L` stamp, `1`–`6` switch
-  documents, `PageUp`/`PageDown` or the wheel scroll long documents, `Esc` pauses.
+  documents, `PageUp`/`PageDown` or the wheel scroll long documents, `Esc` pauses, `F` toggles
+  fullscreen.
+- Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
+  sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 
 Dev builds expose `__debug.startCase('kelp')` in the console to jump into any case.
 
@@ -70,8 +103,10 @@ src/
   config/           palette.ts (the only colours), layout.ts (all layout numbers), gameConfig.ts
   art/              Procedural placeholder textures (swap for sprite sheets later)
   data/             flags.ts (red flag + herring library), schema.ts (zod), cases/*.json, unlockables.ts
-  systems/          Pure logic: scoring, ranks, dailyCase, save, settings, unlocks, audio, caseLoader
-  ui/               Reusable Phaser components: DocumentView + documents/, Magnifier, Stamp, NotebookPanel…
+  systems/          Pure logic: scoring, ranks, dailyCase, save, settings, unlocks, badges, hints,
+                    leaderboard, wallet (Phantom, read-only), weather, audio (synth SFX + lo-fi loop), caseLoader
+  ui/               Reusable Phaser components: DocumentView + documents/, Magnifier, Stamp, NotebookPanel,
+                    DialogueBox (Lucien), BrowserPanel (NetScope), DeskBackground, StickyNote, Toast…
   scenes/           Boot, Cursor (overlay), Title, CaseSelect, Investigation, Report, Notebook, Settings
 scripts/            validate-cases.ts
 tests/              vitest
