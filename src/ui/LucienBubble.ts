@@ -15,6 +15,11 @@ import { charWidth, makeText, wrapMono } from './text';
 export class LucienBubble extends Phaser.GameObjects.Container {
   private static current: LucienBubble | null = null;
 
+  static dismiss(): void {
+    LucienBubble.current?.destroy();
+    LucienBubble.current = null;
+  }
+
   /** `lift` raises the bubble above things at the bottom of the screen (e.g. report buttons). */
   static say(scene: Phaser.Scene, text: string, ms = 3200, lift = 0): void {
     LucienBubble.current?.destroy();

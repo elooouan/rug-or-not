@@ -588,6 +588,7 @@ export class InvestigationScene extends Phaser.Scene {
       return;
     }
     this.paused = true;
+    LucienBubble.dismiss();
     this.clock?.pause(true);
     this.magnifier.suspend();
     this.pauseMenu = new PauseMenu(this, {
