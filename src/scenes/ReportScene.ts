@@ -156,8 +156,14 @@ export class ReportScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
     audio.play(this.payload.breakdown.verdictCorrect ? 'correct' : 'wrong');
+    if (this.payload.rankUp) {
+      this.time.delayedCall(900, () => {
+        toast(this, 'PROMOTED', `You are now ${this.payload.rankUp}`);
+        audio.play('caseClosed');
+      });
+    }
     this.payload.newBadges.forEach((id, i) => {
-      this.time.delayedCall(1200 + i * 3600, () =>
+      this.time.delayedCall((this.payload.rankUp ? 4600 : 1200) + i * 3600, () =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),
       );
     });
@@ -257,6 +263,8 @@ export class ReportScene extends Phaser.Scene {
     }
     if (newUnlockNames.length > 0)
       L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'amber'));
+    if (this.payload.rankUp)
+      L.push({ text: `PROMOTED: ${this.payload.rankUp}`, font: 'ui', size: 12, color: 'amber' });
     if (this.payload.newBadges.length > 0)
       L.push(
         ...wrap(

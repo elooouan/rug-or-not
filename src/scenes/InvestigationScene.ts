@@ -8,6 +8,7 @@ import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
 import { newlyUnlocked, stampInk } from '@/systems/unlocks';
+import { rankForScore } from '@/systems/ranks';
 import { TEX } from '@/art/keys';
 import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -46,6 +47,8 @@ export interface ReportPayload {
   newUnlockNames: string[];
   bestImproved: boolean;
   newBadges: string[];
+  /** Set when this run crossed a rank threshold. */
+  rankUp: string | null;
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -130,6 +133,10 @@ export class InvestigationScene extends Phaser.Scene {
     this.browsing = false;
     this.said = new Set();
     this.hintsUsed = 0;
+    // Scene emitters survive restarts; drop last run's handlers before adding ours.
+    this.events.off('browser:open');
+    this.events.off('browser:close');
+    this.events.off(Phaser.Scenes.Events.RESUME);
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -448,6 +455,7 @@ export class InvestigationScene extends Phaser.Scene {
     });
 
     const before = saveStore.get();
+    const rankBefore = rankForScore(before.totalScore);
     const prevFlags = new Set(before.unlockedFlags);
     const caseFlagIds = c.documents.flatMap((d) =>
       d.clues.filter(isFlagClue).map((cl) => cl.flagId),
@@ -540,6 +548,10 @@ export class InvestigationScene extends Phaser.Scene {
       newUnlockNames: fresh.map((u) => u.name),
       bestImproved,
       newBadges,
+      rankUp:
+        rankForScore(saveStore.get().totalScore) !== rankBefore
+          ? rankForScore(saveStore.get().totalScore)
+          : null,
     };
     this.scene.start('ReportScene', payload);
   }
