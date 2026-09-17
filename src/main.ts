@@ -63,9 +63,88 @@ window.addEventListener('keydown', (e) => {
 if (import.meta.env.DEV) {
   // Handy for poking at scenes from the devtools console:
   //   __debug.startCase('kelp')  jumps straight into a case.
-  const w = window as unknown as { __game: Phaser.Game; __debug: { startCase(id: string): void } };
+  const w = window as unknown as {
+    __game: Phaser.Game;
+    __debug: {
+      startCase(id: string): void;
+      audioLevels(): Promise<Record<string, number>>;
+      musicLevel(): Promise<{ peak: number; rms: number }>;
+    };
+  };
   w.__game = game;
   w.__debug = {
+    /** Render every SFX (and a few bars of music) offline and report peak levels. */
+    async audioLevels(): Promise<Record<string, number>> {
+      const { AudioManager } = await import('@/systems/audio');
+      const names = [
+        'ui',
+        'hover',
+        'pin',
+        'unpin',
+        'tick',
+        'tally',
+        'click',
+        'paper',
+        'slide',
+        'stamp',
+        'correct',
+        'caseClosed',
+        'wrong',
+        'unlock',
+        'sip',
+        'meow',
+        'thunder',
+      ] as const;
+      const out: Record<string, number> = {};
+      for (const name of names) {
+        const ctx = new OfflineAudioContext(1, 44100 * 2, 44100);
+        const m = new AudioManager();
+        m.setMusic(false);
+        m.setRain(false);
+        m.unlock(ctx);
+        m.setVolume(1);
+        m.play(name);
+        const buf = await ctx.startRendering();
+        const d = buf.getChannelData(0);
+        let peak = 0;
+        for (let i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i]));
+        out[name] = Math.round(peak * 1000) / 1000;
+      }
+      return out;
+    },
+    /** Peak and RMS of four seconds of the lo-fi loop, rendered offline. */
+    async musicLevel(): Promise<{ peak: number; rms: number }> {
+      const { AudioManager } = await import('@/systems/audio');
+      const ctx = new OfflineAudioContext(1, 44100 * 4, 44100);
+      const m = new AudioManager();
+      m.setRain(false);
+      m.setMusic(true);
+      m.unlock(ctx);
+      m.setVolume(1);
+      // The scheduler runs on wall-clock intervals; offline rendering needs the steps queued up front.
+      const mm = m as unknown as {
+        playStep(step: number, t: number): void;
+        sixteenth: number;
+        stopMusic(): void;
+        musicTimer: number | null;
+      };
+      if (mm.musicTimer !== null) window.clearInterval(mm.musicTimer);
+      mm.musicTimer = null;
+      const steps = Math.ceil(4 / mm.sixteenth);
+      for (let i = 0; i < steps; i++) mm.playStep(i, i * mm.sixteenth);
+      const buf = await ctx.startRendering();
+      const d = buf.getChannelData(0);
+      let peak = 0;
+      let sum = 0;
+      for (let i = 0; i < d.length; i++) {
+        peak = Math.max(peak, Math.abs(d[i]));
+        sum += d[i] * d[i];
+      }
+      return {
+        peak: Math.round(peak * 1000) / 1000,
+        rms: Math.round(Math.sqrt(sum / d.length) * 1000) / 1000,
+      };
+    },
     startCase(id: string) {
       const c = caseById(id);
       if (!c) throw new Error(`unknown case ${id}`);

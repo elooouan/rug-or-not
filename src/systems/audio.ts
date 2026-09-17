@@ -43,7 +43,7 @@ const CHORDS: { pad: number[]; bass: number }[] = [
 const PENTATONIC = [69, 72, 74, 76, 79, 81, 84];
 
 export class AudioManager {
-  private ctx: AudioContext | null = null;
+  ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private sfx: GainNode | null = null;
   private musicBus: GainNode | null = null;
@@ -63,17 +63,18 @@ export class AudioManager {
   private musicVolume = 0.55;
 
   /** Must be called from a user gesture (pointer/keyboard) to satisfy autoplay rules. */
-  unlock(): void {
+  unlock(existing?: BaseAudioContext): void {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') void this.ctx.resume();
+      if (this.ctx.state === 'suspended') void (this.ctx as AudioContext).resume();
       return;
     }
     try {
       const Ctor =
         window.AudioContext ??
         (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctor) return;
-      this.ctx = new Ctor();
+      if (!Ctor && !existing) return;
+      // `existing` lets tooling render into an OfflineAudioContext to measure levels.
+      this.ctx = (existing ?? new Ctor!()) as AudioContext;
       this.master = this.ctx.createGain();
       this.master.gain.value = this.volume;
       this.master.connect(this.ctx.destination);
@@ -125,7 +126,7 @@ export class AudioManager {
 
   // ---- one-shots -------------------------------------------------------------------
 
-  private lastHover = 0;
+  private lastHover = -1;
 
   play(name: SoundName): void {
     if (!this.ctx || !this.sfx) return;
@@ -161,10 +162,10 @@ export class AudioManager {
         this.tone(t, 'square', 1800, 1800, 0.012, 0.08);
         break;
       case 'paper':
-        this.noise(t, 0.14, 0.22, 1800, 'bandpass', 500);
+        this.noise(t, 0.14, 0.32, 1800, 'bandpass', 500);
         break;
       case 'slide':
-        this.noise(t, 0.22, 0.16, 900, 'lowpass', 300);
+        this.noise(t, 0.22, 0.24, 900, 'lowpass', 300);
         break;
       case 'stamp':
         this.tone(t, 'sine', 120, 38, 0.18, 0.55);
@@ -200,8 +201,9 @@ export class AudioManager {
         this.tone(t + 0.13, 'triangle', 900, 620, 0.2, 0.12);
         break;
       case 'thunder':
-        this.noise(t, 1.4, 0.3, 140, 'lowpass', 40);
-        this.noise(t + 0.25, 0.9, 0.18, 90, 'lowpass', 30);
+        this.noise(t, 1.4, 0.9, 160, 'lowpass', 40);
+        this.noise(t + 0.25, 0.9, 0.5, 90, 'lowpass', 30);
+        this.noise(t + 0.05, 0.3, 0.12, 900, 'bandpass', 300);
         break;
     }
   }
