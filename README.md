@@ -89,7 +89,8 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 
-Dev builds expose `__debug.startCase('kelp')` in the console to jump into any case.
+Deep links: `#case=<id>` opens a file directly and `#daily` opens today's case (the Share button
+includes one). Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.
 
 Scoring lives in [`src/systems/scoring.ts`](src/systems/scoring.ts): +100 correct verdict,
 −50 wrong, +25 per real red flag pinned (+10 if it was fine print), −15 per false

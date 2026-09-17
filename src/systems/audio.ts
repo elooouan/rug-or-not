@@ -152,7 +152,7 @@ export class AudioManager {
         this.tone(t, 'triangle', 1000, 520, 0.09, 0.16);
         break;
       case 'tick':
-        this.noise(t, 0.012, 0.1, 3000, 'highpass');
+        this.noise(t, 0.012, 0.06, 3000, 'highpass');
         break;
       case 'tally':
         this.tone(t, 'square', 880, 880, 0.025, 0.06);

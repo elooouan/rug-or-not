@@ -68,7 +68,7 @@ export class Typewriter {
     }
     this.charIndex++;
     this.texts[this.lineIndex].setText(line.text.slice(0, this.charIndex));
-    if (this.charIndex % 3 === 0 && line.text[this.charIndex - 1] !== ' ') audio.play('tick');
+    if (this.charIndex % 4 === 0 && line.text[this.charIndex - 1] !== ' ') audio.play('tick');
     if (this.charIndex >= line.text.length) {
       this.lineIndex++;
       this.charIndex = 0;

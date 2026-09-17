@@ -304,6 +304,7 @@ export class ReportScene extends Phaser.Scene {
         ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`
         : `Yellow herrings pinned: ${b.falseAccusations.length}`,
       isDaily && save.daily.streak > 1 ? `Streak: ${save.daily.streak} days` : '',
+      `${location.origin}${location.pathname}#${isDaily ? 'daily' : `case=${c.id}`}`,
       '#RugOrNot',
     ].filter(Boolean);
     const text = lines.join('\n');

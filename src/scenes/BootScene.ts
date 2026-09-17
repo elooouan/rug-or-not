@@ -4,6 +4,7 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { PALETTE } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { applyWeatherAudio } from '@/systems/weather';
+import { localDateKey, pickDailyCaseId } from '@/systems/dailyCase';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
@@ -62,6 +63,29 @@ export class BootScene extends Phaser.Scene {
     }
 
     this.scene.launch(CursorScene.KEY);
+    // Deep links: #case=<id> or #daily jump straight to a file (shared results include them).
+    const hash = typeof location !== 'undefined' ? location.hash.slice(1) : '';
+    const m = /^case=([a-z0-9-]+)$/.exec(hash);
+    const linked = m
+      ? loaded.cases.find((c) => c.id === m[1])
+      : hash === 'daily'
+        ? loaded.cases.find(
+            (c) =>
+              c.id ===
+              pickDailyCaseId(
+                localDateKey(),
+                loaded.cases.map((x) => x.id),
+              ),
+          )
+        : undefined;
+    if (linked) {
+      history.replaceState(null, '', location.pathname + location.search);
+      gameState.mode = hash === 'daily' ? 'daily' : 'campaign';
+      gameState.currentCase = linked;
+      gameState.currentIndex = loaded.cases.indexOf(linked);
+      this.scene.start('InvestigationScene');
+      return;
+    }
     this.scene.start(TitleScene.KEY);
   }
 
