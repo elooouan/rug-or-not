@@ -8,6 +8,7 @@ import { claimHint } from '@/systems/hints';
 import { saveStore } from '@/systems/save';
 import { rect } from './shapes';
 import { makeText } from './text';
+import { markEscConsumed } from './escGuard';
 
 export const LUCIEN_TEX = 'lucien';
 export const LUCIEN_FACE_TEX = 'lucien-face';
@@ -127,7 +128,10 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       };
       bind(Phaser.Input.Keyboard.KeyCodes.ENTER, () => this.advance());
       bind(Phaser.Input.Keyboard.KeyCodes.SPACE, () => this.advance());
-      bind(Phaser.Input.Keyboard.KeyCodes.ESC, () => this.finish());
+      bind(Phaser.Input.Keyboard.KeyCodes.ESC, () => {
+        markEscConsumed();
+        this.finish();
+      });
     }
 
     this.setDepth(DEPTH.toast);

@@ -22,6 +22,7 @@ import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
+import { markEscConsumed } from './escGuard';
 
 type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | '404';
 const ALL_PAGES: PageId[] = ['home', 'rugscan', 'coin', 'board', 'news', 'help', 'badges', '404'];
@@ -207,7 +208,10 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     const kb = scene.input.keyboard;
     if (kb) {
       const esc = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
-      esc.on('down', () => this.close());
+      esc.on('down', () => {
+        markEscConsumed();
+        this.close();
+      });
       this.keys.push(esc);
     }
     this.unsubscribeWallet = wallet.onChange(() => this.page === 'coin' && this.render());
