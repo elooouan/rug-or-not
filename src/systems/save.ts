@@ -43,6 +43,10 @@ export interface SaveData {
     cleanStreak: number;
     weathersSeen: string[];
     pagesSeen: string[];
+    runs: number;
+    correct: number;
+    /** How often each red flag was missed, for the personal record page. */
+    flagMisses: Record<string, number>;
   };
   /** Last known wallet snapshot (public address + token balance) for holder perks. */
   wallet: { address: string | null; token: number | null; checkedAt: string | null };
@@ -77,6 +81,9 @@ export function defaultSave(): SaveData {
       cleanStreak: 0,
       weathersSeen: [],
       pagesSeen: [],
+      runs: 0,
+      correct: 0,
+      flagMisses: {},
     },
     wallet: { address: null, token: null, checkedAt: null },
   };
@@ -132,6 +139,13 @@ export function sanitizeSave(raw: unknown): SaveData {
       cleanStreak: num(st.cleanStreak),
       weathersSeen: strs(st.weathersSeen),
       pagesSeen: strs(st.pagesSeen),
+      runs: num(st.runs),
+      correct: num(st.correct),
+      flagMisses: Object.fromEntries(
+        Object.entries((st.flagMisses as Record<string, unknown>) ?? {}).filter(
+          (e): e is [string, number] => typeof e[1] === 'number',
+        ),
+      ),
     };
   }
   if (r.wallet && typeof r.wallet === 'object') {

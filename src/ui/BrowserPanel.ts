@@ -9,6 +9,7 @@ import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
+import { FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
@@ -402,6 +403,18 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       () => ctx.panel.scene && new NamePicker(ctx.scene, () => ctx.panel.render()),
       { variant: 'paper' },
     );
+    const st = save.stats;
+    const acc = st.runs > 0 ? Math.round((st.correct / st.runs) * 100) : 0;
+    const missed = Object.entries(st.flagMisses).sort((a, b) => b[1] - a[1])[0];
+    ctx.line(
+      `Record: ${st.runs} runs  ·  ${acc}% verdict accuracy  ·  badges ${save.badges.length}`,
+      { color: 'woodMid' },
+    );
+    if (missed)
+      ctx.line(
+        `Most missed flag: ${FLAGS[missed[0] as keyof typeof FLAGS]?.title ?? missed[0]} (${missed[1]}x)`,
+        { color: 'stampRed' },
+      );
     ctx.rule();
     ctx.line(`Best runs (${leaderboard.kind === 'remote' ? 'precinct server' : 'this device'}):`, {
       color: 'woodMid',

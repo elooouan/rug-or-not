@@ -28,12 +28,17 @@ const midi = (n: number): number => 440 * Math.pow(2, (n - 69) / 12);
 // Lo-fi loop: 4 chords x 2 bars, A minor-ish, 74 bpm.
 const BPM = 74;
 const STEPS_PER_BAR = 16;
-const LOOP_STEPS = STEPS_PER_BAR * 8;
+const LOOP_STEPS = STEPS_PER_BAR * 16; // A section (8 bars) then B section (8 bars)
 const CHORDS: { pad: number[]; bass: number }[] = [
   { pad: [57, 60, 64, 67], bass: 45 }, // Am7
   { pad: [53, 57, 60, 64], bass: 41 }, // Fmaj7
   { pad: [52, 55, 59, 64], bass: 48 }, // Cmaj7 (rootless)
   { pad: [55, 59, 62, 64], bass: 43 }, // G6
+  // B section: a little more movement, resolves back to Am.
+  { pad: [50, 53, 57, 60], bass: 38 }, // Dm7
+  { pad: [55, 59, 62, 65], bass: 43 }, // G7
+  { pad: [52, 55, 59, 64], bass: 48 }, // Cmaj7
+  { pad: [52, 56, 59, 62], bass: 40 }, // E7 (turnaround)
 ];
 const PENTATONIC = [69, 72, 74, 76, 79, 81, 84];
 

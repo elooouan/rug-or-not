@@ -13,6 +13,8 @@ import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { toast } from '@/ui/Toast';
+import { StickyNote } from '@/ui/StickyNote';
+import { localDateKey } from '@/systems/dailyCase';
 import { BADGE_BY_ID } from '@/data/badges';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
@@ -123,6 +125,9 @@ export class ReportScene extends Phaser.Scene {
         () => this.scene.start('NotebookScene'),
         { width: 80 },
       ),
+    );
+    buttons.push(
+      new PixelButton(this, x + pad + 160, by, 'Share', () => this.share(), { width: 54 }),
     );
     buttons.push(
       new PixelButton(
@@ -261,6 +266,32 @@ export class ReportScene extends Phaser.Scene {
         ),
       );
     return L;
+  }
+
+  /** Wordle-style result text for the clipboard (falls back to a note you can read). */
+  private share(): void {
+    const { caseData: c, verdict, breakdown: b } = this.payload;
+    const flags = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
+    const isDaily = gameState.mode === 'daily';
+    const save = saveStore.get();
+    const lines = [
+      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : `Case: ${c.ticker}`} "${c.title}"`,
+      `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts`,
+      c.verdict === 'rug'
+        ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`
+        : `Yellow herrings pinned: ${b.falseAccusations.length}`,
+      isDaily && save.daily.streak > 1 ? `Streak: ${save.daily.streak} days` : '',
+      '#RugOrNot',
+    ].filter(Boolean);
+    const text = lines.join('\n');
+    const done = () => toast(this, 'COPIED', 'result on the clipboard');
+    try {
+      void navigator.clipboard
+        .writeText(text)
+        .then(done, () => new StickyNote(this, 160, 100, 'share text', text, 320));
+    } catch {
+      new StickyNote(this, 160, 100, 'share text', text, 320);
+    }
   }
 
   private lucienDebrief(): void {

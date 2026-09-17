@@ -13,6 +13,7 @@ import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
 import { BrowserPanel } from '@/ui/BrowserPanel';
+import { LucienBubble } from '@/ui/LucienBubble';
 import { leaderboard } from '@/systems/leaderboard';
 import { wallet } from '@/systems/wallet';
 import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
@@ -68,6 +69,7 @@ export class InvestigationScene extends Phaser.Scene {
   private dialogue: DialogueBox | null = null;
   private tabSwitched = false;
   private browsing = false;
+  private said = new Set<string>();
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -121,6 +123,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.bindKeys();
     this.tabSwitched = false;
     this.browsing = false;
+    this.said = new Set();
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -195,14 +198,20 @@ export class InvestigationScene extends Phaser.Scene {
       registerFinePrint: (obj: Phaser.GameObjects.GameObject) =>
         this.magnifier.registerFinePrint(obj),
       onPinToggle: (clue: Clue, pinned: boolean) => this.onPinToggle(clue, pinned),
-      onStrayChange: () => this.refreshNotebook(),
+      onStrayChange: (count: number) => {
+        this.refreshNotebook();
+        if (count > 0) this.mutter('stray', "That's blank paper, partner. Pins go on evidence.");
+      },
       onHoverSpot: (over: boolean, clueId: string) => {
         this.hoveringSpot = Math.max(0, this.hoveringSpot + (over ? 1 : -1));
         this.magnifier.setGlow(this.hoveringSpot > 0);
         if (over && !this.examined.has(clueId)) {
           this.examined.add(clueId);
           this.notebook?.setExamined(this.examined.size, this.totalSpots);
-          if (this.examined.size === this.totalSpots) audio.play('unlock');
+          if (this.examined.size === this.totalSpots) {
+            audio.play('unlock');
+            this.mutter('thorough', 'Every spot examined. Thorough. Now decide.');
+          }
         }
       },
     };
@@ -265,13 +274,15 @@ export class InvestigationScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
     const menu = new PixelButton(
       this,
-      6,
+      0,
       GAME_HEIGHT - 22,
       'Menu [Esc]',
       () => this.togglePause(),
-      { variant: 'ink' },
+      {
+        variant: 'ink',
+      },
     );
-    menu.setDepth(DEPTH.hud);
+    menu.setDepth(DEPTH.hud).setX(GAME_WIDTH - menu.bw - 6);
     this.magnifier.ignore([this.hint, this.notebook, this.tabs, ...this.stamps, this.clock, menu]);
     audio.play('paper');
     this.tutorial();
@@ -308,8 +319,18 @@ export class InvestigationScene extends Phaser.Scene {
     }
   }
 
+  /** A one-time quip per case, shown in Lucien's corner bubble. */
+  private mutter(key: string, text: string): void {
+    if (this.said.has(key) || this.dialogue?.isActive) return;
+    this.said.add(key);
+    LucienBubble.say(this, text);
+  }
+
   private onPinToggle(clue: Clue, pinned: boolean): void {
     if (pinned) this.suspicions.push({ id: clue.id, label: clue.label });
+    if (pinned && this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.');
+    if (pinned && this.suspicions.length >= 7)
+      this.mutter('many-pins', 'Pinning everything is not a strategy. Some of that is fine.');
     else this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
     this.refreshNotebook();
   }
@@ -413,6 +434,15 @@ export class InvestigationScene extends Phaser.Scene {
       grade: breakdown.grade,
       date: new Date().toISOString(),
       wallet: wallet.state.address ?? undefined,
+    });
+
+    saveStore.update((d) => {
+      d.stats.runs++;
+      if (breakdown.verdictCorrect) d.stats.correct++;
+      for (const m of breakdown.flagsMissed) {
+        if (isFlagClue(m.clue))
+          d.stats.flagMisses[m.clue.flagId] = (d.stats.flagMisses[m.clue.flagId] ?? 0) + 1;
+      }
     });
 
     // Badges (toasts are shown by the report scene).
@@ -545,6 +575,10 @@ export class InvestigationScene extends Phaser.Scene {
         this.lastTickSecond = left;
         audio.play('tick');
       }
+      if (this.clock.isRunning && left <= 30)
+        this.mutter('clock', "Clock's ticking. Go with what you've got.");
+      if (!this.clock.isRunning && left === 0 && this.lastTickSecond === 0)
+        this.mutter('timeup', "Time's up. No bonus, no penalty. Stamp it.");
     }
     this.magnifier.update();
   }
