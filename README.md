@@ -1,6 +1,6 @@
 # Rug or Not?
 
-A pixel-art noir detective game about spotting crypto scams. Each case is a folder of
+A pixel-art noir detective game about spotting crypto scams, with Detective Lucien as your guide. Each case is a folder of
 evidence on your desk: a contract snippet, tokenomics, a team page, a community chat log,
 a liquidity report and sometimes an audit certificate. Read it through the magnifying
 glass, pin the suspicious bits, stamp a verdict (**RUG** or **LEGIT**), and read the report.
@@ -66,7 +66,7 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 
 ## Modes
 
-- **Campaign**: the ten cases in order; each verdict unlocks the next folder.
+- **Campaign**: twelve cases in order (seven rugs, five legit, difficulty 1→5); each verdict unlocks the next folder.
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Daily plays don't unlock campaign folders.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a

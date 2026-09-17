@@ -235,6 +235,12 @@ export const HERRINGS = {
     reassurance:
       'Modest, concrete milestones are what real teams write. Grand promises are the thing to distrust.',
   },
+  'timelocked-admin': {
+    id: 'timelocked-admin',
+    title: 'Admin powers behind a public timelock',
+    reassurance:
+      'An admin that can only act after a public 48-hour delay gives holders time to react. It is the opposite of a hidden owner key.',
+  },
 } as const satisfies Record<string, Herring>;
 
 export type HerringId = keyof typeof HERRINGS;

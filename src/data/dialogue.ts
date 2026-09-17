@@ -107,7 +107,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   'case-files': [
     {
-      text: 'Ten files, easy to nasty. Each verdict unlocks the next drawer. Grades stick around, so replays count.',
+      text: 'Twelve files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
     },
   ],
   settings: [
@@ -139,7 +139,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   'all-cases': [
     {
-      text: 'Ten for ten. You read every file on this desk. Keep the notebook close; the real ones look just like these.',
+      text: 'Every file on this desk, closed. Keep the notebook close; the real ones look just like these.',
     },
   ],
 };
