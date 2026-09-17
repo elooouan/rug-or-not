@@ -12,6 +12,9 @@ import { TEX } from '@/art/keys';
 import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
+import { BrowserPanel } from '@/ui/BrowserPanel';
+import { leaderboard } from '@/systems/leaderboard';
+import { wallet } from '@/systems/wallet';
 import { DeskClock } from '@/ui/DeskClock';
 import type { DocumentView } from '@/ui/DocumentView';
 import { createDocumentView } from '@/ui/documents';
@@ -61,6 +64,7 @@ export class InvestigationScene extends Phaser.Scene {
   private hint?: Phaser.GameObjects.Text;
   private dialogue: DialogueBox | null = null;
   private tabSwitched = false;
+  private browsing = false;
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -90,6 +94,7 @@ export class InvestigationScene extends Phaser.Scene {
       (x, y) =>
         this.phase === 'investigating' &&
         !this.paused &&
+        !this.browsing &&
         this.currentDoc()?.containsPoint(x, y) === true,
     );
     this.magnifier.ignore(this.desk.overlays);
@@ -112,6 +117,17 @@ export class InvestigationScene extends Phaser.Scene {
     new FolderCard(this, c, () => this.openCase());
     this.bindKeys();
     this.tabSwitched = false;
+    this.browsing = false;
+    this.events.on('browser:open', () => {
+      this.browsing = true;
+      this.clock?.pause(true);
+      this.magnifier.suspend();
+      if (BrowserPanel.current) this.magnifier.ignore(BrowserPanel.current);
+    });
+    this.events.on('browser:close', () => {
+      this.browsing = false;
+      if (!this.paused && this.phase === 'investigating') this.clock?.pause(false);
+    });
     this.introDialogue();
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.onResume());
   }
@@ -386,6 +402,16 @@ export class InvestigationScene extends Phaser.Scene {
       else d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
     });
 
+    // Every run goes on the board (local by default; see src/systems/leaderboard.ts).
+    void leaderboard.submit({
+      name: saveStore.get().detectiveName,
+      score: breakdown.total,
+      caseId: c.id,
+      grade: breakdown.grade,
+      date: new Date().toISOString(),
+      wallet: wallet.state.address ?? undefined,
+    });
+
     const fresh = newlyUnlocked(saveStore.get());
     if (fresh.length > 0) saveStore.update((d) => fresh.forEach((u) => d.seenUnlocks.push(u.id)));
 
@@ -439,8 +465,8 @@ export class InvestigationScene extends Phaser.Scene {
     if (!kb) return;
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
-    on('ESC', () => noDialogue() && this.togglePause());
-    const inPlay = () => this.phase === 'investigating' && !this.paused;
+    on('ESC', () => noDialogue() && !this.browsing && this.togglePause());
+    const inPlay = () => this.phase === 'investigating' && !this.paused && !this.browsing;
     const noDialogue = () => !this.dialogue?.isActive;
     on(
       'TAB',

@@ -5,6 +5,7 @@ import {
   type UnlockCategory,
   type UnlockSource,
 } from '@/data/unlockables';
+import { TOKEN } from '@/config/token';
 import { rankIndex } from './ranks';
 import { rankForScore } from './ranks';
 import type { CosmeticSelection, SaveData } from './save';
@@ -16,6 +17,8 @@ export interface UnlockContext {
   gradeCounts: Record<Grade, number>;
   bestStreak: number;
   flagsLearned: number;
+  /** Last known balance of the game's coin, whole tokens. */
+  tokenBalance: number;
 }
 
 export function contextFromSave(save: SaveData): UnlockContext {
@@ -31,6 +34,7 @@ export function contextFromSave(save: SaveData): UnlockContext {
     gradeCounts,
     bestStreak: save.daily.bestStreak,
     flagsLearned: save.unlockedFlags.length,
+    tokenBalance: save.wallet?.token ?? 0,
   };
 }
 
@@ -53,6 +57,7 @@ export const sourceResolvers: { [K in UnlockSource['type']]: Resolver<K> } = {
   },
   streak: (s, ctx) => ctx.bestStreak >= s.value,
   flagsLearned: (s, ctx) => ctx.flagsLearned >= s.value,
+  holder: (s, ctx) => ctx.tokenBalance >= s.value,
 };
 
 export function isUnlocked(u: Unlockable, ctx: UnlockContext): boolean {
@@ -92,6 +97,8 @@ export function describeSource(s: UnlockSource): string {
       return `${s.value}-day daily streak`;
     case 'flagsLearned':
       return `Learn ${s.value} red flags`;
+    case 'holder':
+      return `Hold ${s.value}+ ${TOKEN.symbol}`;
   }
 }
 

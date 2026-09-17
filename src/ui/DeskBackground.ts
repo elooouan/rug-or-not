@@ -10,6 +10,8 @@ import { cycleWeather } from '@/systems/weather';
 import { TIPS } from '@/data/tips';
 import { StickyNote } from './StickyNote';
 import { CursorScene } from '@/scenes/CursorScene';
+import { BrowserPanel } from './BrowserPanel';
+import { localDateKey } from '@/systems/dailyCase';
 import { addText } from './text';
 
 export interface DeskOptions {
@@ -110,6 +112,7 @@ export class DeskBackground {
     if (opts.props !== false) {
       this.buildFolderStack();
       this.buildMug();
+      this.buildPhone();
     }
     if (opts.stamps !== false) this.buildInkPad();
 
@@ -448,6 +451,36 @@ export class DeskBackground {
           ease: 'Quad.easeOut',
         });
       }
+    });
+  }
+
+  private buildPhone(): void {
+    const scene = this.scene;
+    const { x, y } = DESK.phone;
+    // A soft glow pulses when today's daily case hasn't been played yet.
+    const glow = scene.add
+      .image(x - 4, y - 4, TEX.phoneGlow)
+      .setOrigin(0)
+      .setDepth(DEPTH.deskProps)
+      .setAlpha(0);
+    const dailyPending = saveStore.get().daily.lastPlayed !== localDateKey();
+    if (dailyPending && this.motion) {
+      scene.tweens.add({
+        targets: glow,
+        alpha: { from: 0.15, to: 0.6 },
+        duration: 1100,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+    const phone = scene.add.image(x, y, TEX.phone).setOrigin(0).setDepth(DEPTH.deskProps);
+    phone.setInteractive({ useHandCursor: false });
+    phone.on('pointerover', () => audio.play('hover'));
+    phone.on('pointerdown', () => {
+      glow.setAlpha(0);
+      scene.tweens.killTweensOf(glow);
+      BrowserPanel.toggle(scene);
     });
   }
 

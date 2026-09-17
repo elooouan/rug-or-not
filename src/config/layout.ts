@@ -41,6 +41,7 @@ export const DESK = {
   /** The cat sits on the windowsill, right end. */
   cat: { x: 474, y: 46 },
   caseHeader: { x: 632, y: 38 },
+  phone: { x: 118, y: 296 },
   clock: { x: 104, y: 214 },
   inkPad: { x: 516, y: 300 },
   stampRug: { x: 520, y: 262 },
@@ -121,6 +122,17 @@ export const DIALOGUE = {
   mascot: { x: 10, y: 358, height: 72 },
   typeSpeedMs: 16,
   textWidth: 470,
+} as const;
+
+export const BROWSER = {
+  x: 80,
+  y: 24,
+  w: 480,
+  h: 304,
+  titleH: 14,
+  toolbarH: 18,
+  padding: 10,
+  lineH: 13,
 } as const;
 
 export const REPORT = {

@@ -44,6 +44,8 @@ export const TEX = {
   iconPadlock: 'icon-padlock',
   iconPie: 'icon-pie',
   pixel: 'px-white',
+  phone: 'desk-phone',
+  phoneGlow: 'desk-phone-glow',
   drawer: 'cabinet-drawer',
   button: 'ui-button',
   buttonHover: 'ui-button-hover',

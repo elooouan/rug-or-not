@@ -30,6 +30,10 @@ export interface SaveData {
   seenUnlocks: string[];
   /** Lucien dialogue scripts already shown. */
   seenHints: string[];
+  /** Arcade-style handle shown on the leaderboard. */
+  detectiveName: string;
+  /** Last known wallet snapshot (public address + token balance) for holder perks. */
+  wallet: { address: string | null; token: number | null; checkedAt: string | null };
 }
 
 export const DEFAULT_COSMETICS: CosmeticSelection = {
@@ -51,6 +55,8 @@ export function defaultSave(): SaveData {
     cosmetics: { ...DEFAULT_COSMETICS },
     seenUnlocks: [],
     seenHints: [],
+    detectiveName: 'ANON',
+    wallet: { address: null, token: null, checkedAt: null },
   };
 }
 
@@ -86,6 +92,16 @@ export function sanitizeSave(raw: unknown): SaveData {
   }
   if (Array.isArray(r.unlockedFlags))
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
+  if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
+    d.detectiveName = r.detectiveName.slice(0, 12);
+  if (r.wallet && typeof r.wallet === 'object') {
+    const w = r.wallet as Record<string, unknown>;
+    d.wallet = {
+      address: typeof w.address === 'string' ? w.address : null,
+      token: typeof w.token === 'number' && Number.isFinite(w.token) ? w.token : null,
+      checkedAt: typeof w.checkedAt === 'string' ? w.checkedAt : null,
+    };
+  }
   if (Array.isArray(r.seenHints))
     d.seenHints = r.seenHints.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.seenUnlocks))

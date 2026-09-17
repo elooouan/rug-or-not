@@ -1,5 +1,6 @@
 import type { Grade, Rank } from '@/config/gameConfig';
 import type { PaletteKey } from '@/config/palette';
+import { TOKEN } from '@/config/token';
 
 /**
  * Unlock sources are a tagged union so new kinds (achievements, seasonal, ...)
@@ -12,7 +13,9 @@ export type UnlockSource =
   | { type: 'casesCompleted'; value: number }
   | { type: 'grade'; value: { grade: Grade; count: number } }
   | { type: 'streak'; value: number }
-  | { type: 'flagsLearned'; value: number };
+  | { type: 'flagsLearned'; value: number }
+  /** Holds at least this many of the game's coin (see src/config/token.ts). */
+  | { type: 'holder'; value: number };
 
 export type UnlockCategory = 'desk' | 'lamp' | 'rim' | 'ink';
 
@@ -122,6 +125,14 @@ export const UNLOCKABLES: Unlockable[] = [
     description: 'Keep a 3-day daily streak.',
     source: { type: 'streak', value: 3 },
     style: { rim: 'ink', rimDark: 'bg', handle: 'woodMid' },
+  },
+  {
+    id: 'rim-gold',
+    category: 'rim',
+    name: 'Gilded rim',
+    description: 'For coin holders.',
+    source: { type: 'holder', value: TOKEN.holderMin },
+    style: { rim: 'amber', rimDark: 'stampRed', handle: 'amber' },
   },
   // Stamp ink
   {
