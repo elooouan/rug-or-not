@@ -7,6 +7,7 @@ import { shortAddress, TOKEN } from '@/config/token';
 import { NEWS } from '@/data/news';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
+import type { CaseData } from '@/data/schema';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAGS } from '@/data/flags';
@@ -111,6 +112,8 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   private unsubscribeWallet?: () => void;
   private keys: Phaser.Input.Keyboard.Key[] = [];
   private static openPanel: BrowserPanel | null = null;
+  /** What the RugScan page shows: the current case, the token index, or a chosen token. */
+  rugscanView: 'auto' | 'index' | CaseData = 'auto';
 
   static get current(): BrowserPanel | null {
     return BrowserPanel.openPanel;
@@ -180,9 +183,10 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
       const b = tb(label, bx, () => this.go(id));
       bx += b.bw + 3;
     }
-    this.urlText = makeText(scene, x + w - 6, ty + 5, '', {
+    // URL lives in the title bar so the bookmarks have the toolbar to themselves.
+    this.urlText = makeText(scene, x + w - 44, y + 3, '', {
       size: FONT.size.tiny,
-      color: 'woodDark',
+      color: 'paperShadow',
     }).setOrigin(1, 0);
     this.add(this.urlText);
 
@@ -286,14 +290,45 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   },
 
   rugscan(ctx) {
-    const c = gameState.currentCase;
+    const view = ctx.panel.rugscanView;
+    const c = view === 'index' ? null : view === 'auto' ? gameState.currentCase : view;
     ctx.heading('RugScan', 'ink');
     if (!c) {
-      ctx.line(
-        'Search a token to see its explorer page. Open a case first: the current file is searched automatically.',
-      );
+      // Token index: every file in the cabinet, open ones can be launched from here.
+      const save = saveStore.get();
+      const active = ctx.panel.scene.scene.key === 'InvestigationScene';
+      ctx.line('Tokens on record. Open files can be launched straight from here.', {
+        color: 'woodMid',
+      });
+      gameState.cases.forEach((cs, i) => {
+        const unlocked = i < save.campaignUnlocked;
+        const grade = save.caseResults[cs.id]?.bestGrade;
+        const b = ctx.button(
+          `${unlocked ? cs.ticker : '????'}${grade ? `  ${grade}` : ''}`,
+          () => {
+            if (!unlocked) {
+              audio.play('wrong');
+              return;
+            }
+            ctx.panel.rugscanView = cs;
+            ctx.panel.go('rugscan');
+          },
+          { variant: unlocked ? 'ink' : 'paper', sameLine: true },
+        );
+        const label = makeText(ctx.scene, b.bw + 8, ctx.y + 4, unlocked ? cs.title : 'classified', {
+          font: 'body',
+          size: FONT.size.body,
+          color: unlocked ? 'shadow' : 'paperShadow',
+        });
+        ctx.content.add(label);
+        ctx.y += b.bh + 4;
+      });
       ctx.gap();
-      ctx.small('RugScan does not rate tokens. Neither should you, until you have read the file.');
+      ctx.small(
+        active
+          ? 'You are mid-case: the current file is under your token.'
+          : 'RugScan does not rate tokens. Neither should you, until you have read the file.',
+      );
       return;
     }
     const rng = makeRng(`rugscan:${c.id}`);
@@ -331,6 +366,31 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         { color: 'shadow' },
       );
     ctx.gap();
+    const inCase =
+      gameState.currentCase?.id === c.id && ctx.panel.scene.scene.key === 'InvestigationScene';
+    if (!inCase) {
+      ctx.button(
+        'Open this case file',
+        () => {
+          const idx = gameState.cases.indexOf(c);
+          if (idx < 0 || idx >= saveStore.get().campaignUnlocked) return;
+          gameState.mode = 'campaign';
+          gameState.currentIndex = idx;
+          gameState.currentCase = c;
+          ctx.panel.close();
+          ctx.scene.scene.start('InvestigationScene');
+        },
+        { sameLine: true },
+      );
+    }
+    ctx.button(
+      'All tokens',
+      () => {
+        ctx.panel.rugscanView = 'index';
+        ctx.panel.go('rugscan');
+      },
+      { x: inCase ? 0 : 150, variant: 'paper' },
+    );
     ctx.small('RugScan shows data, not verdicts. The evidence on your desk is what counts.');
   },
 
