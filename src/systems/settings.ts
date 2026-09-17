@@ -6,6 +6,8 @@ export interface Settings {
   noMagnifier: boolean; // accessibility: fine print shown inline
   rain: boolean;
   music: boolean;
+  /** Lucien's once-only guidance. */
+  hints: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -16,6 +18,7 @@ export const DEFAULT_SETTINGS: Settings = {
   noMagnifier: false,
   rain: true,
   music: true,
+  hints: true,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -33,5 +36,6 @@ export function sanitizeSettings(raw: unknown): Settings {
     noMagnifier: bool(r.noMagnifier, DEFAULT_SETTINGS.noMagnifier),
     rain: bool(r.rain, DEFAULT_SETTINGS.rain),
     music: bool(r.music, DEFAULT_SETTINGS.music),
+    hints: bool(r.hints, DEFAULT_SETTINGS.hints),
   };
 }

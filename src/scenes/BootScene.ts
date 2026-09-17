@@ -10,6 +10,7 @@ import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
 import { setupScene } from './sceneUtil';
+import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
 
 /** Generates textures, waits for fonts, validates case data, then starts the title. */
 export class BootScene extends Phaser.Scene {
@@ -17,6 +18,11 @@ export class BootScene extends Phaser.Scene {
 
   constructor() {
     super(BootScene.KEY);
+  }
+
+  preload(): void {
+    this.load.image(LUCIEN_TEX, 'img/lucien.png');
+    this.load.image(LUCIEN_FACE_TEX, 'img/lucien-face.png');
   }
 
   create(): void {

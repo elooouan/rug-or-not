@@ -11,6 +11,7 @@ import { newlyUnlocked, stampInk } from '@/systems/unlocks';
 import { TEX } from '@/art/keys';
 import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
 import { DeskClock } from '@/ui/DeskClock';
 import type { DocumentView } from '@/ui/DocumentView';
 import { createDocumentView } from '@/ui/documents';
@@ -56,6 +57,8 @@ export class InvestigationScene extends Phaser.Scene {
   private totalSpots = 0;
   private lastTickSecond = -1;
   private hint?: Phaser.GameObjects.Text;
+  private dialogue: DialogueBox | null = null;
+  private tabSwitched = false;
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -106,7 +109,49 @@ export class InvestigationScene extends Phaser.Scene {
 
     new FolderCard(this, c, () => this.openCase());
     this.bindKeys();
+    this.tabSwitched = false;
+    this.introDialogue();
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.onResume());
+  }
+
+  /** Lucien's once-only guidance: daily explainer, then the intake hint. */
+  private introDialogue(): void {
+    const intake = () =>
+      this.setDialogue(
+        lucienSays(this, 'first-intake', {
+          conditions: { opened: () => this.phase === 'investigating' },
+          onDone: () => {
+            this.dialogue = null;
+            if (this.phase === 'investigating') this.tutorial();
+          },
+        }),
+      );
+    if (gameState.mode === 'daily') {
+      this.setDialogue(lucienSays(this, 'first-daily', { onDone: () => intake() }));
+      if (this.dialogue) return;
+    }
+    intake();
+  }
+
+  /** The lens must not zoom the dialogue box. */
+  private setDialogue(box: DialogueBox | null): DialogueBox | null {
+    this.dialogue = box;
+    if (box) this.magnifier.ignore(box);
+    return box;
+  }
+
+  private tutorial(): void {
+    if (this.dialogue?.isActive) return; // the intake box chains into this via onDone
+    this.setDialogue(
+      lucienSays(this, 'first-investigation', {
+        conditions: {
+          examined: () => this.examined.size > 0,
+          pinned: () => this.docs.some((d) => d.pinnedIds().length > 0),
+          tab: () => this.tabSwitched,
+        },
+        onDone: () => (this.dialogue = null),
+      }),
+    );
   }
 
   private openCase(): void {
@@ -182,6 +227,7 @@ export class InvestigationScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
     this.magnifier.ignore([this.hint, this.notebook, this.tabs, ...this.stamps, this.clock]);
     audio.play('paper');
+    this.tutorial();
   }
 
   private currentDoc(): DocumentView | undefined {
@@ -191,6 +237,7 @@ export class InvestigationScene extends Phaser.Scene {
   private showDocument(i: number, animate = true): void {
     if (i < 0 || i >= this.docs.length) return;
     const changed = i !== this.current;
+    if (changed) this.tabSwitched = true;
     this.docs.forEach((d, idx) => d.setVisible(idx === i));
     this.docs[this.current]?.clearFocus();
     this.current = i;
@@ -364,8 +411,9 @@ export class InvestigationScene extends Phaser.Scene {
     if (!kb) return;
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
-    on('ESC', () => this.togglePause());
+    on('ESC', () => noDialogue() && this.togglePause());
     const inPlay = () => this.phase === 'investigating' && !this.paused;
+    const noDialogue = () => !this.dialogue?.isActive;
     on(
       'TAB',
       (e?: KeyboardEvent) => inPlay() && this.currentDoc()?.focusMove(e?.shiftKey ? -1 : 1),
@@ -374,8 +422,8 @@ export class InvestigationScene extends Phaser.Scene {
     on('RIGHT', () => inPlay() && this.currentDoc()?.focusMove(1));
     on('UP', () => inPlay() && this.currentDoc()?.focusMove(-1));
     on('LEFT', () => inPlay() && this.currentDoc()?.focusMove(-1));
-    on('ENTER', () => inPlay() && this.currentDoc()?.activateFocused());
-    on('SPACE', () => inPlay() && this.currentDoc()?.activateFocused());
+    on('ENTER', () => inPlay() && noDialogue() && this.currentDoc()?.activateFocused());
+    on('SPACE', () => inPlay() && noDialogue() && this.currentDoc()?.activateFocused());
     on('PAGE_DOWN', () => inPlay() && this.currentDoc()?.scroll(1));
     on('PAGE_UP', () => inPlay() && this.currentDoc()?.scroll(-1));
     on('R', () => inPlay() && this.stamps[0]?.trigger((v) => this.onStamp(v)));

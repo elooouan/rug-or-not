@@ -28,6 +28,8 @@ export interface SaveData {
   cosmetics: CosmeticSelection;
   /** Unlockable ids the player has been shown a "new unlock" toast for. */
   seenUnlocks: string[];
+  /** Lucien dialogue scripts already shown. */
+  seenHints: string[];
 }
 
 export const DEFAULT_COSMETICS: CosmeticSelection = {
@@ -48,6 +50,7 @@ export function defaultSave(): SaveData {
     settings: { ...DEFAULT_SETTINGS },
     cosmetics: { ...DEFAULT_COSMETICS },
     seenUnlocks: [],
+    seenHints: [],
   };
 }
 
@@ -83,6 +86,8 @@ export function sanitizeSave(raw: unknown): SaveData {
   }
   if (Array.isArray(r.unlockedFlags))
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
+  if (Array.isArray(r.seenHints))
+    d.seenHints = r.seenHints.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.seenUnlocks))
     d.seenUnlocks = r.seenUnlocks.filter((x): x is string => typeof x === 'string');
   if (r.daily && typeof r.daily === 'object') {

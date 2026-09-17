@@ -1,0 +1,131 @@
+/**
+ * Detective Lucien's lines. Each script is shown once (tracked in the save)
+ * unless hints are reset. Steps with `waitFor` stay on screen until the
+ * player does the thing; the scene supplies the predicate.
+ */
+export interface DialogueLine {
+  text: string;
+  /** Name of a condition the scene checks each frame; the line waits until it's true. */
+  waitFor?: string;
+  /** Short prompt shown while waiting, e.g. "hover the paper". */
+  prompt?: string;
+}
+
+export type ScriptId =
+  | 'title-intro'
+  | 'first-intake'
+  | 'first-investigation'
+  | 'first-report'
+  | 'first-legit'
+  | 'first-wrong'
+  | 'first-daily'
+  | 'notebook'
+  | 'case-files'
+  | 'settings'
+  | 'coffee'
+  | 'cat'
+  | 'browser'
+  | 'wallet'
+  | 'leaderboard'
+  | 'konami'
+  | 'all-cases';
+
+export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
+  'title-intro': [
+    { text: "Evening. Name's Lucien. Detective, coin sniffer, coffee enjoyer." },
+    { text: 'Every night a new token lands on this desk. Some are honest. Most... are not.' },
+    { text: 'Your job: read the evidence, pin what smells, and stamp the verdict. RUG or LEGIT.' },
+    { text: "Grab a coffee. It's going to be a long night. Hit Play when you're ready." },
+  ],
+  'first-intake': [
+    { text: 'First file of the night. Small fry, but they all start small.' },
+    {
+      text: 'Click the folder to open it, or press Enter.',
+      waitFor: 'opened',
+      prompt: 'open the folder',
+    },
+  ],
+  'first-investigation': [
+    {
+      text: 'Move your magnifier over the paper. The lens zooms in, and some fine print only shows up through it.',
+      waitFor: 'examined',
+      prompt: 'hover a clue with the lens',
+    },
+    {
+      text: "That's a clue spot. If it smells wrong, click it to pin it. Pinned clues land in the notebook on the right.",
+      waitFor: 'pinned',
+      prompt: 'pin a clue',
+    },
+    {
+      text: "Good. There's more evidence in the tabs above the paper. Number keys work too.",
+      waitFor: 'tab',
+      prompt: 'open another tab',
+    },
+    {
+      text: "Pinning innocent stuff costs points, so don't just pin everything. Think like a detective, not a fire hose.",
+    },
+    {
+      text: 'When you have a verdict, click a stamp on the right, or press R for RUG and L for LEGIT.',
+    },
+  ],
+  'first-report': [
+    { text: 'The report shows every red flag, the ones you caught and the ones you missed.' },
+    {
+      text: "Each flag you meet gets a page in your Notebook. That's the real prize: next time you'll see it coming.",
+    },
+  ],
+  'first-legit': [
+    { text: 'See? Not every token is a rug. Looking suspicious is not the same as being guilty.' },
+    {
+      text: 'A fixed tax, a silly username, a big pool wallet: yellow herrings. Learn to tell them apart.',
+    },
+  ],
+  'first-wrong': [
+    { text: 'Happens to the best of us. Read the report, learn the tell, get back on the horse.' },
+  ],
+  'first-daily': [
+    {
+      text: 'The daily case: same file for every detective in the city. One shot a day. Keep the streak alive.',
+    },
+  ],
+  notebook: [
+    { text: 'This is where the knowledge lives. Locked pages open as you run into new tricks.' },
+  ],
+  'case-files': [
+    {
+      text: 'Ten files, easy to nasty. Each verdict unlocks the next drawer. Grades stick around, so replays count.',
+    },
+  ],
+  settings: [
+    {
+      text: 'Relaxed mode kills the timer. No-magnifier mode prints the fine print for you. No shame in either.',
+    },
+  ],
+  coffee: [
+    {
+      text: 'Easy on the coffee, partner. The evidence is not going to read itself, but you might.',
+    },
+  ],
+  cat: [{ text: "That's Biscuit. She has never once solved a case. She is, however, the boss." }],
+  browser: [
+    {
+      text: 'The phone runs NetScope. Explorer pages, the leaderboard, your wallet, the news. Mostly the news is nonsense.',
+    },
+  ],
+  wallet: [
+    {
+      text: 'Connecting a wallet only shares your public address. I will never ask you to sign anything. Anyone who does is the case.',
+    },
+  ],
+  leaderboard: [
+    { text: 'Best runs in the city. Yours, mostly, until we wire up the precinct server.' },
+  ],
+  konami: [
+    { text: 'A cheat code? In my office? Cute. No points for you, but here is some confetti.' },
+  ],
+  'all-cases': [
+    {
+      text: 'Ten for ten. You read every file on this desk. Keep the notebook close; the real ones look just like these.',
+    },
+  ],
+};

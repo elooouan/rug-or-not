@@ -10,6 +10,8 @@ import type { Settings } from '@/systems/settings';
 import { applyCosmetics } from '@/systems/cosmetics';
 import { byCategory, contextFromSave, describeSource, isUnlocked } from '@/systems/unlocks';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { lucienSays } from '@/ui/DialogueBox';
+import { resetHints } from '@/systems/hints';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -26,7 +28,7 @@ interface RowDef {
   hint?: () => string;
 }
 
-const CARD = { x: 150, y: 24, w: 340, h: 312, pad: 14, rowH: 18 } as const;
+const CARD = { x: 150, y: 12, w: 340, h: 334, pad: 14, rowH: 16 } as const;
 
 /** Volume, modes, accessibility, cosmetics and reset. Works standalone or as a pause overlay. */
 export class SettingsScene extends Phaser.Scene {
@@ -108,6 +110,21 @@ export class SettingsScene extends Phaser.Scene {
       label: 'Lamp flicker',
       value: () => onOff(s().lampFlicker),
       change: () => set((st) => (st.lampFlicker = !st.lampFlicker)),
+    });
+    this.rows.push({
+      label: "Lucien's hints",
+      value: () => onOff(s().hints),
+      change: () => set((st) => (st.hints = !st.hints)),
+      hint: () => 'once-only guidance from the detective; "Replay hints" shows them again',
+    });
+    this.rows.push({
+      label: 'Replay hints',
+      value: () => '...',
+      change: () => {
+        resetHints();
+        audio.play('unlock');
+        this.refresh();
+      },
     });
     this.rows.push({
       label: 'Music (lo-fi loop)',
@@ -237,6 +254,7 @@ export class SettingsScene extends Phaser.Scene {
     kb?.on('keydown-ENTER', () => this.rows[this.selected].change(1));
     kb?.on('keydown-SPACE', () => this.rows[this.selected].change(1));
     this.select(0);
+    if (!this.overlay) lucienSays(this, 'settings');
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       if (this.cosmeticsDirty) applyCosmetics(this, saveStore.get().cosmetics);

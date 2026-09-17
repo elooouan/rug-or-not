@@ -111,6 +111,18 @@ export const UI = {
   pauseH: 150,
 } as const;
 
+export const DIALOGUE = {
+  x: 84,
+  y: 290,
+  w: 548,
+  h: 62,
+  padding: 8,
+  /** Lucien stands to the left of the box, feet on this baseline. */
+  mascot: { x: 10, y: 358, height: 72 },
+  typeSpeedMs: 16,
+  textWidth: 470,
+} as const;
+
 export const REPORT = {
   x: 110,
   y: 22,

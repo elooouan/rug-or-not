@@ -11,6 +11,7 @@ import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
@@ -64,7 +65,10 @@ export class ReportScene extends Phaser.Scene {
     const instant = saveStore.get().settings.reducedMotion;
     this.typewriter = new Typewriter(this, this.content, lines, 13, REPORT.typeSpeedMs, instant);
     this.maxScroll = Math.max(0, this.typewriter.height - viewH);
-    this.typewriter.then(() => this.showGrade());
+    this.typewriter.then(() => {
+      this.showGrade();
+      this.time.delayedCall(900, () => this.lucienDebrief());
+    });
 
     // Skip / scroll.
     this.input.on('pointerdown', () => this.typewriter?.skip());
@@ -242,6 +246,18 @@ export class ReportScene extends Phaser.Scene {
     if (newUnlockNames.length > 0)
       L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'amber'));
     return L;
+  }
+
+  private lucienDebrief(): void {
+    const b = this.payload.breakdown;
+    const follow = () => {
+      if (!b.verdictCorrect) lucienSays(this, 'first-wrong');
+      else if (this.payload.caseData.verdict === 'legit') lucienSays(this, 'first-legit');
+    };
+    if (!lucienSays(this, 'first-report', { onDone: follow })) follow();
+    if (Object.keys(saveStore.get().caseResults).length >= gameState.cases.length) {
+      this.time.delayedCall(200, () => lucienSays(this, 'all-cases'));
+    }
   }
 
   private showGrade(): void {

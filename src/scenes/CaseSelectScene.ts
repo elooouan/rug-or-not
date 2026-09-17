@@ -9,6 +9,7 @@ import { gameState } from '@/systems/gameState';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, makeText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -95,6 +96,7 @@ export class CaseSelectScene extends Phaser.Scene {
     kb?.on('keydown-ENTER', () => this.open(this.focus));
     this.focus = Math.max(0, this.unlocked.lastIndexOf(true));
     this.refreshFocus();
+    lucienSays(this, 'case-files');
   }
 
   private makeFolder(

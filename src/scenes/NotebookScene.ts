@@ -7,6 +7,7 @@ import { FLAG_IDS, FLAGS, type FlagId, type Severity } from '@/data/flags';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -125,6 +126,7 @@ export class NotebookScene extends Phaser.Scene {
     );
     const first = this.listIds.findIndex((id) => this.unlocked.has(id));
     this.select(Math.max(0, first));
+    lucienSays(this, 'notebook');
   }
 
   private select(i: number): void {
