@@ -277,6 +277,29 @@ export class DeskBackground {
             );
           },
         }),
+        // Biscuit strolls along the sill now and then.
+        scene.time.addEvent({
+          delay: Phaser.Math.Between(25000, 50000),
+          loop: true,
+          callback: () => {
+            if (this.catAsleep || !this.cat.active) return;
+            const home = DESK.cat.x;
+            this.cat.setFlipX(true);
+            scene.tweens.chain({
+              targets: this.cat,
+              tweens: [
+                { x: home - 70, duration: 2200, ease: 'Sine.easeInOut' },
+                { x: home - 70, duration: 3000, onStart: () => this.cat.setFlipX(false) },
+                {
+                  x: home,
+                  duration: 2200,
+                  ease: 'Sine.easeInOut',
+                  onStart: () => this.cat.setFlipX(false),
+                },
+              ],
+            });
+          },
+        }),
         // Distant windows twinkle.
         scene.time.addEvent({
           delay: 1400,
@@ -316,6 +339,17 @@ export class DeskBackground {
         if (!this.motion) return;
         const peak = storm ? 0.6 : 0.42;
         this.flash.setAlpha(peak);
+        // The room catches a little of the flash too.
+        const room = this.scene.add
+          .rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, HEX.paper, storm ? 0.12 : 0.07)
+          .setOrigin(0)
+          .setDepth(DEPTH.light);
+        this.scene.tweens.add({
+          targets: room,
+          alpha: 0,
+          duration: 220,
+          onComplete: () => room.destroy(),
+        });
         audio.play('thunder');
         this.scene.tweens.add({
           targets: this.flash,

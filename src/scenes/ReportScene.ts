@@ -14,6 +14,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { toast } from '@/ui/Toast';
 import { StickyNote } from '@/ui/StickyNote';
+import { LucienBubble } from '@/ui/LucienBubble';
 import { localDateKey } from '@/systems/dailyCase';
 import { BADGE_BY_ID } from '@/data/badges';
 import { PixelButton } from '@/ui/PixelButton';
@@ -316,13 +317,43 @@ export class ReportScene extends Phaser.Scene {
     }
   }
 
+  /** A quick verdict on your verdict, every time. */
+  private lucienComment(): void {
+    const { breakdown: b, caseData: c } = this.payload;
+    const missedFine = b.flagsMissed.filter((f) => f.clue.finePrint).length;
+    const flags = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
+    let line: string;
+    if (!b.verdictCorrect)
+      line =
+        c.verdict === 'rug'
+          ? 'They got past you. Read what you missed; it will not get past you twice.'
+          : 'You rugged a legit one. Scary is not the same as guilty.';
+    else if (b.grade === 'S') line = 'Clean. Frame it.';
+    else if (
+      c.verdict === 'rug' &&
+      b.flagsFound.length === flags &&
+      b.falseAccusations.length + b.strayPins > 0
+    )
+      line = 'You found everything, then kept pinning. Know when to stop.';
+    else if (missedFine > 0)
+      line = 'Right call, but the fine print slipped by. Sweep the lens slower.';
+    else if (b.falseAccusations.length > 0)
+      line = 'Right call. Some of those pins were on innocent paper, though.';
+    else if (b.flagsMissed.length > 0) line = 'Right call. There was more to find.';
+    else line = 'Solid work, detective.';
+    LucienBubble.say(this, line, 5000);
+  }
+
   private lucienDebrief(): void {
     const b = this.payload.breakdown;
     const follow = () => {
       if (!b.verdictCorrect) lucienSays(this, 'first-wrong');
       else if (this.payload.caseData.verdict === 'legit') lucienSays(this, 'first-legit');
     };
-    if (!lucienSays(this, 'first-report', { onDone: follow })) follow();
+    if (!lucienSays(this, 'first-report', { onDone: follow })) {
+      follow();
+      this.time.delayedCall(300, () => this.lucienComment());
+    }
     if (Object.keys(saveStore.get().caseResults).length >= gameState.cases.length) {
       this.time.delayedCall(200, () => lucienSays(this, 'all-cases'));
     }
