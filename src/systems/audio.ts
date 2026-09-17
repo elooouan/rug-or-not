@@ -21,7 +21,8 @@ export type SoundName =
   | 'thunder'
   | 'tally'
   | 'caseClosed'
-  | 'hover';
+  | 'hover'
+  | 'siren';
 
 const midi = (n: number): number => 440 * Math.pow(2, (n - 69) / 12);
 
@@ -203,6 +204,14 @@ export class AudioManager {
         this.tone(t, 'triangle', 540, 900, 0.13, 0.14);
         this.tone(t + 0.13, 'triangle', 900, 620, 0.2, 0.12);
         break;
+      case 'siren': {
+        // A distant patrol car: two slow sweeps, filtered way down.
+        for (let i = 0; i < 3; i++) {
+          this.tone(t + i * 1.2, 'sine', 520, 760, 0.6, 0.018, this.sfx);
+          this.tone(t + i * 1.2 + 0.6, 'sine', 760, 520, 0.6, 0.018, this.sfx);
+        }
+        break;
+      }
       case 'thunder':
         this.noise(t, 1.4, 0.9, 160, 'lowpass', 40);
         this.noise(t + 0.25, 0.9, 0.5, 90, 'lowpass', 30);

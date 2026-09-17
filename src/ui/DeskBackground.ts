@@ -333,7 +333,17 @@ export class DeskBackground {
         }),
       );
       this.scheduleLightning();
+      this.scheduleSiren();
     }
+  }
+
+  /** Every few minutes a patrol car passes somewhere below. Noir. */
+  private scheduleSiren(): void {
+    const t = this.scene.time.delayedCall(Phaser.Math.Between(90000, 220000), () => {
+      if (this.weather !== 'storm' && Math.random() < 0.6) audio.play('siren');
+      this.scheduleSiren();
+    });
+    this.timers.push(t);
   }
 
   private scheduleLightning(): void {

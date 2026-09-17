@@ -153,6 +153,14 @@ npm run validate-cases
 Invalid files are also reported in the browser console at boot and skipped, so a broken
 case never crashes the game.
 
+## Adding Lucien lines, tips, news, badges
+
+- Dialogue scripts: `src/data/dialogue.ts` (`LUCIEN`, keyed by `ScriptId`; lines with
+  `waitFor` need a matching condition in the scene). Title quips: `LUCIEN_QUIPS`. Per-case
+  intro lines: the optional `intro` field in each case file.
+- Corkboard tips: `src/data/tips.ts`. Headlines: `src/data/news.ts`. Badges: `src/data/badges.ts`
+  (award with `awardBadge(scene, id)`; counters live in `save.stats`).
+
 ## Adding a red flag or unlockable
 
 - Red flags: add an entry to `FLAGS` in `src/data/flags.ts` (title, explanation, how to

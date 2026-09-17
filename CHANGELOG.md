@@ -2,6 +2,9 @@
 
 ## v0.4 — the lively desk
 
+- Notebook chapters (red flags + yellow herrings); report lines link to notebook pages.
+- Per-case Lucien intros, distant sirens, music fade-in, denser snow.
+
 - Detective Lucien: Pokémon-style dialogue, first-run tutorial, corner quips, report reviews,
   paid nudges ("Ask Lucien"), title-screen pokes.
 - NetScope phone browser: RugScan token index + explorer pages (launch cases from it), the
