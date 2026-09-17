@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
-import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { DRAWER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
@@ -13,19 +13,7 @@ import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, makeText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
-import { rect } from '@/ui/shapes';
-
-const DRAWER = {
-  x: 80,
-  y: 60,
-  w: 480,
-  h: 250,
-  cols: 5,
-  folderW: 80,
-  folderH: 56,
-  gapX: 12,
-  gapY: 40,
-} as const;
+import { difficultyPips, rect } from '@/ui/shapes';
 
 /** A filing-cabinet drawer of case folders. Locked ones wear a padlock. */
 export class CaseSelectScene extends Phaser.Scene {
@@ -123,19 +111,14 @@ export class CaseSelectScene extends Phaser.Scene {
         color: 'woodDark',
       }).setOrigin(0.5, 0),
     );
-    cont.add(
-      makeText(this, 40, 42, '*'.repeat(c.difficulty) + '.'.repeat(5 - c.difficulty), {
-        size: FONT.size.tiny,
-        color: 'woodMid',
-      }).setOrigin(0.5, 0),
-    );
+    cont.add(difficultyPips(this, 40 - 17, 44, c.difficulty));
     if (!unlocked) {
       cont.add(this.make.image({ x: 62, y: 8, key: TEX.iconPadlock }, false).setOrigin(0));
       img.setAlpha(0.7);
     }
     if (grade) {
-      const gx = 64;
-      const gy = 30;
+      const gx = 68;
+      const gy = 18;
       const box = rect(this, gx, gy, 14, 14).setStrokeStyle(1, HEX.stampGreen).setOrigin(0.5);
       const t = makeText(this, gx, gy, grade, {
         size: FONT.size.small,

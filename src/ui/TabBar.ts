@@ -4,6 +4,8 @@ import { FONT, PAPER, TABS } from '@/config/layout';
 import type { CaseDocument } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { makeText } from './text';
+import { rect } from './shapes';
+import { HEX } from '@/config/palette';
 
 const SHORT: Record<CaseDocument['type'], string> = {
   contract: 'Code',
@@ -16,7 +18,12 @@ const SHORT: Record<CaseDocument['type'], string> = {
 
 /** Folder tabs along the top of the paper, one per evidence document. */
 export class TabBar extends Phaser.GameObjects.Container {
-  private tabs: { bg: Phaser.GameObjects.Image; label: Phaser.GameObjects.Text; x: number }[] = [];
+  private tabs: {
+    bg: Phaser.GameObjects.Image;
+    label: Phaser.GameObjects.Text;
+    dot: Phaser.GameObjects.Rectangle;
+    x: number;
+  }[] = [];
   private current = 0;
 
   constructor(scene: Phaser.Scene, docs: CaseDocument[], onSelect: (index: number) => void) {
@@ -40,8 +47,10 @@ export class TabBar extends Phaser.GameObjects.Container {
         size: FONT.size.small,
         color: 'woodDark',
       }).setOrigin(0.5, 0);
-      this.add([bg, label]);
-      this.tabs.push({ bg, label, x });
+      // Unread dot: goes away once the tab has been opened.
+      const dot = rect(scene, x + w - 7, 3, 3, 3, HEX.stampRed);
+      this.add([bg, label, dot]);
+      this.tabs.push({ bg, label, dot, x });
     });
     scene.add.existing(this);
     this.setCurrent(0);
@@ -49,6 +58,7 @@ export class TabBar extends Phaser.GameObjects.Container {
 
   setCurrent(i: number): void {
     this.current = i;
+    this.tabs[i]?.dot.setVisible(false);
     this.tabs.forEach((t, idx) => {
       t.bg.setTexture(idx === i ? TEX.tabActive : TEX.tab);
       t.label.setColor(idx === i ? '#2b2530' : '#6b5140');

@@ -35,3 +35,18 @@ export function zone(
   z.setOrigin(0);
   return z;
 }
+
+/** Five little pips showing case difficulty (filled = harder). Not colour-only: filled pips are taller. */
+export function difficultyPips(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  level: number,
+): Phaser.GameObjects.Container {
+  const c = new Phaser.GameObjects.Container(scene, x, y);
+  for (let i = 0; i < 5; i++) {
+    const on = i < level;
+    c.add(rect(scene, i * 7, on ? 0 : 2, 5, on ? 5 : 3, on ? 0xe0b566 : 0xb8a88a));
+  }
+  return c;
+}

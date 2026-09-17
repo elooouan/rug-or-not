@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { HEX, type PaletteKey } from '@/config/palette';
-import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { DESK, DRAWER, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { makeRng } from '@/systems/rng';
 import { TEX, STEAM_FRAMES } from './keys';
 import { drawPixels, makeCanvasTexture, makeGraphicsTexture, paintRadial } from './pixelUtil';
@@ -351,21 +351,22 @@ export function makeClock(scene: Phaser.Scene): void {
 }
 
 export function makeDrawer(scene: Phaser.Scene): void {
-  makeGraphicsTexture(scene, TEX.drawer, 480, 250, (g) => {
+  const { w, h } = DRAWER;
+  makeGraphicsTexture(scene, TEX.drawer, w, h, (g) => {
     g.fillStyle(HEX.bg, 1);
-    g.fillRect(0, 0, 480, 250);
+    g.fillRect(0, 0, w, h);
     g.fillStyle(HEX.shadow, 1);
-    g.fillRect(6, 6, 468, 238);
+    g.fillRect(6, 6, w - 12, h - 12);
     g.fillStyle(HEX.woodDark, 1);
-    g.fillRect(0, 0, 480, 6);
-    g.fillRect(0, 244, 480, 6);
-    g.fillRect(0, 0, 6, 250);
-    g.fillRect(474, 0, 6, 250);
+    g.fillRect(0, 0, w, 6);
+    g.fillRect(0, h - 6, w, 6);
+    g.fillRect(0, 0, 6, h);
+    g.fillRect(w - 6, 0, 6, h);
     g.fillStyle(HEX.woodLight, 1);
-    g.fillRect(6, 6, 468, 1);
-    // Hanging rails.
+    g.fillRect(6, 6, w - 12, 1);
+    // Hanging rails, one per folder row.
     g.fillStyle(HEX.paperShadow, 1);
-    g.fillRect(14, 30, 452, 2);
-    g.fillRect(14, 140, 452, 2);
+    g.fillRect(14, 30, w - 28, 2);
+    g.fillRect(14, 30 + DRAWER.folderH + DRAWER.gapY, w - 28, 2);
   });
 }

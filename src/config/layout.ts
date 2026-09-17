@@ -124,6 +124,19 @@ export const DIALOGUE = {
   textWidth: 470,
 } as const;
 
+/** Filing-cabinet drawer on the case select screen: six folders per row. */
+export const DRAWER = {
+  x: 40,
+  y: 60,
+  w: 560,
+  h: 250,
+  cols: 6,
+  folderW: 80,
+  folderH: 56,
+  gapX: 8,
+  gapY: 40,
+} as const;
+
 export const BROWSER = {
   x: 80,
   y: 24,

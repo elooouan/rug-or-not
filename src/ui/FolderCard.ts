@@ -7,7 +7,7 @@ import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
 import { PixelButton } from './PixelButton';
 import { makeText } from './text';
-import { rect } from '@/ui/shapes';
+import { difficultyPips, rect } from '@/ui/shapes';
 
 /** Case intake: a manila folder slides onto the desk with the token's pitch. */
 export class FolderCard extends Phaser.GameObjects.Container {
@@ -38,10 +38,8 @@ export class FolderCard extends Phaser.GameObjects.Container {
         wrap: w - 56,
       }),
     );
-    const stars = '*'.repeat(c.difficulty) + '.'.repeat(5 - c.difficulty);
-    this.add(
-      makeText(scene, 20, 110, `difficulty ${stars}`, { size: FONT.size.small, color: 'woodDark' }),
-    );
+    this.add(makeText(scene, 20, 110, 'difficulty', { size: FONT.size.small, color: 'woodDark' }));
+    this.add(difficultyPips(scene, 78, 113, c.difficulty));
     const relaxed = saveStore.get().settings.relaxed;
     this.add(
       makeText(
