@@ -109,7 +109,10 @@ export class AudioManager {
   /** Music level relative to the master volume. */
   setMusicVolume(v: number): void {
     this.musicVolume = Math.max(0, Math.min(1, v));
-    if (this.musicBus) this.musicBus.gain.value = this.musicVolume;
+    if (this.musicBus && this.ctx) {
+      this.musicBus.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.musicBus.gain.setValueAtTime(this.musicVolume, this.ctx.currentTime);
+    }
   }
 
   /** Last-seconds mode: busier hats and a driving bass. */
@@ -309,6 +312,11 @@ export class AudioManager {
 
   private startMusic(): void {
     if (!this.ctx || !this.musicBus || this.musicTimer !== null) return;
+    // Ease the loop in rather than slamming the first chord.
+    const g = this.musicBus.gain;
+    g.cancelScheduledValues(this.ctx.currentTime);
+    g.setValueAtTime(0.0001, this.ctx.currentTime);
+    g.exponentialRampToValueAtTime(Math.max(0.0001, this.musicVolume), this.ctx.currentTime + 2.5);
     this.step = 0;
     this.nextStepTime = this.ctx.currentTime + 0.05;
     this.startCrackle();
