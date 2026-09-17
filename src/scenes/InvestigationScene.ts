@@ -15,6 +15,8 @@ import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 import { leaderboard } from '@/systems/leaderboard';
 import { wallet } from '@/systems/wallet';
+import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
+import { FLAG_IDS } from '@/data/flags';
 import { DeskClock } from '@/ui/DeskClock';
 import type { DocumentView } from '@/ui/DocumentView';
 import { createDocumentView } from '@/ui/documents';
@@ -39,6 +41,7 @@ export interface ReportPayload {
   newFlagIds: string[];
   newUnlockNames: string[];
   bestImproved: boolean;
+  newBadges: string[];
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -412,6 +415,37 @@ export class InvestigationScene extends Phaser.Scene {
       wallet: wallet.state.address ?? undefined,
     });
 
+    // Badges (toasts are shown by the report scene).
+    const badgesBefore = saveStore.get().badges.length;
+    awardBadge(null, 'first-case');
+    const flagsTotal = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
+    const noFalse = breakdown.falseAccusations.length === 0 && breakdown.strayPins === 0;
+    if (
+      c.verdict === 'rug' &&
+      breakdown.verdictCorrect &&
+      breakdown.flagsFound.length === flagsTotal &&
+      noFalse
+    )
+      awardBadge(null, 'clean-sweep');
+    if (breakdown.verdictCorrect && c.verdict === 'legit' && bumpStat('legitCorrect') >= 3)
+      awardBadge(null, 'fair-judge');
+    if (
+      breakdown.verdictCorrect &&
+      this.clock &&
+      !relaxed &&
+      this.clock.timeLeft > c.timeLimitSec / 2
+    )
+      awardBadge(null, 'quick-draw');
+    if (noFalse) {
+      if (bumpStat('cleanStreak') >= 5) awardBadge(null, 'steady-hand');
+    } else saveStore.update((d) => (d.stats.cleanStreak = 0));
+    if (this.examined.size >= this.totalSpots && this.totalSpots > 0) awardBadge(null, 'thorough');
+    if (Object.keys(saveStore.get().caseResults).length >= gameState.cases.length)
+      awardBadge(null, 'all-cases');
+    if (saveStore.get().unlockedFlags.length >= FLAG_IDS.length) awardBadge(null, 'all-flags');
+    checkAggregateBadges(null);
+    const newBadges = saveStore.get().badges.slice(badgesBefore);
+
     const fresh = newlyUnlocked(saveStore.get());
     if (fresh.length > 0) saveStore.update((d) => fresh.forEach((u) => d.seenUnlocks.push(u.id)));
 
@@ -422,6 +456,7 @@ export class InvestigationScene extends Phaser.Scene {
       newFlagIds,
       newUnlockNames: fresh.map((u) => u.name),
       bestImproved,
+      newBadges,
     };
     this.scene.start('ReportScene', payload);
   }

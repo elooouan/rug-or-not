@@ -14,6 +14,7 @@ import { lucienSays, lucienSaysNow } from '@/ui/DialogueBox';
 import { StickyNote } from '@/ui/StickyNote';
 import { StampMark } from '@/ui/Stamp';
 import { floatText } from '@/ui/DeskBackground';
+import { awardBadge, badgeCount, checkAggregateBadges } from '@/systems/badges';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -52,6 +53,7 @@ export class TitleScene extends Phaser.Scene {
       if (konamiAt === konami.length) {
         konamiAt = 0;
         this.confetti();
+        awardBadge(this, 'cheater');
         lucienSaysNow(this, 'konami');
         return;
       }
@@ -222,11 +224,13 @@ export class TitleScene extends Phaser.Scene {
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'));
     this.input.on('pointermove', () => group.clearFocus());
 
+    checkAggregateBadges(this);
+    const badges = badgeCount();
     const rank = rankForScore(save.totalScore);
     t(
       GAME_WIDTH / 2,
       cy + cardH - 26,
-      `${rank}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} cases`,
+      `${rank}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges`,
       {
         size: 12,
         color: 'woodMid',

@@ -32,6 +32,18 @@ export interface SaveData {
   seenHints: string[];
   /** Arcade-style handle shown on the leaderboard. */
   detectiveName: string;
+  /** Earned badge ids (see src/data/badges.ts). */
+  badges: string[];
+  /** Counters for the sillier badges. */
+  stats: {
+    sips: number;
+    pets: number;
+    lampClicks: number;
+    legitCorrect: number;
+    cleanStreak: number;
+    weathersSeen: string[];
+    pagesSeen: string[];
+  };
   /** Last known wallet snapshot (public address + token balance) for holder perks. */
   wallet: { address: string | null; token: number | null; checkedAt: string | null };
 }
@@ -56,6 +68,16 @@ export function defaultSave(): SaveData {
     seenUnlocks: [],
     seenHints: [],
     detectiveName: 'ANON',
+    badges: [],
+    stats: {
+      sips: 0,
+      pets: 0,
+      lampClicks: 0,
+      legitCorrect: 0,
+      cleanStreak: 0,
+      weathersSeen: [],
+      pagesSeen: [],
+    },
     wallet: { address: null, token: null, checkedAt: null },
   };
 }
@@ -94,6 +116,24 @@ export function sanitizeSave(raw: unknown): SaveData {
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
     d.detectiveName = r.detectiveName.slice(0, 12);
+  if (Array.isArray(r.badges))
+    d.badges = r.badges.filter((x): x is string => typeof x === 'string');
+  if (r.stats && typeof r.stats === 'object') {
+    const st = r.stats as Record<string, unknown>;
+    const num = (v: unknown) =>
+      typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
+    const strs = (v: unknown) =>
+      Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+    d.stats = {
+      sips: num(st.sips),
+      pets: num(st.pets),
+      lampClicks: num(st.lampClicks),
+      legitCorrect: num(st.legitCorrect),
+      cleanStreak: num(st.cleanStreak),
+      weathersSeen: strs(st.weathersSeen),
+      pagesSeen: strs(st.pagesSeen),
+    };
+  }
   if (r.wallet && typeof r.wallet === 'object') {
     const w = r.wallet as Record<string, unknown>;
     d.wallet = {

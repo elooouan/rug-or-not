@@ -12,6 +12,8 @@ import { StickyNote } from './StickyNote';
 import { CursorScene } from '@/scenes/CursorScene';
 import { BrowserPanel } from './BrowserPanel';
 import { localDateKey } from '@/systems/dailyCase';
+import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
+import { WEATHERS } from '@/systems/settings';
 import { addText } from './text';
 
 export interface DeskOptions {
@@ -206,6 +208,8 @@ export class DeskBackground {
     glass.on('pointerdown', (p: Phaser.Input.Pointer) => {
       const next = cycleWeather();
       this.setWeather(next);
+      if (noteSeen('weathersSeen', next).length >= WEATHERS.length)
+        awardBadge(scene, 'weather-watcher');
       floatText(scene, p.worldX, y + h + 8, WEATHER_LABEL[next]);
       audio.play('click');
     });
@@ -345,6 +349,7 @@ export class DeskBackground {
 
   private petCat(): void {
     this.pets++;
+    if (bumpStat('pets') >= 10) awardBadge(this.scene, 'cat-person');
     if (this.catAsleep) {
       floatText(this.scene, this.cat.x + 14, this.cat.y - 22, 'zzz');
       return;
@@ -404,6 +409,7 @@ export class DeskBackground {
     lamp.on('pointerdown', () => {
       this.lampOn = !this.lampOn;
       this.lampClicks++;
+      if (bumpStat('lampClicks') >= 10) awardBadge(this.scene, 'electrician');
       audio.play('click');
       const line =
         this.lampClicks === 10
@@ -528,6 +534,7 @@ export class DeskBackground {
     if (this.sipping || !this.mug) return;
     this.sipping = true;
     this.sips++;
+    if (bumpStat('sips') >= 10) awardBadge(this.scene, 'wired');
     audio.play('sip');
     const lines = ['ahh', 'sip', 'mmm', 'needed that', 'still warm', 'ok. focus.'];
     const line =

@@ -12,6 +12,8 @@ import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
+import { toast } from '@/ui/Toast';
+import { BADGE_BY_ID } from '@/data/badges';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
@@ -149,6 +151,11 @@ export class ReportScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
     audio.play(this.payload.breakdown.verdictCorrect ? 'correct' : 'wrong');
+    this.payload.newBadges.forEach((id, i) => {
+      this.time.delayedCall(1200 + i * 3600, () =>
+        toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),
+      );
+    });
   }
 
   private scrollBy(dy: number): void {
@@ -245,6 +252,14 @@ export class ReportScene extends Phaser.Scene {
     }
     if (newUnlockNames.length > 0)
       L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'amber'));
+    if (this.payload.newBadges.length > 0)
+      L.push(
+        ...wrap(
+          `Badges: ${this.payload.newBadges.map((id) => BADGE_BY_ID[id]?.name ?? id).join(', ')}`,
+          0,
+          'amber',
+        ),
+      );
     return L;
   }
 

@@ -12,13 +12,16 @@ import { rankForScore } from '@/systems/ranks';
 import { makeRng } from '@/systems/rng';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
+import { awardBadge, noteSeen } from '@/systems/badges';
+import { BADGES } from '@/data/badges';
 import { lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
 
-type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | '404';
+type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | '404';
+const ALL_PAGES: PageId[] = ['home', 'rugscan', 'coin', 'board', 'news', 'help', 'badges', '404'];
 
 const URLS: Record<PageId, string> = {
   home: 'netscope://home',
@@ -27,6 +30,7 @@ const URLS: Record<PageId, string> = {
   board: 'board.example/detectives',
   news: 'news.example/latest',
   help: 'netscope://help',
+  badges: 'board.example/badges',
   '404': 'nowhere.example/lost',
 };
 
@@ -167,6 +171,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
       [TOKEN.symbol, 'coin'],
       ['Board', 'board'],
       ['News', 'news'],
+      ['Badges', 'badges'],
       ['Help', 'help'],
     ];
     for (const [label, id] of marks) {
@@ -221,6 +226,8 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     if (pushHistory && page !== this.page) this.history.push(this.page);
     this.page = page;
     this.scrollY = 0;
+    if (noteSeen('pagesSeen', page).length >= ALL_PAGES.length)
+      awardBadge(this.scene, 'power-user');
     this.content.setY(BROWSER.y + BROWSER.titleH + BROWSER.toolbarH + BROWSER.padding);
     audio.play('hover');
     this.render();
@@ -363,6 +370,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         (d) =>
           (d.wallet = { address: s.address, token: s.token, checkedAt: new Date().toISOString() }),
       );
+      if (holder) awardBadge(ctx.scene, 'shareholder');
       ctx.button('Refresh balances', () => void wallet.refresh(), { sameLine: true });
       ctx.button('Disconnect', () => void wallet.disconnect(), { x: 130, variant: 'paper' });
     }
@@ -466,6 +474,21 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.small(
       'All headlines are fictional. Any resemblance to real projects is a coincidence, and a lesson.',
     );
+  },
+
+  badges(ctx) {
+    const earned = new Set(saveStore.get().badges);
+    ctx.heading(`Badges  ${[...earned].length}/${BADGES.length}`, 'ink');
+    for (const b of BADGES) {
+      const has = earned.has(b.id);
+      const name = has || !b.secret ? b.name : '? ? ?';
+      const desc = has || !b.secret ? b.description : 'secret';
+      ctx.line(`${has ? '[x]' : '[ ]'} ${name.padEnd(24)} ${desc}`, {
+        color: has ? 'shadow' : 'paperShadow',
+      });
+    }
+    ctx.gap();
+    ctx.small('Badges are for bragging. They change nothing about scoring.');
   },
 
   help(ctx) {

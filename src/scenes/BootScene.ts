@@ -12,6 +12,7 @@ import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
 import { setupScene } from './sceneUtil';
 import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
+import { installToasts } from '@/ui/Toast';
 
 /** Generates textures, waits for fonts, validates case data, then starts the title. */
 export class BootScene extends Phaser.Scene {
@@ -37,6 +38,7 @@ export class BootScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    installToasts();
     const s = saveStore.get().settings;
     audio.setVolume(s.volume);
     applyWeatherAudio(s.weather);
