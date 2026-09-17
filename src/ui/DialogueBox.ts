@@ -144,6 +144,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       scene.tweens.add({ targets: this, y: 0, alpha: 1, duration: 260, ease: 'Back.easeOut' });
     }
     audio.play('slide');
+    scene.events.emit('dialogue:open');
     this.nextLine();
   }
 
@@ -257,7 +258,9 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.keys.forEach((k) => this.scene.input.keyboard?.removeKey(k, true));
     this.keys = [];
     const done = () => {
+      const scene = this.scene;
       this.destroy();
+      scene?.events.emit('dialogue:close');
       this.onDone?.();
     };
     if (saveStore.get().settings.reducedMotion) done();

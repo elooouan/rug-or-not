@@ -312,6 +312,11 @@ export class TitleScene extends Phaser.Scene {
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+    // The dialogue box draws its own Lucien in the same spot; don't show two.
+    this.events.off('dialogue:open');
+    this.events.off('dialogue:close');
+    this.events.on('dialogue:open', () => idle.setVisible(false));
+    this.events.on('dialogue:close', () => idle.setVisible(true));
     addText(
       this,
       GAME_WIDTH / 2,

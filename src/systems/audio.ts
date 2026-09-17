@@ -112,9 +112,16 @@ export class AudioManager {
 
   // ---- one-shots -------------------------------------------------------------------
 
+  private lastHover = 0;
+
   play(name: SoundName): void {
     if (!this.ctx || !this.sfx) return;
     const t = this.ctx.currentTime;
+    if (name === 'hover') {
+      // Sweeping the lens across many spots shouldn't machine-gun blips.
+      if (t - this.lastHover < 0.07) return;
+      this.lastHover = t;
+    }
     switch (name) {
       case 'ui':
         this.tone(t, 'square', 660, 660, 0.035, 0.1);
