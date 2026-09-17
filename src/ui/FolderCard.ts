@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
+import { DEPTH } from '@/config/depth';
 import { FOLDER_CARD, FONT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
@@ -78,6 +79,7 @@ export class FolderCard extends Phaser.GameObjects.Container {
     folder.on('pointerdown', onOpen);
     label.setInteractive({ useHandCursor: false });
     label.on('pointerdown', onOpen);
+    this.setDepth(DEPTH.documents);
     scene.add.existing(this);
 
     // Slide in from the left edge.

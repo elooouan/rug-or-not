@@ -3,6 +3,7 @@
   "title": "Nothing Happens Here",
   "ticker": "$KELP",
   "pitch": "Kelp DAO: a slow treasury for ocean cleanup grants. No hype, just kelp.",
+  "intro": "Ocean cleanup DAO. One wallet holds sixty percent. Names on wallets matter here.",
   "difficulty": 4,
   "verdict": "legit",
   "timeLimitSec": 300,
@@ -34,14 +35,20 @@
           "label": "Minted once, no mint()",
           "herring": true,
           "herringId": "immutable-supply-note",
-          "anchor": { "kind": "line", "line": 5 }
+          "anchor": {
+            "kind": "line",
+            "line": 5
+          }
         },
         {
           "id": "kp-noadmin",
           "label": "No admin, no upgrades",
           "herring": true,
           "herringId": "renounced-cleanly",
-          "anchor": { "kind": "line", "line": 8 }
+          "anchor": {
+            "kind": "line",
+            "line": 8
+          }
         }
       ]
     },
@@ -51,8 +58,16 @@
       "content": {
         "totalSupply": "10,000,000 KELP",
         "allocations": [
-          { "label": "DAO treasury", "pct": 60, "vesting": "by vote" },
-          { "label": "Liquidity", "pct": 40, "vesting": "locked 2y" }
+          {
+            "label": "DAO treasury",
+            "pct": 60,
+            "vesting": "by vote"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 40,
+            "vesting": "locked 2y"
+          }
         ],
         "notes": [
           "No team allocation. Contributors are paid from grant votes like anyone else.",
@@ -65,7 +80,11 @@
           "label": "'That's it' roadmap",
           "herring": true,
           "herringId": "boring-roadmap",
-          "anchor": { "kind": "row", "row": 1, "table": "notes" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "notes"
+          }
         }
       ]
     },
@@ -103,7 +122,10 @@
           "label": "'kelp_daddy' is doxxed",
           "herring": true,
           "herringId": "doxxed-meme-name",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -124,13 +146,21 @@
             "time": "14:31",
             "text": "it's a 2-of-3 multisig that can only send what a vote approves, and votes take 5 days. if that's still a rug to you, I can't change your mind and that's ok"
           },
-          { "user": "ari", "time": "14:33", "text": "the 5 day delay actually helps. ok" },
+          {
+            "user": "ari",
+            "time": "14:33",
+            "text": "the 5 day delay actually helps. ok"
+          },
           {
             "user": "seaweed_sam",
             "time": "14:40",
             "text": "grant #4 receipts are up. 2 boats, 1 skip, 400kg of nets"
           },
-          { "user": "pete_r", "time": "14:41", "text": "can we airdrop to the crabs" }
+          {
+            "user": "pete_r",
+            "time": "14:41",
+            "text": "can we airdrop to the crabs"
+          }
         ]
       },
       "clues": [
@@ -139,14 +169,20 @@
           "label": "Ari challenges admin",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 0 }
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
         },
         {
           "id": "kp-joke",
           "label": "Crab airdrop",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 4 }
+          "anchor": {
+            "kind": "message",
+            "index": 4
+          }
         }
       ]
     },
@@ -156,11 +192,27 @@
       "content": {
         "pool": "KELP / ETH",
         "liquidityUsd": "$156,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Oct 2028 (2y)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Oct 2028 (2y)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "DAO treasury 2-of-3", "pct": 57, "tag": "multisig" },
-          { "label": "Liquidity pool", "pct": 40, "tag": "pool" },
-          { "label": "Everyone else", "pct": 3 }
+          {
+            "label": "DAO treasury 2-of-3",
+            "pct": 57,
+            "tag": "multisig"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 40,
+            "tag": "pool"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 3
+          }
         ],
         "transfers": [
           {
@@ -177,14 +229,22 @@
           "label": "LP locked 2 years",
           "herring": true,
           "herringId": "liquidity-locked-long",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         },
         {
           "id": "kp-pool",
           "label": "Pool holds 40%",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
         }
       ]
     },
@@ -208,7 +268,11 @@
           "label": "Real audit findings",
           "herring": true,
           "herringId": "real-audit-findings",
-          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
         }
       ]
     }

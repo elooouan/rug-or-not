@@ -3,6 +3,7 @@
   "title": "Slow Water",
   "ticker": "$HRBR",
   "pitch": "Harbor: a savings token for the harbour co-op. 2% fee funds the boat fund.",
+  "intro": "A co-op with a fee and a treasury. Fees aren't crimes. Who can change it, that's the question.",
   "difficulty": 3,
   "verdict": "legit",
   "timeLimitSec": 240,
@@ -45,14 +46,20 @@
           "label": "2% fee, hard-coded",
           "herring": true,
           "herringId": "small-fixed-tax",
-          "anchor": { "kind": "line", "line": 3 }
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
         },
         {
           "id": "hb-noowner",
           "label": "No owner at all",
           "herring": true,
           "herringId": "renounced-cleanly",
-          "anchor": { "kind": "line", "line": 20 }
+          "anchor": {
+            "kind": "line",
+            "line": 20
+          }
         }
       ]
     },
@@ -83,7 +90,10 @@
           "label": "'salty_pete' is doxxed",
           "herring": true,
           "herringId": "doxxed-meme-name",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -104,7 +114,11 @@
             "time": "07:52",
             "text": "yes, it is a tax. it's fixed in the contract, can't be changed, and the fund's spending is voted on. if you don't like it, this token isn't for you, honestly"
           },
-          { "user": "marcus", "time": "07:55", "text": "fair. blunt, but fair" },
+          {
+            "user": "marcus",
+            "time": "07:55",
+            "text": "fair. blunt, but fair"
+          },
           {
             "user": "gull_watcher",
             "time": "08:10",
@@ -123,14 +137,20 @@
           "label": "Marcus grills admin",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 0 }
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
         },
         {
           "id": "hb-joke",
           "label": "Pontoon joke",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 4 }
+          "anchor": {
+            "kind": "message",
+            "index": 4
+          }
         }
       ]
     },
@@ -140,12 +160,31 @@
       "content": {
         "pool": "HRBR / USDC",
         "liquidityUsd": "$212,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Jan 2029 (2y+)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Jan 2029 (2y+)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Boat fund multisig", "pct": 34, "tag": "multisig" },
-          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
-          { "label": "Co-op members", "pct": 28 },
-          { "label": "Everyone else", "pct": 8 }
+          {
+            "label": "Boat fund multisig",
+            "pct": 34,
+            "tag": "multisig"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "Co-op members",
+            "pct": 28
+          },
+          {
+            "label": "Everyone else",
+            "pct": 8
+          }
         ],
         "transfers": [
           {
@@ -162,14 +201,22 @@
           "label": "LP locked 2+ years",
           "herring": true,
           "herringId": "liquidity-locked-long",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         },
         {
           "id": "hb-pool",
           "label": "Pool is #2 holder",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
         }
       ]
     },
@@ -194,7 +241,11 @@
           "label": "Audit found a medium",
           "herring": true,
           "herringId": "real-audit-findings",
-          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
         }
       ]
     }

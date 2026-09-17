@@ -156,6 +156,7 @@ export class InvestigationScene extends Phaser.Scene {
 
   /** Lucien's once-only guidance: daily explainer, then the intake hint. */
   private introDialogue(): void {
+    const c = this.caseData;
     const intake = () =>
       this.setDialogue(
         lucienSays(this, 'first-intake', {
@@ -171,6 +172,12 @@ export class InvestigationScene extends Phaser.Scene {
       if (this.dialogue) return;
     }
     intake();
+    // Lucien's take on the file, every time, unless he's already mid-lesson.
+    if (c.intro && !this.dialogue?.isActive)
+      this.time.delayedCall(
+        700,
+        () => this.phase === 'intake' && LucienBubble.say(this, c.intro as string, 6000),
+      );
   }
 
   /** The lens must not zoom the dialogue box. */

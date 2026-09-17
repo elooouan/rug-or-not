@@ -3,6 +3,7 @@
   "title": "Renounced, Allegedly",
   "ticker": "$SAFEYLD",
   "pitch": "SafeYield Vault: audited, renounced, 100/100 safety score. Sleep easy.",
+  "intro": "Audited, renounced, 100 out of 100. When everything's perfect, look for the part that isn't in scope.",
   "difficulty": 2,
   "verdict": "rug",
   "timeLimitSec": 240,
@@ -46,7 +47,10 @@
           "id": "sy-admin",
           "label": "Admin role kept",
           "flagId": "fake-renounce",
-          "anchor": { "kind": "line", "line": 8 }
+          "anchor": {
+            "kind": "line",
+            "line": 8
+          }
         },
         {
           "id": "sy-fee",
@@ -54,7 +58,10 @@
           "flagId": "sell-tax-adjustable",
           "finePrint": true,
           "text": "// MAX_FEE is never checked here",
-          "anchor": { "kind": "line", "line": 17 }
+          "anchor": {
+            "kind": "line",
+            "line": 17
+          }
         }
       ]
     },
@@ -74,7 +81,11 @@
           "id": "sy-audit",
           "label": "Audit: wrong contract",
           "flagId": "fake-audit",
-          "anchor": { "kind": "row", "row": 1, "table": "field" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "field"
+          }
         }
       ]
     },
@@ -84,11 +95,31 @@
       "content": {
         "totalSupply": "100,000,000 SAFEYLD",
         "allocations": [
-          { "label": "Vault rewards", "pct": 40, "vesting": "emissions" },
-          { "label": "Team", "pct": 25, "vesting": "none" },
-          { "label": "Liquidity", "pct": 20, "vesting": "locked" },
-          { "label": "Presale", "pct": 10, "vesting": "none" },
-          { "label": "Marketing", "pct": 5, "vesting": "12 months" }
+          {
+            "label": "Vault rewards",
+            "pct": 40,
+            "vesting": "emissions"
+          },
+          {
+            "label": "Team",
+            "pct": 25,
+            "vesting": "none"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 20,
+            "vesting": "locked"
+          },
+          {
+            "label": "Presale",
+            "pct": 10,
+            "vesting": "none"
+          },
+          {
+            "label": "Marketing",
+            "pct": 5,
+            "vesting": "12 months"
+          }
         ],
         "notes": ["Team allocation is fully liquid at TGE to 'maximise flexibility'."]
       },
@@ -97,14 +128,20 @@
           "id": "sy-team",
           "label": "25% team, no vesting",
           "flagId": "team-allocation-unvested",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         },
         {
           "id": "sy-marketing",
           "label": "5% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 4 }
+          "anchor": {
+            "kind": "row",
+            "row": 4
+          }
         }
       ]
     },
@@ -136,7 +173,11 @@
             "time": "09:14",
             "text": "ser the audit says 100/100, what more do you want lol"
           },
-          { "user": "lena.eth", "time": "09:15", "text": "an answer about the lock would be nice" },
+          {
+            "user": "lena.eth",
+            "time": "09:15",
+            "text": "an answer about the lock would be nice"
+          },
           {
             "user": "mod_tk",
             "role": "mod",
@@ -150,14 +191,20 @@
           "id": "sy-dodge",
           "label": "Admin dodges lock Q",
           "flagId": "urgency-pressure",
-          "anchor": { "kind": "message", "index": 2 }
+          "anchor": {
+            "kind": "message",
+            "index": 2
+          }
         },
         {
           "id": "sy-question",
           "label": "Lena asks about lock",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 1 }
+          "anchor": {
+            "kind": "message",
+            "index": 1
+          }
         }
       ]
     },
@@ -167,12 +214,32 @@
       "content": {
         "pool": "SAFEYLD / ETH",
         "liquidityUsd": "$96,500",
-        "lock": { "locked": true, "provider": "SafeLock", "expires": "active", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "SafeLock",
+          "expires": "active",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Liquidity pool", "pct": 20, "tag": "pool" },
-          { "label": "Vault contract", "pct": 38, "tag": "contract" },
-          { "label": "Team wallet", "pct": 25, "tag": "team" },
-          { "label": "Everyone else", "pct": 17 }
+          {
+            "label": "Liquidity pool",
+            "pct": 20,
+            "tag": "pool"
+          },
+          {
+            "label": "Vault contract",
+            "pct": 38,
+            "tag": "contract"
+          },
+          {
+            "label": "Team wallet",
+            "pct": 25,
+            "tag": "team"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 17
+          }
         ],
         "transfers": []
       },
@@ -183,7 +250,11 @@
           "flagId": "liquidity-unlocked",
           "finePrint": true,
           "text": "lock term: 7 days. unlocks Fri 03:00 UTC",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         }
       ]
     }

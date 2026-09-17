@@ -3,6 +3,7 @@
   "title": "The Verified Lie",
   "ticker": "$ORCL",
   "pitch": "Oracle Finance: institutional-grade yield, audited by leaders, backed by data.",
+  "intro": "Institutional-grade. Backed by data. No source code. Start with what they won't show you.",
   "difficulty": 4,
   "verdict": "rug",
   "timeLimitSec": 300,
@@ -33,7 +34,11 @@
           "id": "or-unverified",
           "label": "Source not verified",
           "flagId": "unverified-contract",
-          "anchor": { "kind": "row", "row": 0, "table": "header" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "header"
+          }
         },
         {
           "id": "or-gate",
@@ -41,7 +46,10 @@
           "flagId": "honeypot",
           "finePrint": true,
           "text": "// storage[0x7] = per-address sell permission, set by owner",
-          "anchor": { "kind": "line", "line": 7 }
+          "anchor": {
+            "kind": "line",
+            "line": 7
+          }
         }
       ]
     },
@@ -63,7 +71,11 @@
           "flagId": "fake-audit",
           "finePrint": true,
           "text": "meridian-assurance.example registered 8 days ago; no other reports",
-          "anchor": { "kind": "row", "row": 0, "table": "field" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "field"
+          }
         }
       ]
     },
@@ -103,7 +115,11 @@
           "flagId": "anon-team-stock-photos",
           "finePrint": true,
           "text": "AI GEN",
-          "anchor": { "kind": "row", "row": 1, "table": "photo" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "photo"
+          }
         }
       ]
     },
@@ -113,19 +129,59 @@
       "content": {
         "pool": "ORCL / USDC",
         "liquidityUsd": "$310,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Mar 2028 (18mo)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Mar 2028 (18mo)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Liquidity pool", "pct": 22, "tag": "pool" },
-          { "label": "0x41a...c02", "pct": 14 },
-          { "label": "0x9be...11f", "pct": 14 },
-          { "label": "0xd07...8e3", "pct": 13 },
-          { "label": "Marketing multisig", "pct": 4, "tag": "multisig" },
-          { "label": "Everyone else", "pct": 33 }
+          {
+            "label": "Liquidity pool",
+            "pct": 22,
+            "tag": "pool"
+          },
+          {
+            "label": "0x41a...c02",
+            "pct": 14
+          },
+          {
+            "label": "0x9be...11f",
+            "pct": 14
+          },
+          {
+            "label": "0xd07...8e3",
+            "pct": 13
+          },
+          {
+            "label": "Marketing multisig",
+            "pct": 4,
+            "tag": "multisig"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 33
+          }
         ],
         "transfers": [
-          { "when": "12d ago", "from": "Deployer", "to": "0x41a...c02", "amount": "14,000,000" },
-          { "when": "12d ago", "from": "Deployer", "to": "0x9be...11f", "amount": "14,000,000" },
-          { "when": "12d ago", "from": "Deployer", "to": "0xd07...8e3", "amount": "13,000,000" }
+          {
+            "when": "12d ago",
+            "from": "Deployer",
+            "to": "0x41a...c02",
+            "amount": "14,000,000"
+          },
+          {
+            "when": "12d ago",
+            "from": "Deployer",
+            "to": "0x9be...11f",
+            "amount": "14,000,000"
+          },
+          {
+            "when": "12d ago",
+            "from": "Deployer",
+            "to": "0xd07...8e3",
+            "amount": "13,000,000"
+          }
         ]
       },
       "clues": [
@@ -133,7 +189,11 @@
           "id": "or-whales",
           "label": "3 wallets, same source",
           "flagId": "whale-concentration",
-          "anchor": { "kind": "row", "row": 0, "table": "transfers" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "transfers"
+          }
         }
       ]
     },
@@ -143,11 +203,31 @@
       "content": {
         "totalSupply": "100,000,000 ORCL",
         "allocations": [
-          { "label": "Yield reserve", "pct": 41, "vesting": "protocol" },
-          { "label": "Liquidity", "pct": 22, "vesting": "locked" },
-          { "label": "Strategic", "pct": 25, "vesting": "none" },
-          { "label": "Team", "pct": 8, "vesting": "12 months" },
-          { "label": "Marketing", "pct": 4, "vesting": "12 months" }
+          {
+            "label": "Yield reserve",
+            "pct": 41,
+            "vesting": "protocol"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 22,
+            "vesting": "locked"
+          },
+          {
+            "label": "Strategic",
+            "pct": 25,
+            "vesting": "none"
+          },
+          {
+            "label": "Team",
+            "pct": 8,
+            "vesting": "12 months"
+          },
+          {
+            "label": "Marketing",
+            "pct": 4,
+            "vesting": "12 months"
+          }
         ],
         "notes": ["Strategic partners receive tokens at TGE to bootstrap institutional liquidity."]
       },
@@ -156,14 +236,20 @@
           "id": "or-strategic",
           "label": "25% strategic, liquid",
           "flagId": "team-allocation-unvested",
-          "anchor": { "kind": "row", "row": 2 }
+          "anchor": {
+            "kind": "row",
+            "row": 2
+          }
         },
         {
           "id": "or-marketing",
           "label": "4% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 4 }
+          "anchor": {
+            "kind": "row",
+            "row": 4
+          }
         }
       ]
     }

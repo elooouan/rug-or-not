@@ -3,6 +3,7 @@
   "title": "Paperwork",
   "ticker": "$ARCV",
   "pitch": "Archive Protocol: pays libraries to host open data. Slow, dull, audited.",
+  "intro": "Libraries and paperwork. There's an admin and a pause. Read how they're allowed to use them.",
   "difficulty": 4,
   "verdict": "legit",
   "timeLimitSec": 300,
@@ -51,21 +52,30 @@
           "label": "Admin behind timelock",
           "herring": true,
           "herringId": "timelocked-admin",
-          "anchor": { "kind": "line", "line": 3 }
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
         },
         {
           "id": "ar-supply",
           "label": "Hard cap, minted once",
           "herring": true,
           "herringId": "immutable-supply-note",
-          "anchor": { "kind": "line", "line": 14 }
+          "anchor": {
+            "kind": "line",
+            "line": 14
+          }
         },
         {
           "id": "ar-pause",
           "label": "Pause expires itself",
           "herring": true,
           "herringId": "timelocked-admin",
-          "anchor": { "kind": "line", "line": 18 }
+          "anchor": {
+            "kind": "line",
+            "line": 18
+          }
         }
       ]
     },
@@ -75,10 +85,26 @@
       "content": {
         "totalSupply": "25,000,000 ARCV",
         "allocations": [
-          { "label": "Library grants", "pct": 55, "vesting": "by vote" },
-          { "label": "Liquidity", "pct": 25, "vesting": "locked 3y" },
-          { "label": "Contributors", "pct": 14, "vesting": "1y cliff+2y" },
-          { "label": "Marketing", "pct": 6, "vesting": "24 months" }
+          {
+            "label": "Library grants",
+            "pct": 55,
+            "vesting": "by vote"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 25,
+            "vesting": "locked 3y"
+          },
+          {
+            "label": "Contributors",
+            "pct": 14,
+            "vesting": "1y cliff+2y"
+          },
+          {
+            "label": "Marketing",
+            "pct": 6,
+            "vesting": "24 months"
+          }
         ],
         "notes": [
           "Roadmap: onboard four more libraries this year. Publish uptime reports. Nothing else."
@@ -90,14 +116,21 @@
           "label": "'Nothing else' roadmap",
           "herring": true,
           "herringId": "boring-roadmap",
-          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
         },
         {
           "id": "ar-marketing",
           "label": "6% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 3 }
+          "anchor": {
+            "kind": "row",
+            "row": 3
+          }
         }
       ]
     },
@@ -135,7 +168,10 @@
           "label": "shelf_wizard is doxxed",
           "herring": true,
           "herringId": "doxxed-meme-name",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -180,14 +216,20 @@
           "label": "Ren challenges pause",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 0 }
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
         },
         {
           "id": "ar-joke",
           "label": "Overdue fees joke",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 4 }
+          "anchor": {
+            "kind": "message",
+            "index": 4
+          }
         }
       ]
     },
@@ -197,15 +239,40 @@
       "content": {
         "pool": "ARCV / USDC",
         "liquidityUsd": "$240,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Sep 2029 (3y)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Sep 2029 (3y)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Timelock (grants)", "pct": 54, "tag": "timelock" },
-          { "label": "Liquidity pool", "pct": 25, "tag": "pool" },
-          { "label": "Contributor vesting", "pct": 14, "tag": "vesting" },
-          { "label": "Everyone else", "pct": 7 }
+          {
+            "label": "Timelock (grants)",
+            "pct": 54,
+            "tag": "timelock"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 25,
+            "tag": "pool"
+          },
+          {
+            "label": "Contributor vesting",
+            "pct": 14,
+            "tag": "vesting"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 7
+          }
         ],
         "transfers": [
-          { "when": "4d ago", "from": "Timelock", "to": "Northcove library", "amount": "80,000" }
+          {
+            "when": "4d ago",
+            "from": "Timelock",
+            "to": "Northcove library",
+            "amount": "80,000"
+          }
         ]
       },
       "clues": [
@@ -214,14 +281,22 @@
           "label": "LP locked 3 years",
           "herring": true,
           "herringId": "liquidity-locked-long",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         },
         {
           "id": "ar-pool",
           "label": "Pool holds 25%",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
         }
       ]
     },
@@ -247,7 +322,11 @@
           "label": "Audit found a medium",
           "herring": true,
           "herringId": "real-audit-findings",
-          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
         }
       ]
     }

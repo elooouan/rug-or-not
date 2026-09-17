@@ -3,6 +3,7 @@
   "title": "Cookies From a Stranger",
   "ticker": "$GRNDMA",
   "pitch": "GrandmaCoin: as safe as grandma's cookies. Bake profits with the family.",
+  "intro": "Grandma's cookies. Sweet. Check the family photos, and look for anything called 'naughty'.",
   "difficulty": 3,
   "verdict": "rug",
   "timeLimitSec": 240,
@@ -43,14 +44,20 @@
           "id": "gm-blacklist",
           "label": "Owner freezes wallets",
           "flagId": "blacklist",
-          "anchor": { "kind": "line", "line": 5 }
+          "anchor": {
+            "kind": "line",
+            "line": 5
+          }
         },
         {
           "id": "gm-tax",
           "label": "2% tax (fixed)",
           "herring": true,
           "herringId": "small-fixed-tax",
-          "anchor": { "kind": "line", "line": 2 }
+          "anchor": {
+            "kind": "line",
+            "line": 2
+          }
         }
       ]
     },
@@ -90,13 +97,21 @@
           "flagId": "anon-team-stock-photos",
           "finePrint": true,
           "text": "STOCK IMG",
-          "anchor": { "kind": "row", "row": 0, "table": "photo" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "photo"
+          }
         },
         {
           "id": "gm-roadmap",
           "label": "Roadmap names PupCoin",
           "flagId": "copied-whitepaper",
-          "anchor": { "kind": "row", "row": 0, "table": "note" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "note"
+          }
         }
       ]
     },
@@ -106,10 +121,26 @@
       "content": {
         "totalSupply": "1,000,000,000 GRNDMA",
         "allocations": [
-          { "label": "Cookie jar (LP)", "pct": 35, "vesting": "locked 1y" },
-          { "label": "Family", "pct": 30, "vesting": "none" },
-          { "label": "Bake sale", "pct": 25, "vesting": "none" },
-          { "label": "Kitchen fund", "pct": 10, "vesting": "12 months" }
+          {
+            "label": "Cookie jar (LP)",
+            "pct": 35,
+            "vesting": "locked 1y"
+          },
+          {
+            "label": "Family",
+            "pct": 30,
+            "vesting": "none"
+          },
+          {
+            "label": "Bake sale",
+            "pct": 25,
+            "vesting": "none"
+          },
+          {
+            "label": "Kitchen fund",
+            "pct": 10,
+            "vesting": "12 months"
+          }
         ],
         "notes": ["Family tokens are held in Grandma's purse for safekeeping."]
       },
@@ -118,7 +149,10 @@
           "id": "gm-family",
           "label": "30% family, no vesting",
           "flagId": "team-allocation-unvested",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -143,7 +177,11 @@
             "time": "11:01",
             "text": "just baked my bag bigger, grandma never rugs"
           },
-          { "user": "priya", "time": "11:03", "text": "lol why is everyone saying the same thing" },
+          {
+            "user": "priya",
+            "time": "11:03",
+            "text": "lol why is everyone saying the same thing"
+          },
           {
             "user": "Cousin_Kit",
             "role": "admin",
@@ -173,20 +211,29 @@
           "id": "gm-bots",
           "label": "Same msg, 3 accounts",
           "flagId": "bot-chat",
-          "anchor": { "kind": "message", "index": 1 }
+          "anchor": {
+            "kind": "message",
+            "index": 1
+          }
         },
         {
           "id": "gm-urgency",
           "label": "'ends at midnight'",
           "flagId": "urgency-pressure",
-          "anchor": { "kind": "message", "index": 6 }
+          "anchor": {
+            "kind": "message",
+            "index": 6
+          }
         },
         {
           "id": "gm-joke",
           "label": "dough_boy joke",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 7 }
+          "anchor": {
+            "kind": "message",
+            "index": 7
+          }
         }
       ]
     }

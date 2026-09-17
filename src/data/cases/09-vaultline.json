@@ -3,6 +3,7 @@
   "title": "The Proxy",
   "ticker": "$VLT",
   "pitch": "Vaultline: audited, doxxed, renounced. A calm 0.5% daily yield, no drama.",
+  "intro": "Everything's in order. Too much order. The word 'proxy' should make your eye twitch.",
   "difficulty": 5,
   "verdict": "rug",
   "timeLimitSec": 300,
@@ -44,7 +45,10 @@
           "flagId": "fake-renounce",
           "finePrint": true,
           "text": "// ProxyAdmin owner: 0x6a8...f40 (deployer). Can upgrade implementation.",
-          "anchor": { "kind": "line", "line": 2 }
+          "anchor": {
+            "kind": "line",
+            "line": 2
+          }
         },
         {
           "id": "vl-hook",
@@ -52,14 +56,20 @@
           "flagId": "honeypot",
           "finePrint": true,
           "text": "// hook lives in the implementation; current version reverts sells > 1% of pool",
-          "anchor": { "kind": "line", "line": 16 }
+          "anchor": {
+            "kind": "line",
+            "line": 16
+          }
         },
         {
           "id": "vl-renounce",
           "label": "Ownership renounced",
           "herring": true,
           "herringId": "renounced-cleanly",
-          "anchor": { "kind": "line", "line": 11 }
+          "anchor": {
+            "kind": "line",
+            "line": 11
+          }
         }
       ]
     },
@@ -69,10 +79,26 @@
       "content": {
         "totalSupply": "20,000,000 VLT",
         "allocations": [
-          { "label": "Yield pool", "pct": 50, "vesting": "emissions" },
-          { "label": "Liquidity", "pct": 30, "vesting": "locked" },
-          { "label": "Team", "pct": 12, "vesting": "12 months" },
-          { "label": "Marketing", "pct": 8, "vesting": "12 months" }
+          {
+            "label": "Yield pool",
+            "pct": 50,
+            "vesting": "emissions"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 30,
+            "vesting": "locked"
+          },
+          {
+            "label": "Team",
+            "pct": 12,
+            "vesting": "12 months"
+          },
+          {
+            "label": "Marketing",
+            "pct": 8,
+            "vesting": "12 months"
+          }
         ],
         "notes": [
           "Holders receive a fixed 0.5% daily yield, paid from the yield pool, guaranteed for 24 months.",
@@ -84,14 +110,21 @@
           "id": "vl-yield",
           "label": "'Fixed 0.5% daily'",
           "flagId": "guaranteed-returns",
-          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
         },
         {
           "id": "vl-marketing",
           "label": "8% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 3 }
+          "anchor": {
+            "kind": "row",
+            "row": 3
+          }
         }
       ]
     },
@@ -121,7 +154,10 @@
           "id": "vl-anon",
           "label": "Anon dev holds deploys",
           "flagId": "anon-team-stock-photos",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -145,7 +181,11 @@
           "label": "Audit lists findings",
           "herring": true,
           "herringId": "real-audit-findings",
-          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
         }
       ]
     },
@@ -155,12 +195,32 @@
       "content": {
         "pool": "VLT / USDC",
         "liquidityUsd": "$402,000",
-        "lock": { "locked": true, "provider": "SafeLock", "expires": "Fri (2 days)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "SafeLock",
+          "expires": "Fri (2 days)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Yield pool contract", "pct": 48, "tag": "contract" },
-          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
-          { "label": "Team vesting", "pct": 11, "tag": "vesting" },
-          { "label": "Everyone else", "pct": 11 }
+          {
+            "label": "Yield pool contract",
+            "pct": 48,
+            "tag": "contract"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "Team vesting",
+            "pct": 11,
+            "tag": "vesting"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 11
+          }
         ],
         "transfers": [
           {
@@ -176,14 +236,22 @@
           "id": "vl-lock",
           "label": "Lock ends in 2 days",
           "flagId": "liquidity-unlocked",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         },
         {
           "id": "vl-pool",
           "label": "Pool holds 30%",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
         }
       ]
     }

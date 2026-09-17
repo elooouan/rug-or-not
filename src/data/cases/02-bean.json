@@ -3,6 +3,7 @@
   "title": "Small Batch",
   "ticker": "$BEAN",
   "pitch": "A loyalty token for Vela Roasters' three coffee shops. Buy beans, earn BEAN.",
+  "intro": "Coffee shop token. Boring pitch, which is either honest or clever. Check the lock and the tax.",
   "difficulty": 1,
   "verdict": "legit",
   "timeLimitSec": 240,
@@ -43,21 +44,30 @@
           "label": "1% tax (fixed)",
           "herring": true,
           "herringId": "small-fixed-tax",
-          "anchor": { "kind": "line", "line": 3 }
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
         },
         {
           "id": "bn-supply",
           "label": "Supply minted once",
           "herring": true,
           "herringId": "immutable-supply-note",
-          "anchor": { "kind": "line", "line": 8 }
+          "anchor": {
+            "kind": "line",
+            "line": 8
+          }
         },
         {
           "id": "bn-renounce",
           "label": "Renounced at deploy",
           "herring": true,
           "herringId": "renounced-cleanly",
-          "anchor": { "kind": "line", "line": 17 }
+          "anchor": {
+            "kind": "line",
+            "line": 17
+          }
         }
       ]
     },
@@ -67,10 +77,26 @@
       "content": {
         "totalSupply": "10,000,000 BEAN",
         "allocations": [
-          { "label": "Loyalty rewards", "pct": 50, "vesting": "5 years" },
-          { "label": "Liquidity", "pct": 30, "vesting": "locked 2y" },
-          { "label": "Team", "pct": 12, "vesting": "24 months" },
-          { "label": "Marketing", "pct": 8, "vesting": "12 months" }
+          {
+            "label": "Loyalty rewards",
+            "pct": 50,
+            "vesting": "5 years"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 30,
+            "vesting": "locked 2y"
+          },
+          {
+            "label": "Team",
+            "pct": 12,
+            "vesting": "24 months"
+          },
+          {
+            "label": "Marketing",
+            "pct": 8,
+            "vesting": "12 months"
+          }
         ],
         "notes": [
           "Rewards are released to the loyalty contract 1% per month.",
@@ -83,7 +109,10 @@
           "label": "8% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 3 }
+          "anchor": {
+            "kind": "row",
+            "row": 3
+          }
         }
       ]
     },
@@ -115,7 +144,10 @@
           "label": "Dev has a silly handle",
           "herring": true,
           "herringId": "doxxed-meme-name",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         }
       ]
     },
@@ -125,16 +157,45 @@
       "content": {
         "pool": "BEAN / USDC",
         "liquidityUsd": "$188,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Jun 2028 (2y)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Jun 2028 (2y)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
-          { "label": "Loyalty contract", "pct": 49, "tag": "contract" },
-          { "label": "Team vesting", "pct": 12, "tag": "vesting" },
-          { "label": "Marketing multisig", "pct": 6, "tag": "multisig" },
-          { "label": "Everyone else", "pct": 3 }
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "Loyalty contract",
+            "pct": 49,
+            "tag": "contract"
+          },
+          {
+            "label": "Team vesting",
+            "pct": 12,
+            "tag": "vesting"
+          },
+          {
+            "label": "Marketing multisig",
+            "pct": 6,
+            "tag": "multisig"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 3
+          }
         ],
         "transfers": [
-          { "when": "3d ago", "from": "Loyalty contract", "to": "Shop 2 POS", "amount": "12,400" }
+          {
+            "when": "3d ago",
+            "from": "Loyalty contract",
+            "to": "Shop 2 POS",
+            "amount": "12,400"
+          }
         ]
       },
       "clues": [
@@ -143,14 +204,22 @@
           "label": "LP locked 2 years",
           "herring": true,
           "herringId": "liquidity-locked-long",
-          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
         },
         {
           "id": "bn-pool",
           "label": "Pool is a top holder",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 0, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "holders"
+          }
         }
       ]
     },
@@ -174,7 +243,11 @@
           "label": "Audit lists findings",
           "herring": true,
           "herringId": "real-audit-findings",
-          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
         }
       ]
     }

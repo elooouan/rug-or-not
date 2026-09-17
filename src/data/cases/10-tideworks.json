@@ -3,6 +3,7 @@
   "title": "High Tide",
   "ticker": "$TIDE",
   "pitch": "TideWorks: real yield from real ports. Compliance-first, community-owned.",
+  "intro": "Ports, compliance, partners under NDA. Read the caps, read the whitepaper, count the whales.",
   "difficulty": 5,
   "verdict": "rug",
   "timeLimitSec": 300,
@@ -49,13 +50,19 @@
           "flagId": "sell-tax-adjustable",
           "finePrint": true,
           "text": "// 10_000 bps = 100%. 'cap' is decorative.",
-          "anchor": { "kind": "line", "line": 3 }
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
         },
         {
           "id": "td-compliance",
           "label": "'Compliance' blacklist",
           "flagId": "blacklist",
-          "anchor": { "kind": "line", "line": 13 }
+          "anchor": {
+            "kind": "line",
+            "line": 13
+          }
         }
       ]
     },
@@ -65,11 +72,31 @@
       "content": {
         "totalSupply": "500,000,000 TIDE",
         "allocations": [
-          { "label": "Port revenue pool", "pct": 40, "vesting": "protocol" },
-          { "label": "Liquidity", "pct": 24, "vesting": "locked 1y" },
-          { "label": "Ecosystem partners", "pct": 27, "vesting": "none" },
-          { "label": "Team", "pct": 6, "vesting": "18 months" },
-          { "label": "Marketing", "pct": 3, "vesting": "12 months" }
+          {
+            "label": "Port revenue pool",
+            "pct": 40,
+            "vesting": "protocol"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 24,
+            "vesting": "locked 1y"
+          },
+          {
+            "label": "Ecosystem partners",
+            "pct": 27,
+            "vesting": "none"
+          },
+          {
+            "label": "Team",
+            "pct": 6,
+            "vesting": "18 months"
+          },
+          {
+            "label": "Marketing",
+            "pct": 3,
+            "vesting": "12 months"
+          }
         ],
         "notes": [
           "Risk disclosure: $HRBR tokens may fluctuate in value. The harbour co-op is not liable for loses.",
@@ -83,20 +110,30 @@
           "flagId": "copied-whitepaper",
           "finePrint": true,
           "text": "same typo ('loses') as Harbor's whitepaper v0.2",
-          "anchor": { "kind": "row", "row": 0, "table": "notes" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
         },
         {
           "id": "td-partners",
           "label": "27% partners, liquid",
           "flagId": "team-allocation-unvested",
-          "anchor": { "kind": "row", "row": 2 }
+          "anchor": {
+            "kind": "row",
+            "row": 2
+          }
         },
         {
           "id": "td-marketing",
           "label": "3% marketing, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 4 }
+          "anchor": {
+            "kind": "row",
+            "row": 4
+          }
         }
       ]
     },
@@ -135,7 +172,11 @@
           "flagId": "anon-team-stock-photos",
           "finePrint": true,
           "text": "PHOTO ID 4471",
-          "anchor": { "kind": "row", "row": 1, "table": "photo" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "photo"
+          }
         }
       ]
     },
@@ -191,14 +232,20 @@
           "label": "Quill asks re: freeze",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 2 }
+          "anchor": {
+            "kind": "message",
+            "index": 2
+          }
         },
         {
           "id": "td-joke",
           "label": "Bathtub joke",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 1 }
+          "anchor": {
+            "kind": "message",
+            "index": 1
+          }
         }
       ]
     },
@@ -208,19 +255,59 @@
       "content": {
         "pool": "TIDE / USDC",
         "liquidityUsd": "$580,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Sep 2027 (1y)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Sep 2027 (1y)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Revenue pool contract", "pct": 39, "tag": "contract" },
-          { "label": "Liquidity pool", "pct": 24, "tag": "pool" },
-          { "label": "0xb3f...019", "pct": 9 },
-          { "label": "0x2ee...a77", "pct": 9 },
-          { "label": "0x8c1...5d5", "pct": 9 },
-          { "label": "Everyone else", "pct": 10 }
+          {
+            "label": "Revenue pool contract",
+            "pct": 39,
+            "tag": "contract"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 24,
+            "tag": "pool"
+          },
+          {
+            "label": "0xb3f...019",
+            "pct": 9
+          },
+          {
+            "label": "0x2ee...a77",
+            "pct": 9
+          },
+          {
+            "label": "0x8c1...5d5",
+            "pct": 9
+          },
+          {
+            "label": "Everyone else",
+            "pct": 10
+          }
         ],
         "transfers": [
-          { "when": "6d ago", "from": "Deployer", "to": "0xb3f...019", "amount": "45,000,000" },
-          { "when": "6d ago", "from": "Deployer", "to": "0x2ee...a77", "amount": "45,000,000" },
-          { "when": "6d ago", "from": "Deployer", "to": "0x8c1...5d5", "amount": "45,000,000" }
+          {
+            "when": "6d ago",
+            "from": "Deployer",
+            "to": "0xb3f...019",
+            "amount": "45,000,000"
+          },
+          {
+            "when": "6d ago",
+            "from": "Deployer",
+            "to": "0x2ee...a77",
+            "amount": "45,000,000"
+          },
+          {
+            "when": "6d ago",
+            "from": "Deployer",
+            "to": "0x8c1...5d5",
+            "amount": "45,000,000"
+          }
         ]
       },
       "clues": [
@@ -230,14 +317,22 @@
           "flagId": "whale-concentration",
           "finePrint": true,
           "text": "all three funded in block 19,442,117 from the deployer",
-          "anchor": { "kind": "row", "row": 2, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 2,
+            "table": "holders"
+          }
         },
         {
           "id": "td-pool",
           "label": "Pool holds 24%",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 1, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
         }
       ]
     }

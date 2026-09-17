@@ -183,6 +183,8 @@ export const CaseSchema = z
     title: z.string().min(1).max(40),
     ticker: z.string().regex(/^\$[A-Z0-9]{2,8}$/, 'ticker like $MOONPUP'),
     pitch: z.string().min(1).max(90),
+    /** Lucien's one-liner when the folder lands on the desk. */
+    intro: z.string().max(160).optional(),
     difficulty: z.number().int().min(1).max(5),
     verdict: z.enum(['rug', 'legit']),
     timeLimitSec: z.number().int().min(30).max(900),

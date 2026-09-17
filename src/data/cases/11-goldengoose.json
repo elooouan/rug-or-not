@@ -3,6 +3,7 @@
   "title": "The Goose That Laid",
   "ticker": "$GOOSE",
   "pitch": "GoldenGoose lays a golden egg every day. Hold the goose, eat the eggs.",
+  "intro": "A goose that lays golden eggs. Ask where eggs come from when nobody's buying.",
   "difficulty": 3,
   "verdict": "rug",
   "timeLimitSec": 240,
@@ -45,7 +46,10 @@
           "id": "gg-lay",
           "label": "layEgg mints freely",
           "flagId": "mint-unlimited",
-          "anchor": { "kind": "line", "line": 9 }
+          "anchor": {
+            "kind": "line",
+            "line": 9
+          }
         },
         {
           "id": "gg-rate",
@@ -53,7 +57,10 @@
           "flagId": "guaranteed-returns",
           "finePrint": true,
           "text": "// 1% daily, forever. paid by minting. math is not our department",
-          "anchor": { "kind": "line", "line": 2 }
+          "anchor": {
+            "kind": "line",
+            "line": 2
+          }
         }
       ]
     },
@@ -63,10 +70,26 @@
       "content": {
         "totalSupply": "500,000,000 GOOSE (+eggs)",
         "allocations": [
-          { "label": "Barn (LP)", "pct": 30, "vesting": "locked 6mo" },
-          { "label": "The farm (team)", "pct": 28, "vesting": "none" },
-          { "label": "Hatchery (sale)", "pct": 32, "vesting": "none" },
-          { "label": "Feed (marketing)", "pct": 10, "vesting": "12 months" }
+          {
+            "label": "Barn (LP)",
+            "pct": 30,
+            "vesting": "locked 6mo"
+          },
+          {
+            "label": "The farm (team)",
+            "pct": 28,
+            "vesting": "none"
+          },
+          {
+            "label": "Hatchery (sale)",
+            "pct": 32,
+            "vesting": "none"
+          },
+          {
+            "label": "Feed (marketing)",
+            "pct": 10,
+            "vesting": "12 months"
+          }
         ],
         "notes": ["Supply grows with eggs. Eggs are good. More eggs is more good."]
       },
@@ -75,14 +98,20 @@
           "id": "gg-farm",
           "label": "28% farm, no vesting",
           "flagId": "team-allocation-unvested",
-          "anchor": { "kind": "row", "row": 1 }
+          "anchor": {
+            "kind": "row",
+            "row": 1
+          }
         },
         {
           "id": "gg-feed",
           "label": "10% feed, vested",
           "herring": true,
           "herringId": "small-vested-marketing",
-          "anchor": { "kind": "row", "row": 3 }
+          "anchor": {
+            "kind": "row",
+            "row": 3
+          }
         }
       ]
     },
@@ -136,27 +165,39 @@
           "id": "gg-honks",
           "label": "Three identical honks",
           "flagId": "bot-chat",
-          "anchor": { "kind": "message", "index": 2 }
+          "anchor": {
+            "kind": "message",
+            "index": 2
+          }
         },
         {
           "id": "gg-noon",
           "label": "'closes at noon'",
           "flagId": "urgency-pressure",
-          "anchor": { "kind": "message", "index": 0 }
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
         },
         {
           "id": "gg-marta",
           "label": "Marta asks re: eggs",
           "herring": true,
           "herringId": "tough-questions",
-          "anchor": { "kind": "message", "index": 4 }
+          "anchor": {
+            "kind": "message",
+            "index": 4
+          }
         },
         {
           "id": "gg-duck",
           "label": "Duck guy",
           "herring": true,
           "herringId": "community-jokes",
-          "anchor": { "kind": "message", "index": 6 }
+          "anchor": {
+            "kind": "message",
+            "index": 6
+          }
         }
       ]
     },
@@ -166,11 +207,27 @@
       "content": {
         "pool": "GOOSE / ETH",
         "liquidityUsd": "$58,000",
-        "lock": { "locked": true, "provider": "LockBox", "expires": "Mar (6mo)", "pct": 100 },
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Mar (6mo)",
+          "pct": 100
+        },
         "holders": [
-          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
-          { "label": "The farm", "pct": 28, "tag": "team" },
-          { "label": "Everyone else", "pct": 42 }
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "The farm",
+            "pct": 28,
+            "tag": "team"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 42
+          }
         ],
         "transfers": []
       },
@@ -180,7 +237,11 @@
           "label": "Pool holds 30%",
           "herring": true,
           "herringId": "pool-top-holder",
-          "anchor": { "kind": "row", "row": 0, "table": "holders" }
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "holders"
+          }
         }
       ]
     }
