@@ -28,6 +28,8 @@ const game = new Phaser.Game({
     height: CANVAS_HEIGHT,
   },
   render: { antialias: true, antialiasGL: true },
+  // Dev only: keep the loop stepping in a background tab so automated checks don't stall.
+  fps: import.meta.env.DEV ? { forceSetTimeOut: true, target: 60 } : undefined,
   input: { keyboard: true, mouse: { preventDefaultWheel: true } },
   scene: [
     BootScene,

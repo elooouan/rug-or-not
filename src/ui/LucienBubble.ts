@@ -15,13 +15,14 @@ import { charWidth, makeText, wrapMono } from './text';
 export class LucienBubble extends Phaser.GameObjects.Container {
   private static current: LucienBubble | null = null;
 
-  static say(scene: Phaser.Scene, text: string, ms = 3200): void {
+  /** `lift` raises the bubble above things at the bottom of the screen (e.g. report buttons). */
+  static say(scene: Phaser.Scene, text: string, ms = 3200, lift = 0): void {
     LucienBubble.current?.destroy();
-    LucienBubble.current = new LucienBubble(scene, text, ms);
+    LucienBubble.current = new LucienBubble(scene, text, ms, lift);
   }
 
-  constructor(scene: Phaser.Scene, text: string, ms: number) {
-    super(scene, 0, 0);
+  constructor(scene: Phaser.Scene, text: string, ms: number, lift = 0) {
+    super(scene, 0, -lift);
     const faceH = 40;
     const face = scene.make
       .image({ x: 6, y: GAME_HEIGHT - 4, key: LUCIEN_FACE_TEX }, false)
@@ -56,8 +57,8 @@ export class LucienBubble extends Phaser.GameObjects.Container {
     audio.play('hover');
     const reduced = saveStore.get().settings.reducedMotion;
     if (!reduced) {
-      this.setAlpha(0).setY(6);
-      scene.tweens.add({ targets: this, alpha: 1, y: 0, duration: 160, ease: 'Quad.easeOut' });
+      this.setAlpha(0).setY(6 - lift);
+      scene.tweens.add({ targets: this, alpha: 1, y: -lift, duration: 160, ease: 'Quad.easeOut' });
     }
     scene.time.delayedCall(ms, () => {
       if (!this.active) return;

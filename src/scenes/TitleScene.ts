@@ -328,7 +328,8 @@ export class TitleScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
 
     // Intro: lamp clicks on, the case file slides in. Only once per session.
-    if (!TitleScene.seenIntro && !reduced) {
+    // Skip the animated intro when the tab is in the background: timers would stall mid-way.
+    if (!TitleScene.seenIntro && !reduced && !document.hidden) {
       TitleScene.seenIntro = true;
       desk.light.setVisible(false);
       card.setY(GAME_HEIGHT).setAlpha(0);

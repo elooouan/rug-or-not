@@ -342,22 +342,29 @@ export class ReportScene extends Phaser.Scene {
       line = 'Right call. Some of those pins were on innocent paper, though.';
     else if (b.flagsMissed.length > 0) line = 'Right call. There was more to find.';
     else line = 'Solid work, detective.';
-    LucienBubble.say(this, line, 5000);
+    LucienBubble.say(this, line, 5000, 34);
   }
 
+  /**
+   * Once-only lessons chain first (report -> legit/wrong -> all cases); when
+   * nothing new needs saying, Lucien just gives his quick take.
+   */
   private lucienDebrief(): void {
     const b = this.payload.breakdown;
-    const follow = () => {
-      if (!b.verdictCorrect) lucienSays(this, 'first-wrong');
-      else if (this.payload.caseData.verdict === 'legit') lucienSays(this, 'first-legit');
+    const allDone = Object.keys(saveStore.get().caseResults).length >= gameState.cases.length;
+    const finale = () => {
+      const box = allDone ? lucienSays(this, 'all-cases') : null;
+      if (!box) this.lucienComment();
     };
-    if (!lucienSays(this, 'first-report', { onDone: follow })) {
-      follow();
-      this.time.delayedCall(300, () => this.lucienComment());
-    }
-    if (Object.keys(saveStore.get().caseResults).length >= gameState.cases.length) {
-      this.time.delayedCall(200, () => lucienSays(this, 'all-cases'));
-    }
+    const follow = () => {
+      const box = !b.verdictCorrect
+        ? lucienSays(this, 'first-wrong', { onDone: finale })
+        : this.payload.caseData.verdict === 'legit'
+          ? lucienSays(this, 'first-legit', { onDone: finale })
+          : null;
+      if (!box) finale();
+    };
+    if (!lucienSays(this, 'first-report', { onDone: follow })) follow();
   }
 
   private showGrade(): void {
