@@ -70,6 +70,8 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - **Campaign**: twelve cases in order (seven rugs, five legit, difficulty 1→5); each verdict unlocks the next folder.
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Daily plays don't unlock campaign folders.
+- **Detective's honour** (hard mode): no nudges from Lucien, no examined counter, no hover
+  highlights; every run scores ×1.25 and is starred on the board.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a
   no-magnifier accessibility mode (fine print shown inline with a dotted underline) live there too.
 - **Detective's Notebook**: every red flag you meet in a report unlocks its glossary page.
@@ -94,7 +96,8 @@ includes one). Dev builds expose `__debug.startCase('kelp')` and `__debug.audioL
 
 Scoring lives in [`src/systems/scoring.ts`](src/systems/scoring.ts): +100 correct verdict,
 −50 wrong, +25 per real red flag pinned (+10 if it was fine print), −15 per false
-accusation, a time bonus in timed mode, and a letter grade S/A/B/C/D. Your total score is
+accusation, −10 per nudge bought from Lucien (max three), a time bonus in timed mode,
+×1.25 in Detective's honour mode, and a letter grade S/A/B/C/D. Your total score is
 the sum of your **best** run per case, so replays can't farm points.
 
 ## Project layout

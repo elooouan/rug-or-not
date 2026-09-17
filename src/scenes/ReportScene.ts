@@ -267,7 +267,7 @@ export class ReportScene extends Phaser.Scene {
       text: `Verdict ${fmt(b.verdictPoints)}   Flags ${fmt(b.flagPoints)}   Penalties ${fmt(b.penaltyPoints)}${b.hintPoints ? `   Hints ${fmt(b.hintPoints)}` : ''}   Time ${fmt(b.timeBonus)}`,
     });
     L.push({
-      text: `TOTAL ${b.total} / ${b.maxPossible}${bestImproved ? '   new best!' : ''}`,
+      text: `TOTAL ${b.total} / ${b.maxPossible}${b.multiplier !== 1 ? `   (honour x${b.multiplier})` : ''}${bestImproved ? '   new best!' : ''}`,
       font: 'ui',
       size: 12,
       color: 'shadow',

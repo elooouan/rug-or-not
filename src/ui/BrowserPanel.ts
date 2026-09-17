@@ -546,7 +546,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         return;
       }
       entries.forEach((e, i) => {
-        const line = `${String(i + 1).padStart(2, ' ')}. ${e.name.padEnd(12)} ${String(e.score).padStart(4)}  ${e.grade}  ${e.caseId.padEnd(10)} ${e.date.slice(0, 10)}`;
+        const line = `${String(i + 1).padStart(2, ' ')}. ${e.name.padEnd(12)} ${String(e.score).padStart(4)}${e.hard ? '*' : ' '} ${e.grade}  ${e.caseId.padEnd(10)} ${e.date.slice(0, 10)}`;
         ctx.content.add(
           makeText(ctx.scene, 0, y, line, {
             font: 'body',

@@ -19,6 +19,8 @@ export interface ScoreInput {
   pins: PinState;
   /** Seconds remaining, or null in relaxed mode. */
   timeLeftSec: number | null;
+  /** Detective's honour mode multiplies the (non-negative) total. */
+  hardMode?: boolean;
 }
 
 export interface ClueOutcome {
@@ -38,6 +40,8 @@ export interface ScoreBreakdown {
   penaltyPoints: number;
   hintPoints: number;
   timeBonus: number;
+  /** 1 normally, SCORING.hardModeMultiplier in hard mode. */
+  multiplier: number;
   total: number;
   maxPossible: number;
   grade: Grade;
@@ -75,7 +79,7 @@ export function gradeFor(total: number, maxPossible: number): Grade {
 
 /** Pure scoring. Never negative in total (a case can't cost you progress). */
 export function scoreCase(input: ScoreInput): ScoreBreakdown {
-  const { caseData, verdict, pins, timeLeftSec } = input;
+  const { caseData, verdict, pins, timeLeftSec, hardMode } = input;
   const pinned = new Set(pins.clueIds);
   const verdictCorrect = verdict === caseData.verdict;
   const verdictPoints = verdictCorrect ? SCORING.correctVerdict : SCORING.wrongVerdict;
@@ -102,8 +106,9 @@ export function scoreCase(input: ScoreInput): ScoreBreakdown {
   const hintPoints = Math.max(0, Math.floor(pins.hintsUsed ?? 0)) * SCORING.hintCost || 0;
   const bonus = timeBonus(timeLeftSec, caseData.timeLimitSec);
   const raw = verdictPoints + flagPoints + penaltyPoints + hintPoints + bonus;
-  const total = Math.max(0, raw);
-  const maxPossible = maxPossibleScore(caseData, timeLeftSec !== null);
+  const multiplier = hardMode ? SCORING.hardModeMultiplier : 1;
+  const total = Math.round(Math.max(0, raw) * multiplier);
+  const maxPossible = Math.round(maxPossibleScore(caseData, timeLeftSec !== null) * multiplier);
   return {
     verdictCorrect,
     verdictPoints,
@@ -115,6 +120,7 @@ export function scoreCase(input: ScoreInput): ScoreBreakdown {
     penaltyPoints,
     hintPoints,
     timeBonus: bonus,
+    multiplier,
     total,
     maxPossible,
     grade: gradeFor(total, maxPossible),

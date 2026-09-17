@@ -82,6 +82,11 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
 
   /** How many clue spots the lens has passed over, out of all spots in the case. */
   setExamined(n: number, total: number): void {
+    if (n < 0) {
+      this.examinedText.setText("detective's honour");
+      this.examinedText.setColor('#9a3b3b');
+      return;
+    }
     this.examinedText.setText(
       `examined ${n}/${total}${n >= total && total > 0 ? '  all seen' : ''}`,
     );

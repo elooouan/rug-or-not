@@ -10,6 +10,8 @@ export const SCORING = {
   /** Asking Lucien for a nudge. */
   hintCost: -10,
   maxHints: 3,
+  /** Detective's honour: no nudges, no examined counter, no hover highlights; everything scores more. */
+  hardModeMultiplier: 1.25,
 } as const;
 
 export const GRADES = [

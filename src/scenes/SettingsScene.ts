@@ -30,7 +30,7 @@ interface RowDef {
   hint?: () => string;
 }
 
-const CARD = { x: 150, y: 12, w: 340, h: 334, pad: 14, rowH: 15 } as const;
+const CARD = { x: 150, y: 10, w: 340, h: 340, pad: 12, rowH: 15 } as const;
 
 /** Volume, modes, accessibility, cosmetics and reset. Works standalone or as a pause overlay. */
 export class SettingsScene extends Phaser.Scene {
@@ -113,6 +113,12 @@ export class SettingsScene extends Phaser.Scene {
       label: 'Lamp flicker',
       value: () => onOff(s().lampFlicker),
       change: () => set((st) => (st.lampFlicker = !st.lampFlicker)),
+    });
+    this.rows.push({
+      label: "Detective's honour",
+      value: () => onOff(s().hardMode),
+      change: () => set((st) => (st.hardMode = !st.hardMode)),
+      hint: () => 'hard mode: no nudges, no examined counter, no hover highlights. Scores x1.25.',
     });
     this.rows.push({
       label: "Lucien's hints",

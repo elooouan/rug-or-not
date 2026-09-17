@@ -115,6 +115,20 @@ describe('scoreCase', () => {
     );
   });
 
+  it('multiplies in hard mode and keeps the grade scale consistent', () => {
+    const r = scoreCase({
+      caseData: rugCase,
+      verdict: 'rug',
+      pins: { clueIds: ['f1', 'f2', 'f3'], strayPins: 0 },
+      timeLeftSec: null,
+      hardMode: true,
+    });
+    expect(r.multiplier).toBe(SCORING.hardModeMultiplier);
+    expect(r.total).toBe(Math.round(185 * SCORING.hardModeMultiplier));
+    expect(r.maxPossible).toBe(Math.round(185 * SCORING.hardModeMultiplier));
+    expect(r.grade).toBe('S');
+  });
+
   it('charges for hints', () => {
     const r = scoreCase({
       caseData: rugCase,

@@ -9,6 +9,8 @@ export interface ScoreEntry {
   /** ISO date. */
   date: string;
   wallet?: string;
+  /** Detective's honour run. */
+  hard?: boolean;
 }
 
 export interface LeaderboardProvider {

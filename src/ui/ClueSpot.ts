@@ -110,7 +110,7 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     this.pin.setVisible(this.pinned);
     if (this.pinned) {
       this.highlight.setFillStyle(HEX.stampRed, 0.12).setStrokeStyle(1, HEX.stampRed, 0.7);
-    } else if (this.hovered || this.focused) {
+    } else if ((this.hovered && !saveStore.get().settings.hardMode) || this.focused) {
       this.highlight.setFillStyle(HEX.amber, 0.22).setStrokeStyle(1, HEX.amber, 0.9);
     } else {
       this.highlight.setFillStyle(HEX.amber, 0).setStrokeStyle();

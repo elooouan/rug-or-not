@@ -223,7 +223,7 @@ export class InvestigationScene extends Phaser.Scene {
         this.magnifier.setGlow(this.hoveringSpot > 0);
         if (over && !this.examined.has(clueId)) {
           this.examined.add(clueId);
-          this.notebook?.setExamined(this.examined.size, this.totalSpots);
+          if (!s.hardMode) this.notebook?.setExamined(this.examined.size, this.totalSpots);
           if (this.examined.size === this.totalSpots) {
             audio.play('unlock');
             this.mutter('thorough', 'Every spot examined. Thorough. Now decide.');
@@ -241,7 +241,8 @@ export class InvestigationScene extends Phaser.Scene {
     this.notebook = new NotebookPanel(this);
     this.notebook.setDepth(DEPTH.notebook);
     this.totalSpots = c.documents.reduce((n, d) => n + d.clues.length, 0);
-    this.notebook.setExamined(0, this.totalSpots);
+    if (s.hardMode) this.notebook.setExamined(-1, 0);
+    else this.notebook.setExamined(0, this.totalSpots);
     this.refreshNotebook();
 
     this.clock = new DeskClock(this);
@@ -358,6 +359,10 @@ export class InvestigationScene extends Phaser.Scene {
   /** A paid nudge: points at a document with spots you haven't examined. Never names a flag. */
   private askLucien(): void {
     if (this.phase !== 'investigating' || this.paused || this.browsing) return;
+    if (saveStore.get().settings.hardMode) {
+      LucienBubble.say(this, "Detective's honour. You're on your own tonight.");
+      return;
+    }
     if (this.hintsUsed >= SCORING.maxHints) {
       LucienBubble.say(this, "Three nudges is my limit. Detective's honour.");
       return;
@@ -456,6 +461,7 @@ export class InvestigationScene extends Phaser.Scene {
       verdict,
       pins,
       timeLeftSec: relaxed || !this.clock ? null : this.clock.timeLeft,
+      hardMode: saveStore.get().settings.hardMode,
     });
 
     const before = saveStore.get();
@@ -501,6 +507,7 @@ export class InvestigationScene extends Phaser.Scene {
       grade: breakdown.grade,
       date: new Date().toISOString(),
       wallet: wallet.state.address ?? undefined,
+      hard: saveStore.get().settings.hardMode || undefined,
     });
 
     saveStore.update((d) => {
