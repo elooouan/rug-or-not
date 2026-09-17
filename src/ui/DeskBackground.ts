@@ -67,6 +67,7 @@ export class DeskBackground {
   private fogA!: Phaser.GameObjects.Image;
   private fogB!: Phaser.GameObjects.Image;
   private weather: Weather = 'rain';
+  private sillSnow!: Phaser.GameObjects.Rectangle;
   private lightningTimer?: Phaser.Time.TimerEvent;
   private lights0!: Phaser.GameObjects.Image;
   private lights1!: Phaser.GameObjects.Image;
@@ -213,11 +214,17 @@ export class DeskBackground {
       speedX: { min: -10, max: 10 },
       lifespan: 1600,
       quantity: 1,
-      frequency: 90,
+      frequency: 55,
       alpha: { start: 0.95, end: 0.3 },
       scale: { start: 1, end: 0.6 },
     });
     this.snow.setDepth(DEPTH.windowRain);
+    // Snow settles on the sill.
+    this.sillSnow = scene.add
+      .rectangle(x + 4, y + h - 7, w - 8, 2, HEX.paper, 0.9)
+      .setOrigin(0)
+      .setDepth(DEPTH.windowRain)
+      .setVisible(false);
 
     // Click the glass to change the weather; click the moon because why not.
     glass.setInteractive({ useHandCursor: false });
@@ -387,6 +394,7 @@ export class DeskBackground {
         this.snow.killAll();
       }
     }
+    this.sillSnow.setVisible(w === 'snow');
     const clear = w === 'clear';
     this.stars0.setVisible(clear);
     this.stars1.setVisible(clear && this.stars1.visible);
