@@ -16,6 +16,7 @@ export interface Settings {
   noMagnifier: boolean; // accessibility: fine print shown inline
   weather: Weather;
   music: boolean;
+  musicVolume: number; // 0..1, relative to master
   /** Lucien's once-only guidance. */
   hints: boolean;
 }
@@ -28,6 +29,7 @@ export const DEFAULT_SETTINGS: Settings = {
   noMagnifier: false,
   weather: 'rain',
   music: true,
+  musicVolume: 0.5,
   hints: true,
 };
 
@@ -50,6 +52,10 @@ export function sanitizeSettings(raw: unknown): Settings {
         ? 'clear' // legacy saves had a rain on/off switch
         : DEFAULT_SETTINGS.weather,
     music: bool(r.music, DEFAULT_SETTINGS.music),
+    musicVolume:
+      typeof r.musicVolume === 'number' && Number.isFinite(r.musicVolume)
+        ? Math.min(1, Math.max(0, r.musicVolume))
+        : DEFAULT_SETTINGS.musicVolume,
     hints: bool(r.hints, DEFAULT_SETTINGS.hints),
   };
 }

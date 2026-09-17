@@ -162,6 +162,9 @@ export class ReportScene extends Phaser.Scene {
         audio.play('caseClosed');
       });
     }
+    this.payload.newUnlockNames.forEach((name, i) => {
+      this.time.delayedCall(2400 + i * 3600, () => toast(this, 'UNLOCKED', name));
+    });
     this.payload.newBadges.forEach((id, i) => {
       this.time.delayedCall((this.payload.rankUp ? 4600 : 1200) + i * 3600, () =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),

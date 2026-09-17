@@ -59,6 +59,8 @@ export class AudioManager {
   private step = 0;
   private padVoices: { osc: OscillatorNode[]; gain: GainNode }[] = [];
   private noiseBuf: AudioBuffer | null = null;
+  private tension = false;
+  private musicVolume = 0.55;
 
   /** Must be called from a user gesture (pointer/keyboard) to satisfy autoplay rules. */
   unlock(): void {
@@ -79,7 +81,7 @@ export class AudioManager {
       this.sfx.gain.value = 1;
       this.sfx.connect(this.master);
       this.musicBus = this.ctx.createGain();
-      this.musicBus.gain.value = 0.55;
+      this.musicBus.gain.value = this.musicVolume;
       this.musicBus.connect(this.master);
       if (this.rainWanted) this.startRain();
       if (this.musicWanted) this.startMusic();
@@ -101,6 +103,17 @@ export class AudioManager {
       this.startRain();
       if (this.rainGain) this.rainGain.gain.value = heavy ? 0.06 : 0.03;
     } else this.stopRain();
+  }
+
+  /** Music level relative to the master volume. */
+  setMusicVolume(v: number): void {
+    this.musicVolume = Math.max(0, Math.min(1, v));
+    if (this.musicBus) this.musicBus.gain.value = this.musicVolume;
+  }
+
+  /** Last-seconds mode: busier hats and a driving bass. */
+  setTension(on: boolean): void {
+    this.tension = on;
   }
 
   setMusic(on: boolean): void {
@@ -336,16 +349,24 @@ export class AudioManager {
       for (const v of this.padVoices) this.releasePad(v, t);
       this.padVoices = chord.pad.map((n) => this.padVoice(n, t));
     }
-    // Bass on 1 and the "and" of 3.
-    if (inBar === 0 || inBar === 10)
-      this.tone(t, 'sine', midi(chord.bass), midi(chord.bass), 0.55, 0.16, bus);
+    // Bass on 1 and the "and" of 3; every beat when the clock is running out.
+    if (inBar === 0 || inBar === 10 || (this.tension && inBar % 4 === 0))
+      this.tone(
+        t,
+        'sine',
+        midi(chord.bass),
+        midi(chord.bass),
+        this.tension ? 0.3 : 0.55,
+        0.16,
+        bus,
+      );
     // Kick on 1 and 3, snare on 2 and 4, hats on eighths.
     if (inBar === 0 || inBar === 8) this.tone(t, 'sine', 110, 42, 0.13, 0.32, bus);
     if (inBar === 4 || inBar === 12) {
       this.noise(t, 0.11, 0.09, 1700, 'bandpass', undefined, bus);
       this.tone(t, 'sine', 190, 120, 0.05, 0.08, bus);
     }
-    if (inBar % 2 === 0)
+    if (inBar % 2 === 0 || this.tension)
       this.noise(t, 0.025, inBar % 4 === 0 ? 0.035 : 0.02, 7000, 'highpass', undefined, bus);
     // Sparse pentatonic melody with a little vibrato.
     if (step % 4 === 0 && Math.random() < 0.3) {

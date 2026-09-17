@@ -43,6 +43,7 @@ export class BootScene extends Phaser.Scene {
     audio.setVolume(s.volume);
     applyWeatherAudio(s.weather);
     audio.setMusic(s.music);
+    audio.setMusicVolume(s.musicVolume);
 
     void this.boot(msg);
   }

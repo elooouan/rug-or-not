@@ -133,6 +133,8 @@ export class InvestigationScene extends Phaser.Scene {
     this.browsing = false;
     this.said = new Set();
     this.hintsUsed = 0;
+    audio.setTension(false);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => audio.setTension(false));
     // Scene emitters survive restarts; drop last run's handlers before adding ours.
     this.events.off('browser:open');
     this.events.off('browser:close');
@@ -407,6 +409,7 @@ export class InvestigationScene extends Phaser.Scene {
   private onStamp(verdict: Verdict): void {
     if (this.phase !== 'investigating') return;
     this.phase = 'stamped';
+    audio.setTension(false);
     this.magnifier.suspend();
     this.stamps.forEach((s) => s.setLocked(true));
     this.clock?.pause(true);
@@ -644,8 +647,10 @@ export class InvestigationScene extends Phaser.Scene {
         this.lastTickSecond = left;
         audio.play('tick');
       }
-      if (this.clock.isRunning && left <= 30)
+      if (this.clock.isRunning && left <= 30) {
         this.mutter('clock', "Clock's ticking. Go with what you've got.");
+        audio.setTension(true);
+      }
       if (!this.clock.isRunning && left === 0 && this.lastTickSecond === 0)
         this.mutter('timeup', "Time's up. No bonus, no penalty. Stamp it.");
     }

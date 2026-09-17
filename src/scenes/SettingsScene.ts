@@ -30,7 +30,7 @@ interface RowDef {
   hint?: () => string;
 }
 
-const CARD = { x: 150, y: 12, w: 340, h: 334, pad: 14, rowH: 16 } as const;
+const CARD = { x: 150, y: 12, w: 340, h: 334, pad: 14, rowH: 15 } as const;
 
 /** Volume, modes, accessibility, cosmetics and reset. Works standalone or as a pause overlay. */
 export class SettingsScene extends Phaser.Scene {
@@ -87,6 +87,7 @@ export class SettingsScene extends Phaser.Scene {
       audio.setVolume(s.volume);
       applyWeatherAudio(s.weather);
       audio.setMusic(s.music);
+      audio.setMusicVolume(s.musicVolume);
       this.refresh();
     };
     const s = () => saveStore.get().settings;
@@ -132,6 +133,15 @@ export class SettingsScene extends Phaser.Scene {
       label: 'Music (lo-fi loop)',
       value: () => onOff(s().music),
       change: () => set((st) => (st.music = !st.music)),
+    });
+    this.rows.push({
+      label: 'Music volume',
+      value: () => `${Math.round(s().musicVolume * 10) * 10}%`,
+      change: (d) =>
+        set(
+          (st) =>
+            (st.musicVolume = Phaser.Math.Clamp(Math.round(st.musicVolume * 10 + d) / 10, 0, 1)),
+        ),
     });
     this.rows.push({
       label: 'Weather outside',
@@ -230,7 +240,7 @@ export class SettingsScene extends Phaser.Scene {
       zone.on('pointerdown', (p: Phaser.Input.Pointer) => {
         this.select(i);
         // Left half steps back for stepped values, right half forward.
-        row.change(p.worldX < x + w / 2 + 40 && row.label === 'Master volume' ? -1 : 1);
+        row.change(p.worldX < x + w / 2 + 40 && row.label.endsWith('volume') ? -1 : 1);
       });
       this.rowTexts.push({ label, value, ring });
     });

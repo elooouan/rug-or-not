@@ -11,7 +11,7 @@ import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
-import { addText, makeText } from '@/ui/text';
+import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { difficultyPips, rect } from '@/ui/shapes';
 
@@ -21,6 +21,7 @@ export class CaseSelectScene extends Phaser.Scene {
   private focus = 0;
   private folders: Phaser.GameObjects.Container[] = [];
   private unlocked: boolean[] = [];
+  private tip?: Phaser.GameObjects.Container;
 
   constructor() {
     super(CaseSelectScene.KEY);
@@ -144,9 +145,50 @@ export class CaseSelectScene extends Phaser.Scene {
     cont.on('pointerover', () => {
       this.focus = i;
       this.refreshFocus();
+      this.showTip(c, i, x, y, unlocked);
     });
+    cont.on('pointerout', () => this.hideTip());
     cont.on('pointerdown', () => this.open(i));
     return cont;
+  }
+
+  /** A little card under the folder: pitch, best run, or what unlocks it. */
+  private showTip(c: CaseData, i: number, x: number, y: number, unlocked: boolean): void {
+    this.hideTip();
+    const save = saveStore.get();
+    const best = save.caseResults[c.id];
+    const w = 220;
+    const cw = charWidth(this, 'body', FONT.size.body);
+    const maxChars = Math.floor((w - 12) / cw);
+    const lines = unlocked
+      ? [
+          ...wrapMono(`"${c.pitch}"`, maxChars),
+          best
+            ? `best: ${best.bestScore} pts (${best.bestGrade})  ·  played ${best.completions}x`
+            : 'not played yet',
+        ]
+      : wrapMono(`Locked. Close case #${i} to open this folder.`, maxChars);
+    const h = 10 + lines.length * 12;
+    const tx = Phaser.Math.Clamp(x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
+    const ty = y + DRAWER.folderH + 8;
+    const tip = this.add.container(0, 0).setDepth(DEPTH.toast);
+    tip.add(rect(this, tx + 2, ty + 3, w, h, HEX.bg, 0.5));
+    tip.add(rect(this, tx, ty, w, h, HEX.paper));
+    lines.forEach((l, li) =>
+      tip.add(
+        makeText(this, tx + 6, ty + 5 + li * 12, l, {
+          font: 'body',
+          size: FONT.size.body,
+          color: unlocked && li === lines.length - 1 ? 'ink' : 'shadow',
+        }),
+      ),
+    );
+    this.tip = tip;
+  }
+
+  private hideTip(): void {
+    this.tip?.destroy();
+    this.tip = undefined;
   }
 
   private moveFocus(d: number): void {
