@@ -9,6 +9,7 @@ import { saveStore } from '@/systems/save';
 import { applyCosmetics } from '@/systems/unlocks';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
+import { setupScene } from './sceneUtil';
 
 /** Generates textures, waits for fonts, validates case data, then starts the title. */
 export class BootScene extends Phaser.Scene {
@@ -19,6 +20,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    setupScene(this);
     this.cameras.main.setBackgroundColor(PALETTE.bg);
     const msg = this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'loading...', {
@@ -28,13 +30,10 @@ export class BootScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Audio must be unlocked by a gesture; hook it once globally.
-    const unlock = () => audio.unlock();
-    this.input.on('pointerdown', unlock);
-    this.input.keyboard?.on('keydown', unlock);
     const s = saveStore.get().settings;
     audio.setVolume(s.volume);
     audio.setRain(s.rain);
+    audio.setMusic(s.music);
 
     void this.boot(msg);
   }

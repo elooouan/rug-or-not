@@ -9,7 +9,7 @@ import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { keepCursorOnTop } from './sceneUtil';
+import { setupScene } from './sceneUtil';
 
 const BOOK = { x: 70, y: 30, w: 500, h: 300, gutter: 8, pad: 14, lineH: 14 } as const;
 const SEV_COLOR: Record<Severity, PaletteKey> = {
@@ -33,7 +33,7 @@ export class NotebookScene extends Phaser.Scene {
   }
 
   create(): void {
-    keepCursorOnTop(this);
+    setupScene(this);
     new DeskBackground(this, { props: false, stamps: false });
     this.unlocked = new Set(saveStore.get().unlockedFlags);
     this.listIds = [...FLAG_IDS];

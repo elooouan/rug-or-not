@@ -13,7 +13,12 @@ export const TEX = {
   stampLegit: 'desk-stamp-legit',
   corkboard: 'desk-corkboard',
   window: 'desk-window',
+  windowLights: 'desk-window-lights', // + frame index
+  windowFlash: 'desk-window-flash',
   raindrop: 'desk-raindrop',
+  cat: 'desk-cat', // + frame index
+  heart: 'desk-heart',
+  steamPuff: 'desk-steam-puff',
   clock: 'desk-clock',
   paper: 'paper-sheet',
   paperSmall: 'paper-sheet-small',

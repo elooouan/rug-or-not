@@ -17,6 +17,7 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
   private pinIcons: Phaser.GameObjects.Image[] = [];
   private countText: Phaser.GameObjects.Text;
   private emptyText: Phaser.GameObjects.Text;
+  private examinedText: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     super(scene, NOTEBOOK.x, NOTEBOOK.y);
@@ -55,6 +56,11 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
       { size: FONT.size.body, font: 'body', color: 'woodLight' },
     );
     this.add(this.emptyText);
+    this.examinedText = makeText(scene, padding, h - padding - 6, 'examined 0/0', {
+      size: FONT.size.tiny,
+      color: 'woodMid',
+    });
+    this.add(this.examinedText);
     for (let i = 0; i < NOTEBOOK.maxLines; i++) {
       const y = padding + 14 + i * NOTEBOOK.lineHeight;
       const icon = scene.make
@@ -72,6 +78,14 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
       this.add([icon, t]);
     }
     scene.add.existing(this);
+  }
+
+  /** How many clue spots the lens has passed over, out of all spots in the case. */
+  setExamined(n: number, total: number): void {
+    this.examinedText.setText(
+      `examined ${n}/${total}${n >= total && total > 0 ? '  all seen' : ''}`,
+    );
+    this.examinedText.setColor(n >= total && total > 0 ? '#4f7a5a' : '#6b5140');
   }
 
   setEntries(entries: SuspicionEntry[]): void {

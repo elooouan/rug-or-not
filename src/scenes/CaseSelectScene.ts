@@ -11,7 +11,7 @@ import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, makeText } from '@/ui/text';
-import { keepCursorOnTop } from './sceneUtil';
+import { setupScene } from './sceneUtil';
 import { rect } from '@/ui/shapes';
 
 const DRAWER = {
@@ -38,7 +38,7 @@ export class CaseSelectScene extends Phaser.Scene {
   }
 
   create(): void {
-    keepCursorOnTop(this);
+    setupScene(this);
     new DeskBackground(this, { props: false, stamps: false });
     const save = saveStore.get();
     const cases = gameState.cases;

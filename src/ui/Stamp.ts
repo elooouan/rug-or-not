@@ -69,7 +69,7 @@ export class Stamp extends Phaser.GameObjects.Container {
         this.slam(opts.onStamp);
         return;
       }
-      if (opts.overPaper(p.x, p.y)) {
+      if (opts.overPaper(p.worldX, p.worldY)) {
         this.slam(opts.onStamp);
       } else {
         scene.tweens.add({

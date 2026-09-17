@@ -17,7 +17,7 @@ import {
 import { DeskBackground } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
-import { keepCursorOnTop } from './sceneUtil';
+import { setupScene } from './sceneUtil';
 
 interface SettingsInit {
   overlay?: boolean;
@@ -59,7 +59,7 @@ export class SettingsScene extends Phaser.Scene {
   }
 
   create(): void {
-    keepCursorOnTop(this);
+    setupScene(this);
     this.confirmReset = false;
     this.cosmeticsDirty = false;
     this.rows = [];
@@ -87,6 +87,7 @@ export class SettingsScene extends Phaser.Scene {
       const s = saveStore.get().settings;
       audio.setVolume(s.volume);
       audio.setRain(s.rain);
+      audio.setMusic(s.music);
       this.refresh();
     };
     const s = () => saveStore.get().settings;
@@ -112,6 +113,11 @@ export class SettingsScene extends Phaser.Scene {
       label: 'Lamp flicker',
       value: () => onOff(s().lampFlicker),
       change: () => set((st) => (st.lampFlicker = !st.lampFlicker)),
+    });
+    this.rows.push({
+      label: 'Music (lo-fi loop)',
+      value: () => onOff(s().music),
+      change: () => set((st) => (st.music = !st.music)),
     });
     this.rows.push({
       label: 'Rain on the window',
@@ -204,7 +210,7 @@ export class SettingsScene extends Phaser.Scene {
       zone.on('pointerdown', (p: Phaser.Input.Pointer) => {
         this.select(i);
         // Left half steps back for stepped values, right half forward.
-        row.change(p.x < x + w / 2 + 40 && row.label === 'Master volume' ? -1 : 1);
+        row.change(p.worldX < x + w / 2 + 40 && row.label === 'Master volume' ? -1 : 1);
       });
       this.rowTexts.push({ label, value, ring });
     });

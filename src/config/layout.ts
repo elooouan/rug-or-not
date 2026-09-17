@@ -5,6 +5,15 @@
 export const GAME_WIDTH = 640;
 export const GAME_HEIGHT = 360;
 
+/**
+ * The world is 640x360 pixel-art units, but the canvas is rendered at this
+ * multiple (camera zoom) so text can be rasterised sharply while sprites keep
+ * their chunky pixels. Retina screens get 3x, everything else 2x.
+ */
+export const RENDER_SCALE = typeof window !== 'undefined' && window.devicePixelRatio >= 2 ? 3 : 2;
+export const CANVAS_WIDTH = GAME_WIDTH * RENDER_SCALE;
+export const CANVAS_HEIGHT = GAME_HEIGHT * RENDER_SCALE;
+
 export const FONT = {
   ui: 'Pixelify Sans',
   body: 'VT323',
@@ -27,8 +36,11 @@ export const DESK = {
   lightRadius: 330,
   mug: { x: 30, y: 176 },
   folderStack: { x: 14, y: 232 },
-  corkboard: { x: 500, y: -8, w: 150, h: 46 },
-  window: { x: 150, y: -2, w: 330, h: 26 },
+  corkboard: { x: 526, y: -6, w: 120, h: 44 },
+  window: { x: 124, y: 0, w: 396, h: 50 },
+  /** The cat sits on the windowsill, right end. */
+  cat: { x: 474, y: 46 },
+  caseHeader: { x: 632, y: 38 },
   clock: { x: 104, y: 214 },
   inkPad: { x: 516, y: 300 },
   stampRug: { x: 520, y: 262 },
@@ -37,9 +49,9 @@ export const DESK = {
 
 export const PAPER = {
   x: 160,
-  y: 38,
+  y: 48,
   w: 316,
-  h: 306,
+  h: 296,
   padding: 12,
   shadowOffset: 4,
   /** Line height for body text on documents. */
@@ -50,14 +62,17 @@ export const PAPER = {
 export const TABS = {
   x: PAPER.x + 6,
   y: PAPER.y - 16,
+  /** Maximum tab width; narrower when a case has many documents. */
   w: 58,
   h: 20,
   gap: 3,
+  /** Tabs must fit inside the paper minus this margin on both sides. */
+  margin: 6,
 } as const;
 
 export const NOTEBOOK = {
   x: 490,
-  y: 44,
+  y: 54,
   w: 142,
   h: 196,
   padding: 8,
@@ -101,5 +116,5 @@ export const REPORT = {
   y: 22,
   w: 420,
   h: 318,
-  typeSpeedMs: 14,
+  typeSpeedMs: 6,
 } as const;

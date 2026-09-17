@@ -1,5 +1,5 @@
 import type Phaser from 'phaser';
-import { FONT } from '@/config/layout';
+import { FONT, RENDER_SCALE } from '@/config/layout';
 import { PALETTE, type PaletteKey } from '@/config/palette';
 
 export interface TextOpts {
@@ -22,7 +22,7 @@ export function textStyle(opts: TextOpts = {}): Phaser.Types.GameObjects.Text.Te
     fontSize: `${opts.size ?? FONT.size.body}px`,
     color: PALETTE[opts.color ?? 'paper'],
     align: opts.align ?? 'left',
-    resolution: opts.resolution ?? 1,
+    resolution: opts.resolution ?? RENDER_SCALE,
   };
   if (opts.wrap) style.wordWrap = { width: opts.wrap, useAdvancedWrap: true };
   if (opts.lineSpacing !== undefined) style.lineSpacing = opts.lineSpacing;

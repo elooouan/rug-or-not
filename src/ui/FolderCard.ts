@@ -57,12 +57,22 @@ export class FolderCard extends Phaser.GameObjects.Container {
         },
       ),
     );
-    const btn = new PixelButton(scene, w / 2 - 50, h - 32, 'Open case  [Enter]', onOpen, {
-      width: 100,
+    const btn = new PixelButton(scene, w / 2 - 60, h - 34, 'Open case', onOpen, {
+      width: 120,
       hotkey: 'ENTER',
     });
     this.remove(btn);
     this.add(btn);
+    this.add(
+      makeText(scene, w / 2, h - 12, 'click the folder or press Enter', {
+        size: FONT.size.tiny,
+        color: 'woodDark',
+      }).setOrigin(0.5, 0),
+    );
+    folder.setInteractive({ useHandCursor: false });
+    folder.on('pointerdown', onOpen);
+    label.setInteractive({ useHandCursor: false });
+    label.on('pointerdown', onOpen);
     scene.add.existing(this);
 
     // Slide in from the left edge.

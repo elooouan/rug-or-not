@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '@/config/layout';
 import { PALETTE } from '@/config/palette';
 import { BootScene } from '@/scenes/BootScene';
 import { CursorScene } from '@/scenes/CursorScene';
@@ -9,21 +9,25 @@ import { InvestigationScene } from '@/scenes/InvestigationScene';
 import { ReportScene } from '@/scenes/ReportScene';
 import { NotebookScene } from '@/scenes/NotebookScene';
 import { SettingsScene } from '@/scenes/SettingsScene';
+import { audio } from '@/systems/audio';
 import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
-  pixelArt: true,
+  width: CANVAS_WIDTH,
+  height: CANVAS_HEIGHT,
+  // Not pixelArt mode: sprite textures are set to NEAREST individually so text stays smooth.
+  pixelArt: false,
   roundPixels: true,
   backgroundColor: PALETTE.bg,
   scale: {
-    mode: Phaser.Scale.NONE,
-    autoCenter: Phaser.Scale.NO_CENTER,
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: CANVAS_WIDTH,
+    height: CANVAS_HEIGHT,
   },
-  render: { antialias: false, antialiasGL: false },
+  render: { antialias: true, antialiasGL: true },
   input: { keyboard: true, mouse: { preventDefaultWheel: true } },
   scene: [
     BootScene,
@@ -37,16 +41,24 @@ const game = new Phaser.Game({
   ],
 });
 
-/** Integer scaling: the 640x360 canvas grows by whole multiples and is letterboxed. */
-function fit(): void {
-  const zoom = Math.max(
-    1,
-    Math.floor(Math.min(window.innerWidth / GAME_WIDTH, window.innerHeight / GAME_HEIGHT)),
-  );
-  game.scale.setZoom(zoom);
+// Audio can only start after a user gesture; listen globally so any first click counts.
+const unlockAudio = () => audio.unlock();
+window.addEventListener('pointerdown', unlockAudio);
+window.addEventListener('keydown', unlockAudio);
+
+// Fullscreen toggle (F) works from any scene; browsers require a user gesture.
+export function toggleFullscreen(): void {
+  if (!document.fullscreenEnabled) return;
+  try {
+    if (game.scale.isFullscreen) game.scale.stopFullscreen();
+    else game.scale.startFullscreen();
+  } catch {
+    /* browser refused (no gesture / iframe); nothing to do */
+  }
 }
-window.addEventListener('resize', fit);
-fit();
+window.addEventListener('keydown', (e) => {
+  if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) toggleFullscreen();
+});
 
 if (import.meta.env.DEV) {
   // Handy for poking at scenes from the devtools console:

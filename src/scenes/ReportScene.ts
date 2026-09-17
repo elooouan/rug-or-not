@@ -15,7 +15,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
 import type { ReportPayload } from './InvestigationScene';
-import { keepCursorOnTop } from './sceneUtil';
+import { setupScene } from './sceneUtil';
 
 /** The typed-out case report: truth, flags found/missed, false accusations, score, grade. */
 export class ReportScene extends Phaser.Scene {
@@ -36,7 +36,7 @@ export class ReportScene extends Phaser.Scene {
   }
 
   create(): void {
-    keepCursorOnTop(this);
+    setupScene(this);
     new DeskBackground(this, { props: true, stamps: false });
     const { x, y, w, h } = REPORT;
     const pad = 14;
@@ -69,6 +69,7 @@ export class ReportScene extends Phaser.Scene {
     // Skip / scroll.
     this.input.on('pointerdown', () => this.typewriter?.skip());
     this.input.keyboard?.on('keydown-SPACE', () => this.typewriter?.skip());
+    this.input.keyboard?.on('keydown-ENTER', () => this.typewriter?.skip());
     this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) =>
       this.scrollBy(dy > 0 ? 26 : -26),
     );
@@ -272,6 +273,32 @@ export class ReportScene extends Phaser.Scene {
         onComplete: () => audio.play('stamp'),
       });
     } else mark.setAlpha(0.9);
+
+    // Verdict banner across the top of the sheet.
+    const correct = this.payload.breakdown.verdictCorrect;
+    const banner = this.add
+      .container(x + w / 2, y + 8)
+      .setDepth(DEPTH.hud)
+      .setAngle(-3);
+    const bw = 150;
+    const bg = this.add
+      .rectangle(0, 0, bw, 18, HEX[correct ? 'stampGreen' : 'stampRed'])
+      .setOrigin(0.5);
+    const edge = this.add
+      .rectangle(0, 0, bw - 4, 14)
+      .setStrokeStyle(1, HEX.paper)
+      .setOrigin(0.5);
+    const label = makeText(this, 0, 0, correct ? 'CASE CLOSED' : 'WRONG CALL', {
+      size: FONT.size.body,
+      color: 'paper',
+    }).setOrigin(0.5);
+    banner.add([bg, edge, label]);
+    this.time.delayedCall(reduced ? 0 : 260, () => {
+      audio.play(correct ? 'caseClosed' : 'wrong');
+      if (reduced) return;
+      banner.setScale(1.5).setAlpha(0);
+      this.tweens.add({ targets: banner, scale: 1, alpha: 1, duration: 200, ease: 'Back.easeOut' });
+    });
   }
 
   override update(_t: number, delta: number): void {

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
-import { LENS } from '@/config/layout';
+import { GAME_HEIGHT, GAME_WIDTH, LENS, RENDER_SCALE } from '@/config/layout';
 import { saveStore } from '@/systems/save';
 
 export type CursorMode = 'pointer' | 'lens' | 'hidden';
@@ -25,6 +25,7 @@ export class CursorScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.cameras.main.setZoom(RENDER_SCALE).centerOn(GAME_WIDTH / 2, GAME_HEIGHT / 2);
     const size = LENS.radius * 2 + 40;
     const c = (LENS.radius + 4) / size;
     this.rim = this.add.image(0, 0, TEX.lensRim).setOrigin(c, c).setVisible(false);
@@ -51,8 +52,8 @@ export class CursorScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     const p = this.input.activePointer;
-    const x = Math.round(p.x);
-    const y = Math.round(p.y);
+    const x = Math.round(p.worldX);
+    const y = Math.round(p.worldY);
     const reduced = saveStore.get().settings.reducedMotion;
     const wantLens = this.mode === 'lens' && this.inside;
     // Ease the rim in/out so the lens "grows" over a document.

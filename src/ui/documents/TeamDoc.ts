@@ -1,5 +1,5 @@
 import { makePortrait, PORTRAIT_SIZE } from '@/art/portraits';
-import { FONT } from '@/config/layout';
+import { FONT, LENS, RENDER_SCALE } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseDocument } from '@/data/schema';
 import { DocumentView } from '@/ui/DocumentView';
@@ -51,7 +51,7 @@ export class TeamDoc extends DocumentView {
                 color: 'paper',
                 stroke: 'bg',
                 strokeThickness: 2,
-                resolution: 2,
+                resolution: LENS.zoom * RENDER_SCALE,
               })
                 .setOrigin(0.5)
                 .setAngle(-28)

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
-import { FONT, PAPER } from '@/config/layout';
+import { FONT, LENS, PAPER, RENDER_SCALE } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import type { CaseDocument, Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
@@ -15,7 +15,7 @@ export interface DocContext {
   registerFinePrint(obj: Phaser.GameObjects.GameObject): void;
   onPinToggle(clue: Clue, pinned: boolean): void;
   onStrayChange(count: number): void;
-  onHoverSpot(over: boolean): void;
+  onHoverSpot(over: boolean, clueId: string): void;
 }
 
 export interface Row {
@@ -164,7 +164,7 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     const row = this.rowOf(rowRef);
     const spot = new ClueSpot(this.scene, clue, rect, {
       onToggle: (s) => this.togglePin(s),
-      onHover: (_s, over) => this.ctx.onHoverSpot(over),
+      onHover: (s, over) => this.ctx.onHoverSpot(over, s.clue.id),
     });
     row.spots.push(spot);
     row.container.add(spot);
@@ -205,7 +205,7 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
       font: 'body',
       color,
       wrap: maxW,
-      resolution: 2,
+      resolution: LENS.zoom * RENDER_SCALE,
     });
     row.container.add(t);
     this.ctx.registerFinePrint(t);

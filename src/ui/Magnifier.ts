@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH, LENS } from '@/config/layout';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, LENS, RENDER_SCALE } from '@/config/layout';
 import { CursorScene } from '@/scenes/CursorScene';
 import { saveStore } from '@/systems/save';
 
@@ -23,15 +23,16 @@ export class Magnifier {
   ) {
     this.enabled = !saveStore.get().settings.noMagnifier;
     this.cursorScene = scene.scene.get(CursorScene.KEY) as CursorScene;
-    this.cam = scene.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT, false, 'lens');
-    this.cam.setZoom(LENS.zoom);
+    this.cam = scene.cameras.add(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, false, 'lens');
+    this.cam.setZoom(LENS.zoom * RENDER_SCALE);
     this.cam.setRoundPixels(true);
     // The lens is display-only. If it took part in hit-testing, its scroll (updated
     // after input runs) would be a frame stale and clicks would land off-target.
     this.cam.inputEnabled = false;
     this.maskGfx = scene.make.graphics({ x: 0, y: 0 }, false);
     this.maskGfx.fillStyle(0xffffff, 1);
-    this.maskGfx.fillCircle(0, 0, LENS.radius);
+    // The mask is in screen space (default camera), hence the render scale.
+    this.maskGfx.fillCircle(0, 0, LENS.radius * RENDER_SCALE);
     this.cam.setMask(new Phaser.Display.Masks.GeometryMask(scene, this.maskGfx), true);
     this.cam.setVisible(false);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.destroy());
@@ -63,14 +64,17 @@ export class Magnifier {
   update(): void {
     if (!this.enabled) return;
     const p = this.scene.input.activePointer;
-    const over = this.scene.input.manager.isOver && this.hitTest(p.x, p.y);
+    const over = this.scene.input.manager.isOver && this.hitTest(p.worldX, p.worldY);
     this.setActive(over);
     if (!over) return;
-    const px = Math.round(p.x);
-    const py = Math.round(p.y);
-    this.maskGfx.setPosition(px, py);
-    // World point under the pointer must land at the pointer's screen position.
-    this.cam.centerOn((px + GAME_WIDTH / 2) / LENS.zoom, (py + GAME_HEIGHT / 2) / LENS.zoom);
+    // Mask lives in screen space; the camera centre is worked out so the world
+    // point under the pointer lands exactly at the pointer's screen position.
+    this.maskGfx.setPosition(Math.round(p.x), Math.round(p.y));
+    const zoom = LENS.zoom * RENDER_SCALE;
+    this.cam.centerOn(
+      p.worldX - (p.x - CANVAS_WIDTH / 2) / zoom,
+      p.worldY - (p.y - CANVAS_HEIGHT / 2) / zoom,
+    );
   }
 
   private setActive(on: boolean): void {

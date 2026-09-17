@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { DEPTH } from '@/config/depth';
-import { DESK, GAME_HEIGHT, GAME_WIDTH, STAMP } from '@/config/layout';
+import { DESK, GAME_HEIGHT, GAME_WIDTH, PAPER, STAMP } from '@/config/layout';
 import { FLAGS, isFlagClue, type CaseData, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { localDateKey, recordDailyPlay } from '@/systems/dailyCase';
@@ -8,6 +8,8 @@ import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
 import { newlyUnlocked, stampInk } from '@/systems/unlocks';
+import { TEX } from '@/art/keys';
+import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
 import type { DocumentView } from '@/ui/DocumentView';
@@ -19,7 +21,7 @@ import { PauseMenu } from '@/ui/PauseMenu';
 import { Stamp, StampMark } from '@/ui/Stamp';
 import { TabBar } from '@/ui/TabBar';
 import { addText } from '@/ui/text';
-import { keepCursorOnTop } from './sceneUtil';
+import { setupScene } from './sceneUtil';
 import type { PaletteKey } from '@/config/palette';
 
 type Phase = 'intake' | 'opening' | 'investigating' | 'stamped';
@@ -50,6 +52,9 @@ export class InvestigationScene extends Phaser.Scene {
   private pauseMenu?: PauseMenu;
   private suspicions: SuspicionEntry[] = [];
   private hoveringSpot = 0;
+  private examined = new Set<string>();
+  private totalSpots = 0;
+  private lastTickSecond = -1;
   private hint?: Phaser.GameObjects.Text;
 
   constructor() {
@@ -57,7 +62,7 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   create(): void {
-    keepCursorOnTop(this);
+    setupScene(this);
     const c = gameState.currentCase;
     if (!c) {
       this.scene.start('TitleScene');
@@ -71,6 +76,8 @@ export class InvestigationScene extends Phaser.Scene {
     this.suspicions = [];
     this.current = 0;
     this.hoveringSpot = 0;
+    this.examined = new Set();
+    this.lastTickSecond = -1;
 
     this.desk = new DeskBackground(this, { props: true, stamps: true });
     this.magnifier = new Magnifier(
@@ -83,11 +90,17 @@ export class InvestigationScene extends Phaser.Scene {
     this.magnifier.ignore(this.desk.overlays);
 
     // Case header on the corkboard edge / top of screen.
-    const header = addText(this, GAME_WIDTH / 2, 4, `${c.ticker}  -  ${c.title}`, {
-      size: 10,
-      color: 'paperShadow',
-    })
-      .setOrigin(0.5, 0)
+    const header = addText(
+      this,
+      DESK.caseHeader.x,
+      DESK.caseHeader.y,
+      `${c.ticker}  ·  ${c.title}`,
+      {
+        size: 10,
+        color: 'paperShadow',
+      },
+    )
+      .setOrigin(1, 0)
       .setDepth(DEPTH.hud);
     this.magnifier.ignore(header);
 
@@ -117,9 +130,14 @@ export class InvestigationScene extends Phaser.Scene {
         this.magnifier.registerFinePrint(obj),
       onPinToggle: (clue: Clue, pinned: boolean) => this.onPinToggle(clue, pinned),
       onStrayChange: () => this.refreshNotebook(),
-      onHoverSpot: (over: boolean) => {
+      onHoverSpot: (over: boolean, clueId: string) => {
         this.hoveringSpot = Math.max(0, this.hoveringSpot + (over ? 1 : -1));
         this.magnifier.setGlow(this.hoveringSpot > 0);
+        if (over && !this.examined.has(clueId)) {
+          this.examined.add(clueId);
+          this.notebook?.setExamined(this.examined.size, this.totalSpots);
+          if (this.examined.size === this.totalSpots) audio.play('unlock');
+        }
       },
     };
     this.docs = c.documents.map((d) =>
@@ -127,10 +145,12 @@ export class InvestigationScene extends Phaser.Scene {
     );
     this.tabs = new TabBar(this, c.documents, (i) => this.showDocument(i));
     this.tabs.setDepth(DEPTH.documents - 1);
-    this.showDocument(0);
+    this.showDocument(0, false);
 
     this.notebook = new NotebookPanel(this);
     this.notebook.setDepth(DEPTH.notebook);
+    this.totalSpots = c.documents.reduce((n, d) => n + d.clues.length, 0);
+    this.notebook.setExamined(0, this.totalSpots);
     this.refreshNotebook();
 
     this.clock = new DeskClock(this);
@@ -168,14 +188,30 @@ export class InvestigationScene extends Phaser.Scene {
     return this.docs[this.current];
   }
 
-  private showDocument(i: number): void {
+  private showDocument(i: number, animate = true): void {
     if (i < 0 || i >= this.docs.length) return;
+    const changed = i !== this.current;
     this.docs.forEach((d, idx) => d.setVisible(idx === i));
     this.docs[this.current]?.clearFocus();
     this.current = i;
     this.tabs?.setCurrent(i);
     this.hoveringSpot = 0;
     this.magnifier.setGlow(false);
+    if (changed && animate) {
+      audio.play('paper');
+      const doc = this.docs[i];
+      if (!saveStore.get().settings.reducedMotion) {
+        // A quick page flip: the sheet lands from slightly above.
+        doc.setY(PAPER.y - 6).setAlpha(0.6);
+        this.tweens.add({
+          targets: doc,
+          y: PAPER.y,
+          alpha: 1,
+          duration: 140,
+          ease: 'Quad.easeOut',
+        });
+      }
+    }
   }
 
   private onPinToggle(clue: Clue, pinned: boolean): void {
@@ -208,7 +244,24 @@ export class InvestigationScene extends Phaser.Scene {
     );
     this.magnifier.ignore(mark);
     const s = saveStore.get().settings;
-    if (!s.reducedMotion) this.cameras.main.shake(STAMP.shakeDurationMs, STAMP.shakeIntensity);
+    if (!s.reducedMotion) {
+      this.cameras.main.shake(STAMP.shakeDurationMs, STAMP.shakeIntensity);
+      // Ink splatter.
+      const splat = this.add.particles(STAMP.impression.x, STAMP.impression.y, TEX.pixel, {
+        speed: { min: 40, max: 140 },
+        angle: { min: 0, max: 360 },
+        lifespan: { min: 200, max: 450 },
+        scale: { start: 1, end: 0.2 },
+        alpha: { start: 0.9, end: 0 },
+        tint: HEX[(verdict === 'rug' ? ink.rug : ink.legit) as PaletteKey],
+        quantity: 18,
+        emitting: false,
+      });
+      splat.setDepth(DEPTH.pins);
+      splat.explode(18);
+      this.magnifier.ignore(splat);
+      this.time.delayedCall(600, () => splat.destroy());
+    }
     this.time.delayedCall(s.reducedMotion ? 400 : 1000, () => this.finish(verdict));
   }
 
@@ -303,7 +356,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.desk.setFlicker(s.lampFlicker && !s.reducedMotion);
     this.desk.setSteam(!s.reducedMotion);
     this.desk.setRain(s.rain);
-    keepCursorOnTop(this);
+    setupScene(this);
   }
 
   private bindKeys(): void {
@@ -342,12 +395,20 @@ export class InvestigationScene extends Phaser.Scene {
     this.input.on('wheel', (p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
       if (!inPlay()) return;
       const doc = this.currentDoc();
-      if (doc?.containsPoint(p.x, p.y)) doc.scroll(dy > 0 ? 1 : -1);
+      if (doc?.containsPoint(p.worldX, p.worldY)) doc.scroll(dy > 0 ? 1 : -1);
     });
   }
 
   override update(_t: number, delta: number): void {
-    if (this.phase === 'investigating' && !this.paused) this.clock?.tick(delta);
+    if (this.phase === 'investigating' && !this.paused && this.clock) {
+      this.clock.tick(delta);
+      // Ticking in the last ten seconds.
+      const left = this.clock.timeLeft;
+      if (this.clock.isRunning && left <= 10 && left !== this.lastTickSecond) {
+        this.lastTickSecond = left;
+        audio.play('tick');
+      }
+    }
     this.magnifier.update();
   }
 }

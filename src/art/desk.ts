@@ -23,12 +23,12 @@ export function makeWood(scene: Phaser.Scene, key: string, style: WoodStyle): vo
       // Slight tone variation per plank via sparse dark/light dither.
       const tone = rng.int(0, 2);
       // Grain lines.
-      const grainCount = rng.int(6, 10);
+      const grainCount = rng.int(4, 7);
       for (let i = 0; i < grainCount; i++) {
         const gy = py + rng.int(2, plankH - 3);
         const gx = rng.int(0, GAME_WIDTH);
         const len = rng.int(30, 160);
-        g.fillStyle(HEX[rng.chance(0.6) ? style.dark : style.light], 1);
+        g.fillStyle(HEX[rng.chance(0.6) ? style.dark : style.light], 0.55);
         // Wobbly line: step every ~20px.
         let cy = gy;
         for (let x = gx; x < Math.min(GAME_WIDTH, gx + len); x += 1) {
@@ -37,7 +37,7 @@ export function makeWood(scene: Phaser.Scene, key: string, style: WoodStyle): vo
         }
       }
       // Knot occasionally.
-      if (rng.chance(0.35)) {
+      if (rng.chance(0.2)) {
         const kx = rng.int(40, GAME_WIDTH - 40);
         const ky = py + plankH / 2;
         g.fillStyle(HEX[style.dark], 1);
@@ -72,7 +72,7 @@ export function makeLampLight(scene: Phaser.Scene): void {
       DESK.lightCenter.y,
       DESK.lightRadius,
       'amber',
-      (t) => Math.pow(1 - t, 1.6) * 0.32,
+      (t) => Math.pow(1 - t, 1.6) * 0.24,
       7,
     );
   });
@@ -88,7 +88,7 @@ export function makeVignette(scene: Phaser.Scene): void {
       DESK.lightCenter.y,
       DESK.lightRadius + 60,
       'bg',
-      (t) => Math.pow(Math.max(0, t - 0.35) / 0.65, 1.4) * 0.88,
+      (t) => Math.pow(Math.max(0, t - 0.35) / 0.65, 1.4) * 0.82,
       8,
     );
   });
@@ -317,35 +317,13 @@ export function makeCorkboard(scene: Phaser.Scene): void {
       g.fillStyle(HEX[pin], 1);
       g.fillRect(x + nw / 2 - 1, y - 1, 3, 3);
     };
-    note(14, 10, 30, 26, 'stampRed');
-    note(58, 14, 22, 20, 'ink');
-    note(96, 8, 36, 30, 'stampRed');
+    note(10, 10, 28, 24, 'stampRed');
+    note(46, 14, 22, 20, 'ink');
+    note(78, 8, 32, 28, 'stampRed');
     // String between pins (red thread, classic corkboard).
     g.lineStyle(1, HEX.stampRed, 1);
-    g.lineBetween(30, 10, 69, 14);
-    g.lineBetween(69, 14, 114, 8);
-  });
-}
-
-export function makeWindow(scene: Phaser.Scene): void {
-  const { w, h } = DESK.window;
-  makeGraphicsTexture(scene, TEX.window, w, h, (g) => {
-    g.fillStyle(HEX.woodDark, 1);
-    g.fillRect(0, 0, w, h);
-    g.fillStyle(HEX.bg, 1);
-    g.fillRect(4, 0, w - 8, h - 4);
-    g.fillStyle(HEX.shadow, 1);
-    g.fillRect(4, h - 12, w - 8, 8); // distant skyline glow band
-    // Mullions.
-    g.fillStyle(HEX.woodDark, 1);
-    for (let x = 4 + Math.floor((w - 8) / 3); x < w - 8; x += Math.floor((w - 8) / 3))
-      g.fillRect(x, 0, 3, h);
-    g.fillStyle(HEX.woodLight, 1);
-    g.fillRect(0, h - 4, w, 1);
-  });
-  makeGraphicsTexture(scene, TEX.raindrop, 1, 4, (g) => {
-    g.fillStyle(HEX.ink, 1);
-    g.fillRect(0, 0, 1, 4);
+    g.lineBetween(24, 10, 57, 14);
+    g.lineBetween(57, 14, 94, 8);
   });
 }
 

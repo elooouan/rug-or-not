@@ -5,6 +5,7 @@ export interface Settings {
   lampFlicker: boolean;
   noMagnifier: boolean; // accessibility: fine print shown inline
   rain: boolean;
+  music: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   lampFlicker: true,
   noMagnifier: false,
   rain: true,
+  music: true,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -30,5 +32,6 @@ export function sanitizeSettings(raw: unknown): Settings {
     lampFlicker: bool(r.lampFlicker, DEFAULT_SETTINGS.lampFlicker),
     noMagnifier: bool(r.noMagnifier, DEFAULT_SETTINGS.noMagnifier),
     rain: bool(r.rain, DEFAULT_SETTINGS.rain),
+    music: bool(r.music, DEFAULT_SETTINGS.music),
   };
 }

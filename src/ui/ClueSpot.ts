@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { HEX } from '@/config/palette';
+import { saveStore } from '@/systems/save';
 import type { Clue } from '@/data/schema';
+import { audio } from '@/systems/audio';
 import { rect as mkRect, zone as mkZone } from '@/ui/shapes';
 
 export interface SpotRect {
@@ -45,6 +47,7 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     const zone = mkZone(scene, rect.x, rect.y, rect.w, rect.h);
     zone.setInteractive({ useHandCursor: false });
     zone.on('pointerover', () => {
+      audio.play('hover');
       this.hovered = true;
       this.refresh();
       cb.onHover(this, true);
@@ -68,6 +71,26 @@ export class ClueSpot extends Phaser.GameObjects.Container {
   setPinned(p: boolean): void {
     this.pinned = p;
     this.refresh();
+    if (p && !saveStore.get().settings.reducedMotion) {
+      // Drop the pin in from above with a little bounce.
+      const y = this.rect.y - 4;
+      this.pin.setY(y - 10).setAlpha(0);
+      this.scene.tweens.add({
+        targets: this.pin,
+        y,
+        alpha: 1,
+        duration: 220,
+        ease: 'Bounce.easeOut',
+      });
+      this.highlight.setScale(1.04);
+      this.scene.tweens.add({
+        targets: this.highlight,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 160,
+        ease: 'Sine.easeOut',
+      });
+    }
   }
 
   setFocused(f: boolean): void {

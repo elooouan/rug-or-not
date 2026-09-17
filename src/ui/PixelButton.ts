@@ -37,7 +37,8 @@ export class PixelButton extends Phaser.GameObjects.Container {
     this.variant = opts.variant ?? 'paper';
     const textColor: PaletteKey = opts.color ?? (this.variant === 'paper' ? 'shadow' : 'paper');
     this.label = makeText(scene, 0, 0, text, { size: 12, color: textColor });
-    this.bw = opts.width ?? Math.ceil(this.label.width) + UI.buttonPadX * 2;
+    // Never narrower than the label: a fixed width is a minimum, not a clamp.
+    this.bw = Math.max(opts.width ?? 0, Math.ceil(this.label.width) + UI.buttonPadX * 2);
     const frame = rect(scene, 0, 0, this.bw, this.bh, HEX.shadow);
     this.face = rect(scene, 1, 1, this.bw - 2, this.bh - 3, this.faceColor(false));
     this.bottom = rect(scene, 1, this.bh - 2, this.bw - 2, 1, this.edgeColor(false));

@@ -1,4 +1,4 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import { HEX, PALETTE, type PaletteKey } from '@/config/palette';
 
 /** Map from a single character to a palette key. '.' (or missing) is transparent. */
@@ -37,6 +37,12 @@ export function makeGraphicsTexture(
   draw(g);
   g.generateTexture(key, w, h);
   g.destroy();
+  crisp(scene, key);
+}
+
+/** Sprites are pixel art: sample them with NEAREST so the camera zoom keeps hard edges. */
+export function crisp(scene: Phaser.Scene, key: string): void {
+  scene.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
 }
 
 /** Create a texture by drawing on a 2D canvas (for gradients / per-pixel work). */
@@ -52,6 +58,7 @@ export function makeCanvasTexture(
   if (!tex) return;
   draw(tex.context, w, h);
   tex.refresh();
+  crisp(scene, key);
 }
 
 /** 4x4 ordered-dither threshold in [0, 16). */
