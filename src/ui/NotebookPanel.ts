@@ -1,0 +1,90 @@
+import Phaser from 'phaser';
+import { TEX } from '@/art/keys';
+import { FONT, NOTEBOOK } from '@/config/layout';
+import { HEX } from '@/config/palette';
+import { makeText } from './text';
+import { rect } from '@/ui/shapes';
+
+export interface SuspicionEntry {
+  id: string;
+  label: string;
+  stray?: boolean;
+}
+
+/** The detective's small notebook listing pinned "Suspicions". */
+export class NotebookPanel extends Phaser.GameObjects.Container {
+  private lines: Phaser.GameObjects.Text[] = [];
+  private pinIcons: Phaser.GameObjects.Image[] = [];
+  private countText: Phaser.GameObjects.Text;
+  private emptyText: Phaser.GameObjects.Text;
+
+  constructor(scene: Phaser.Scene) {
+    super(scene, NOTEBOOK.x, NOTEBOOK.y);
+    const { w, h, padding } = NOTEBOOK;
+    const shadow = rect(scene, 3, 4, w, h, HEX.bg, 0.5);
+    const cover = rect(scene, -4, -3, w + 8, h + 6, HEX.woodDark);
+    const page = rect(scene, 0, 0, w, h, HEX.paper);
+    this.add([shadow, cover, page]);
+    // Spiral rings along the top.
+    for (let x = 10; x < w - 6; x += 12) {
+      this.add(rect(scene, x, -6, 3, 8, HEX.paperShadow));
+    }
+    // Ruled lines.
+    for (let i = 0; i < NOTEBOOK.maxLines; i++) {
+      const y = padding + 14 + i * NOTEBOOK.lineHeight + NOTEBOOK.lineHeight - 2;
+      this.add(rect(scene, padding - 2, y, w - padding * 2 + 4, 1, HEX.paperShadow, 0.6));
+    }
+    // Red margin line.
+    this.add(rect(scene, padding + 8, 4, 1, h - 8, HEX.stampRed, 0.35));
+    this.add(
+      makeText(scene, padding, padding - 2, 'SUSPICIONS', {
+        size: FONT.size.small,
+        color: 'woodDark',
+      }),
+    );
+    this.countText = makeText(scene, w - padding, padding - 1, '0', {
+      size: FONT.size.tiny,
+      color: 'paperShadow',
+    }).setOrigin(1, 0);
+    this.add(this.countText);
+    this.emptyText = makeText(
+      scene,
+      padding + 12,
+      padding + 16,
+      'pin clues on the\nevidence to list\nthem here',
+      { size: FONT.size.body, font: 'body', color: 'paperShadow' },
+    );
+    this.add(this.emptyText);
+    for (let i = 0; i < NOTEBOOK.maxLines; i++) {
+      const y = padding + 14 + i * NOTEBOOK.lineHeight;
+      const icon = scene.make
+        .image({ x: padding, y: y + 1, key: TEX.pin }, false)
+        .setOrigin(0)
+        .setScale(0.75)
+        .setVisible(false);
+      const t = makeText(scene, padding + 12, y, '', {
+        size: FONT.size.body,
+        font: 'body',
+        color: 'shadow',
+      });
+      this.pinIcons.push(icon);
+      this.lines.push(t);
+      this.add([icon, t]);
+    }
+    scene.add.existing(this);
+  }
+
+  setEntries(entries: SuspicionEntry[]): void {
+    this.countText.setText(String(entries.length));
+    this.emptyText.setVisible(entries.length === 0);
+    const maxChars = 22;
+    // Show the most recent entries if the list overflows.
+    const shown = entries.slice(-NOTEBOOK.maxLines);
+    for (let i = 0; i < NOTEBOOK.maxLines; i++) {
+      const e = shown[i];
+      this.lines[i].setText(e ? e.label.slice(0, maxChars) : '');
+      this.lines[i].setColor(e?.stray ? '#5b6f8a' : '#2b2530');
+      this.pinIcons[i].setVisible(!!e).setTexture(e?.stray ? TEX.pinStray : TEX.pin);
+    }
+  }
+}

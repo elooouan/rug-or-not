@@ -1,0 +1,191 @@
+{
+  "id": "safeyield",
+  "title": "Renounced, Allegedly",
+  "ticker": "$SAFEYLD",
+  "pitch": "SafeYield Vault: audited, renounced, 100/100 safety score. Sleep easy.",
+  "difficulty": 2,
+  "verdict": "rug",
+  "timeLimitSec": 240,
+  "debrief": "SafeYield renounced ownership on stage, but a hidden admin role kept every power that mattered, including a fee with no ceiling. The 'audit' named a contract that doesn't exist. The liquidity lock was real, but only for a week.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "SafeYieldVault.sol",
+      "content": {
+        "fileName": "contracts/SafeYieldVault.sol",
+        "verified": true,
+        "lines": [
+          "pragma solidity ^0.8.0;",
+          "contract SafeYieldVault is Ownable {",
+          "  address private immutable _admin;",
+          "  uint256 public fee = 3;",
+          "  uint256 public constant MAX_FEE = 10;",
+          "",
+          "  constructor() { _admin = msg.sender; }",
+          "",
+          "  modifier onlyAdmin() {",
+          "    require(msg.sender == _admin); _;",
+          "  }",
+          "",
+          "  function renounceOwnership() public override onlyOwner {",
+          "    super.renounceOwnership(); // fully renounced!",
+          "  }",
+          "",
+          "  function setFee(uint256 f) external onlyAdmin {",
+          "    fee = f;",
+          "  }",
+          "",
+          "  function deposit() external payable {",
+          "    shares[msg.sender] += msg.value * (100 - fee) / 100;",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "sy-admin",
+          "label": "Admin role kept",
+          "flagId": "fake-renounce",
+          "anchor": { "kind": "line", "line": 8 }
+        },
+        {
+          "id": "sy-fee",
+          "label": "Fee has no ceiling",
+          "flagId": "sell-tax-adjustable",
+          "finePrint": true,
+          "text": "// MAX_FEE is never checked here",
+          "anchor": { "kind": "line", "line": 17 }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "CertiSure Labs",
+        "contractName": "SafeYeild.sol",
+        "date": "2 Sep",
+        "score": "100 / 100",
+        "summary": "No issues found. The contract is fully safe and cannot be exploited. Certified rug-proof.",
+        "findings": []
+      },
+      "clues": [
+        {
+          "id": "sy-audit",
+          "label": "Audit: wrong contract",
+          "flagId": "fake-audit",
+          "anchor": { "kind": "row", "row": 1, "table": "field" }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "100,000,000 SAFEYLD",
+        "allocations": [
+          { "label": "Vault rewards", "pct": 40, "vesting": "emissions" },
+          { "label": "Team", "pct": 25, "vesting": "none" },
+          { "label": "Liquidity", "pct": 20, "vesting": "locked" },
+          { "label": "Presale", "pct": 10, "vesting": "none" },
+          { "label": "Marketing", "pct": 5, "vesting": "12 months" }
+        ],
+        "notes": ["Team allocation is fully liquid at TGE to 'maximise flexibility'."]
+      },
+      "clues": [
+        {
+          "id": "sy-team",
+          "label": "25% team, no vesting",
+          "flagId": "team-allocation-unvested",
+          "anchor": { "kind": "row", "row": 1 }
+        },
+        {
+          "id": "sy-marketing",
+          "label": "5% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": { "kind": "row", "row": 4 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Discord: #general",
+      "content": {
+        "channel": "general",
+        "messages": [
+          {
+            "user": "Vault_Ops",
+            "role": "admin",
+            "time": "09:10",
+            "text": "GM vault fam. Renounce tx is live, we are officially trustless."
+          },
+          {
+            "user": "lena.eth",
+            "time": "09:12",
+            "text": "nice. what's the LP lock duration? the locker page just says 'active'"
+          },
+          {
+            "user": "Vault_Ops",
+            "role": "admin",
+            "time": "09:13",
+            "text": "we're renounced, locks don't matter anymore. presale round 2 closes in 1 hour, don't miss it"
+          },
+          {
+            "user": "yield_hunter",
+            "time": "09:14",
+            "text": "ser the audit says 100/100, what more do you want lol"
+          },
+          { "user": "lena.eth", "time": "09:15", "text": "an answer about the lock would be nice" },
+          {
+            "user": "mod_tk",
+            "role": "mod",
+            "time": "09:15",
+            "text": "let's keep it positive in here please"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "sy-dodge",
+          "label": "Admin dodges lock Q",
+          "flagId": "urgency-pressure",
+          "anchor": { "kind": "message", "index": 2 }
+        },
+        {
+          "id": "sy-question",
+          "label": "Lena asks about lock",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": { "kind": "message", "index": 1 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "SAFEYLD / ETH",
+        "liquidityUsd": "$96,500",
+        "lock": { "locked": true, "provider": "SafeLock", "expires": "active", "pct": 100 },
+        "holders": [
+          { "label": "Liquidity pool", "pct": 20, "tag": "pool" },
+          { "label": "Vault contract", "pct": 38, "tag": "contract" },
+          { "label": "Team wallet", "pct": 25, "tag": "team" },
+          { "label": "Everyone else", "pct": 17 }
+        ],
+        "transfers": []
+      },
+      "clues": [
+        {
+          "id": "sy-lock",
+          "label": "Lock expires in days",
+          "flagId": "liquidity-unlocked",
+          "finePrint": true,
+          "text": "lock term: 7 days. unlocks Fri 03:00 UTC",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        }
+      ]
+    }
+  ]
+}

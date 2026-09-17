@@ -1,0 +1,182 @@
+{
+  "id": "bean",
+  "title": "Small Batch",
+  "ticker": "$BEAN",
+  "pitch": "A loyalty token for Vela Roasters' three coffee shops. Buy beans, earn BEAN.",
+  "difficulty": 1,
+  "verdict": "legit",
+  "timeLimitSec": 240,
+  "debrief": "BEAN is boring in the best way. Fixed supply, a 1% tax hard-coded and capped, a doxxed team with real shops, liquidity locked for two years, and an audit that actually found (and fixed) small things. Nothing here lets anyone take your money.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "BeanToken.sol",
+      "content": {
+        "fileName": "contracts/BeanToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract BeanToken is ERC20 {",
+          "  uint256 public constant TAX_BPS = 100; // 1%",
+          "  address public immutable treasury;",
+          "",
+          "  constructor(address _treasury) ERC20(\"Bean\", \"BEAN\") {",
+          "    treasury = _treasury;",
+          "    _mint(msg.sender, 10_000_000 * 1e18); // fixed",
+          "  }",
+          "",
+          "  function _update(address from, address to, uint256 v)",
+          "    internal override {",
+          "    uint256 fee = v * TAX_BPS / 10_000;",
+          "    super._update(from, treasury, fee);",
+          "    super._update(from, to, v - fee);",
+          "  }",
+          "  // No mint, no owner, no pause. Ownership renounced",
+          "  // at deploy (tx 0x4b1...e2).",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "bn-tax",
+          "label": "1% tax (fixed)",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": { "kind": "line", "line": 3 }
+        },
+        {
+          "id": "bn-supply",
+          "label": "Supply minted once",
+          "herring": true,
+          "herringId": "immutable-supply-note",
+          "anchor": { "kind": "line", "line": 8 }
+        },
+        {
+          "id": "bn-renounce",
+          "label": "Renounced at deploy",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": { "kind": "line", "line": 17 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "10,000,000 BEAN",
+        "allocations": [
+          { "label": "Loyalty rewards", "pct": 50, "vesting": "5 years" },
+          { "label": "Liquidity", "pct": 30, "vesting": "locked 2y" },
+          { "label": "Team", "pct": 12, "vesting": "24 months" },
+          { "label": "Marketing", "pct": 8, "vesting": "12 months" }
+        ],
+        "notes": [
+          "Rewards are released to the loyalty contract 1% per month.",
+          "Marketing wallet is a 2-of-3 multisig; spend reports posted monthly."
+        ]
+      },
+      "clues": [
+        {
+          "id": "bn-marketing",
+          "label": "8% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": { "kind": "row", "row": 3 }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Team",
+      "content": {
+        "members": [
+          {
+            "name": "Marta Vela",
+            "role": "Founder, Vela Roasters",
+            "bio": "Owns three coffee shops in the harbour district since 2016. Speaks at the local business meetup monthly.",
+            "portraitSeed": "marta",
+            "style": "normal"
+          },
+          {
+            "name": "beanlord_69",
+            "role": "Lead developer",
+            "bio": "aka Tomas Rey. Backend engineer, 9 years shipping payments software. Handle chosen by his kids.",
+            "portraitSeed": "tomas",
+            "style": "normal"
+          }
+        ],
+        "note": "Both founders host a weekly open call from the Harbour Street shop."
+      },
+      "clues": [
+        {
+          "id": "bn-handle",
+          "label": "Dev has a silly handle",
+          "herring": true,
+          "herringId": "doxxed-meme-name",
+          "anchor": { "kind": "row", "row": 1 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "BEAN / USDC",
+        "liquidityUsd": "$188,000",
+        "lock": { "locked": true, "provider": "LockBox", "expires": "Jun 2028 (2y)", "pct": 100 },
+        "holders": [
+          { "label": "Liquidity pool", "pct": 30, "tag": "pool" },
+          { "label": "Loyalty contract", "pct": 49, "tag": "contract" },
+          { "label": "Team vesting", "pct": 12, "tag": "vesting" },
+          { "label": "Marketing multisig", "pct": 6, "tag": "multisig" },
+          { "label": "Everyone else", "pct": 3 }
+        ],
+        "transfers": [
+          { "when": "3d ago", "from": "Loyalty contract", "to": "Shop 2 POS", "amount": "12,400" }
+        ]
+      },
+      "clues": [
+        {
+          "id": "bn-lock",
+          "label": "LP locked 2 years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "bn-pool",
+          "label": "Pool is a top holder",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": { "kind": "row", "row": 0, "table": "holders" }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "BeanToken.sol (0x8a2...c41)",
+        "date": "14 Mar",
+        "score": "Pass - 2 low findings",
+        "summary": "Scope: BeanToken.sol at commit 3f9a. Manual review plus static analysis. No critical, high or medium issues.",
+        "findings": [
+          "Missing event on treasury transfer (low) - resolved in 3f9a.",
+          "Floating pragma in test helper (informational)."
+        ]
+      },
+      "clues": [
+        {
+          "id": "bn-findings",
+          "label": "Audit lists findings",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": { "kind": "row", "row": 0, "table": "findings" }
+        }
+      ]
+    }
+  ]
+}

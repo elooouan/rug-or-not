@@ -1,0 +1,208 @@
+{
+  "id": "moonpup",
+  "title": "The Dog That Paid Back",
+  "ticker": "$MOONPUP",
+  "pitch": "The dog coin that pays you back! 100x guaranteed, presale closes tonight.",
+  "difficulty": 1,
+  "verdict": "rug",
+  "timeLimitSec": 240,
+  "debrief": "MoonPup was a textbook pull: the owner could print tokens, raise the sell tax to anything, and sells were gated behind a whitelist. Liquidity sat in the deployer's wallet the whole time. The chat was three bots and an admin with a countdown.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "MoonPup.sol",
+      "content": {
+        "fileName": "contracts/MoonPup.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity ^0.8.0;",
+          "contract MoonPup {",
+          "  string public name = \"MoonPup\";",
+          "  uint256 public totalSupply = 1_000_000_000;",
+          "  uint256 public sellTax = 5;",
+          "  address public owner;",
+          "  address public pool;",
+          "  mapping(address => uint256) balances;",
+          "",
+          "  function mint(uint256 amount) public onlyOwner {",
+          "    totalSupply += amount;",
+          "    balances[owner] += amount;",
+          "  }",
+          "",
+          "  function setSellTax(uint256 t) public onlyOwner {",
+          "    sellTax = t;",
+          "  }",
+          "",
+          "  function transfer(address to, uint256 amt) public {",
+          "    require(_allowed(msg.sender, to));",
+          "    uint256 fee = amt * sellTax / 100;",
+          "    balances[msg.sender] -= amt;",
+          "    balances[to] += amt - fee;",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "mp-mint",
+          "label": "Owner can mint forever",
+          "flagId": "mint-unlimited",
+          "anchor": { "kind": "line", "line": 10 }
+        },
+        {
+          "id": "mp-tax",
+          "label": "Owner sets sell tax",
+          "flagId": "sell-tax-adjustable",
+          "anchor": { "kind": "line", "line": 15 }
+        },
+        {
+          "id": "mp-honeypot",
+          "label": "Sells need whitelist",
+          "flagId": "honeypot",
+          "finePrint": true,
+          "text": "// _allowed: sells blocked unless whitelisted",
+          "anchor": { "kind": "line", "line": 20 }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "1,000,000,000 MOONPUP",
+        "allocations": [
+          { "label": "Team", "pct": 40, "vesting": "none" },
+          { "label": "Presale", "pct": 25, "vesting": "none" },
+          { "label": "Liquidity", "pct": 20, "vesting": "none" },
+          { "label": "Marketing", "pct": 15, "vesting": "none" }
+        ],
+        "notes": [
+          "Team tokens reward the team for their hard work and belief.",
+          "Marketing wallet funds influencer shoutouts."
+        ]
+      },
+      "clues": [
+        {
+          "id": "mp-team",
+          "label": "40% team, no vesting",
+          "flagId": "team-allocation-unvested",
+          "anchor": { "kind": "row", "row": 0 }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Telegram: MoonPup Army",
+      "content": {
+        "channel": "moonpup-army",
+        "messages": [
+          {
+            "user": "PupAdmin",
+            "role": "admin",
+            "time": "21:02",
+            "text": "PRESALE CLOSES IN 10 MINUTES. Last chance before we moon. Don't miss out!!!"
+          },
+          {
+            "user": "cryptoking_88",
+            "time": "21:02",
+            "text": "100x guaranteed, get in now!!! best dog coin of the year"
+          },
+          {
+            "user": "mooner_2231",
+            "time": "21:02",
+            "text": "100x guaranteed, get in now!!! best dog coin of the year"
+          },
+          {
+            "user": "wagmi_bot",
+            "time": "21:03",
+            "text": "100x guaranteed, get in now!!! best dog coin of the year"
+          },
+          {
+            "user": "sam_k",
+            "time": "21:04",
+            "text": "is the liquidity locked? can't find a lock link anywhere"
+          },
+          {
+            "user": "PupAdmin",
+            "role": "admin",
+            "time": "21:04",
+            "text": "bro stop fudding, just buy. we pay 3% daily to holders, forever. it's math."
+          },
+          {
+            "user": "dave",
+            "time": "21:05",
+            "text": "my dog just sneezed on my keyboard, that's a buy signal right"
+          },
+          {
+            "user": "sam_k",
+            "time": "21:05",
+            "text": "not fud, just asking. where is the lock?",
+            "deleted": true
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "mp-bots",
+          "label": "Copy-pasted hype",
+          "flagId": "bot-chat",
+          "anchor": { "kind": "message", "index": 2 }
+        },
+        {
+          "id": "mp-urgency",
+          "label": "Countdown pressure",
+          "flagId": "urgency-pressure",
+          "anchor": { "kind": "message", "index": 0 }
+        },
+        {
+          "id": "mp-returns",
+          "label": "'3% daily forever'",
+          "flagId": "guaranteed-returns",
+          "anchor": { "kind": "message", "index": 5 }
+        },
+        {
+          "id": "mp-joke",
+          "label": "Dog sneeze joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": { "kind": "message", "index": 6 }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "MOONPUP / ETH",
+        "liquidityUsd": "$41,200",
+        "lock": { "locked": false, "pct": 100 },
+        "holders": [
+          { "label": "Deployer wallet", "pct": 40, "tag": "team" },
+          { "label": "Liquidity pool", "pct": 20, "tag": "pool" },
+          { "label": "0x9f3...a1c", "pct": 15 },
+          { "label": "0x77b...0de", "pct": 12 },
+          { "label": "Everyone else", "pct": 13 }
+        ],
+        "transfers": [
+          { "when": "2h ago", "from": "Deployer", "to": "0x9f3...a1c", "amount": "150,000,000" },
+          { "when": "1h ago", "from": "Deployer", "to": "0x77b...0de", "amount": "120,000,000" }
+        ]
+      },
+      "clues": [
+        {
+          "id": "mp-lock",
+          "label": "Liquidity not locked",
+          "flagId": "liquidity-unlocked",
+          "anchor": { "kind": "row", "row": 0, "table": "lock" }
+        },
+        {
+          "id": "mp-whale",
+          "label": "Deployer holds 40%",
+          "flagId": "whale-concentration",
+          "anchor": { "kind": "row", "row": 0, "table": "holders" }
+        }
+      ]
+    }
+  ]
+}
