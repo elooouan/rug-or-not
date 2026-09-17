@@ -125,6 +125,39 @@ export function makeWindow(scene: Phaser.Scene): void {
     g.fillRect(frame, frame, w - frame * 2, glassH);
   });
 
+  // Snow, stars (two twinkle frames) and a fog bank for the other weathers.
+  makeGraphicsTexture(scene, TEX.snowflake, 2, 2, (g) => {
+    g.fillStyle(HEX.paper, 1);
+    g.fillRect(0, 0, 2, 2);
+  });
+  for (let f = 0; f < 2; f++) {
+    makeGraphicsTexture(scene, `${TEX.stars}-${f}`, w, h, (g) => {
+      const rng = makeRng(`stars-${f}`);
+      for (let i = 0; i < 34; i++) {
+        g.fillStyle(HEX[rng.chance(0.3) ? 'paperShadow' : 'paper'], rng.chance(0.5) ? 1 : 0.6);
+        g.fillRect(
+          rng.int(frame + 1, w - frame - 2),
+          rng.int(frame + 1, frame + glassH * 0.55),
+          1,
+          1,
+        );
+      }
+    });
+  }
+  makeGraphicsTexture(scene, TEX.fog, w * 2, glassH, (g) => {
+    const rng = makeRng('fog');
+    for (let y = 0; y < glassH; y++) {
+      for (let x = 0; x < w * 2; x++) {
+        // Soft horizontal bands, denser near the bottom.
+        const band = 0.35 + 0.45 * (y / glassH) + 0.2 * Math.sin(x / 23 + y / 5);
+        if (bayer4(x, y) / 16 < band * 0.5 && rng.chance(0.9)) {
+          g.fillStyle(HEX.paperShadow, 1);
+          g.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+  });
+
   makeGraphicsTexture(scene, TEX.raindrop, 1, 5, (g) => {
     g.fillStyle(HEX.paperShadow, 1);
     g.fillRect(0, 0, 1, 3);

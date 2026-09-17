@@ -8,6 +8,8 @@ import { audio } from '@/systems/audio';
 import { saveStore, type CosmeticSelection } from '@/systems/save';
 import type { Settings } from '@/systems/settings';
 import { applyCosmetics } from '@/systems/cosmetics';
+import { applyWeatherAudio } from '@/systems/weather';
+import { WEATHERS, WEATHER_LABEL } from '@/systems/settings';
 import { byCategory, contextFromSave, describeSource, isUnlocked } from '@/systems/unlocks';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
@@ -83,7 +85,7 @@ export class SettingsScene extends Phaser.Scene {
       saveStore.update((d) => fn(d.settings));
       const s = saveStore.get().settings;
       audio.setVolume(s.volume);
-      audio.setRain(s.rain);
+      applyWeatherAudio(s.weather);
       audio.setMusic(s.music);
       this.refresh();
     };
@@ -132,9 +134,15 @@ export class SettingsScene extends Phaser.Scene {
       change: () => set((st) => (st.music = !st.music)),
     });
     this.rows.push({
-      label: 'Rain on the window',
-      value: () => onOff(s().rain),
-      change: () => set((st) => (st.rain = !st.rain)),
+      label: 'Weather outside',
+      value: () => WEATHER_LABEL[s().weather],
+      change: (d) =>
+        set(
+          (st) =>
+            (st.weather =
+              WEATHERS[(WEATHERS.indexOf(st.weather) + d + WEATHERS.length) % WEATHERS.length]),
+        ),
+      hint: () => 'you can also click the window',
     });
     this.rows.push({
       label: 'No-magnifier mode',

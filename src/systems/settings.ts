@@ -1,10 +1,20 @@
+export const WEATHERS = ['rain', 'storm', 'snow', 'clear', 'fog'] as const;
+export type Weather = (typeof WEATHERS)[number];
+export const WEATHER_LABEL: Record<Weather, string> = {
+  rain: 'rain',
+  storm: 'thunderstorm',
+  snow: 'snow',
+  clear: 'clear night',
+  fog: 'fog',
+};
+
 export interface Settings {
   volume: number; // 0..1
   relaxed: boolean; // disables timers
   reducedMotion: boolean;
   lampFlicker: boolean;
   noMagnifier: boolean; // accessibility: fine print shown inline
-  rain: boolean;
+  weather: Weather;
   music: boolean;
   /** Lucien's once-only guidance. */
   hints: boolean;
@@ -16,13 +26,13 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   lampFlicker: true,
   noMagnifier: false,
-  rain: true,
+  weather: 'rain',
   music: true,
   hints: true,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
-  const r = (raw ?? {}) as Partial<Record<keyof Settings, unknown>>;
+  const r = (raw ?? {}) as Partial<Record<keyof Settings | 'rain', unknown>>;
   const bool = (v: unknown, d: boolean) => (typeof v === 'boolean' ? v : d);
   const vol =
     typeof r.volume === 'number' && Number.isFinite(r.volume)
@@ -34,7 +44,11 @@ export function sanitizeSettings(raw: unknown): Settings {
     reducedMotion: bool(r.reducedMotion, DEFAULT_SETTINGS.reducedMotion),
     lampFlicker: bool(r.lampFlicker, DEFAULT_SETTINGS.lampFlicker),
     noMagnifier: bool(r.noMagnifier, DEFAULT_SETTINGS.noMagnifier),
-    rain: bool(r.rain, DEFAULT_SETTINGS.rain),
+    weather: (WEATHERS as readonly string[]).includes(r.weather as string)
+      ? (r.weather as Weather)
+      : r.rain === false
+        ? 'clear' // legacy saves had a rain on/off switch
+        : DEFAULT_SETTINGS.weather,
     music: bool(r.music, DEFAULT_SETTINGS.music),
     hints: bool(r.hints, DEFAULT_SETTINGS.hints),
   };

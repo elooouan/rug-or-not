@@ -22,6 +22,8 @@ import { PauseMenu } from '@/ui/PauseMenu';
 import { Stamp, StampMark } from '@/ui/Stamp';
 import { TabBar } from '@/ui/TabBar';
 import { addText } from '@/ui/text';
+import { PixelButton } from '@/ui/PixelButton';
+import { floatText } from '@/ui/DeskBackground';
 import { setupScene } from './sceneUtil';
 import type { PaletteKey } from '@/config/palette';
 
@@ -200,6 +202,23 @@ export class InvestigationScene extends Phaser.Scene {
 
     this.clock = new DeskClock(this);
     this.clock.setDepth(DEPTH.deskProps);
+    this.clock.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, 30, 34),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    this.clock.on('pointerdown', () => {
+      audio.play('tick');
+      const relaxed = saveStore.get().settings.relaxed;
+      const lines = relaxed
+        ? ['time is a construct', 'no rush', 'take your time']
+        : ['tick tock', 'no pressure', 'clocks cannot be bribed', 'it is later than you think'];
+      floatText(
+        this,
+        DESK.clock.x + 15,
+        DESK.clock.y - 4,
+        lines[Phaser.Math.Between(0, lines.length - 1)],
+      );
+    });
     if (s.relaxed) this.clock.setRelaxed();
     else this.clock.start(c.timeLimitSec);
 
@@ -225,7 +244,16 @@ export class InvestigationScene extends Phaser.Scene {
     )
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
-    this.magnifier.ignore([this.hint, this.notebook, this.tabs, ...this.stamps, this.clock]);
+    const menu = new PixelButton(
+      this,
+      6,
+      GAME_HEIGHT - 22,
+      'Menu [Esc]',
+      () => this.togglePause(),
+      { variant: 'ink' },
+    );
+    menu.setDepth(DEPTH.hud);
+    this.magnifier.ignore([this.hint, this.notebook, this.tabs, ...this.stamps, this.clock, menu]);
     audio.play('paper');
     this.tutorial();
   }
@@ -402,7 +430,7 @@ export class InvestigationScene extends Phaser.Scene {
     const s = saveStore.get().settings;
     this.desk.setFlicker(s.lampFlicker && !s.reducedMotion);
     this.desk.setSteam(!s.reducedMotion);
-    this.desk.setRain(s.rain);
+    this.desk.setWeather(s.weather);
     setupScene(this);
   }
 

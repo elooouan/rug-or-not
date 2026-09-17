@@ -19,6 +19,7 @@ export class CursorScene extends Phaser.Scene {
   private glow = false;
   private inside = true;
   private lensScale = 0;
+  private inkTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
     super(CursorScene.KEY);
@@ -42,6 +43,13 @@ export class CursorScene extends Phaser.Scene {
 
   setMode(mode: CursorMode): void {
     this.mode = mode;
+  }
+
+  /** Tint the pointer for a while (ink pad easter egg). */
+  setInked(ms: number): void {
+    this.cursor.setTint(0x9a3b3b);
+    this.inkTimer?.remove(false);
+    this.inkTimer = this.time.delayedCall(ms, () => this.cursor.clearTint());
   }
 
   setGlow(glow: boolean): void {

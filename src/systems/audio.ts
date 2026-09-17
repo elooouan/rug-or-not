@@ -46,6 +46,8 @@ export class AudioManager {
   private crackle: AudioBufferSourceNode | null = null;
   private volume = 0.6;
   private rainWanted = false;
+  private rainHeavy = false;
+  private rainGain: GainNode | null = null;
   private musicWanted = true;
   private musicTimer: number | null = null;
   private nextStepTime = 0;
@@ -86,11 +88,14 @@ export class AudioManager {
     if (this.master) this.master.gain.value = this.volume;
   }
 
-  setRain(on: boolean): void {
+  setRain(on: boolean, heavy = false): void {
     this.rainWanted = on;
+    this.rainHeavy = heavy;
     if (!this.ctx) return;
-    if (on) this.startRain();
-    else this.stopRain();
+    if (on) {
+      this.startRain();
+      if (this.rainGain) this.rainGain.gain.value = heavy ? 0.06 : 0.03;
+    } else this.stopRain();
   }
 
   setMusic(on: boolean): void {
@@ -252,10 +257,11 @@ export class AudioManager {
     filt.frequency.value = 2200;
     filt.Q.value = 0.4;
     const g = this.ctx.createGain();
-    g.gain.value = 0.03;
+    g.gain.value = this.rainHeavy ? 0.06 : 0.03;
     src.connect(filt).connect(g).connect(this.sfx);
     src.start();
     this.rainNode = src;
+    this.rainGain = g;
   }
 
   private stopRain(): void {
@@ -265,6 +271,7 @@ export class AudioManager {
       /* already stopped */
     }
     this.rainNode = null;
+    this.rainGain = null;
   }
 
   // ---- lo-fi loop ---------------------------------------------------------------------

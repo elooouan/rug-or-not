@@ -16,6 +16,9 @@ export const TEX = {
   windowLights: 'desk-window-lights', // + frame index
   windowFlash: 'desk-window-flash',
   raindrop: 'desk-raindrop',
+  snowflake: 'desk-snowflake',
+  stars: 'desk-stars', // + frame index
+  fog: 'desk-fog',
   cat: 'desk-cat', // + frame index
   heart: 'desk-heart',
   steamPuff: 'desk-steam-puff',

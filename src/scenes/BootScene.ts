@@ -3,6 +3,7 @@ import { generateAllTextures } from '@/art';
 import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { PALETTE } from '@/config/palette';
 import { audio } from '@/systems/audio';
+import { applyWeatherAudio } from '@/systems/weather';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
@@ -38,7 +39,7 @@ export class BootScene extends Phaser.Scene {
 
     const s = saveStore.get().settings;
     audio.setVolume(s.volume);
-    audio.setRain(s.rain);
+    applyWeatherAudio(s.weather);
     audio.setMusic(s.music);
 
     void this.boot(msg);

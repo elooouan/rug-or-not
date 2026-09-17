@@ -10,7 +10,10 @@ import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
-import { lucienSays } from '@/ui/DialogueBox';
+import { lucienSays, lucienSaysNow } from '@/ui/DialogueBox';
+import { StickyNote } from '@/ui/StickyNote';
+import { StampMark } from '@/ui/Stamp';
+import { floatText } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -22,6 +25,85 @@ export class TitleScene extends Phaser.Scene {
 
   constructor() {
     super(TitleScene.KEY);
+  }
+
+  /** Typed words, the Konami code, and other nonsense. */
+  private bindEasterEggs(cx: number, cy: number, cardW: number, cardH: number): void {
+    const kb = this.input.keyboard;
+    if (!kb) return;
+    let typed = '';
+    const konami = [
+      'ArrowUp',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowLeft',
+      'ArrowRight',
+      'b',
+      'a',
+    ];
+    let konamiAt = 0;
+    kb.on('keydown', (e: KeyboardEvent) => {
+      // Konami.
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      konamiAt = k === konami[konamiAt] ? konamiAt + 1 : k === konami[0] ? 1 : 0;
+      if (konamiAt === konami.length) {
+        konamiAt = 0;
+        this.confetti();
+        lucienSaysNow(this, 'konami');
+        return;
+      }
+      if (e.key.length !== 1) return;
+      typed = (typed + e.key.toLowerCase()).slice(-8);
+      const stampAt = (verdict: 'rug' | 'legit') => {
+        const m = new StampMark(this, verdict, verdict === 'rug' ? 'stampRed' : 'stampGreen');
+        m.setPosition(
+          cx + Phaser.Math.Between(60, cardW - 60),
+          cy + Phaser.Math.Between(30, cardH - 30),
+        ).setDepth(DEPTH.pins);
+        audio.play('stamp');
+        if (!saveStore.get().settings.reducedMotion) this.cameras.main.shake(100, 0.004);
+        this.tweens.add({
+          targets: m,
+          alpha: 0,
+          delay: 2500,
+          duration: 600,
+          onComplete: () => m.destroy(),
+        });
+        typed = '';
+      };
+      if (typed.endsWith('rug')) stampAt('rug');
+      else if (typed.endsWith('legit')) stampAt('legit');
+      else if (typed.endsWith('cat')) {
+        audio.play('meow');
+        floatText(this, 488, 24, 'mrrp?');
+        typed = '';
+      } else if (typed.endsWith('lucien')) {
+        lucienSaysNow(this, 'title-intro');
+        typed = '';
+      }
+    });
+  }
+
+  private confetti(): void {
+    audio.play('unlock');
+    const emitter = this.add.particles(GAME_WIDTH / 2, -4, TEX.pixel, {
+      x: { min: -GAME_WIDTH / 2, max: GAME_WIDTH / 2 },
+      speedY: { min: 40, max: 90 },
+      speedX: { min: -20, max: 20 },
+      lifespan: 4000,
+      quantity: 2,
+      frequency: 30,
+      scale: { min: 0.8, max: 1.6 },
+      rotate: { start: 0, end: 360 },
+      tint: [HEX.amber, HEX.stampRed, HEX.stampGreen, HEX.paper, HEX.ink],
+      gravityY: 20,
+    });
+    emitter.setDepth(DEPTH.toast);
+    this.time.delayedCall(3000, () => emitter.stop());
+    this.time.delayedCall(7500, () => emitter.destroy());
   }
 
   create(): void {
@@ -59,7 +141,16 @@ export class TitleScene extends Phaser.Scene {
       return obj;
     };
     t(GAME_WIDTH / 2, cy + 14, 'CASE FILE', { size: 10, color: 'paperShadow' }).setOrigin(0.5, 0);
-    t(GAME_WIDTH / 2, cy + 26, 'RUG OR NOT?', { size: 32, color: 'shadow' }).setOrigin(0.5, 0);
+    const title = t(GAME_WIDTH / 2, cy + 26, 'RUG OR NOT?', {
+      size: 32,
+      color: 'shadow',
+    }).setOrigin(0.5, 0);
+    title.setInteractive({ useHandCursor: false });
+    title.on('pointerdown', () => {
+      const flipped = title.text !== 'RUG OR NOT?';
+      title.setText(flipped ? 'RUG OR NOT?' : 'NOT OR RUG?');
+      audio.play(flipped ? 'correct' : 'wrong');
+    });
     t(GAME_WIDTH / 2, cy + 62, 'a crypto detective story', {
       size: 16,
       color: 'ink',
@@ -76,6 +167,11 @@ export class TitleScene extends Phaser.Scene {
     mark.add([r, mt]);
     this.children.remove(mark);
     card.add(mark);
+    r.setInteractive({ useHandCursor: false });
+    r.on('pointerdown', () => {
+      audio.play('hover');
+      floatText(this, cx + cardW - 58, cy + 22, 'shh.');
+    });
 
     // Menu.
     const cases = gameState.cases;
@@ -158,7 +254,26 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
-    addText(this, 6, GAME_HEIGHT - 12, 'v0.2', { size: 8, color: 'woodLight' }).setDepth(DEPTH.hud);
+    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.3', {
+      size: 8,
+      color: 'woodLight',
+    }).setDepth(DEPTH.hud);
+    version.setInteractive({ useHandCursor: false });
+    let versionClicks = 0;
+    version.on('pointerdown', () => {
+      versionClicks++;
+      if (versionClicks % 5 === 0) {
+        new StickyNote(
+          this,
+          12,
+          GAME_HEIGHT - 150,
+          'credits',
+          'Rug or Not? A pixel-noir detective game. Mascot: Detective Lucien. Fonts: Pixelify Sans and VT323 (OFL). Engine: Phaser 3. Biscuit the cat: unpaid.',
+          240,
+        );
+      } else audio.play('hover');
+    });
+    this.bindEasterEggs(cx, cy, cardW, cardH);
     addText(
       this,
       GAME_WIDTH / 2,
