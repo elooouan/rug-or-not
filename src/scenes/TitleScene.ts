@@ -262,7 +262,7 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
-    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.3', {
+    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.4', {
       size: 8,
       color: 'woodLight',
     }).setDepth(DEPTH.hud);

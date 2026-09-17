@@ -234,6 +234,17 @@ export class ReportScene extends Phaser.Scene {
       }
     }
 
+    const missedFine = b.flagsMissed.filter((f) => f.clue.finePrint).length;
+    if (missedFine > 0) {
+      L.push(
+        ...wrap(
+          `${missedFine} of the missed flag${missedFine > 1 ? 's were' : ' was'} fine print: only legible through the lens. Sweep slowly.`,
+          0,
+          'ink',
+        ),
+      );
+    }
+
     if (b.falseAccusations.length > 0 || b.strayPins > 0) {
       L.push({ text: 'FALSE ACCUSATIONS', font: 'ui', size: 10, color: 'woodDark', gap: 6 });
       for (const f of b.falseAccusations) {
