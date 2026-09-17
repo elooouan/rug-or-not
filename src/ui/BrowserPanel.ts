@@ -667,10 +667,10 @@ class NamePicker extends Phaser.GameObjects.Container {
     const sx = x + (w - slotW * 6) / 2;
     this.slots.forEach((_, i) => {
       const cx = sx + i * slotW + slotW / 2;
-      const up = new PixelButton(scene, cx - 9, y + 20, '^', () => this.bump(i, 1), {
+      const up = new PixelButton(scene, cx - 9, y + 20, '+', () => this.bump(i, 1), {
         variant: 'paper',
       });
-      const down = new PixelButton(scene, cx - 9, y + 58, 'v', () => this.bump(i, -1), {
+      const down = new PixelButton(scene, cx - 9, y + 58, '-', () => this.bump(i, -1), {
         variant: 'paper',
       });
       scene.children.remove(up);
