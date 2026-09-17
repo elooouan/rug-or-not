@@ -79,3 +79,22 @@ describe('SaveStore', () => {
     expect(new SaveStore(storage).get()).toEqual(defaultSave());
   });
 });
+
+describe('export / import', () => {
+  it('round-trips a save through a code', async () => {
+    const { exportSave, importSave } = await import('@/systems/save');
+    const a = new SaveStore(null);
+    a.update((d) => {
+      d.totalScore = 777;
+      d.detectiveName = 'ZED';
+    });
+    const code = exportSave(a);
+    expect(code.startsWith('RON1:')).toBe(true);
+    const b = new SaveStore(null);
+    expect(importSave(b, code)).toBe(true);
+    expect(b.get().totalScore).toBe(777);
+    expect(b.get().detectiveName).toBe('ZED');
+    expect(importSave(b, 'garbage')).toBe(false);
+    expect(importSave(b, 'RON1:!!!')).toBe(false);
+  });
+});

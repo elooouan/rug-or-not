@@ -5,7 +5,8 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { UnlockCategory } from '@/data/unlockables';
 import { audio } from '@/systems/audio';
-import { saveStore, type CosmeticSelection } from '@/systems/save';
+import { exportSave, importSave, saveStore, type CosmeticSelection } from '@/systems/save';
+import { toast } from '@/ui/Toast';
 import type { Settings } from '@/systems/settings';
 import { applyCosmetics } from '@/systems/cosmetics';
 import { applyWeatherAudio } from '@/systems/weather';
@@ -30,7 +31,7 @@ interface RowDef {
   hint?: () => string;
 }
 
-const CARD = { x: 150, y: 10, w: 340, h: 340, pad: 12, rowH: 15 } as const;
+const CARD = { x: 150, y: 6, w: 340, h: 348, pad: 10, rowH: 14 } as const;
 
 /** Volume, modes, accessibility, cosmetics and reset. Works standalone or as a pause overlay. */
 export class SettingsScene extends Phaser.Scene {
@@ -199,6 +200,42 @@ export class SettingsScene extends Phaser.Scene {
       cosmetic('Lamp shade', 'lamp', 'lamp');
       cosmetic('Magnifier rim', 'rim', 'rim');
       cosmetic('Stamp ink', 'ink', 'ink');
+    }
+    if (!this.overlay) {
+      this.rows.push({
+        label: 'Export progress',
+        value: () => 'copy',
+        change: () => {
+          const blob = exportSave(saveStore);
+          const done = () => toast(this, 'COPIED', 'save code on the clipboard');
+          try {
+            void navigator.clipboard
+              .writeText(blob)
+              .then(done, () => window.prompt('Copy your save code:', blob));
+          } catch {
+            window.prompt('Copy your save code:', blob);
+          }
+        },
+        hint: () => 'copies a save code you can paste on another device',
+      });
+      this.rows.push({
+        label: 'Import progress',
+        value: () => 'paste',
+        change: () => {
+          const blob = window.prompt('Paste a save code:');
+          if (!blob) return;
+          if (importSave(saveStore, blob)) {
+            audio.play('unlock');
+            audio.setVolume(saveStore.get().settings.volume);
+            toast(this, 'IMPORTED', 'progress restored');
+            this.refresh();
+          } else {
+            audio.play('wrong');
+            toast(this, 'NOPE', 'that was not a save code');
+          }
+        },
+        hint: () => "replaces this device's progress with the pasted code",
+      });
     }
     this.rows.push({
       label: 'Reset progress',

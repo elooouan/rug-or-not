@@ -77,6 +77,8 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - **Detective's Notebook**: two chapters. Every red flag you meet in a report unlocks its
   glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter.
   Flag and herring lines in a report are links straight to the page.
+- **Progress**: everything lives in `localStorage`; Settings can export a save code to the
+  clipboard and import one on another device.
 - **Unlockables**: cosmetic desk woods, lamp shades, magnifier rims and stamp inks earned by
   rank, cases closed, grades, streaks and flags learned. They never affect gameplay.
 

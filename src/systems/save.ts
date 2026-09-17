@@ -254,5 +254,25 @@ function safeStorage(): Storage | null {
   }
 }
 
+/** Base64 JSON blob of the current save, for moving progress between devices. */
+export function exportSave(store: SaveStore): string {
+  const json = JSON.stringify(store.get());
+  return `RON1:${btoa(unescape(encodeURIComponent(json)))}`;
+}
+
+/** Parse an exported blob; returns null when it isn't one. Sanitised like any other save. */
+export function importSave(store: SaveStore, blob: string): boolean {
+  const m = /^RON1:([A-Za-z0-9+/=]+)$/.exec(blob.trim());
+  if (!m) return false;
+  try {
+    const json = decodeURIComponent(escape(atob(m[1])));
+    const data = sanitizeSave(JSON.parse(json));
+    store.update((d) => Object.assign(d, data));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Game-wide singleton. Scenes read settings/progress from here. */
 export const saveStore = new SaveStore();
