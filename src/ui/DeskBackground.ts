@@ -11,6 +11,7 @@ import { TIPS } from '@/data/tips';
 import { StickyNote } from './StickyNote';
 import { CursorScene } from '@/scenes/CursorScene';
 import { BrowserPanel } from './BrowserPanel';
+import { lucienSays } from './DialogueBox';
 import { localDateKey } from '@/systems/dailyCase';
 import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
 import { WEATHERS } from '@/systems/settings';
@@ -90,7 +91,22 @@ export class DeskBackground {
     const s = saveStore.get().settings;
     this.motion = !s.reducedMotion;
 
-    scene.add.image(0, 0, TEX.wood).setOrigin(0).setDepth(DEPTH.wood);
+    const wood = scene.add.image(0, 0, TEX.wood).setOrigin(0).setDepth(DEPTH.wood);
+    wood.setInteractive({ useHandCursor: false });
+    let knocks = 0;
+    wood.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      // Idle clicks on the desk: mostly nothing, occasionally a knock.
+      knocks++;
+      if (knocks % 3 !== 0) return;
+      audio.play('click');
+      floatText(
+        scene,
+        p.worldX,
+        p.worldY - 6,
+        knocks % 9 === 0 ? "who's there?" : 'knock knock',
+        'woodLight',
+      );
+    });
     this.buildWindow(s.weather);
     const cork = scene.add
       .image(DESK.corkboard.x, DESK.corkboard.y, TEX.corkboard)
@@ -367,6 +383,7 @@ export class DeskBackground {
       return;
     }
     audio.play('meow');
+    if (this.pets === 1) lucienSays(this.scene, 'cat');
     floatText(
       this.scene,
       this.cat.x + 14,
@@ -535,6 +552,7 @@ export class DeskBackground {
     this.sipping = true;
     this.sips++;
     if (bumpStat('sips') >= 10) awardBadge(this.scene, 'wired');
+    if (this.sips === 6) lucienSays(this.scene, 'coffee');
     audio.play('sip');
     const lines = ['ahh', 'sip', 'mmm', 'needed that', 'still warm', 'ok. focus.'];
     const line =
