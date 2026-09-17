@@ -57,10 +57,18 @@ export class ClueSpot extends Phaser.GameObjects.Container {
       this.refresh();
       cb.onHover(this, false);
     });
+    // Toggle on release, and only for taps: a drag across the paper (finger or
+    // mouse) is inspecting, not pinning, so touch players can use the lens.
     zone.on(
       'pointerdown',
       (p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
-        if (p.rightButtonDown()) return;
+        if (!p.rightButtonDown()) ev.stopPropagation();
+      },
+    );
+    zone.on(
+      'pointerup',
+      (p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+        if (p.rightButtonReleased() || p.getDistance() > 8) return;
         ev.stopPropagation();
         cb.onToggle(this);
       },

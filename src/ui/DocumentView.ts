@@ -68,8 +68,9 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
       .setAlpha(0.55);
     const paper = scene.make.image({ x: 0, y: 0, key: TEX.paper }, false).setOrigin(0);
     paper.setInteractive({ useHandCursor: false });
-    paper.on('pointerdown', (p: Phaser.Input.Pointer, lx: number, ly: number) => {
-      if (p.rightButtonDown()) return;
+    // Taps on empty paper drop a stray pin; drags (inspecting with the lens) don't.
+    paper.on('pointerup', (p: Phaser.Input.Pointer, lx: number, ly: number) => {
+      if (p.rightButtonReleased() || p.getDistance() > 8) return;
       this.addStrayPin(Math.round(lx), Math.round(ly));
     });
     this.add([shadow, paper]);
@@ -286,6 +287,11 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     pin.setInteractive({ useHandCursor: false });
     pin.on(
       'pointerdown',
+      (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) =>
+        ev.stopPropagation(),
+    );
+    pin.on(
+      'pointerup',
       (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
         ev.stopPropagation();
         pin.destroy();

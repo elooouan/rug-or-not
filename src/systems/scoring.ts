@@ -9,6 +9,8 @@ export interface PinState {
   clueIds: string[];
   /** Number of pins placed on empty paper (no clue underneath). */
   strayPins: number;
+  /** Nudges bought from Lucien. */
+  hintsUsed?: number;
 }
 
 export interface ScoreInput {
@@ -34,6 +36,7 @@ export interface ScoreBreakdown {
   strayPins: number;
   flagPoints: number;
   penaltyPoints: number;
+  hintPoints: number;
   timeBonus: number;
   total: number;
   maxPossible: number;
@@ -96,8 +99,9 @@ export function scoreCase(input: ScoreInput): ScoreBreakdown {
   }
   const strayPins = Math.max(0, Math.floor(pins.strayPins));
   const penaltyPoints = (falseAccusations.length + strayPins) * SCORING.falseAccusation || 0;
+  const hintPoints = Math.max(0, Math.floor(pins.hintsUsed ?? 0)) * SCORING.hintCost || 0;
   const bonus = timeBonus(timeLeftSec, caseData.timeLimitSec);
-  const raw = verdictPoints + flagPoints + penaltyPoints + bonus;
+  const raw = verdictPoints + flagPoints + penaltyPoints + hintPoints + bonus;
   const total = Math.max(0, raw);
   const maxPossible = maxPossibleScore(caseData, timeLeftSec !== null);
   return {
@@ -109,6 +113,7 @@ export function scoreCase(input: ScoreInput): ScoreBreakdown {
     strayPins,
     flagPoints,
     penaltyPoints,
+    hintPoints,
     timeBonus: bonus,
     total,
     maxPossible,

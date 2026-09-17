@@ -14,6 +14,9 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 import { LucienBubble } from '@/ui/LucienBubble';
+import { LUCIEN_FACE_TEX } from '@/ui/DialogueBox';
+import { SCORING } from '@/config/gameConfig';
+import { FONT } from '@/config/layout';
 import { leaderboard } from '@/systems/leaderboard';
 import { wallet } from '@/systems/wallet';
 import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
@@ -70,6 +73,8 @@ export class InvestigationScene extends Phaser.Scene {
   private tabSwitched = false;
   private browsing = false;
   private said = new Set<string>();
+  private hintsUsed = 0;
+  private askLabel?: Phaser.GameObjects.Text;
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -124,6 +129,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.tabSwitched = false;
     this.browsing = false;
     this.said = new Set();
+    this.hintsUsed = 0;
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -265,12 +271,12 @@ export class InvestigationScene extends Phaser.Scene {
 
     this.hint = addText(
       this,
-      GAME_WIDTH / 2,
+      GAME_WIDTH - 96,
       GAME_HEIGHT - 12,
-      'hover evidence with the lens  ·  click clues to pin  ·  stamp RUG or LEGIT  ·  Esc pause',
+      'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
       { size: 10, color: 'paperShadow' },
     )
-      .setOrigin(0.5, 0)
+      .setOrigin(1, 0)
       .setDepth(DEPTH.hud);
     const menu = new PixelButton(
       this,
@@ -283,6 +289,26 @@ export class InvestigationScene extends Phaser.Scene {
       },
     );
     menu.setDepth(DEPTH.hud).setX(GAME_WIDTH - menu.bw - 6);
+    // Lucien's face in the corner: click to buy a nudge.
+    const face = this.add
+      .image(6, GAME_HEIGHT - 4, LUCIEN_FACE_TEX)
+      .setOrigin(0, 1)
+      .setDepth(DEPTH.hud);
+    face.setDisplaySize(Math.round(face.width * (40 / face.height)), 40);
+    face.setInteractive({ useHandCursor: false });
+    face.on('pointerover', () => audio.play('hover'));
+    face.on('pointerdown', () => this.askLucien());
+    this.askLabel = addText(
+      this,
+      6 + face.displayWidth + 2,
+      GAME_HEIGHT - 14,
+      `ask (${SCORING.hintCost})`,
+      {
+        size: FONT.size.tiny,
+        color: 'paperShadow',
+      },
+    ).setDepth(DEPTH.hud);
+    this.magnifier.ignore([face, this.askLabel]);
     this.magnifier.ignore([this.hint, this.notebook, this.tabs, ...this.stamps, this.clock, menu]);
     audio.play('paper');
     this.tutorial();
@@ -317,6 +343,32 @@ export class InvestigationScene extends Phaser.Scene {
         });
       }
     }
+  }
+
+  /** A paid nudge: points at a document with spots you haven't examined. Never names a flag. */
+  private askLucien(): void {
+    if (this.phase !== 'investigating' || this.paused || this.browsing) return;
+    if (this.hintsUsed >= SCORING.maxHints) {
+      LucienBubble.say(this, "Three nudges is my limit. Detective's honour.");
+      return;
+    }
+    const unexaminedIn = (i: number) =>
+      this.caseData.documents[i].clues.filter((cl) => !this.examined.has(cl.id)).length;
+    let text: string;
+    if (unexaminedIn(this.current) > 0)
+      text = "There's something on this very page you haven't looked at closely.";
+    else {
+      const other = this.caseData.documents.map((_, i) => i).find((i) => unexaminedIn(i) > 0);
+      if (other !== undefined)
+        text = `Have a closer look at the "${this.caseData.documents[other].title}" tab.`;
+      else
+        text =
+          "You've seen every spot. Now it's judgment: pin what you can explain, drop what you can't.";
+    }
+    this.hintsUsed++;
+    audio.play('wrong');
+    this.askLabel?.setText(`ask (${SCORING.hintCost})  used ${this.hintsUsed}/${SCORING.maxHints}`);
+    LucienBubble.say(this, text, 4500);
   }
 
   /** A one-time quip per case, shown in Lucien's corner bubble. */
@@ -386,6 +438,7 @@ export class InvestigationScene extends Phaser.Scene {
     const pins = {
       clueIds: this.docs.flatMap((d) => d.pinnedIds()),
       strayPins: this.docs.reduce((n, d) => n + d.strayCount, 0),
+      hintsUsed: this.hintsUsed,
     };
     const breakdown = scoreCase({
       caseData: c,
@@ -509,6 +562,10 @@ export class InvestigationScene extends Phaser.Scene {
       onResume: () => this.togglePause(),
       onSettings: () => {
         this.scene.launch('SettingsScene', { overlay: true, returnTo: InvestigationScene.KEY });
+        this.scene.pause();
+      },
+      onNotebook: () => {
+        this.scene.launch('NotebookScene', { overlay: true, returnTo: InvestigationScene.KEY });
         this.scene.pause();
       },
       onQuit: () => this.scene.start('TitleScene'),

@@ -5,11 +5,13 @@ import { HEX } from '@/config/palette';
 import { ButtonGroup } from './ButtonGroup';
 import { PixelButton } from './PixelButton';
 import { makeText } from './text';
+import { toggleFullscreen } from '@/main';
 import { rect } from '@/ui/shapes';
 
 export interface PauseActions {
   onResume: () => void;
   onSettings: () => void;
+  onNotebook: () => void;
   onQuit: () => void;
 }
 
@@ -36,10 +38,23 @@ export class PauseMenu extends Phaser.GameObjects.Container {
       new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 48, 'Resume', actions.onResume, {
         width: 100,
       }),
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 74, 'Settings', actions.onSettings, {
+      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 70, 'Notebook', actions.onNotebook, {
         width: 100,
       }),
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 100, 'Quit to title', actions.onQuit, {
+      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 92, 'Settings', actions.onSettings, {
+        width: 100,
+      }),
+      new PixelButton(
+        scene,
+        GAME_WIDTH / 2 - 50,
+        y + 114,
+        'Fullscreen [F]',
+        () => toggleFullscreen(),
+        {
+          width: 100,
+        },
+      ),
+      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 136, 'Quit to title', actions.onQuit, {
         width: 100,
       }),
     ];

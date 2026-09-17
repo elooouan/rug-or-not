@@ -51,6 +51,8 @@ export class LucienBubble extends Phaser.GameObjects.Container {
     this.add(face);
     this.setDepth(DEPTH.toast);
     scene.add.existing(this);
+    // Don't linger over a pause overlay.
+    scene.events.once(Phaser.Scenes.Events.PAUSE, () => this.active && this.destroy());
     audio.play('hover');
     const reduced = saveStore.get().settings.reducedMotion;
     if (!reduced) {

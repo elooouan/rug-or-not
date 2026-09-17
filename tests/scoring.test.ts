@@ -115,6 +115,17 @@ describe('scoreCase', () => {
     );
   });
 
+  it('charges for hints', () => {
+    const r = scoreCase({
+      caseData: rugCase,
+      verdict: 'rug',
+      pins: { clueIds: [], strayPins: 0, hintsUsed: 2 },
+      timeLeftSec: null,
+    });
+    expect(r.hintPoints).toBe(SCORING.hintCost * 2);
+    expect(r.total).toBe(SCORING.correctVerdict + SCORING.hintCost * 2);
+  });
+
   it('ignores pins for ids that do not exist', () => {
     const r = scoreCase({
       caseData: rugCase,

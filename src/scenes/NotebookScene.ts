@@ -28,14 +28,30 @@ export class NotebookScene extends Phaser.Scene {
   private detail!: Phaser.GameObjects.Container;
   private unlocked = new Set<string>();
   private listIds: FlagId[] = [];
+  private overlay = false;
+  private returnTo = 'TitleScene';
 
   constructor() {
     super(NotebookScene.KEY);
   }
 
+  init(data: { overlay?: boolean; returnTo?: string } | undefined): void {
+    this.overlay = !!data?.overlay;
+    this.returnTo = data?.returnTo ?? 'TitleScene';
+  }
+
+  private close(): void {
+    if (this.overlay) {
+      this.scene.stop();
+      this.scene.resume(this.returnTo);
+    } else this.scene.start(this.returnTo);
+  }
+
   create(): void {
     setupScene(this);
-    new DeskBackground(this, { props: false, stamps: false });
+    if (this.overlay)
+      this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, HEX.bg, 0.7).setOrigin(0).setInteractive();
+    else new DeskBackground(this, { props: false, stamps: false });
     this.unlocked = new Set(saveStore.get().unlockedFlags);
     this.listIds = [...FLAG_IDS];
     const { x, y, w, h, pad } = BOOK;
@@ -112,7 +128,7 @@ export class NotebookScene extends Phaser.Scene {
       GAME_WIDTH - 100,
       GAME_HEIGHT - 24,
       'Back  [Esc]',
-      () => this.scene.start('TitleScene'),
+      () => this.close(),
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);

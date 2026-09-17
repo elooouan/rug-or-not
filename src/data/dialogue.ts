@@ -30,6 +30,20 @@ export type ScriptId =
   | 'konami'
   | 'all-cases';
 
+/** Things Lucien says when you poke him on the title screen. */
+export const LUCIEN_QUIPS: string[] = [
+  'The coffee is not for sharing.',
+  'Biscuit solved a case once. Sat on the evidence until it confessed.',
+  "If the chart only goes up, somebody's holding the elevator door.",
+  'Renounced is a word. Renounced with a proxy admin is a costume.',
+  "I don't do guaranteed returns. I do guaranteed reading.",
+  'Every rug starts with a pitch and ends with a wallet named 0x9f3.',
+  'The lamp flickers when someone lies. Or when it rains. Mostly rain.',
+  'Pin what you can explain. Drop what you cannot.',
+  'A team photo with a watermark is a team of one: the intern who downloaded it.',
+  'Quiet night. Suspiciously quiet. Probably fine.',
+];
+
 export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   'title-intro': [
     { text: "Evening. Name's Lucien. Detective, coin sniffer, coffee enjoyer." },

@@ -15,6 +15,10 @@ import { StickyNote } from '@/ui/StickyNote';
 import { StampMark } from '@/ui/Stamp';
 import { floatText } from '@/ui/DeskBackground';
 import { awardBadge, badgeCount, checkAggregateBadges } from '@/systems/badges';
+import { LUCIEN_TEX } from '@/ui/DialogueBox';
+import { LucienBubble } from '@/ui/LucienBubble';
+import { DIALOGUE } from '@/config/layout';
+import { LUCIEN_QUIPS } from '@/data/dialogue';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
@@ -278,6 +282,36 @@ export class TitleScene extends Phaser.Scene {
       } else audio.play('hover');
     });
     this.bindEasterEggs(cx, cy, cardW, cardH);
+
+    // Lucien hangs around the desk; poke him for a quip.
+    const m = DIALOGUE.mascot;
+    const idle = this.add.image(m.x, m.y, LUCIEN_TEX).setOrigin(0, 1).setDepth(DEPTH.hud);
+    idle.setDisplaySize(Math.round(idle.width * (m.height / idle.height)), m.height);
+    idle.setInteractive({ useHandCursor: false });
+    let quip = Phaser.Math.Between(0, LUCIEN_QUIPS.length - 1);
+    idle.on('pointerdown', () => {
+      quip = (quip + 1) % LUCIEN_QUIPS.length;
+      LucienBubble.say(this, LUCIEN_QUIPS[quip], 3600);
+      if (!reduced) {
+        idle.setScale(idle.scaleX * 1.06, idle.scaleY * 0.94);
+        this.tweens.add({
+          targets: idle,
+          scaleX: idle.scaleX / 1.06,
+          scaleY: idle.scaleY / 0.94,
+          duration: 220,
+          ease: 'Back.easeOut',
+        });
+      }
+    });
+    if (!reduced)
+      this.tweens.add({
+        targets: idle,
+        y: m.y - 2,
+        duration: 1100,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
     addText(
       this,
       GAME_WIDTH / 2,

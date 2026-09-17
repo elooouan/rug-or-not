@@ -7,6 +7,9 @@ export const SCORING = {
   falseAccusation: -15,
   /** Max time bonus in timed mode, scaled by remaining time fraction. */
   timeBonusMax: 50,
+  /** Asking Lucien for a nudge. */
+  hintCost: -10,
+  maxHints: 3,
 } as const;
 
 export const GRADES = [

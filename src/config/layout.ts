@@ -109,7 +109,7 @@ export const UI = {
   buttonPadX: 8,
   focusRingPad: 2,
   pauseW: 220,
-  pauseH: 150,
+  pauseH: 176,
 } as const;
 
 export const DIALOGUE = {
