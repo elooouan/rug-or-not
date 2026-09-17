@@ -12,6 +12,7 @@ import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
+import { currentStreak, localDateKey, playedStrip } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
 import { awardBadge, noteSeen } from '@/systems/badges';
@@ -351,6 +352,15 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       `Socials:       ${['website, telegram', 'telegram only', 'website, discord, x', 'x only'][rng.int(0, 3)]}`,
     );
     ctx.gap();
+    const asides = [
+      'Lucien: "Holders" counts wallets, not people. One person, forty hats.',
+      'Lucien: The socials line tells you how many places they can delete your question.',
+      'Lucien: Liquidity is a number until you read who can move it.',
+      'Lucien: Deployed X days ago. Ask what the deployer did the day before.',
+      'Lucien: Verified source means you can read it. It does not mean you did.',
+    ];
+    ctx.line(asides[rng.int(0, asides.length - 1)], { color: 'ink' });
+    ctx.gap(2);
     ctx.line('Community notes:', { color: 'woodMid' });
     const notes = [
       'lol',
@@ -478,6 +488,26 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       () => ctx.panel.scene && new NamePicker(ctx.scene, () => ctx.panel.render()),
       { variant: 'paper' },
     );
+    // Daily strip: the last two weeks, filled squares are days played.
+    const today = localDateKey();
+    const strip = playedStrip(save.daily, today, 14);
+    ctx.line(
+      `Daily streak: ${currentStreak(save.daily, today)}  ·  best ${save.daily.bestStreak}`,
+      { color: 'woodMid' },
+    );
+    strip.forEach((on, i) => {
+      ctx.content.add(
+        rect(ctx.scene, i * 12, ctx.y + 1, 9, 9, on ? HEX.stampGreen : HEX.paperShadow),
+      );
+      if (!on) ctx.content.add(rect(ctx.scene, i * 12 + 3, ctx.y + 4, 3, 3, HEX.paper));
+    });
+    ctx.content.add(
+      makeText(ctx.scene, 14 * 12 + 4, ctx.y, 'last 14 days', {
+        size: FONT.size.tiny,
+        color: 'woodMid',
+      }),
+    );
+    ctx.y += 14;
     const st = save.stats;
     const acc = st.runs > 0 ? Math.round((st.correct / st.runs) * 100) : 0;
     const missed = Object.entries(st.flagMisses).sort((a, b) => b[1] - a[1])[0];

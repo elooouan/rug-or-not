@@ -487,8 +487,10 @@ export class InvestigationScene extends Phaser.Scene {
         lastVerdictCorrect: breakdown.verdictCorrect,
       };
       for (const id of newFlagIds) if (FLAGS[id as keyof typeof FLAGS]) d.unlockedFlags.push(id);
-      if (gameState.mode === 'daily') d.daily = recordDailyPlay(d.daily, localDateKey());
-      else d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
+      if (gameState.mode === 'daily') {
+        const next = recordDailyPlay(d.daily, localDateKey());
+        d.daily = { ...next, played: next.played ?? [] };
+      } else d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
     });
 
     // Every run goes on the board (local by default; see src/systems/leaderboard.ts).

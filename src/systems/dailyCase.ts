@@ -24,7 +24,11 @@ export interface DailyState {
   lastPlayed: string | null;
   streak: number;
   bestStreak: number;
+  /** Dates played, most recent last, capped for the calendar strip. */
+  played?: string[];
 }
+
+export const DAILY_HISTORY_MAX = 60;
 
 function addDays(dateKey: string, days: number): string {
   const [y, m, d] = dateKey.split('-').map(Number);
@@ -34,10 +38,17 @@ function addDays(dateKey: string, days: number): string {
 
 /** Apply a completed daily case for `today` to the streak state. Pure. */
 export function recordDailyPlay(state: DailyState, today: string): DailyState {
-  if (state.lastPlayed === today) return { ...state };
+  if (state.lastPlayed === today) return { ...state, played: state.played ?? [] };
   const continues = state.lastPlayed !== null && addDays(state.lastPlayed, 1) === today;
   const streak = continues ? state.streak + 1 : 1;
-  return { lastPlayed: today, streak, bestStreak: Math.max(state.bestStreak, streak) };
+  const played = [...(state.played ?? []), today].slice(-DAILY_HISTORY_MAX);
+  return { lastPlayed: today, streak, bestStreak: Math.max(state.bestStreak, streak), played };
+}
+
+/** For the last `days` days ending today: true where the daily was played. */
+export function playedStrip(state: DailyState, today: string, days = 14): boolean[] {
+  const set = new Set(state.played ?? []);
+  return Array.from({ length: days }, (_, i) => set.has(addDays(today, i - (days - 1))));
 }
 
 /** The streak the player currently "holds" (0 if it lapsed). */

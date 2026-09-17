@@ -3,6 +3,7 @@ import {
   currentStreak,
   localDateKey,
   pickDailyCaseId,
+  playedStrip,
   recordDailyPlay,
   type DailyState,
 } from '@/systems/dailyCase';
@@ -44,7 +45,12 @@ describe('streaks', () => {
   it('starts, continues and resets', () => {
     let s: DailyState = { lastPlayed: null, streak: 0, bestStreak: 0 };
     s = recordDailyPlay(s, '2026-03-01');
-    expect(s).toEqual({ lastPlayed: '2026-03-01', streak: 1, bestStreak: 1 });
+    expect(s).toEqual({
+      lastPlayed: '2026-03-01',
+      streak: 1,
+      bestStreak: 1,
+      played: ['2026-03-01'],
+    });
     s = recordDailyPlay(s, '2026-03-02');
     expect(s.streak).toBe(2);
     // Same day again doesn't double count.
@@ -52,7 +58,7 @@ describe('streaks', () => {
     expect(s.streak).toBe(2);
     // Skipping a day resets but keeps the best.
     s = recordDailyPlay(s, '2026-03-05');
-    expect(s).toEqual({ lastPlayed: '2026-03-05', streak: 1, bestStreak: 2 });
+    expect(s).toMatchObject({ lastPlayed: '2026-03-05', streak: 1, bestStreak: 2 });
   });
   it('crosses month boundaries', () => {
     let s = recordDailyPlay({ lastPlayed: null, streak: 0, bestStreak: 0 }, '2026-01-31');
@@ -66,6 +72,15 @@ describe('streaks', () => {
     expect(currentStreak(s, '2026-03-04')).toBe(0);
     expect(currentStreak({ lastPlayed: null, streak: 0, bestStreak: 0 }, '2026-03-04')).toBe(0);
   });
+  it('keeps a played-dates history and renders a strip', () => {
+    let s: DailyState = { lastPlayed: null, streak: 0, bestStreak: 0 };
+    s = recordDailyPlay(s, '2026-03-01');
+    s = recordDailyPlay(s, '2026-03-02');
+    s = recordDailyPlay(s, '2026-03-04');
+    expect(s.played).toEqual(['2026-03-01', '2026-03-02', '2026-03-04']);
+    expect(playedStrip(s, '2026-03-04', 5)).toEqual([false, true, true, false, true]);
+  });
+
   it('formats local date keys', () => {
     expect(localDateKey(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
