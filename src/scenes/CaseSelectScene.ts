@@ -64,9 +64,7 @@ export class CaseSelectScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
 
     this.folders = [];
-    this.unlocked = cases.map(
-      (c, i) => i === 0 || !!save.caseResults[cases[i - 1].id] || !!save.caseResults[c.id],
-    );
+    this.unlocked = cases.map((_c, i) => i < save.campaignUnlocked);
     cases.forEach((c, i) => {
       const col = i % DRAWER.cols;
       const row = Math.floor(i / DRAWER.cols);

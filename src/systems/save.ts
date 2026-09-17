@@ -21,6 +21,8 @@ export interface SaveData {
   caseResults: Record<string, CaseResult>;
   /** Flag ids whose notebook entry has been unlocked. */
   unlockedFlags: string[];
+  /** How many campaign folders are open (daily plays don't count). */
+  campaignUnlocked: number;
   daily: { lastPlayed: string | null; streak: number; bestStreak: number };
   settings: Settings;
   cosmetics: CosmeticSelection;
@@ -41,6 +43,7 @@ export function defaultSave(): SaveData {
     totalScore: 0,
     caseResults: {},
     unlockedFlags: [],
+    campaignUnlocked: 1,
     daily: { lastPlayed: null, streak: 0, bestStreak: 0 },
     settings: { ...DEFAULT_SETTINGS },
     cosmetics: { ...DEFAULT_COSMETICS },
@@ -74,6 +77,9 @@ export function sanitizeSave(raw: unknown): SaveData {
         lastVerdictCorrect: cr.lastVerdictCorrect === true,
       };
     }
+  }
+  if (typeof r.campaignUnlocked === 'number' && Number.isFinite(r.campaignUnlocked)) {
+    d.campaignUnlocked = Math.max(1, Math.floor(r.campaignUnlocked));
   }
   if (Array.isArray(r.unlockedFlags))
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');

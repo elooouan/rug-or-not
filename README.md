@@ -18,16 +18,32 @@ npm run dev        # http://localhost:5173
 
 Other scripts:
 
-| Script                   | What it does                                        |
-| ------------------------ | --------------------------------------------------- |
-| `npm run build`          | Typecheck + production build into `dist/`           |
-| `npm run preview`        | Serve the production build locally                  |
+| Script                   | What it does                                         |
+| ------------------------ | ---------------------------------------------------- |
+| `npm run build`          | Typecheck + production build into `dist/`            |
+| `npm run preview`        | Serve the production build locally                   |
 | `npm test`               | Vitest: scoring, daily seeding, save, unlocks, cases |
-| `npm run validate-cases` | Validate every case file and print a summary        |
-| `npm run lint`           | ESLint                                              |
-| `npm run format`         | Prettier                                            |
+| `npm run validate-cases` | Validate every case file and print a summary         |
+| `npm run lint`           | ESLint                                               |
+| `npm run format`         | Prettier                                             |
 
-The game is a static site: deploy `dist/` anywhere.
+The game is a static site: deploy `dist/` anywhere (paths are relative, so it works
+from a sub-folder). A GitHub Pages workflow is included in
+`.github/workflows/deploy.yml`: enable Pages (Settings → Pages → Source: _GitHub Actions_)
+and run the workflow from the Actions tab, or change its trigger to `push` to deploy on
+every commit. CI (`.github/workflows/ci.yml`) runs lint, typecheck, case validation, tests
+and a build on every push.
+
+## Modes
+
+- **Campaign**: the ten cases in order; each verdict unlocks the next folder.
+- **Daily Case**: one case chosen deterministically from today's date (same for everyone),
+  with a local streak counter. Daily plays don't unlock campaign folders.
+- **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a
+  no-magnifier accessibility mode (fine print shown inline with a dotted underline) live there too.
+- **Detective's Notebook**: every red flag you meet in a report unlocks its glossary page.
+- **Unlockables**: cosmetic desk woods, lamp shades, magnifier rims and stamp inks earned by
+  rank, cases closed, grades, streaks and flags learned. They never affect gameplay.
 
 ## How to play
 
@@ -38,6 +54,8 @@ The game is a static site: deploy `dist/` anywhere.
 - **Stamp** RUG or LEGIT by clicking a stamp or dragging it onto the paper.
 - Keyboard: `Tab`/arrows cycle clue spots, `Enter` pins, `R`/`L` stamp, `1`–`6` switch
   documents, `PageUp`/`PageDown` or the wheel scroll long documents, `Esc` pauses.
+
+Dev builds expose `__debug.startCase('kelp')` in the console to jump into any case.
 
 Scoring lives in [`src/systems/scoring.ts`](src/systems/scoring.ts): +100 correct verdict,
 −50 wrong, +25 per real red flag pinned (+10 if it was fine print), −15 per false
@@ -74,14 +92,14 @@ public/fonts/       Pixelify Sans + VT323 (both SIL OFL, licences included)
 
 Anchors per document type:
 
-| Type         | Anchor                                                                       |
-| ------------ | ---------------------------------------------------------------------------- |
+| Type         | Anchor                                                                              |
+| ------------ | ----------------------------------------------------------------------------------- |
 | `contract`   | `{ "kind": "line", "line": N }` or `{ "kind": "row", "row": 0, "table": "header" }` |
-| `tokenomics` | `{ "kind": "row", "row": N }` (allocation) or `"table": "notes"`             |
-| `team`       | `{ "kind": "row", "row": N }` (bio) / `"table": "photo"` / `"table": "note"` |
-| `chat`       | `{ "kind": "message", "index": N }`                                          |
-| `liquidity`  | `{ "kind": "row", "row": N, "table": "lock" \| "holders" \| "transfers" }`   |
-| `audit`      | `{ "kind": "row", "row": 0-3, "table": "field" }` or `"table": "findings"`   |
+| `tokenomics` | `{ "kind": "row", "row": N }` (allocation) or `"table": "notes"`                    |
+| `team`       | `{ "kind": "row", "row": N }` (bio) / `"table": "photo"` / `"table": "note"`        |
+| `chat`       | `{ "kind": "message", "index": N }`                                                 |
+| `liquidity`  | `{ "kind": "row", "row": N, "table": "lock" \| "holders" \| "transfers" }`          |
+| `audit`      | `{ "kind": "row", "row": 0-3, "table": "field" }` or `"table": "findings"`          |
 
 Rules enforced by the schema: legit cases contain only herrings, rug cases contain at least
 one red flag, anchors must be in range, clue ids must be unique, fine print needs `text`.

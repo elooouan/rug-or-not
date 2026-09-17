@@ -39,6 +39,11 @@ describe('sanitizeSave', () => {
     expect(s.settings.volume).toBe(1);
     expect(s.settings.relaxed).toBe(true);
   });
+  it('clamps campaign progress', () => {
+    expect(sanitizeSave({ campaignUnlocked: 0 }).campaignUnlocked).toBe(1);
+    expect(sanitizeSave({ campaignUnlocked: 4.7 }).campaignUnlocked).toBe(4);
+    expect(sanitizeSave({ campaignUnlocked: 'x' }).campaignUnlocked).toBe(1);
+  });
 });
 
 describe('sanitizeSettings', () => {
