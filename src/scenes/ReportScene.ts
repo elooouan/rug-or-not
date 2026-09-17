@@ -214,13 +214,18 @@ export class ReportScene extends Phaser.Scene {
         L.push({
           text: `+ FOUND  ${flag.title}  (+${pts}${f.clue.finePrint ? ', fine print' : ''})`,
           color: 'lampGreen',
+          onClick: () => this.openNotebook('flags', flag.id),
         });
         L.push(...wrap(flag.explanation, 12));
       }
       for (const f of b.flagsMissed) {
         if (!isFlagClue(f.clue)) continue;
         const flag = FLAGS[f.clue.flagId as keyof typeof FLAGS];
-        L.push({ text: `x MISSED  ${flag.title}  (in ${f.documentTitle})`, color: 'stampRed' });
+        L.push({
+          text: `x MISSED  ${flag.title}  (in ${f.documentTitle})`,
+          color: 'stampRed',
+          onClick: () => this.openNotebook('flags', flag.id),
+        });
         L.push(...wrap(flag.explanation, 12));
       }
     } else {
@@ -230,7 +235,11 @@ export class ReportScene extends Phaser.Scene {
         for (const clue of doc.clues) {
           if (isFlagClue(clue)) continue;
           const h = HERRINGS[clue.herringId as keyof typeof HERRINGS];
-          L.push({ text: `- ${h.title}`, color: 'ink' });
+          L.push({
+            text: `- ${h.title}`,
+            color: 'ink',
+            onClick: () => this.openNotebook('herrings', h.id),
+          });
         }
       }
     }
@@ -251,7 +260,11 @@ export class ReportScene extends Phaser.Scene {
       for (const f of b.falseAccusations) {
         if (isFlagClue(f.clue)) continue;
         const h = HERRINGS[f.clue.herringId as keyof typeof HERRINGS];
-        L.push({ text: `! ${h.title}  (${SCORING.falseAccusation})`, color: 'stampRed' });
+        L.push({
+          text: `! ${h.title}  (${SCORING.falseAccusation})`,
+          color: 'stampRed',
+          onClick: () => this.openNotebook('herrings', h.id),
+        });
         L.push(...wrap(h.reassurance, 12));
       }
       if (b.strayPins > 0) {
@@ -319,6 +332,13 @@ export class ReportScene extends Phaser.Scene {
   }
 
   /** A quick verdict on your verdict, every time. */
+  /** Flag and herring lines are links into the notebook (overlay, comes back here). */
+  private openNotebook(chapter: 'flags' | 'herrings', id: string): void {
+    audio.play('paper');
+    this.scene.launch('NotebookScene', { overlay: true, returnTo: ReportScene.KEY, chapter, id });
+    this.scene.pause();
+  }
+
   private lucienComment(): void {
     const { breakdown: b, caseData: c } = this.payload;
     const missedFine = b.flagsMissed.filter((f) => f.clue.finePrint).length;

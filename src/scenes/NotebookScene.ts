@@ -44,14 +44,21 @@ export class NotebookScene extends Phaser.Scene {
   private overlay = false;
   private returnTo = 'TitleScene';
   private tabButtons: PixelButton[] = [];
+  /** Hover-select only after the pointer has actually moved (a link click lands here mid-list). */
+  private hoverArmed = false;
 
   constructor() {
     super(NotebookScene.KEY);
   }
 
-  init(data: { overlay?: boolean; returnTo?: string } | undefined): void {
+  private openAt: { chapter: Chapter; id: string } | null = null;
+
+  init(
+    data: { overlay?: boolean; returnTo?: string; chapter?: Chapter; id?: string } | undefined,
+  ): void {
     this.overlay = !!data?.overlay;
     this.returnTo = data?.returnTo ?? 'TitleScene';
+    this.openAt = data?.chapter && data?.id ? { chapter: data.chapter, id: data.id } : null;
   }
 
   private close(): void {
@@ -129,6 +136,8 @@ export class NotebookScene extends Phaser.Scene {
     );
     back.setDepth(DEPTH.hud);
 
+    this.hoverArmed = false;
+    this.input.once('pointermove', () => (this.hoverArmed = true));
     const kb = this.input.keyboard;
     kb?.addCapture(['UP', 'DOWN', 'LEFT', 'RIGHT', 'TAB']);
     kb?.on('keydown-DOWN', () => this.select((this.selected + 1) % this.ids.length));
@@ -138,7 +147,11 @@ export class NotebookScene extends Phaser.Scene {
     );
     kb?.on('keydown-LEFT', () => this.setChapter('flags'));
     kb?.on('keydown-RIGHT', () => this.setChapter('herrings'));
-    this.setChapter('flags');
+    this.setChapter(this.openAt?.chapter ?? 'flags');
+    if (this.openAt) {
+      const idx = this.ids.indexOf(this.openAt.id);
+      if (idx >= 0) this.select(idx);
+    }
     lucienSays(this, 'notebook');
   }
 
@@ -169,7 +182,7 @@ export class NotebookScene extends Phaser.Scene {
         color: known ? 'shadow' : 'paperShadow',
       });
       t.setInteractive({ useHandCursor: false });
-      t.on('pointerover', () => this.select(i));
+      t.on('pointerover', () => this.hoverArmed && this.select(i));
       this.listPage.add(t);
       if (ch === 'flags') {
         const sev = FLAGS[id as FlagId].severity;

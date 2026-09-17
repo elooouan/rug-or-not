@@ -74,7 +74,9 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
   highlights; every run scores ×1.25 and is starred on the board.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a
   no-magnifier accessibility mode (fine print shown inline with a dotted underline) live there too.
-- **Detective's Notebook**: every red flag you meet in a report unlocks its glossary page.
+- **Detective's Notebook**: two chapters. Every red flag you meet in a report unlocks its
+  glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter.
+  Flag and herring lines in a report are links straight to the page.
 - **Unlockables**: cosmetic desk woods, lamp shades, magnifier rims and stamp inks earned by
   rank, cases closed, grades, streaks and flags learned. They never affect gameplay.
 

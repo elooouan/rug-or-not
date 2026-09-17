@@ -11,6 +11,8 @@ export interface TypedLine {
   indent?: number;
   /** Extra vertical gap before this line. */
   gap?: number;
+  /** Makes the line clickable (e.g. to open a notebook page). */
+  onClick?: () => void;
 }
 
 /**
@@ -43,6 +45,18 @@ export class Typewriter {
         color: line.color ?? 'shadow',
       };
       const t = makeText(scene, line.indent ?? 0, y, '', opts);
+      if (line.onClick) {
+        t.setInteractive({ useHandCursor: false });
+        t.on(
+          'pointerdown',
+          (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+            ev.stopPropagation();
+            line.onClick?.();
+          },
+        );
+        t.on('pointerover', () => t.setAlpha(0.7));
+        t.on('pointerout', () => t.setAlpha(1));
+      }
       container.add(t);
       this.texts.push(t);
       y += Math.max(this.lineHeight, line.size ? line.size + 2 : this.lineHeight);
