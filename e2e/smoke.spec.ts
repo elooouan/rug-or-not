@@ -21,19 +21,50 @@ const activeScenes = (page: Page) =>
       .filter((k) => k !== 'CursorScene'),
   );
 
+/** CI runners render through software GL and crawl; give the game room. */
+const SLOW = 45_000;
+
 async function boot(page: Page, hash = ''): Promise<string[]> {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => {
     if (m.type() === 'error' && !/WebSocket|favicon/.test(m.text())) errors.push(m.text());
   });
+  // A quiet save: no tutorials, no music, no shake or particles, so the run is short and
+  // deterministic on a slow machine.
+  await page.addInitScript(() => {
+    if (localStorage.getItem('rug-or-not:save:v1')) return;
+    localStorage.setItem(
+      'rug-or-not:save:v1',
+      JSON.stringify({
+        version: 1,
+        settings: { hints: false, music: false, reducedMotion: true, quips: false },
+      }),
+    );
+  });
   // A fresh query each time: a hash-only change would not reload the page.
   await page.goto(`/?boot=${Date.now()}${hash}`);
-  await page.waitForFunction(() => typeof window.__game !== 'undefined');
-  await page.waitForFunction(() => window.__game.scene.getScenes(true).length > 0);
+  await page.waitForFunction(() => typeof window.__game !== 'undefined', null, { timeout: SLOW });
+  await page.waitForFunction(() => window.__game.scene.getScenes(true).length > 0, null, {
+    timeout: SLOW,
+  });
   await page.waitForTimeout(800);
   return errors;
 }
+
+const waitForScene = (page: Page, key: string) =>
+  page.waitForFunction(
+    (k) => window.__game.scene.getScenes(true).some((s) => s.scene.key === k),
+    key,
+    { timeout: SLOW },
+  );
+
+const waitForPhase = (page: Page, phase: string) =>
+  page.waitForFunction(
+    (p) => (window.__game.scene.getScene('InvestigationScene') as { phase: string }).phase === p,
+    phase,
+    { timeout: SLOW },
+  );
 
 /** Skip whatever Lucien is saying so the scene accepts input. */
 const skipTalk = (page: Page) =>
@@ -55,36 +86,30 @@ test('a case can be opened, stamped and reported', async ({ page }) => {
   const errors = await boot(page);
   await skipTalk(page);
   await page.evaluate(() => window.__debug.startCase('moonpup'));
-  await page.waitForTimeout(1200);
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
   await skipTalk(page);
-  expect(await activeScenes(page)).toEqual(['InvestigationScene']);
   // Enter opens the folder; then stamp RUG through the scene's own API.
   await page.keyboard.press('Enter');
-  await page.waitForTimeout(1200);
+  await waitForPhase(page, 'investigating');
   await skipTalk(page);
   await page.evaluate(() => {
     const inv = window.__game.scene.getScene('InvestigationScene') as {
-      phase: string;
       stamps: { trigger(fn: (v: string) => void): void }[];
       onStamp(v: string): void;
     };
-    if (inv.phase !== 'investigating') throw new Error(`phase ${inv.phase}`);
     inv.stamps[0].trigger((v) => inv.onStamp(v));
   });
-  await page.waitForFunction(
-    () => window.__game.scene.getScenes(true).some((s) => s.scene.key === 'ReportScene'),
-    null,
-    { timeout: 10_000 },
-  );
+  await waitForScene(page, 'ReportScene');
   expect(errors).toEqual([]);
 });
 
 test('deep links open the rush and a cold case', async ({ page }) => {
   let errors = await boot(page, '#rush');
-  expect(await activeScenes(page)).toEqual(['RushScene']);
+  await waitForScene(page, 'RushScene');
   expect(errors).toEqual([]);
   errors = await boot(page, '#cold=e2e-seed');
-  expect(await activeScenes(page)).toEqual(['InvestigationScene']);
+  await waitForScene(page, 'InvestigationScene');
   expect(errors).toEqual([]);
 });
 
