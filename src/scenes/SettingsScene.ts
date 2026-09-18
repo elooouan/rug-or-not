@@ -130,6 +130,12 @@ export class SettingsScene extends Phaser.Scene {
       hint: () => 'once-only guidance from the detective; "Replay hints" shows them again',
     });
     this.rows.push({
+      label: "Lucien's remarks",
+      value: () => onOff(s().quips),
+      change: () => set((st) => (st.quips = !st.quips)),
+      hint: () => 'the corner bubbles: reactions, reading tips, radio reviews. Hints stay on.',
+    });
+    this.rows.push({
       label: 'Replay hints',
       value: () => '...',
       change: () => {
@@ -139,7 +145,7 @@ export class SettingsScene extends Phaser.Scene {
       },
     });
     this.rows.push({
-      label: 'Music (lo-fi loop)',
+      label: 'Music (the radio)',
       value: () => onOff(s().music),
       change: () => set((st) => (st.music = !st.music)),
     });

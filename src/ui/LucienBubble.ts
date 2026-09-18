@@ -23,6 +23,7 @@ export class LucienBubble extends Phaser.GameObjects.Container {
   /** `lift` raises the bubble above things at the bottom of the screen (e.g. report buttons). */
   static say(scene: Phaser.Scene, text: string, ms = 3200, lift = 0): void {
     LucienBubble.current?.destroy();
+    if (!saveStore.get().settings.quips) return;
     LucienBubble.current = new LucienBubble(scene, text, ms, lift);
   }
 

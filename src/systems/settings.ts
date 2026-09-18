@@ -19,6 +19,8 @@ export interface Settings {
   musicVolume: number; // 0..1, relative to master
   /** Lucien's once-only guidance. */
   hints: boolean;
+  /** Lucien's passing remarks (corner bubbles). */
+  quips: boolean;
   /** Detective's honour: no nudges, no counters, no hover highlights, x1.25 score. */
   hardMode: boolean;
 }
@@ -33,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   music: true,
   musicVolume: 0.5,
   hints: true,
+  quips: true,
   hardMode: false,
 };
 
@@ -60,6 +63,7 @@ export function sanitizeSettings(raw: unknown): Settings {
         ? Math.min(1, Math.max(0, r.musicVolume))
         : DEFAULT_SETTINGS.musicVolume,
     hints: bool(r.hints, DEFAULT_SETTINGS.hints),
+    quips: bool(r.quips, DEFAULT_SETTINGS.quips),
     hardMode: bool(r.hardMode, DEFAULT_SETTINGS.hardMode),
   };
 }
