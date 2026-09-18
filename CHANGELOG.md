@@ -2,6 +2,13 @@
 
 ## v0.5 — rush hour
 
+- Cold cases: a procedural case generator (names, contracts, tokenomics, teams, chats,
+  liquidity, audits assembled from the red-flag and herring libraries; difficulty sets how
+  many flags and how much fine print). Endless play with its own board and badges, seeds
+  shareable as `#cold=<seed>`.
+- Dev builds keep the game loop stepping in a hidden tab (a worker drives it), so automated
+  checks and long-running tests don't freeze.
+
 - Red Flag Rush: an arcade mode. Sixty seconds, one page at a time, streak multipliers,
   its own board, three badges, Lucien's rules talk, a 3-2-1 countdown.
 - A radio under the lamp: lo-fi / late jazz / static / off. The jazz station is a second

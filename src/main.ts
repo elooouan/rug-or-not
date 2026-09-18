@@ -83,6 +83,21 @@ if (import.meta.env.DEV) {
     };
   };
   w.__game = game;
+  // Browsers throttle background-tab timers to once a second, which freezes the
+  // loop (and every automated check) while the tab is hidden. Worker timers are
+  // not throttled that hard, so a worker drives the loop whenever the tab is hidden.
+  try {
+    const pump = new Worker(
+      URL.createObjectURL(
+        new Blob(['setInterval(() => postMessage(0), 16);'], { type: 'text/javascript' }),
+      ),
+    );
+    pump.onmessage = () => {
+      if (document.hidden) game.loop.step(performance.now());
+    };
+  } catch {
+    /* no workers here; the loop just idles in the background */
+  }
   w.__debug = {
     audio,
     /** Render every SFX (and a few bars of music) offline and report peak levels. */

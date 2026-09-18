@@ -7,7 +7,8 @@ import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
-import { gameState } from '@/systems/gameState';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
@@ -92,16 +93,22 @@ export class ReportScene extends Phaser.Scene {
     const by = y + h - pad - 18;
     const buttons: PixelButton[] = [];
     const isDaily = gameState.mode === 'daily';
+    const isCold = gameState.mode === 'cold';
     const nextIndex = gameState.currentIndex + 1;
-    const hasNext = !isDaily && nextIndex < playableCases(saveStore.get(), gameState.cases).length;
+    const hasNext =
+      isCold || (!isDaily && nextIndex < playableCases(saveStore.get(), gameState.cases).length);
     if (hasNext) {
       buttons.push(
         new PixelButton(
           this,
           x + pad,
           by,
-          'Next case',
+          isCold ? 'Next cold one' : 'Next case',
           () => {
+            if (isCold) {
+              startColdCase(this, newColdSeed());
+              return;
+            }
             gameState.currentIndex = nextIndex;
             gameState.currentCase = gameState.cases[nextIndex];
             this.scene.start('InvestigationScene');
@@ -140,8 +147,8 @@ export class ReportScene extends Phaser.Scene {
         this,
         x + w - pad - 90,
         by,
-        isDaily ? 'Title' : 'Case files',
-        () => this.scene.start(isDaily ? 'TitleScene' : 'CaseSelectScene'),
+        isDaily || isCold ? 'Title' : 'Case files',
+        () => this.scene.start(isDaily || isCold ? 'TitleScene' : 'CaseSelectScene'),
         { width: 90 },
       ),
     );
@@ -385,7 +392,9 @@ export class ReportScene extends Phaser.Scene {
           : `Yellow herrings pinned ${b.falseAccusations.length}`,
       mode: isDaily
         ? `Daily ${localDateKey()}`
-        : `Case ${gameState.currentIndex + 1} of ${gameState.cases.length}`,
+        : gameState.mode === 'cold'
+          ? `Cold case ${gameState.coldSeed ?? ''}`
+          : `Case ${gameState.currentIndex + 1} of ${gameState.cases.length}`,
       detective: saveStore.get().detectiveName,
       url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
       mascot: mascotTex,
@@ -406,13 +415,13 @@ export class ReportScene extends Phaser.Scene {
     const isDaily = gameState.mode === 'daily';
     const save = saveStore.get();
     const lines = [
-      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : `Case: ${c.ticker}`} "${c.title}"`,
+      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? `Cold case ${c.ticker}` : `Case: ${c.ticker}`} "${c.title}"`,
       `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts`,
       c.verdict === 'rug'
         ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`
         : `Yellow herrings pinned: ${b.falseAccusations.length}`,
       isDaily && save.daily.streak > 1 ? `Streak: ${save.daily.streak} days` : '',
-      `${location.origin}${location.pathname}#${isDaily ? 'daily' : `case=${c.id}`}`,
+      `${location.origin}${location.pathname}#${isDaily ? 'daily' : gameState.mode === 'cold' ? `cold=${gameState.coldSeed ?? ''}` : `case=${c.id}`}`,
       '#RugOrNot',
     ].filter(Boolean);
     const text = lines.join('\n');

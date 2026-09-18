@@ -78,6 +78,11 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
   RugScan until then).
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Daily plays don't unlock campaign folders.
+- **Cold cases**: an endless pile of generated files (`src/systems/caseGen.ts`). Each is built
+  from a seed, so a share link (`#cold=<seed>`) brings back the exact same file; every
+  generated case passes the same schema as the handcrafted ones (400 seeds are validated in
+  the tests). Cold cases unlock notebook pages but keep their own tally and board; they never
+  touch the campaign or your rank.
 - **Red Flag Rush**: sixty seconds, one evidence page at a time. Every page hides at least
   one red flag; click it to clear the page (+3 s), herrings cost 5 s, blank paper 2 s, streaks
   multiply up to ×3. Fine print is shown inline (no lens). Best score, longest streak and a
@@ -109,7 +114,8 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 
-Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case and `#rush` starts a rush (the Share button
+Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case, `#cold=<seed>` prints
+that cold case and `#rush` starts a rush (the Share button
 includes one in its clipboard text; its "Save card" option downloads a 1280x720 PNG of the
 report instead). Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.
 

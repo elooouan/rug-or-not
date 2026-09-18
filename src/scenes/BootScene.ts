@@ -6,6 +6,7 @@ import { audio } from '@/systems/audio';
 import { applyWeatherAudio } from '@/systems/weather';
 import { localDateKey, pickDailyCaseId } from '@/systems/dailyCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
+import { startColdCase } from '@/systems/coldCase';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
@@ -81,6 +82,12 @@ export class BootScene extends Phaser.Scene {
       gameState.currentCase = linked;
       gameState.currentIndex = loaded.cases.indexOf(linked);
       this.scene.start('InvestigationScene');
+      return;
+    }
+    const cold = /^cold=([a-z0-9-]{1,32})$/.exec(hash);
+    if (cold) {
+      history.replaceState(null, '', location.pathname + location.search);
+      startColdCase(this, cold[1]);
       return;
     }
     if (hash === 'rush') {

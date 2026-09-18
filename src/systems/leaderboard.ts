@@ -17,7 +17,7 @@ export interface ScoreEntry {
   holder?: boolean;
 }
 
-export type BoardMode = 'case' | 'rush';
+export type BoardMode = 'case' | 'rush' | 'cold';
 
 export interface LeaderboardProvider {
   readonly kind: 'local' | 'remote';
@@ -26,7 +26,7 @@ export interface LeaderboardProvider {
 }
 
 export function modeOf(e: ScoreEntry): BoardMode {
-  return e.mode === 'rush' ? 'rush' : 'case';
+  return e.mode === 'rush' || e.mode === 'cold' ? e.mode : 'case';
 }
 
 const BOARD_KEY = 'rug-or-not:board:v1';
@@ -51,7 +51,7 @@ export function sanitizeEntries(raw: unknown): ScoreEntry[] {
     .map((e) => ({
       ...e,
       name: e.name.slice(0, 12),
-      mode: e.mode === 'rush' ? ('rush' as const) : undefined,
+      mode: e.mode === 'rush' || e.mode === 'cold' ? e.mode : undefined,
       holder: e.holder === true ? true : undefined,
     }));
 }
@@ -88,6 +88,7 @@ export class LocalLeaderboard implements LeaderboardProvider {
     const all = [
       ...rankEntries(merged, MAX_ENTRIES, 'case'),
       ...rankEntries(merged, MAX_ENTRIES, 'rush'),
+      ...rankEntries(merged, MAX_ENTRIES, 'cold'),
     ];
     try {
       this.storage?.setItem(BOARD_KEY, JSON.stringify(all));

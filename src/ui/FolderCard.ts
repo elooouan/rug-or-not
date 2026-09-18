@@ -29,7 +29,11 @@ export class FolderCard extends Phaser.GameObjects.Container {
         scene,
         6,
         1,
-        `${gameState.mode === 'daily' ? 'DAILY CASE' : `CASE #${String(gameState.currentIndex + 1).padStart(2, '0')}`}`,
+        gameState.mode === 'daily'
+          ? 'DAILY CASE'
+          : gameState.mode === 'cold'
+            ? `COLD CASE  ${gameState.coldSeed ?? ''}`
+            : `CASE #${String(gameState.currentIndex + 1).padStart(2, '0')}`,
         {
           size: FONT.size.tiny,
           color: 'woodDark',

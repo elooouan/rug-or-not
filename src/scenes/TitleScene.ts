@@ -5,7 +5,8 @@ import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
-import { gameState } from '@/systems/gameState';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { startColdCase } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
@@ -127,9 +128,9 @@ export class TitleScene extends Phaser.Scene {
 
     // Title card: a sheet of paper under the lamp.
     const cardW = 300;
-    const cardH = 255;
+    const cardH = 282;
     const cx = Math.round((GAME_WIDTH - cardW) / 2);
-    const cy = 58;
+    const cy = 54;
     const card = this.add.container(0, 0).setDepth(DEPTH.documents);
     const shadow = this.make
       .image({ x: cx + 4, y: cy + 5, key: TEX.paper }, false)
@@ -234,6 +235,7 @@ export class TitleScene extends Phaser.Scene {
       ),
       mk('Case files', () => this.scene.start('CaseSelectScene')),
       mk('Red Flag Rush', () => this.scene.start('RushScene')),
+      mk('Cold case', () => startColdCase(this, newColdSeed())),
       mk('Notebook', () => this.scene.start('NotebookScene')),
       mk('Settings', () => this.scene.start('SettingsScene')),
     ];
@@ -246,13 +248,15 @@ export class TitleScene extends Phaser.Scene {
     const next = nextRankInfo(save.totalScore);
     t(
       GAME_WIDTH / 2,
+      cy + cardH - 38,
+      `${rank}  ·  ${save.totalScore} pts${next ? `  ·  ${next.remaining} to ${next.rank}` : ''}`,
+      { size: 12, color: 'woodMid', font: 'body' },
+    ).setOrigin(0.5, 0);
+    t(
+      GAME_WIDTH / 2,
       cy + cardH - 26,
-      `${rank}  ·  ${save.totalScore} pts${next ? ` (${next.remaining} to ${next.rank})` : ''}  ·  ${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges`,
-      {
-        size: 12,
-        color: 'woodMid',
-        font: 'body',
-      },
+      `${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges  ·  ${save.stats.coldRuns} cold`,
+      { size: 12, color: 'woodMid', font: 'body' },
     ).setOrigin(0.5, 0);
     t(
       GAME_WIDTH / 2,

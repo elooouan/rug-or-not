@@ -623,6 +623,36 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       });
     });
     ctx.y += BROWSER.lineH * 5;
+    ctx.rule();
+    ctx.line(
+      `Cold cases: ${st.coldRuns} closed  ·  ${st.coldCorrect} called right  ·  best ${st.coldBest}`,
+      { color: 'woodMid' },
+    );
+    const coldY = ctx.y;
+    void leaderboard.list(5, 'cold').then((entries: ScoreEntry[]) => {
+      if (!ctx.content.active) return;
+      if (entries.length === 0) {
+        ctx.content.add(
+          makeText(ctx.scene, 0, coldY, 'No cold cases yet. The pile never ends.', {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'paperShadow',
+          }),
+        );
+        return;
+      }
+      entries.forEach((e, i) => {
+        const line = `${String(i + 1).padStart(2, ' ')}. ${(e.name + (e.holder ? '$' : '')).padEnd(13)} ${String(e.score).padStart(4)}${e.hard ? '*' : ' '} ${e.grade}  ${e.caseId.replace(/^cold-/, '').padEnd(8)} ${e.date.slice(0, 10)}`;
+        ctx.content.add(
+          makeText(ctx.scene, 0, coldY + i * BROWSER.lineH, line, {
+            font: 'body',
+            size: FONT.size.body,
+            color: i === 0 ? 'amber' : 'shadow',
+          }),
+        );
+      });
+    });
+    ctx.y += BROWSER.lineH * 5;
     lucienSays(ctx.scene, 'leaderboard');
   },
 
@@ -693,6 +723,9 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.line('Esc pauses. F toggles fullscreen.');
     ctx.line(
       'Red Flag Rush: sixty seconds, one page at a time. Click the red flag to clear the page; herrings and blank paper cost seconds.',
+    );
+    ctx.line(
+      'Cold cases: files the printer makes up on the spot, endless. Same rules, their own board; the seed in the share link brings the same file back.',
     );
     ctx.gap();
     ctx.line(

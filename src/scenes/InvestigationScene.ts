@@ -498,12 +498,29 @@ export class InvestigationScene extends Phaser.Scene {
     );
     const newFlagIds = [...new Set(caseFlagIds)].filter((id) => !prevFlags.has(id));
     let bestImproved = false;
+    const cold = gameState.mode === 'cold';
     const caughtName =
-      c.verdict === 'rug' && breakdown.verdictCorrect && !before.caseResults[c.id]?.solved
+      !cold && c.verdict === 'rug' && breakdown.verdictCorrect && !before.caseResults[c.id]?.solved
         ? rogueOf(c).name
         : null;
 
     saveStore.update((d) => {
+      // Notebook pages unlock from any file, generated or not.
+      for (const id of newFlagIds) if (FLAGS[id as keyof typeof FLAGS]) d.unlockedFlags.push(id);
+      for (const doc of c.documents)
+        for (const clue of doc.clues)
+          if (!isFlagClue(clue) && !d.unlockedHerrings.includes(clue.herringId))
+            d.unlockedHerrings.push(clue.herringId);
+      if (cold) {
+        // Cold cases keep their own tally and never touch the campaign or the rank.
+        d.stats.coldRuns++;
+        if (breakdown.verdictCorrect) d.stats.coldCorrect++;
+        if (breakdown.total > d.stats.coldBest) {
+          d.stats.coldBest = breakdown.total;
+          bestImproved = true;
+        }
+        return;
+      }
       const prev = d.caseResults[c.id];
       const prevBest = prev?.bestScore ?? 0;
       if (breakdown.total > prevBest) {
@@ -523,11 +540,6 @@ export class InvestigationScene extends Phaser.Scene {
         lastVerdictCorrect: breakdown.verdictCorrect,
         solved: (prev?.solved ?? false) || breakdown.verdictCorrect,
       };
-      for (const id of newFlagIds) if (FLAGS[id as keyof typeof FLAGS]) d.unlockedFlags.push(id);
-      for (const doc of c.documents)
-        for (const clue of doc.clues)
-          if (!isFlagClue(clue) && !d.unlockedHerrings.includes(clue.herringId))
-            d.unlockedHerrings.push(clue.herringId);
       if (gameState.mode === 'daily') {
         const next = recordDailyPlay(d.daily, localDateKey());
         d.daily = { ...next, played: next.played ?? [] };
@@ -544,6 +556,7 @@ export class InvestigationScene extends Phaser.Scene {
       wallet: wallet.state.address ?? undefined,
       hard: saveStore.get().settings.hardMode || undefined,
       holder: holderPerks() || undefined,
+      mode: cold ? 'cold' : undefined,
     });
 
     saveStore.update((d) => {
@@ -557,7 +570,10 @@ export class InvestigationScene extends Phaser.Scene {
 
     // Badges (toasts are shown by the report scene).
     const badgesBefore = saveStore.get().badges.length;
-    awardBadge(null, 'first-case');
+    if (cold) {
+      awardBadge(null, 'cold-one');
+      if (saveStore.get().stats.coldCorrect >= 10) awardBadge(null, 'cold-ten');
+    } else awardBadge(null, 'first-case');
     const flagsTotal = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
     const noFalse = breakdown.falseAccusations.length === 0 && breakdown.strayPins === 0;
     if (

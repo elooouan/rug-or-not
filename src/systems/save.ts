@@ -55,6 +55,10 @@ export interface SaveData {
     rushRuns: number;
     rushBest: number;
     rushBestStreak: number;
+    /** Cold cases (generated files). */
+    coldRuns: number;
+    coldCorrect: number;
+    coldBest: number;
   };
   /** Last known wallet snapshot (public address + token balance) for holder perks. */
   wallet: { address: string | null; token: number | null; checkedAt: string | null };
@@ -96,6 +100,9 @@ export function defaultSave(): SaveData {
       rushRuns: 0,
       rushBest: 0,
       rushBestStreak: 0,
+      coldRuns: 0,
+      coldCorrect: 0,
+      coldBest: 0,
     },
     wallet: { address: null, token: null, checkedAt: null },
   };
@@ -164,6 +171,9 @@ export function sanitizeSave(raw: unknown): SaveData {
       rushRuns: num(st.rushRuns),
       rushBest: num(st.rushBest),
       rushBestStreak: num(st.rushBestStreak),
+      coldRuns: num(st.coldRuns),
+      coldCorrect: num(st.coldCorrect),
+      coldBest: num(st.coldBest),
     };
   }
   if (r.wallet && typeof r.wallet === 'object') {
