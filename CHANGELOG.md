@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7 — night shift (unreleased)
+
+- Streak freezes: every seventh daily in a row earns one (two at most); a freeze quietly
+  bridges a single missed night. The report says when one is earned or spent; the board
+  shows what's in hand.
+- Back on the title after the first case, Lucien gives a once-only tour of the desk (phone,
+  radio, cat, polaroid, safe). Drills can start from a report's notebook links; the rush
+  names the flag on every hit; the help page covers the weekly, drills and custom files.
+- Seasonal dressing: a pumpkin by the mug in the last week of October, fairy lights in the
+  window from December 10th. PixelForge carries the young-token herring.
+- Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.
+
 ## v0.6 — the pile
 
 - Cold cases: a procedural case generator (names, contracts, tokenomics, teams, chats,
@@ -7,9 +19,6 @@
   many flags and how much fine print). Endless play with its own board and badges, seeds
   shareable as `#cold=<seed>`; "the pile" folder in the drawer prints one. Difficulty grows
   with the number of campaign files you've solved (a `d<n>-` prefix in the seed pins it).
-- Streak freezes: every seventh daily in a row earns one (two at most); a freeze quietly
-  bridges a single missed night. The report says when one is earned or spent; the board
-  shows what's in hand.
 - Every other day the daily is a generated file seeded by the date (still the same for
   everyone); generated dailies count for the streak and the cold-case tally, never for the
   campaign or the rank.
@@ -45,18 +54,15 @@
   NetScope pages, the report and the ledger all scroll by dragging.
 - Returning players get a one-line "new tonight" from Lucien after an update (the save
   remembers the last version it was opened with).
-- Back on the title after the first case, Lucien gives a once-only tour of the desk (phone,
-  radio, cat, polaroid, safe).
 - On the title, Lucien points at a drill for the flag that keeps getting past you (missed
   more than pinned, never drilled) when there is no streak to nag about.
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
-- Snow and fog nights get a low wind bed with slow gusts. Seasonal dressing: a pumpkin by
-  the mug in the last week of October, fairy lights in the window from December 10th.
 
 - Share menus (report and rush) offer copy / share sheet, "Post on X" and "Telegram"
   (prefilled intents in a new tab); the report's also saves the card.
+- Snow and fog nights get a low wind bed with slow gusts.
 - Share uses the phone's share sheet where there is one; the clipboard elsewhere; a note
   with the text if neither works.
 - Deleted chat messages leave a ghost of their text that only the lens can read.
