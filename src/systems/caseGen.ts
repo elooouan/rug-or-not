@@ -381,7 +381,8 @@ function contractDoc(
         fine('proxy-admin') ? '// the admin can point the proxy at any code, any time' : undefined,
       ),
     );
-    push(`contract ${cname} is ERC20Upgradeable${ownable ? ', OwnableUpgradeable' : ''} {`);
+    push(`contract ${cname} is`);
+    push(`  ERC20Upgradeable${ownable ? ', OwnableUpgradeable' : ''} {`);
   } else push(`contract ${cname} is ERC20${ownable ? ', Ownable' : ''} {`);
   const supplyLine = push(`  uint256 public constant MAX_SUPPLY = ${facts.supplyM}_000_000e18;`);
   if (herrings.includes('immutable-supply-note'))
