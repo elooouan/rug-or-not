@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LENS, RENDER_SCALE } from '@/config/layout';
 import { CursorScene } from '@/scenes/CursorScene';
 import { saveStore } from '@/systems/save';
+import { lensLift } from './lensLift';
 
 /**
  * The signature mechanic: a second camera zoomed 2x, masked to a circle that
@@ -64,16 +65,22 @@ export class Magnifier {
   update(): void {
     if (!this.enabled) return;
     const p = this.scene.input.activePointer;
-    const over = this.scene.input.manager.isOver && this.hitTest(p.worldX, p.worldY);
+    // Fingers only get a lens while they're down; mice get one whenever they hover.
+    const over =
+      this.scene.input.manager.isOver &&
+      (!p.wasTouch || p.isDown) &&
+      this.hitTest(p.worldX, p.worldY);
     this.setActive(over);
     if (!over) return;
     // Mask lives in screen space; the camera centre is worked out so the world
-    // point under the pointer lands exactly at the pointer's screen position.
-    this.maskGfx.setPosition(Math.round(p.x), Math.round(p.y));
+    // point under the pointer lands exactly at the lens centre (which floats
+    // above a finger, see lensLift).
+    const sy = p.y - lensLift(p) * RENDER_SCALE;
+    this.maskGfx.setPosition(Math.round(p.x), Math.round(sy));
     const zoom = LENS.zoom * RENDER_SCALE;
     this.cam.centerOn(
       p.worldX - (p.x - CANVAS_WIDTH / 2) / zoom,
-      p.worldY - (p.y - CANVAS_HEIGHT / 2) / zoom,
+      p.worldY - (sy - CANVAS_HEIGHT / 2) / zoom,
     );
   }
 

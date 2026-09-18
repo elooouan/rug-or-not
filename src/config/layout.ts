@@ -93,6 +93,8 @@ export const FOLDER_CARD = {
 export const LENS = {
   radius: 48,
   zoom: 2,
+  /** On touch screens the lens floats this far above the finger so the finger doesn't hide it. */
+  touchLift: 64,
   /** How far the cursor sprite's hotspot sits from its texture origin. */
   cursorHotspot: { x: 8, y: 8 },
 } as const;

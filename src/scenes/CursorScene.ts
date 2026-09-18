@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { GAME_HEIGHT, GAME_WIDTH, LENS, RENDER_SCALE } from '@/config/layout';
 import { saveStore } from '@/systems/save';
+import { lensLift } from '@/ui/lensLift';
 
 export type CursorMode = 'pointer' | 'lens' | 'hidden';
 
@@ -61,7 +62,8 @@ export class CursorScene extends Phaser.Scene {
   override update(_time: number, delta: number): void {
     const p = this.input.activePointer;
     const x = Math.round(p.worldX);
-    const y = Math.round(p.worldY);
+    // The lens rim floats above a finger, in step with the magnifier camera.
+    const y = Math.round(p.worldY - lensLift(p));
     const reduced = saveStore.get().settings.reducedMotion;
     const wantLens = this.mode === 'lens' && this.inside;
     // Ease the rim in/out so the lens "grows" over a document.
@@ -79,6 +81,9 @@ export class CursorScene extends Phaser.Scene {
     this.glint
       .setVisible(showLens && this.lensScale > 0.9)
       .setPosition(x - LENS.radius * 0.45, y - LENS.radius * 0.5);
-    this.cursor.setVisible(this.inside && this.mode !== 'hidden' && !showLens).setPosition(x, y);
+    // No arrow under a finger.
+    this.cursor
+      .setVisible(this.inside && this.mode !== 'hidden' && !showLens && !p.wasTouch)
+      .setPosition(x, Math.round(p.worldY));
   }
 }
