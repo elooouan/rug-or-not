@@ -29,7 +29,7 @@ Other scripts:
 | `npm run preview`        | Serve the production build locally                   |
 | `npm test`               | Vitest: scoring, rush, generator, save, cases, board |
 | `npm run validate-cases` | Validate every case file and print a summary         |
-| `npm run e2e`            | Playwright smoke tests against the dev server        |
+| `npm run e2e`            | Playwright smoke tests (dev server + built bundle)   |
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
 
