@@ -142,6 +142,16 @@ describe('wallet service', () => {
     await vi.waitFor(() => expect(stub.mock.calls.length).toBeGreaterThan(afterConnect));
   });
 
+  it('explains an account switch the site is not approved for', async () => {
+    const p = fakeProvider();
+    const w = install(p);
+    await w.connect();
+    p.connect.mockRejectedValueOnce({ code: 4001 });
+    p.emit('accountChanged', null);
+    await vi.waitFor(() => expect(w.state.error).toMatch(/not approved/));
+    expect(w.state.connected).toBe(false);
+  });
+
   it('warns when the RPC is on another network', async () => {
     vi.stubGlobal('fetch', rpcStub(GENESIS_HASH.devnet));
     const w = install(fakeProvider());

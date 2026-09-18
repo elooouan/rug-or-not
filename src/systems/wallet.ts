@@ -172,8 +172,17 @@ export class WalletService {
         this.set({ address: key.toString(), sol: null, token: null });
         void this.refresh();
       } else {
-        // Phantom switched to an account this site isn't approved for: try a silent reconnect.
-        void this.link(p, true);
+        // Phantom switched to an account this site isn't approved for: the old address and
+        // balances are stale now. Try a silent reconnect, and say why they went away if
+        // that doesn't work.
+        this.clear(false);
+        void this.link(p, true).then(() => {
+          if (!this.state.connected)
+            this.set({
+              error:
+                'The wallet switched to an account this site is not approved for. Connect again to use it.',
+            });
+        });
       }
     });
   }
