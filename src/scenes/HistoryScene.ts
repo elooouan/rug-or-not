@@ -71,13 +71,21 @@ export class HistoryScene extends Phaser.Scene {
     this.layer.add(
       this.make.image({ x: 0, y: 0, key: makeCork(this, contentH) }, false).setOrigin(0),
     );
+    const scrollTo = (y: number) => {
+      this.layer.y = Phaser.Math.Clamp(y, -(contentH - GAME_HEIGHT), 0);
+    };
     this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
       if (this.big) return;
-      this.layer.y = Phaser.Math.Clamp(
-        this.layer.y - (dy > 0 ? 30 : -30),
-        -(contentH - GAME_HEIGHT),
-        0,
-      );
+      scrollTo(this.layer.y - (dy > 0 ? 30 : -30));
+    });
+    // Dragging the wall scrolls it too (phones have no wheel).
+    let dragY: number | null = null;
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => (dragY = p.worldY));
+    this.input.on('pointerup', () => (dragY = null));
+    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+      if (dragY === null || !p.isDown || this.big) return;
+      scrollTo(this.layer.y + (p.worldY - dragY));
+      dragY = p.worldY;
     });
     rect(this, 0, 0, GAME_WIDTH, 22, HEX.woodDark, 0.85).setDepth(DEPTH.hud - 1);
     addText(this, GAME_WIDTH / 2, 8, 'CASE FILE: RUG OR NOT?  -  how the office came together', {
@@ -197,7 +205,10 @@ export class HistoryScene extends Phaser.Scene {
       c.setScale(1.04);
     });
     zone.on('pointerout', () => c.setScale(1));
-    zone.on('pointerdown', () => this.lookCloser(frame));
+    // Taps open the photo; drags scroll the wall.
+    zone.on('pointerup', (p: Phaser.Input.Pointer) => {
+      if (p.getDistance() < 8) this.lookCloser(frame);
+    });
     c.add(zone);
     return c;
   }
