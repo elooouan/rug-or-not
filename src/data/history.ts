@@ -100,4 +100,11 @@ export const HISTORY: HistoryFrame[] = [
     title: 'Tonight',
     caption: 'Ask Lucien, share your results, hard mode, and the wall you are looking at.',
   },
+  {
+    file: '13-v04-wall',
+    version: 'v0.4',
+    date: '2026-09-18',
+    title: 'The wall',
+    caption: 'A photo of the wall, on the wall. The Historian badge for finding the polaroid.',
+  },
 ];

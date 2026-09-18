@@ -26,6 +26,8 @@ export class HistoryScene extends Phaser.Scene {
   private points: { x: number; y: number }[] = [];
   private progress = 0;
   private big?: Phaser.GameObjects.Container;
+  /** Things that stay put while the wall scrolls (our zoomed camera can't use scrollFactor 0). */
+  private hud: { obj: Phaser.GameObjects.Components.Transform; y: number }[] = [];
 
   constructor() {
     super(HistoryScene.KEY);
@@ -43,13 +45,37 @@ export class HistoryScene extends Phaser.Scene {
   create(): void {
     setupScene(this);
     const reduced = saveStore.get().settings.reducedMotion;
-    this.add.image(0, 0, TEX.cork).setOrigin(0).setDepth(DEPTH.wood);
-    addText(this, GAME_WIDTH / 2, 8, 'CASE FILE: RUG OR NOT?  -  how the office came together', {
-      size: FONT.size.small,
-      color: 'paper',
-    })
+    // The wall grows downward as frames are added; the camera scrolls with the wheel.
+    const rows = Math.ceil(HISTORY.length / WALL.cols);
+    const contentH = Math.max(GAME_HEIGHT, WALL.y0 + rows * WALL.dy + 40);
+    this.add.tileSprite(0, 0, GAME_WIDTH, contentH, TEX.cork).setOrigin(0).setDepth(DEPTH.wood);
+    this.cameras.main.setBounds(0, 0, GAME_WIDTH, contentH);
+    this.hud = [];
+    const scrollBase = this.cameras.main.scrollY;
+    this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
+      if (this.big) return;
+      const next = Phaser.Math.Clamp(
+        this.cameras.main.scrollY + (dy > 0 ? 30 : -30),
+        scrollBase,
+        scrollBase + contentH - GAME_HEIGHT,
+      );
+      this.cameras.main.scrollY = next;
+      const offset = next - scrollBase;
+      this.hud.forEach((h) => (h.obj.y = h.y + offset));
+    });
+    const header = addText(
+      this,
+      GAME_WIDTH / 2,
+      8,
+      'CASE FILE: RUG OR NOT?  -  how the office came together',
+      {
+        size: FONT.size.small,
+        color: 'paper',
+      },
+    )
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
+    this.hud.push({ obj: header, y: 8 });
 
     // Photos, staggered rows so the string zig-zags.
     this.points = [];
@@ -98,10 +124,15 @@ export class HistoryScene extends Phaser.Scene {
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);
-    addText(this, 8, GAME_HEIGHT - 12, `${HISTORY.length} photos  ·  click one to look closer`, {
-      size: FONT.size.tiny,
-      color: 'paper',
-    }).setDepth(DEPTH.hud);
+    this.hud.push({ obj: back, y: GAME_HEIGHT - 24 });
+    const caption = addText(
+      this,
+      8,
+      GAME_HEIGHT - 12,
+      `${HISTORY.length} photos  ·  click one to look closer${rows > WALL.visibleRows ? '  ·  wheel to scroll' : ''}`,
+      { size: FONT.size.tiny, color: 'paper' },
+    ).setDepth(DEPTH.hud);
+    this.hud.push({ obj: caption, y: GAME_HEIGHT - 12 });
 
     this.time.delayedCall(reduced ? 0 : 1200 + HISTORY.length * 130, () => {
       if (!this.big && this.scene.isActive()) lucienSaysNow(this, 'wall');
@@ -196,7 +227,8 @@ export class HistoryScene extends Phaser.Scene {
     const h = WALL.bigH + 16 + 40;
     const x = (GAME_WIDTH - w) / 2;
     const y = (GAME_HEIGHT - h) / 2 - 4;
-    const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
+    // Follow the camera so the close-up sits on screen wherever the wall is scrolled.
+    const c = this.add.container(0, this.scrollOffset()).setDepth(DEPTH.overlay);
     const dim = rect(this, 0, 0, GAME_WIDTH, GAME_HEIGHT, HEX.bg, 0.6);
     dim.setInteractive({ useHandCursor: false });
     dim.on('pointerdown', () => this.closeBig());
@@ -237,6 +269,12 @@ export class HistoryScene extends Phaser.Scene {
       this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 160, ease: 'Back.easeOut' });
     }
     this.big = c;
+  }
+
+  /** How far the wall has been scrolled from its resting position. */
+  private scrollOffset(): number {
+    const h = this.hud[0];
+    return h ? h.obj.y - h.y : 0;
   }
 
   private closeBig(): void {

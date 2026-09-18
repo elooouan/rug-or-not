@@ -139,19 +139,21 @@ export const DRAWER = {
 
 /** The evidence wall (history storyboard). */
 export const WALL = {
-  cols: 4,
-  thumbW: 112,
-  thumbH: 63,
+  cols: 5,
+  thumbW: 96,
+  thumbH: 54,
   frame: 4,
-  frameBottom: 16,
-  x0: 46,
+  frameBottom: 15,
+  x0: 24,
   y0: 30,
-  dx: 150,
-  dy: 96,
+  dx: 120,
+  dy: 90,
   /** Odd rows shift right so the string zig-zags. */
-  stagger: 18,
+  stagger: 14,
   bigW: 400,
   bigH: 225,
+  /** Wheel scrolling kicks in past this many rows. */
+  visibleRows: 3,
 } as const;
 
 export const BROWSER = {
