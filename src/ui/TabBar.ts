@@ -42,7 +42,18 @@ export class TabBar extends Phaser.GameObjects.Container {
         if (i === this.current) return;
         onSelect(i);
       });
-      bg.on('pointerover', () => i !== this.current && audio.play('hover'));
+      // Inactive tabs lift a pixel under the pointer, like the stamps.
+      bg.on('pointerover', () => {
+        if (i === this.current) return;
+        audio.play('hover');
+        bg.setY(-1);
+        this.tabs[i]?.label.setY(4);
+      });
+      bg.on('pointerout', () => {
+        if (i === this.current) return;
+        bg.setY(0);
+        this.tabs[i]?.label.setY(5);
+      });
       const label = makeText(scene, x + w / 2, 4, `${i + 1} ${SHORT[doc.type]}`, {
         size: FONT.size.small,
         color: 'woodDark',
@@ -60,7 +71,7 @@ export class TabBar extends Phaser.GameObjects.Container {
     this.current = i;
     this.tabs[i]?.dot.setVisible(false);
     this.tabs.forEach((t, idx) => {
-      t.bg.setTexture(idx === i ? TEX.tabActive : TEX.tab);
+      t.bg.setTexture(idx === i ? TEX.tabActive : TEX.tab).setY(0);
       t.label.setColor(idx === i ? '#2b2530' : '#6b5140');
       t.label.setY(idx === i ? 4 : 5);
     });

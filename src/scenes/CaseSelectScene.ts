@@ -264,6 +264,7 @@ export class CaseSelectScene extends Phaser.Scene {
     );
     cont.on('pointerover', () => {
       audio.play('hover');
+      cont.setY(at.y - 4);
       this.hideTip();
       const w = 220;
       const tx = Phaser.Math.Clamp(at.x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
@@ -282,7 +283,10 @@ export class CaseSelectScene extends Phaser.Scene {
       );
       this.tip = tip;
     });
-    cont.on('pointerout', () => this.hideTip());
+    cont.on('pointerout', () => {
+      cont.setY(at.y);
+      this.hideTip();
+    });
     cont.on('pointerdown', () => {
       audio.play('paper');
       startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
@@ -325,6 +329,7 @@ export class CaseSelectScene extends Phaser.Scene {
     );
     cont.on('pointerover', () => {
       audio.play('hover');
+      cont.setY(at.y - 4);
       this.hideTip();
       const w = 220;
       const tx = Phaser.Math.Clamp(at.x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
@@ -344,7 +349,10 @@ export class CaseSelectScene extends Phaser.Scene {
       );
       this.tip = tip;
     });
-    cont.on('pointerout', () => this.hideTip());
+    cont.on('pointerout', () => {
+      cont.setY(at.y);
+      this.hideTip();
+    });
     cont.on('pointerdown', () => {
       audio.play('paper');
       startColdCase(this, seed);
