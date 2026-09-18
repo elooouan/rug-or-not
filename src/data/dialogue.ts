@@ -116,6 +116,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
       text: "Pinning innocent stuff costs points, so don't just pin everything. Think like a detective, not a fire hose.",
     },
     {
+      text: 'Stuck? Click my face in the corner and I will point at something. It costs ten points, so read first.',
+    },
+    {
       text: 'When you have a verdict, click a stamp on the right, or press R for RUG and L for LEGIT.',
     },
   ],
