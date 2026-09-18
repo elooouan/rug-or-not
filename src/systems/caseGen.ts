@@ -348,7 +348,9 @@ function contractDoc(
   }
   if (flags.includes('sell-tax-adjustable')) {
     push(`  uint256 public sellTaxBps = ${rng.int(2, 5) * 100};`);
-    const l = push('  function setSellTax(uint256 bps) external onlyOwner { sellTaxBps = bps; }');
+    const l = push('  function setSellTax(uint256 bps) external onlyOwner {');
+    push('    sellTaxBps = bps;');
+    push('  }');
     clues.push(
       flagClue(
         'g-selltax',
@@ -361,9 +363,9 @@ function contractDoc(
   }
   if (flags.includes('blacklist')) {
     push('  mapping(address => bool) public flagged; // anti-bot');
-    const l = push(
-      '  function setFlagged(address a, bool b) external onlyOwner { flagged[a] = b; }',
-    );
+    const l = push('  function setFlagged(address a, bool b) external onlyOwner {');
+    push('    flagged[a] = b;');
+    push('  }');
     clues.push(
       flagClue(
         'g-blacklist',
@@ -399,7 +401,7 @@ function contractDoc(
     );
   }
   if (renouncedCleanly) {
-    const l = push('    // no owner, no operator, no proxy. what you see is what runs.');
+    const l = push('    // no owner, no operator, no proxy.');
     clues.push(
       herringClue('g-clean', 'No owner, no operator', 'renounced-cleanly', {
         kind: 'line',
@@ -428,9 +430,10 @@ function contractDoc(
   }
   if (fakeRenounce && !flags.includes('mint-unlimited')) {
     push('');
-    push(
-      '  function setFees(uint256 b, uint256 s) external { require(msg.sender == operator); buy = b; sell = s; }',
-    );
+    push('  function setFees(uint256 b, uint256 s) external {');
+    push("    require(msg.sender == operator, 'operator');");
+    push('    buy = b; sell = s;');
+    push('  }');
   }
   // The transfer hook: where fees, freezes and the honeypot actually bite.
   const taxed = flags.includes('sell-tax-adjustable') || herrings.includes('small-fixed-tax');
