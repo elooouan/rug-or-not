@@ -138,6 +138,8 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   private static openPanel: BrowserPanel | null = null;
   /** What the RugScan page shows: the current case, the token index, or a chosen token. */
   rugscanView: 'auto' | 'index' | CaseData = 'auto';
+  /** Board page: show only entries with the holder mark. */
+  holdersOnly = false;
 
   static get current(): BrowserPanel | null {
     return BrowserPanel.openPanel;
@@ -672,9 +674,21 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         { color: 'stampRed' },
       );
     ctx.rule();
-    ctx.line(`Best runs (${leaderboard.kind === 'remote' ? 'precinct server' : 'this device'}):`, {
-      color: 'woodMid',
-    });
+    ctx.line(
+      `Best runs (${leaderboard.kind === 'remote' ? 'precinct server' : 'this device'})${ctx.panel.holdersOnly ? ', holders only' : ''}:`,
+      { color: 'woodMid' },
+    );
+    if (TOKEN.mint) {
+      ctx.button(
+        ctx.panel.holdersOnly ? 'Everyone' : `${TOKEN.symbol} holders only`,
+        () => {
+          ctx.panel.holdersOnly = !ctx.panel.holdersOnly;
+          ctx.panel.render();
+        },
+        { variant: 'paper' },
+      );
+    }
+    const holdersOnly = ctx.panel.holdersOnly;
     const placeholder = makeText(ctx.scene, 0, ctx.y, 'loading...', {
       font: 'body',
       size: FONT.size.body,
@@ -682,17 +696,24 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     });
     ctx.content.add(placeholder);
     const startY = ctx.y;
-    void leaderboard.list(10).then((entries: ScoreEntry[]) => {
+    void leaderboard.list(holdersOnly ? 50 : 10).then((all: ScoreEntry[]) => {
       if (!placeholder.active) return;
       placeholder.destroy();
       let y = startY;
+      const entries = (holdersOnly ? all.filter((e) => e.holder) : all).slice(0, 10);
       if (entries.length === 0) {
         ctx.content.add(
-          makeText(ctx.scene, 0, y, 'No runs yet. Close a case and come back.', {
-            font: 'body',
-            size: FONT.size.body,
-            color: 'paperShadow',
-          }),
+          makeText(
+            ctx.scene,
+            0,
+            y,
+            holdersOnly ? 'No holder runs yet.' : 'No runs yet. Close a case and come back.',
+            {
+              font: 'body',
+              size: FONT.size.body,
+              color: 'paperShadow',
+            },
+          ),
         );
         return;
       }

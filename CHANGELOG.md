@@ -11,6 +11,7 @@
 - Seasonal dressing: a pumpkin by the mug in the last week of October, fairy lights in the
   window from December 10th. PixelForge carries the young-token herring.
 - Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.
+- Once a mint is configured, the board page can show holders only.
 - Board handles pass a light word filter (client and worker); the weekly file sits at
   difficulty 3-4; the pile and the weekly have P / W hotkeys in the drawer.
 
