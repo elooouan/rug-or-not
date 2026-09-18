@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { makeCork } from '@/art/desk';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { FONT, GAME_HEIGHT, GAME_WIDTH, WALL } from '@/config/layout';
@@ -7,13 +8,16 @@ import { HISTORY, type HistoryFrame } from '@/data/history';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
 import { lucienSaysNow } from '@/ui/DialogueBox';
-import { awardBadge } from '@/systems/badges';
+import { awardBadge, badgeCount } from '@/systems/badges';
+import { rankForScore } from '@/systems/ranks';
+import { WEATHER_LABEL } from '@/systems/settings';
+import { LIVE_PHOTO_KEY } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 
-const KEY = (f: HistoryFrame): string => `history-${f.file}`;
+const KEY = (f: HistoryFrame): string => (f.file === 'live' ? LIVE_PHOTO_KEY : `history-${f.file}`);
 
 /**
  * The evidence wall: every notable build of the game, pinned as a polaroid,
@@ -26,8 +30,10 @@ export class HistoryScene extends Phaser.Scene {
   private points: { x: number; y: number }[] = [];
   private progress = 0;
   private big?: Phaser.GameObjects.Container;
-  /** Things that stay put while the wall scrolls (our zoomed camera can't use scrollFactor 0). */
-  private hud: { obj: Phaser.GameObjects.Components.Transform; y: number }[] = [];
+  /** The published frames plus, when the desk was photographed on the way in, tonight's. */
+  private frames: HistoryFrame[] = [];
+  /** Cork, photos and string live here; scrolling moves the layer, not the camera. */
+  private layer!: Phaser.GameObjects.Container;
 
   constructor() {
     super(HistoryScene.KEY);
@@ -44,42 +50,46 @@ export class HistoryScene extends Phaser.Scene {
 
   create(): void {
     setupScene(this);
-    const reduced = saveStore.get().settings.reducedMotion;
-    // The wall grows downward as frames are added; the camera scrolls with the wheel.
-    const rows = Math.ceil(HISTORY.length / WALL.cols);
+    const save = saveStore.get();
+    const reduced = save.settings.reducedMotion;
+    this.frames = [...HISTORY];
+    if (this.textures.exists(LIVE_PHOTO_KEY)) {
+      const badges = badgeCount();
+      this.frames.push({
+        file: 'live',
+        version: 'now',
+        date: new Date().toISOString().slice(0, 10),
+        title: 'Tonight',
+        caption: `Your desk, a moment ago. ${WEATHER_LABEL[save.settings.weather]} outside, ${rankForScore(save.totalScore)} at the desk, ${badges.earned}/${badges.total} badges on the wall.`,
+      });
+    }
+    const frames = this.frames;
+    // The wall grows downward as frames are added; the wheel slides the layer up.
+    const rows = Math.ceil(frames.length / WALL.cols);
     const contentH = Math.max(GAME_HEIGHT, WALL.y0 + rows * WALL.dy + 40);
-    this.add.tileSprite(0, 0, GAME_WIDTH, contentH, TEX.cork).setOrigin(0).setDepth(DEPTH.wood);
-    this.cameras.main.setBounds(0, 0, GAME_WIDTH, contentH);
-    this.hud = [];
-    const scrollBase = this.cameras.main.scrollY;
+    this.layer = this.add.container(0, 0).setDepth(DEPTH.wood);
+    this.layer.add(
+      this.make.image({ x: 0, y: 0, key: makeCork(this, contentH) }, false).setOrigin(0),
+    );
     this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
       if (this.big) return;
-      const next = Phaser.Math.Clamp(
-        this.cameras.main.scrollY + (dy > 0 ? 30 : -30),
-        scrollBase,
-        scrollBase + contentH - GAME_HEIGHT,
+      this.layer.y = Phaser.Math.Clamp(
+        this.layer.y - (dy > 0 ? 30 : -30),
+        -(contentH - GAME_HEIGHT),
+        0,
       );
-      this.cameras.main.scrollY = next;
-      const offset = next - scrollBase;
-      this.hud.forEach((h) => (h.obj.y = h.y + offset));
     });
-    const header = addText(
-      this,
-      GAME_WIDTH / 2,
-      8,
-      'CASE FILE: RUG OR NOT?  -  how the office came together',
-      {
-        size: FONT.size.small,
-        color: 'paper',
-      },
-    )
+    rect(this, 0, 0, GAME_WIDTH, 22, HEX.woodDark, 0.85).setDepth(DEPTH.hud - 1);
+    addText(this, GAME_WIDTH / 2, 8, 'CASE FILE: RUG OR NOT?  -  how the office came together', {
+      size: FONT.size.small,
+      color: 'paper',
+    })
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
-    this.hud.push({ obj: header, y: 8 });
 
     // Photos, staggered rows so the string zig-zags.
     this.points = [];
-    HISTORY.forEach((frame, i) => {
+    frames.forEach((frame, i) => {
       const col = i % WALL.cols;
       const row = Math.floor(i / WALL.cols);
       const x = WALL.x0 + col * WALL.dx + (row % 2 ? WALL.stagger : 0);
@@ -102,13 +112,14 @@ export class HistoryScene extends Phaser.Scene {
     });
 
     // Red string, drawn progressively from photo to photo.
-    this.string = this.add.graphics().setDepth(DEPTH.pins + 1);
+    this.string = this.make.graphics({ x: 0, y: 0 }, false);
+    this.layer.add(this.string);
     this.progress = reduced ? 1 : 0;
     if (!reduced) {
       this.tweens.add({
         targets: this,
         progress: 1,
-        duration: 200 + HISTORY.length * 130,
+        duration: 200 + frames.length * 130,
         delay: 300,
         ease: 'Sine.easeInOut',
       });
@@ -124,17 +135,15 @@ export class HistoryScene extends Phaser.Scene {
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);
-    this.hud.push({ obj: back, y: GAME_HEIGHT - 24 });
-    const caption = addText(
+    addText(
       this,
       8,
       GAME_HEIGHT - 12,
-      `${HISTORY.length} photos  ·  click one to look closer${rows > WALL.visibleRows ? '  ·  wheel to scroll' : ''}`,
+      `${frames.length} photos  ·  click one to look closer${rows > WALL.visibleRows ? '  ·  wheel to scroll' : ''}`,
       { size: FONT.size.tiny, color: 'paper' },
     ).setDepth(DEPTH.hud);
-    this.hud.push({ obj: caption, y: GAME_HEIGHT - 12 });
 
-    this.time.delayedCall(reduced ? 0 : 1200 + HISTORY.length * 130, () => {
+    this.time.delayedCall(reduced ? 0 : 1200 + frames.length * 130, () => {
       if (!this.big && this.scene.isActive()) lucienSaysNow(this, 'wall');
       awardBadge(this, 'historian');
     });
@@ -148,7 +157,8 @@ export class HistoryScene extends Phaser.Scene {
   ): Phaser.GameObjects.Container {
     const w = WALL.thumbW + WALL.frame * 2;
     const h = WALL.thumbH + WALL.frame + WALL.frameBottom;
-    const c = this.add.container(x, y).setDepth(DEPTH.pins);
+    const c = this.make.container({ x, y }, false);
+    this.layer.add(c);
     c.add(rect(this, 3, 4, w, h, HEX.bg, 0.5));
     c.add(rect(this, 0, 0, w, h, HEX.paper));
     const img = this.make
@@ -169,7 +179,7 @@ export class HistoryScene extends Phaser.Scene {
       }).setOrigin(1, 0),
     );
     c.add(this.make.image({ x: w / 2 - 4, y: -6, key: TEX.pin }, false).setOrigin(0));
-    if (index === HISTORY.length - 1) {
+    if (index === this.frames.length - 1) {
       const tag = rect(this, w - 30, -5, 28, 10, HEX.stampRed);
       c.add([
         tag,
@@ -227,8 +237,7 @@ export class HistoryScene extends Phaser.Scene {
     const h = WALL.bigH + 16 + 40;
     const x = (GAME_WIDTH - w) / 2;
     const y = (GAME_HEIGHT - h) / 2 - 4;
-    // Follow the camera so the close-up sits on screen wherever the wall is scrolled.
-    const c = this.add.container(0, this.scrollOffset()).setDepth(DEPTH.overlay);
+    const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
     const dim = rect(this, 0, 0, GAME_WIDTH, GAME_HEIGHT, HEX.bg, 0.6);
     dim.setInteractive({ useHandCursor: false });
     dim.on('pointerdown', () => this.closeBig());
@@ -269,12 +278,6 @@ export class HistoryScene extends Phaser.Scene {
       this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 160, ease: 'Back.easeOut' });
     }
     this.big = c;
-  }
-
-  /** How far the wall has been scrolled from its resting position. */
-  private scrollOffset(): number {
-    const h = this.hud[0];
-    return h ? h.obj.y - h.y : 0;
   }
 
   private closeBig(): void {

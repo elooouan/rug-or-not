@@ -50,6 +50,9 @@ export function floatText(
   });
 }
 
+/** Texture key for the snapshot taken when the wall opens (see HistoryScene). */
+export const LIVE_PHOTO_KEY = 'history-live';
+
 type Station = 'lofi' | 'static' | 'off';
 const STATION_LABEL: Record<Station, string> = {
   lofi: '88.5  lo-fi',
@@ -148,8 +151,22 @@ export class DeskBackground {
       (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
         ev.stopPropagation();
         audio.play('paper');
-        scene.scene.launch('HistoryScene', { returnTo: scene.scene.key });
-        scene.scene.pause();
+        const go = () => {
+          scene.scene.launch('HistoryScene', { returnTo: scene.scene.key });
+          scene.scene.pause();
+        };
+        // Photograph the desk as it is right now: it becomes the last polaroid on the wall.
+        try {
+          scene.game.renderer.snapshot((img) => {
+            if (img instanceof HTMLImageElement) {
+              if (scene.textures.exists(LIVE_PHOTO_KEY)) scene.textures.remove(LIVE_PHOTO_KEY);
+              scene.textures.addImage(LIVE_PHOTO_KEY, img);
+            }
+            go();
+          });
+        } catch {
+          go();
+        }
       },
     );
     cork.setInteractive({ useHandCursor: false });

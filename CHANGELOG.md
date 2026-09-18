@@ -9,7 +9,9 @@
 - Rogues gallery: a third notebook chapter with a WANTED poster for every rug you've called
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
 - Toasts queue instead of stacking on top of each other.
-- The wall gets photos of the safe and the rush.
+- The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid
+  is now a live photo of your own desk, taken as you open it. Scrolling moves the wall, not
+  the camera, so Lucien and the buttons stay put.
 - Fixed: pinned clues stay listed in the desk notebook (a quip had eaten the else branch).
 
 ## v0.4 — the lively desk

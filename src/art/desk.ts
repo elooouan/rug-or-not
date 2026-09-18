@@ -366,28 +366,34 @@ export function makeClock(scene: Phaser.Scene): void {
   });
 }
 
-/** A full-screen cork texture for the evidence wall. */
-export function makeCork(scene: Phaser.Scene): void {
-  makeGraphicsTexture(scene, TEX.cork, GAME_WIDTH, GAME_HEIGHT, (g) => {
+/**
+ * A framed cork texture for the evidence wall. The wall grows as photos are
+ * added, so the height is a parameter; the key carries it.
+ */
+export function makeCork(scene: Phaser.Scene, height = GAME_HEIGHT): string {
+  const key = height === GAME_HEIGHT ? TEX.cork : `${TEX.cork}-${height}`;
+  makeGraphicsTexture(scene, key, GAME_WIDTH, height, (g) => {
     const rng = makeRng('big-cork');
     g.fillStyle(HEX.woodDark, 1);
-    g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    g.fillRect(0, 0, GAME_WIDTH, height);
     g.fillStyle(HEX.woodLight, 1);
-    g.fillRect(6, 6, GAME_WIDTH - 12, GAME_HEIGHT - 12);
+    g.fillRect(6, 6, GAME_WIDTH - 12, height - 12);
+    const dots = Math.round((5200 * height) / GAME_HEIGHT);
     g.fillStyle(HEX.woodMid, 1);
-    for (let i = 0; i < 5200; i++)
-      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, GAME_HEIGHT - 8), 1, 1);
+    for (let i = 0; i < dots; i++)
+      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, height - 8), 1, 1);
     g.fillStyle(HEX.paperShadow, 0.35);
-    for (let i = 0; i < 900; i++)
-      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, GAME_HEIGHT - 8), 1, 1);
+    for (let i = 0; i < dots / 6; i++)
+      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, height - 8), 1, 1);
     // Frame bevel.
     g.fillStyle(HEX.paperShadow, 0.5);
     g.fillRect(6, 6, GAME_WIDTH - 12, 1);
-    g.fillRect(6, 6, 1, GAME_HEIGHT - 12);
+    g.fillRect(6, 6, 1, height - 12);
     g.fillStyle(HEX.bg, 0.5);
-    g.fillRect(6, GAME_HEIGHT - 7, GAME_WIDTH - 12, 1);
-    g.fillRect(GAME_WIDTH - 7, 6, 1, GAME_HEIGHT - 12);
+    g.fillRect(6, height - 7, GAME_WIDTH - 12, 1);
+    g.fillRect(GAME_WIDTH - 7, 6, 1, height - 12);
   });
+  return key;
 }
 
 export function makeDrawer(scene: Phaser.Scene): void {
