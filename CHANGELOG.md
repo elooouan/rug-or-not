@@ -49,6 +49,7 @@
 - A case editor (`editor.html`): write a file against the game's schema with templates and
   live validation, download it for `src/data/cases/`, or save it into this browser's game
   (NetScope > RugScan > Your files, `#custom=<id>`).
+- A social preview image (`public/img/og.png`) with Open Graph / Twitter card tags.
 - Offline: a network-first service worker (production builds) keeps a desk you've opened
   once playable without a connection. Phaser ships in its own chunk.
 - `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board

@@ -27,6 +27,8 @@ Other scripts:
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
 
+`index.html` carries Open Graph / Twitter card tags pointing at `public/img/og.png` on the
+GitHub Pages URL; change those absolute URLs if the game moves to another host.
 Production builds register a small network-first service worker (`public/sw.js`) so the game
 keeps working offline after one visit. The game is a static site: deploy `dist/` anywhere (paths are relative, so it works
 from a sub-folder). A GitHub Pages workflow is included in
