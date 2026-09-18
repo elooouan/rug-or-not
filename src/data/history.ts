@@ -177,4 +177,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'The seventh daily in a row earns a streak freeze: one missed night, forgiven. The chain is the point.',
   },
+  {
+    file: '23-v07-wallet',
+    version: 'v0.7',
+    date: '2026-09-18',
+    title: 'Shareholder',
+    caption:
+      'Phantom on the coin page, read-only: an address, two balances, a tier. The staged 1,200 in the photo is a dev switch; the mint is still blank.',
+  },
 ];
