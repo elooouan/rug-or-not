@@ -134,9 +134,10 @@ the coin page once a mint is set; it's read-only and cached for a minute.
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 
 Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case, `#cold=<seed>` prints
-that cold case and `#rush` starts a rush (the Share button
-includes one in its clipboard text; its "Save card" option downloads a 1280x720 PNG of the
-report instead). Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.
+that cold case, `#custom=<id>` opens a file saved from the editor and `#rush` starts a rush.
+The Share menu on a report or a rush result copies the text (or opens the phone's share
+sheet), posts to X or Telegram with a prefilled message, and on reports saves a 1280x720 PNG
+card. Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.
 
 Scoring lives in [`src/systems/scoring.ts`](src/systems/scoring.ts): +100 correct verdict,
 −50 wrong, +25 per real red flag pinned (+10 if it was fine print), −15 per false
