@@ -37,7 +37,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { SharePopover } from '@/ui/SharePopover';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'over';
 
@@ -608,7 +608,7 @@ export class RushScene extends Phaser.Scene {
   }
 
   private quit(): void {
-    this.scene.start(this.drill ? 'NotebookScene' : 'TitleScene');
+    goTo(this, this.drill ? 'NotebookScene' : 'TitleScene');
   }
 
   /** Result text for the clipboard, with a fallback note. */

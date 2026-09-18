@@ -27,7 +27,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
 import type { ReportPayload } from './InvestigationScene';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 
 /** The typed-out case report: truth, flags found/missed, false accusations, score, grade. */
 export class ReportScene extends Phaser.Scene {
@@ -131,7 +131,7 @@ export class ReportScene extends Phaser.Scene {
             }
             gameState.currentIndex = nextIndex;
             gameState.currentCase = gameState.cases[nextIndex];
-            this.scene.start('InvestigationScene');
+            goTo(this, 'InvestigationScene');
           },
           { width: 84 },
         ),
@@ -143,7 +143,7 @@ export class ReportScene extends Phaser.Scene {
         x + pad + (hasNext ? 90 : 0),
         by,
         'Retry',
-        () => this.scene.start('InvestigationScene'),
+        () => goTo(this, 'InvestigationScene'),
         { width: 60 },
       ),
     );
@@ -169,7 +169,7 @@ export class ReportScene extends Phaser.Scene {
         x + w - pad - 90,
         by,
         isDaily || isCold ? 'Title' : 'Case files',
-        () => this.scene.start(isDaily || isCold ? 'TitleScene' : 'CaseSelectScene'),
+        () => goTo(this, isDaily || isCold ? 'TitleScene' : 'CaseSelectScene'),
         { width: 90 },
       ),
     );
@@ -462,7 +462,8 @@ export class ReportScene extends Phaser.Scene {
       line = 'Right call. Some of those pins were on innocent paper, though.';
     else if (b.flagsMissed.length > 0) line = 'Right call. There was more to find.';
     else line = 'Solid work, detective.';
-    LucienBubble.say(this, line, 5000, 34);
+    // Lifted clear of the button row along the report's bottom edge.
+    LucienBubble.say(this, line, 5000, 52);
   }
 
   /**

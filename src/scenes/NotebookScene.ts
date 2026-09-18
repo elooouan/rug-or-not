@@ -23,7 +23,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 import { HANDBOOK } from '@/data/handbook';
 import { closedFiles, FEATURES, unlocked } from '@/systems/discovery';
 import { PALETTE } from '@/config/palette';
@@ -82,7 +82,7 @@ export class NotebookScene extends Phaser.Scene {
     if (this.overlay) {
       this.scene.stop();
       this.scene.resume(this.returnTo);
-    } else this.scene.start(this.returnTo);
+    } else goTo(this, this.returnTo);
   }
 
   private get rugs(): CaseData[] {
@@ -358,7 +358,7 @@ export class NotebookScene extends Phaser.Scene {
           drilled ? 'Drill again' : 'Drill this flag',
           () => {
             if (this.overlay) this.scene.stop(this.returnTo);
-            this.scene.start('RushScene', { drill: id });
+            goTo(this, 'RushScene', { drill: id });
           },
           { variant: 'ink' },
         );

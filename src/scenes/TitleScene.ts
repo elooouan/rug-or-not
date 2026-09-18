@@ -29,7 +29,7 @@ import { FLAGS, isFlagId } from '@/data/flags';
 import { PixelButton } from '@/ui/PixelButton';
 import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
 import { markDiscovered, pendingDiscovery, unlocked, type Feature } from '@/systems/discovery';
@@ -269,7 +269,7 @@ export class TitleScene extends Phaser.Scene {
       gameState.mode = 'campaign';
       gameState.currentIndex = nextIndex;
       gameState.currentCase = cases[nextIndex];
-      this.scene.start('InvestigationScene');
+      goTo(this, 'InvestigationScene');
     };
     const buttons = [
       mk(
@@ -278,7 +278,7 @@ export class TitleScene extends Phaser.Scene {
           : save.campaignUnlocked > 1
             ? `Continue  (case ${nextIndex + 1})`
             : 'Play',
-        () => (allDone ? this.scene.start('CaseSelectScene') : play()),
+        () => (allDone ? goTo(this, 'CaseSelectScene') : play()),
       ),
       mk(
         dailyDone
@@ -289,16 +289,14 @@ export class TitleScene extends Phaser.Scene {
           startDaily(this, daily);
         },
       ),
-      only('drawer', () => mk('Case files', () => this.scene.start('CaseSelectScene'))),
-      only('rush', () => mk('Red Flag Rush', () => this.scene.start('RushScene'))),
+      only('drawer', () => mk('Case files', () => goTo(this, 'CaseSelectScene'))),
+      only('rush', () => mk('Red Flag Rush', () => goTo(this, 'RushScene'))),
       only('cold', () =>
         mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())))),
       ),
-      mk('How to play', () =>
-        this.scene.start('NotebookScene', { chapter: 'handbook', id: 'desk' }),
-      ),
-      mk('Notebook', () => this.scene.start('NotebookScene'), 'left'),
-      mk('Settings', () => this.scene.start('SettingsScene'), 'right'),
+      mk('How to play', () => goTo(this, 'NotebookScene', { chapter: 'handbook', id: 'desk' })),
+      mk('Notebook', () => goTo(this, 'NotebookScene'), 'left'),
+      mk('Settings', () => goTo(this, 'SettingsScene'), 'right'),
     ].filter((b): b is PixelButton => b !== null);
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'));
     this.input.on('pointermove', () => group.clearFocus());

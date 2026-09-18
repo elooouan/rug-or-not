@@ -17,7 +17,7 @@ import { lucienSays } from '@/ui/DialogueBox';
 import { resetHints } from '@/systems/hints';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 import { currentTheme, THEME_IDS, THEMES } from '@/config/palette';
 import { syncTheme } from '@/systems/theme';
 
@@ -383,7 +383,7 @@ export class SettingsScene extends Phaser.Scene {
       this.scene.stop();
       this.scene.resume(this.returnTo);
     } else {
-      this.scene.start(this.returnTo);
+      goTo(this, this.returnTo);
     }
   }
 }

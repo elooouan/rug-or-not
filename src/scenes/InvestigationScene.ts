@@ -38,7 +38,7 @@ import { TabBar } from '@/ui/TabBar';
 import { addText } from '@/ui/text';
 import { PixelButton } from '@/ui/PixelButton';
 import { floatText } from '@/ui/DeskBackground';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 import type { PaletteKey } from '@/config/palette';
 
 type Phase = 'intake' | 'opening' | 'investigating' | 'stamped';
@@ -748,7 +748,7 @@ export class InvestigationScene extends Phaser.Scene {
         this.scene.launch('NotebookScene', { overlay: true, returnTo: InvestigationScene.KEY });
         this.scene.pause();
       },
-      onQuit: () => this.scene.start('TitleScene'),
+      onQuit: () => goTo(this, 'TitleScene'),
       subtitle: `${this.caseData.ticker}  ·  ${this.caseData.title}${
         this.clock && !saveStore.get().settings.relaxed
           ? `  ·  ${Math.floor(this.clock.timeLeft / 60)}:${String(this.clock.timeLeft % 60).padStart(2, '0')} left`

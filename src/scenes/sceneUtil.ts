@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '@/config/layout';
 import { CursorScene } from './CursorScene';
 import { saveStore } from '@/systems/save';
+import { rgb } from '@/config/palette';
 
 /**
  * Call first thing in every scene's create(): points the main camera at the
@@ -22,7 +23,27 @@ export function setupScene(scene: Phaser.Scene): void {
   // A short fade up from the dark so screens don't hard-cut. Overlays launched on top of a
   // paused scene skip it (they slide in over the desk).
   if (!saveStore.get().settings.reducedMotion && !scene.scene.isPaused(otherScene(scene)))
-    scene.cameras.main.fadeIn(160, 0x1b, 0x1a, 0x1f);
+    scene.cameras.main.fadeIn(160, ...rgb('bg'));
+}
+
+const LEAVING = new WeakSet<Phaser.Scene>();
+
+/**
+ * Leave for another scene the way the screens arrive: a short dip to dark, then the
+ * switch (which fades the new one up). A second call during the dip is ignored, so a
+ * double-click on a button can't start two scenes. Reduced motion cuts straight over.
+ */
+export function goTo(scene: Phaser.Scene, key: string, data?: object): void {
+  if (LEAVING.has(scene)) return;
+  if (saveStore.get().settings.reducedMotion || !scene.scene.isActive()) {
+    scene.scene.start(key, data);
+    return;
+  }
+  LEAVING.add(scene);
+  scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => LEAVING.delete(scene));
+  const cam = scene.cameras.main;
+  cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => scene.scene.start(key, data));
+  cam.fadeOut(130, ...rgb('bg'));
 }
 
 /** The scene this one was launched over, if any (overlay data carries returnTo). */

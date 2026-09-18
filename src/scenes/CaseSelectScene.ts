@@ -15,7 +15,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { setupScene } from './sceneUtil';
+import { goTo, setupScene } from './sceneUtil';
 import { unlocked } from '@/systems/discovery';
 import { difficultyPips, rect } from '@/ui/shapes';
 
@@ -85,7 +85,7 @@ export class CaseSelectScene extends Phaser.Scene {
       12,
       GAME_HEIGHT - 26,
       'Back  [Esc]',
-      () => this.scene.start('TitleScene'),
+      () => goTo(this, 'TitleScene'),
       { hotkey: 'ESC' },
     );
     back.setDepth(DEPTH.hud);
@@ -378,6 +378,6 @@ export class CaseSelectScene extends Phaser.Scene {
     gameState.currentIndex = i;
     gameState.currentCase = gameState.cases[i];
     audio.play('paper');
-    this.scene.start('InvestigationScene');
+    goTo(this, 'InvestigationScene');
   }
 }

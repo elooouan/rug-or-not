@@ -1,3 +1,4 @@
+import { goTo } from '@/scenes/sceneUtil';
 import type Phaser from 'phaser';
 import type { CaseData } from '@/data/schema';
 import { generateCase } from './caseGen';
@@ -17,7 +18,7 @@ export function startColdCase(scene: Phaser.Scene, seed: string): void {
     : {};
   gameState.currentCase = generateCase(seed, m ? { difficulty: Number(m[1]) } : weekly);
   gameState.currentIndex = -1;
-  scene.scene.start('InvestigationScene');
+  goTo(scene, 'InvestigationScene');
 }
 
 /** How many ordinary campaign files have been stamped right (drives cold difficulty). */
@@ -32,7 +33,7 @@ export function startCustomCase(scene: Phaser.Scene, c: CaseData): void {
   gameState.coldSeed = null;
   gameState.currentCase = c;
   gameState.currentIndex = -1;
-  scene.scene.start('InvestigationScene');
+  goTo(scene, 'InvestigationScene');
 }
 
 /** Today's daily (handcrafted or generated) goes on the desk. */
@@ -41,5 +42,5 @@ export function startDaily(scene: Phaser.Scene, c: CaseData): void {
   gameState.coldSeed = null;
   gameState.currentCase = c;
   gameState.currentIndex = gameState.cases.indexOf(c);
-  scene.scene.start('InvestigationScene');
+  goTo(scene, 'InvestigationScene');
 }
