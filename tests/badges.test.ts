@@ -3,6 +3,7 @@ import { BADGES } from '@/data/badges';
 import {
   awardBadge,
   badgeCount,
+  badgeProgress,
   bumpStat,
   checkAggregateBadges,
   hasBadge,
@@ -51,5 +52,20 @@ describe('shortAddress', () => {
   it('truncates long addresses only', () => {
     expect(shortAddress('abc')).toBe('abc');
     expect(shortAddress('1234567890abcdef')).toBe('1234...cdef');
+  });
+
+  it('reports progress towards counter badges', () => {
+    const totals = { cases: 15, rugs: 8, pages: 9, flags: 15, weathers: 5 };
+    expect(badgeProgress('wired', totals)).toEqual({ n: 0, of: 10 });
+    bumpStat('sips', 4);
+    expect(badgeProgress('wired', totals)).toEqual({ n: 4, of: 10 });
+    saveStore.update((d) => {
+      d.stats.drilled = ['a', 'b'];
+      d.stats.coldCorrect = 30;
+    });
+    expect(badgeProgress('drill-sergeant', totals)).toEqual({ n: 2, of: 15 });
+    // Never over the target, and null for one-off badges.
+    expect(badgeProgress('cold-ten', totals)).toEqual({ n: 10, of: 10 });
+    expect(badgeProgress('historian', totals)).toBeNull();
   });
 });

@@ -55,4 +55,29 @@ describe('leaderboard', () => {
     storage.setItem('rug-or-not:board:v1', '{oops');
     expect(await new LocalLeaderboard(storage).list()).toEqual([]);
   });
+
+  it('keeps the boards apart and caps each one on its own', async () => {
+    const board = new LocalLeaderboard(new MemoryStorage());
+    for (let i = 0; i < 60; i++) await board.submit({ ...e(`r${i}`, 1000 + i), mode: 'rush' });
+    await board.submit(e('case-run', 5));
+    await board.submit({ ...e('cold-run', 7), mode: 'cold' });
+    expect((await board.list(10, 'case')).map((x) => x.name)).toEqual(['case-run']);
+    expect((await board.list(10, 'cold')).map((x) => x.name)).toEqual(['cold-run']);
+    const rush = await board.list(50, 'rush');
+    expect(rush).toHaveLength(50);
+    expect(rush[0].name).toBe('r59');
+    // The default listing is the case board, untouched by 60 rush entries.
+    expect(await board.list()).toHaveLength(1);
+  });
+
+  it('sanitises mode and holder flags', () => {
+    const [a, b] = sanitizeEntries([
+      { ...e('a', 1), mode: 'rush', holder: true },
+      { ...e('b', 1), mode: 'bogus', holder: 'yes' },
+    ]);
+    expect(a.mode).toBe('rush');
+    expect(a.holder).toBe(true);
+    expect(b.mode).toBeUndefined();
+    expect(b.holder).toBeUndefined();
+  });
 });
