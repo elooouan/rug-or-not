@@ -111,6 +111,7 @@ export class DeskBackground {
   private flickerOn = true;
   private motion = true;
   private lampOn = true;
+  private dust?: Phaser.GameObjects.Particles.ParticleEmitter;
   private lampClicks = 0;
   private sipping = false;
   private sips = 0;
@@ -208,6 +209,24 @@ export class DeskBackground {
       .setBlendMode(Phaser.BlendModes.ADD);
     this.vignette = scene.add.image(0, 0, TEX.vignette).setOrigin(0).setDepth(DEPTH.vignette);
     this.overlays = [this.light, this.vignette, this.flash];
+    // Dust in the lamplight: a handful of faint motes drifting through the beam.
+    if (this.motion) {
+      this.dust = scene.add.particles(0, 0, TEX.pixel, {
+        x: { min: DESK.lightCenter.x - 150, max: DESK.lightCenter.x + 150 },
+        y: { min: 40, max: 320 },
+        lifespan: { min: 7000, max: 12000 },
+        speedX: { min: -3, max: 4 },
+        speedY: { min: 1, max: 4 },
+        // Fade in, hang, fade out.
+        alpha: { values: [0, 0.3, 0.3, 0], interpolation: 'linear' },
+        tint: HEX.amber,
+        frequency: 900,
+        maxAliveParticles: 12,
+        blendMode: Phaser.BlendModes.ADD,
+      });
+      this.dust.setDepth(DEPTH.light - 1);
+      this.overlays.push(this.dust);
+    }
 
     this.setFlicker(s.lampFlicker && this.motion);
     if (this.motion && opts.props !== false) this.scheduleFly();
@@ -790,6 +809,7 @@ export class DeskBackground {
               : 'click.';
       floatText(this.scene, DESK.lamp.x + 58, DESK.lamp.y + 20, line);
       this.light.setVisible(this.lampOn);
+      this.dust?.setVisible(this.lampOn);
       this.vignette.setAlpha(this.lampOn ? 1 : 1.4);
       this.vignette.setTint(this.lampOn ? 0xffffff : HEX.bg);
     });

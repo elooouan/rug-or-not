@@ -67,6 +67,10 @@ export class PixelButton extends Phaser.GameObjects.Container {
     this.on('pointerdown', () => {
       if (this.disabled) return;
       audio.play('ui');
+      // A one-pixel press so the click reads even when the handler is instant.
+      const y0 = this.y;
+      this.setY(y0 + 1);
+      scene.time.delayedCall(90, () => this.active && this.y === y0 + 1 && this.setY(y0));
       onClick();
     });
     if (opts.hotkey) {
