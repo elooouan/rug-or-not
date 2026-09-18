@@ -83,7 +83,9 @@ every squish returns to rest), make interactions respond immediately, check UI e
   (`startCase(id)`, `snapshot(name)`, `audio`, `audioLevels()`).
 - In the browser pane drive the game with synthetic DOM events on the canvas (world→canvas
   scaling by the canvas rect); synthetic `KeyboardEvent`s must define `keyCode`. The pane's
-  document is usually hidden; a dev-only worker pump keeps the loop running.
+  document is usually hidden: a dev-only worker pump keeps the game loop running, but page
+  `setTimeout`s are throttled to about a second, so don't time anything under 1 s with them
+  (read game state instead).
 - Dynamic `import('/src/...')` from the console can give a different module instance than
   the game's; read state from scene objects instead.
 - CI runners render through software GL: e2e waits must be condition-based (see `e2e/`).
