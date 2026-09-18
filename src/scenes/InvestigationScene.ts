@@ -231,6 +231,7 @@ export class InvestigationScene extends Phaser.Scene {
       onStrayChange: (count: number) => {
         this.refreshNotebook();
         if (count > 0) this.mutter('stray', "That's blank paper, partner. Pins go on evidence.");
+        if (count >= 3) this.mutter('stray-3', "You're pinning the paper, not the case.");
       },
       onHoverSpot: (over: boolean, clueId: string) => {
         this.hoveringSpot = Math.max(0, this.hoveringSpot + (over ? 1 : -1));
@@ -423,10 +424,16 @@ export class InvestigationScene extends Phaser.Scene {
   private onPinToggle(clue: Clue, pinned: boolean): void {
     if (pinned) {
       this.suspicions.push({ id: clue.id, label: clue.label });
+      // Neutral remarks keyed to counts only; nothing here says whether a pin is right.
       if (this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.');
+      if (this.suspicions.length === 4)
+        this.mutter('pins-4', 'Four. Could you explain each one to a judge?');
       if (this.suspicions.length >= 7)
         this.mutter('many-pins', 'Pinning everything is not a strategy. Some of that is fine.');
-    } else this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
+    } else {
+      this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
+      this.mutter('unpin', 'Second thoughts. Fine. Doubt is part of the job.');
+    }
     this.refreshNotebook();
   }
 
