@@ -111,7 +111,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   'case-files': [
     {
-      text: 'Twelve files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
+      text: 'Fourteen files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
     },
   ],
   settings: [
