@@ -91,6 +91,9 @@ export class AudioManager {
   private musicVolume = 0.55;
   private bpm = DEFAULT_BPM;
   private style: MusicStyle = 'lofi';
+  private windWanted = false;
+  private windNode: AudioBufferSourceNode | null = null;
+  private windLfo: OscillatorNode | null = null;
   private staticWanted = false;
   private staticNode: AudioBufferSourceNode | null = null;
   private morseText = '';
@@ -119,6 +122,7 @@ export class AudioManager {
       this.musicBus.gain.value = this.musicVolume;
       this.musicBus.connect(this.master);
       if (this.rainWanted) this.startRain();
+      if (this.windWanted) this.startWind();
       if (this.musicWanted) this.startMusic();
       if (this.staticWanted) this.startStatic();
     } catch {
@@ -139,6 +143,53 @@ export class AudioManager {
       this.startRain();
       if (this.rainGain) this.rainGain.gain.value = heavy ? 0.06 : 0.03;
     } else this.stopRain();
+  }
+
+  /** A slow, breathy wind bed for snow and fog nights. */
+  setWind(on: boolean): void {
+    this.windWanted = on;
+    if (!this.ctx) return;
+    if (on) this.startWind();
+    else this.stopWind();
+  }
+
+  private startWind(): void {
+    if (!this.ctx || !this.sfx || this.windNode) return;
+    const buf = this.noiseBuffer();
+    if (!buf) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    src.playbackRate.value = 0.6;
+    const filt = this.ctx.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = 320;
+    filt.Q.value = 0.7;
+    // The gust: an LFO nudging the filter and level every ten seconds or so.
+    const lfo = this.ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.09;
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.value = 140;
+    lfo.connect(lfoGain).connect(filt.frequency);
+    const g = this.ctx.createGain();
+    g.gain.value = 0.06;
+    src.connect(filt).connect(g).connect(this.sfx);
+    src.start();
+    lfo.start();
+    this.windNode = src;
+    this.windLfo = lfo;
+  }
+
+  private stopWind(): void {
+    try {
+      this.windNode?.stop();
+      this.windLfo?.stop();
+    } catch {
+      /* already stopped */
+    }
+    this.windNode = null;
+    this.windLfo = null;
   }
 
   /** Music level relative to the master volume. */

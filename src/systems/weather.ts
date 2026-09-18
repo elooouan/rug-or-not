@@ -17,4 +17,5 @@ export function setWeather(w: Weather): void {
 
 export function applyWeatherAudio(w: Weather): void {
   audio.setRain(w === 'rain' || w === 'storm', w === 'storm');
+  audio.setWind(w === 'snow' || w === 'fog');
 }
