@@ -169,4 +169,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Case fifteen: honest code behind a proxy, two wallets passing the same bag back and forth. New tells, same desk.',
   },
+  {
+    file: '22-v07-freeze',
+    version: 'v0.7',
+    date: '2026-09-18',
+    title: 'Seven nights',
+    caption:
+      'The seventh daily in a row earns a streak freeze: one missed night, forgiven. The chain is the point.',
+  },
 ];

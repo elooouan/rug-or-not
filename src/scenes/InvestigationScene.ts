@@ -578,9 +578,9 @@ export class InvestigationScene extends Phaser.Scene {
     const afterDaily = saveStore.get().daily;
     if (gameState.mode === 'daily' && dailyBefore.lastPlayed !== localDateKey()) {
       if (afterDaily.freezes > dailyBefore.freezes)
-        notes.push(['STREAK FREEZE', 'one missed night forgiven, when it happens']);
+        notes.push(['STREAK FREEZE', 'one missed night, forgiven']);
       else if (afterDaily.freezes < dailyBefore.freezes)
-        notes.push(['FREEZE USED', 'the chain held through a missed night']);
+        notes.push(['FREEZE SPENT', 'the chain held']);
     }
 
     // Every run goes on the board (local by default; see src/systems/leaderboard.ts).
