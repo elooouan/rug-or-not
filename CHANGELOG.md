@@ -11,6 +11,9 @@
   (lens, pins, tabs, stamping, scoring, hints, notebook, daily, drawer, cold cases, weekly,
   rush, the phone, the coin, badges, sharing, desk toys). "How to play" on the title opens
   it; pages about things not yet on the desk say when they turn up.
+- Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
+  button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
+  "Save this photo" button so it can leave the office as a PNG.
 - Office colours: five looks for the whole place (Noir, Old file, Blue hour, Newsprint,
   Speakeasy) under Settings. Everything is redrawn in the new palette on the spot; a change
   made from a paused file waits for the title.

@@ -15,6 +15,8 @@ import { LIVE_PHOTO_KEY } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
+import { downloadCanvas } from '@/systems/shareCard';
+import { toast } from '@/ui/Toast';
 import { setupScene } from './sceneUtil';
 
 const KEY = (f: HistoryFrame): string => (f.file === 'live' ? LIVE_PHOTO_KEY : `history-${f.file}`);
@@ -245,7 +247,8 @@ export class HistoryScene extends Phaser.Scene {
     this.big?.destroy();
     audio.play('paper');
     const w = WALL.bigW + 16;
-    const h = WALL.bigH + 16 + 40;
+    // Tonight's photo gets a button row under the caption.
+    const h = WALL.bigH + 16 + 40 + (frame.file === 'live' ? 24 : 0);
     const x = (GAME_WIDTH - w) / 2;
     const y = (GAME_HEIGHT - h) / 2 - 4;
     const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
@@ -283,6 +286,30 @@ export class HistoryScene extends Phaser.Scene {
         color: 'paperShadow',
       }).setOrigin(1, 1),
     );
+    // Tonight's photo is the player's own: it can leave the office as a PNG.
+    if (frame.file === 'live') {
+      const save = new PixelButton(this, x + 8, y + h - 28, 'Save this photo', () => {
+        const src = this.textures.get(LIVE_PHOTO_KEY).getSourceImage() as HTMLImageElement;
+        const canvas = document.createElement('canvas');
+        canvas.width = src.width;
+        canvas.height = src.height;
+        canvas.getContext('2d')?.drawImage(src, 0, 0);
+        const ok = downloadCanvas(canvas, `rug-or-not-desk-${frame.date}.png`);
+        audio.play(ok ? 'stamp' : 'wrong');
+        toast(
+          this,
+          ok ? 'PHOTO SAVED' : 'NO LUCK',
+          ok ? 'your desk, tonight' : 'this browser blocks downloads',
+        );
+      });
+      save.on(
+        'pointerdown',
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) =>
+          ev.stopPropagation(),
+      );
+      this.children.remove(save);
+      c.add(save);
+    }
     c.setAngle(-1);
     if (!saveStore.get().settings.reducedMotion) {
       c.setScale(0.92).setAlpha(0);
