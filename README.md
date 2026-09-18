@@ -41,7 +41,8 @@ from a sub-folder). A GitHub Pages workflow is included in
 `.github/workflows/deploy.yml`: enable Pages (Settings → Pages → Source: _GitHub Actions_)
 and run the workflow from the Actions tab, or change its trigger to `push` to deploy on
 every commit. CI (`.github/workflows/ci.yml`) runs lint, typecheck, case validation, tests
-a build and Playwright smoke tests (boot, a full case, deep links, the editor) on every push.
+a build and Playwright smoke tests (boot, a full case, deep links, the editor, a fake Phantom
+connecting read-only) on every push.
 
 ## Meet Detective Lucien
 
