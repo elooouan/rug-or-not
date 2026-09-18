@@ -682,6 +682,22 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
 
   help(ctx) {
     ctx.heading('Help', 'ink');
+    // The long version lives in the notebook; it opens over a case like the wall does.
+    ctx.button(
+      'Open the handbook (the notebook, chapter four)',
+      () => {
+        const scene = ctx.scene;
+        ctx.panel.close();
+        const at = { chapter: 'handbook', id: 'desk' };
+        if (scene.scene.key === 'TitleScene') {
+          scene.scene.start('NotebookScene', at);
+          return;
+        }
+        scene.scene.launch('NotebookScene', { overlay: true, returnTo: scene.scene.key, ...at });
+        scene.scene.pause();
+      },
+      { variant: 'paper' },
+    );
     ctx.line('Hover evidence with the lens. Fine print only shows through it.');
     ctx.line('Click a suspicious line to pin it. Click again to unpin.');
     ctx.line('Stamp RUG (R) or LEGIT (L). Herring pins cost points.');

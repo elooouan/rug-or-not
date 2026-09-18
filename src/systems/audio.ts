@@ -113,7 +113,7 @@ export class AudioManager {
       // `existing` lets tooling render into an OfflineAudioContext to measure levels.
       this.ctx = (existing ?? new Ctor!()) as AudioContext;
       this.master = this.ctx.createGain();
-      this.master.gain.value = this.volume;
+      this.master.gain.value = this.muted ? 0 : this.volume;
       this.master.connect(this.ctx.destination);
       this.sfx = this.ctx.createGain();
       this.sfx.gain.value = 1;
@@ -135,7 +135,11 @@ export class AudioManager {
     if (this.master) this.master.gain.value = this.muted ? 0 : this.volume;
   }
 
-  private muted = false;
+  /**
+   * Dev builds can start silent (`localStorage['rug-or-not:dev-mute'] = '1'`), so a
+   * test loop in a browser pane doesn't play the radio at whoever is next to it.
+   */
+  private muted = devMuted();
 
   /** A quick mute (M) that keeps the volume setting for when it comes back. */
   toggleMute(): boolean {
@@ -711,6 +715,15 @@ export class AudioManager {
     src.connect(filt).connect(g).connect(this.musicBus);
     src.start();
     this.crackle = src;
+  }
+}
+
+function devMuted(): boolean {
+  if (!import.meta.env.DEV) return false;
+  try {
+    return localStorage.getItem('rug-or-not:dev-mute') === '1';
+  } catch {
+    return false;
   }
 }
 

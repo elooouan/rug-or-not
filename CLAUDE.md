@@ -79,7 +79,9 @@ every squish returns to rest), make interactions respond immediately, check UI e
 
 ## Testing tips
 
-- Dev server: `npm run dev` (port 5173). Dev builds expose `window.__game` and `__debug`
+- Dev server: `npm run dev` (port 5173). Set `localStorage['rug-or-not:dev-mute'] = '1'` on
+  the origin (from any page on it, e.g. `/favicon-32.png`) so the game starts silent in the
+  browser pane: it survives reloads and save resets. Dev builds expose `window.__game` and `__debug`
   (`startCase(id)`, `snapshot(name)`, `audio`, `audioLevels()`, `wallet`). To test wallet
   flows without Phantom, inject a fake `window.phantom.solana` (connect/disconnect/on) and
   stub `fetch` for the RPC, then drive `__debug.wallet`; `VITE_TOKEN_MOCK_BALANCE` fakes a
