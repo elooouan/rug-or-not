@@ -158,7 +158,7 @@ src/
                     settings, unlocks, badges, hints, leaderboard, wallet (Phantom, read-only), weather,
                     audio (synth SFX, lo-fi + jazz loops, radio static), shareCard, caseLoader
   ui/               Reusable Phaser components: DocumentView + documents/, Magnifier, Stamp, NotebookPanel,
-                    DialogueBox (Lucien), BrowserPanel (NetScope), DeskBackground (window, cat, radio, safe…),
+                    DialogueBox (Lucien), BrowserPanel + browser/pages (NetScope), DeskBackground (window, cat, radio, safe…),
                     Vault, StickyNote, Toast, dragScroll…
   scenes/           Boot, Cursor (overlay), Title, CaseSelect, Investigation, Report, Notebook, Settings,
                     Rush (also drills), History (the wall)
