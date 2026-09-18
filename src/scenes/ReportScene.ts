@@ -349,7 +349,7 @@ export class ReportScene extends Phaser.Scene {
     this.children.remove(outside);
     c.add(outside);
     const w = 96;
-    const h = 74;
+    const h = 96;
     const px = bx - 20;
     const py = by - h - 6;
     c.add(this.add.rectangle(px + 3, py + 4, w, h, HEX.bg, 0.5).setOrigin(0));
@@ -372,16 +372,22 @@ export class ReportScene extends Phaser.Scene {
     };
     mk('Copy text', py + 5, () => this.share());
     mk('Save card', py + 27, () => this.saveCard());
-    mk('Post on X', py + 49, () => {
+    const intent = (build: (text: string, url: string) => string) => () => {
       const lines = this.shareLines();
       const url = lines.find((l) => l.startsWith('http')) ?? '';
       const text = lines.filter((l) => l !== url).join('\n');
-      window.open(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-        '_blank',
-        'noopener',
-      );
-    });
+      window.open(build(encodeURIComponent(text), encodeURIComponent(url)), '_blank', 'noopener');
+    };
+    mk(
+      'Post on X',
+      py + 49,
+      intent((text, url) => `https://twitter.com/intent/tweet?text=${text}&url=${url}`),
+    );
+    mk(
+      'Telegram',
+      py + 71,
+      intent((text, url) => `https://t.me/share/url?url=${url}&text=${text}`),
+    );
     this.sharePopover = c;
   }
 
