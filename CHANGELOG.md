@@ -13,7 +13,10 @@
 - A WEEKLY folder in the drawer: this week's cold case, the same file for everyone
   (`#cold=week-<year>-w<week>`), marked closed once stamped.
 - Drills: from any red-flag page in the notebook, five generated pages that all hide that
-  flag. Clearing them logs the drill; all fifteen earn Drill Sergeant.
+  flag. Clearing them logs the drill; the full set earns Drill Sergeant.
+- Two more red flags (an upgradeable proxy behind one admin key; wash trading between the
+  same two wallets) and two more herrings (a token that is only weeks old; a team of two).
+  The generator plants them; the notebook teaches them.
 - A hidden fifteenth file, "The Tailor" ($SEAM), opens once every ordinary case has been
   stamped correctly: a difficulty-5 rug where everything is stitched to look right. Lucien
   announces it; the drawer shows a nameless folder until then; Tailor-Made badge and late

@@ -148,6 +148,24 @@ export const FLAGS = {
       'renounceOwnership() present, but also an admin or operator address that can still change fees or mint.',
     severity: 'critical',
   },
+  'proxy-admin': {
+    id: 'proxy-admin',
+    title: 'Upgradeable proxy with one admin key',
+    explanation:
+      'The code you are reading can be swapped for different code by whoever holds the proxy admin key. Every promise in the source lasts exactly until the next upgrade.',
+    howToSpot:
+      'initialize() instead of a constructor, "TransparentUpgradeableProxy" or "UUPS" in the comments, and an admin address that is one wallet, not a timelock or multisig.',
+    severity: 'critical',
+  },
+  'wash-trading': {
+    id: 'wash-trading',
+    title: 'Wash trading between the same wallets',
+    explanation:
+      'The "volume" on the chart is two wallets passing the same tokens back and forth to look busy. Nobody new is buying; the numbers are a costume for the listing sites.',
+    howToSpot:
+      'Transfers alternating between the same pair of addresses every few minutes, in similar amounts, on a token with almost no holders.',
+    severity: 'major',
+  },
 } as const satisfies Record<string, RedFlag>;
 
 export type FlagId = keyof typeof FLAGS;
@@ -240,6 +258,18 @@ export const HERRINGS = {
     title: 'Admin powers behind a public timelock',
     reassurance:
       'An admin that can only act after a public 48-hour delay gives holders time to react. It is the opposite of a hidden owner key.',
+  },
+  'young-token': {
+    id: 'young-token',
+    title: 'Token is only weeks old',
+    reassurance:
+      'Everything was new once. Age is not a verdict; the lock, the code and the team are.',
+  },
+  'two-person-team': {
+    id: 'two-person-team',
+    title: 'A team of two',
+    reassurance:
+      'Small teams ship. Two named people with public histories beat twelve stock photos.',
   },
 } as const satisfies Record<string, Herring>;
 

@@ -40,6 +40,8 @@ describe('cold case generator', () => {
       'liquidity-unlocked',
       'whale-concentration',
       'fake-audit',
+      'proxy-admin',
+      'wash-trading',
     ];
     for (const flag of pool)
       for (let i = 0; i < 20; i++) {

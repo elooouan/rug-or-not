@@ -215,7 +215,8 @@ type ContractFlag =
   | 'honeypot'
   | 'blacklist'
   | 'fake-renounce'
-  | 'unverified-contract';
+  | 'unverified-contract'
+  | 'proxy-admin';
 type ContractHerring =
   'small-fixed-tax' | 'renounced-cleanly' | 'immutable-supply-note' | 'timelocked-admin';
 const CONTRACT_FLAGS: ContractFlag[] = [
@@ -225,6 +226,7 @@ const CONTRACT_FLAGS: ContractFlag[] = [
   'blacklist',
   'fake-renounce',
   'unverified-contract',
+  'proxy-admin',
 ];
 const CONTRACT_HERRINGS: ContractHerring[] = [
   'small-fixed-tax',
@@ -353,10 +355,25 @@ function contractDoc(
   const renouncedCleanly = herrings.includes('renounced-cleanly');
   const fakeRenounce = flags.includes('fake-renounce');
   const timelock = herrings.includes('timelocked-admin');
+  const proxy = flags.includes('proxy-admin');
   const ownable = !renouncedCleanly && !timelock;
   push('// SPDX-License-Identifier: MIT');
   push('pragma solidity 0.8.24;');
-  push(`contract ${cname} is ERC20${ownable ? ', Ownable' : ''} {`);
+  if (proxy) {
+    const l = push('// deployed behind TransparentUpgradeableProxy');
+    const admin = `0x${rng.int(0x100, 0xfff).toString(16)}...${rng.int(0x100, 0xfff).toString(16)}`;
+    push(`// admin: ${admin} (EOA)`);
+    clues.push(
+      flagClue(
+        'g-proxy',
+        'Proxy, one admin key',
+        'proxy-admin',
+        { kind: 'line', line: l },
+        fine('proxy-admin') ? '// the admin can point the proxy at any code, any time' : undefined,
+      ),
+    );
+    push(`contract ${cname} is ERC20Upgradeable${ownable ? ', OwnableUpgradeable' : ''} {`);
+  } else push(`contract ${cname} is ERC20${ownable ? ', Ownable' : ''} {`);
   const supplyLine = push(`  uint256 public constant MAX_SUPPLY = ${rng.int(10, 900)}_000_000e18;`);
   if (herrings.includes('immutable-supply-note'))
     clues.push(
@@ -425,7 +442,10 @@ function contractDoc(
     push('  address public operator;');
   }
   push('');
-  push(`  constructor() ERC20("${nm.name}", "${nm.ticker.slice(1)}") {`);
+  if (proxy) {
+    push('  function initialize() public initializer {');
+    push(`    __ERC20_init("${nm.name}", "${nm.ticker.slice(1)}");`);
+  } else push(`  constructor() ERC20("${nm.name}", "${nm.ticker.slice(1)}") {`);
   push('    _mint(msg.sender, MAX_SUPPLY);');
   if (fakeRenounce) {
     push('    operator = msg.sender;');
@@ -601,7 +621,7 @@ function tokenomicsDoc(
 
 function teamDoc(
   rng: Rng,
-  wants: { stock: boolean; meme: boolean },
+  wants: { stock: boolean; meme: boolean; duo: boolean },
   fine: (id: string) => boolean,
 ): CaseDocument {
   const clues: ClueDraft[] = [];
@@ -617,7 +637,7 @@ function teamDoc(
     ['CEO', 'CTO', 'Head of Ops', 'Contract dev', 'Community lead', 'Treasurer', 'Partnerships'],
     3,
   );
-  for (let i = 0; i < (wants.meme ? 2 : 3); i++) {
+  for (let i = 0; i < (wants.meme || wants.duo ? 2 : 3); i++) {
     const name = `${rng.pick(FIRST)} ${rng.pick(LAST)}`;
     members.push({
       name,
@@ -666,10 +686,21 @@ function teamDoc(
       }),
     );
   }
+  let note: string | undefined;
+  if (wants.duo) {
+    note = `Two of us, full time, since ${rng.pick(['March', 'last spring', 'the pilot'])}. No advisors, no "strategic partners". Ask us anything in the chat.`;
+    clues.push(
+      herringClue('g-duo', 'A team of two', 'two-person-team', {
+        kind: 'row',
+        row: 0,
+        table: 'note',
+      }),
+    );
+  }
   return {
     type: 'team',
     title: 'Team',
-    content: { members: members.slice(0, 4) },
+    content: note ? { members: members.slice(0, 4), note } : { members: members.slice(0, 4) },
     clues: clues as unknown as Clue[],
   };
 }
@@ -816,7 +847,14 @@ function chatDoc(
 function liquidityDoc(
   rng: Rng,
   nm: Names,
-  wants: { unlocked: boolean; whales: boolean; lockedLong: boolean; poolTop: boolean },
+  wants: {
+    unlocked: boolean;
+    whales: boolean;
+    wash: boolean;
+    lockedLong: boolean;
+    poolTop: boolean;
+    young: boolean;
+  },
   fine: (id: string) => boolean,
 ): CaseDocument {
   const clues: ClueDraft[] = [];
@@ -889,6 +927,48 @@ function liquidityDoc(
     );
   } else {
     holders.push({ label: 'Treasury contract', pct: rng.int(15, 25), tag: 'contract' });
+  }
+  if (wants.wash) {
+    // Two wallets passing the same bag back and forth, a few minutes apart.
+    const a = `0x${rng.int(0x100, 0xfff).toString(16)}...${rng.int(0x100, 0xfff).toString(16)}`;
+    const b = `0x${rng.int(0x100, 0xfff).toString(16)}...${rng.int(0x100, 0xfff).toString(16)}`;
+    const amount = `${rng.int(4, 9)},${rng.int(100, 999)},000`;
+    let mins = rng.int(2, 6);
+    for (let k = 0; k < 4; k++) {
+      transfers.push({
+        when: `${mins}m ago`,
+        from: k % 2 === 0 ? a : b,
+        to: k % 2 === 0 ? b : a,
+        amount,
+      });
+      mins += rng.int(3, 7);
+    }
+    clues.push(
+      flagClue(
+        'g-wash',
+        'Same two wallets trading',
+        'wash-trading',
+        { kind: 'row', row: 0, table: 'transfers' },
+        fine('wash-trading')
+          ? `${a} and ${b} were funded by the same wallet an hour before launch`
+          : undefined,
+      ),
+    );
+  }
+  if (wants.young) {
+    transfers.push({
+      when: `${rng.int(15, 27)}d ago`,
+      from: 'Deployer',
+      to: 'Liquidity pool',
+      amount: 'pool created',
+    });
+    clues.push(
+      herringClue('g-young', 'Only weeks old', 'young-token', {
+        kind: 'row',
+        row: transfers.length - 1,
+        table: 'transfers',
+      }),
+    );
   }
   const used = holders.reduce((s, x) => s + x.pct, 0);
   holders.push({ label: 'Everyone else', pct: Math.max(1, 100 - used) });
@@ -985,6 +1065,8 @@ const FLAG_POOL = [
   'liquidity-unlocked',
   'whale-concentration',
   'fake-audit',
+  'proxy-admin',
+  'wash-trading',
 ] as const;
 const HERRING_POOL = [
   'small-fixed-tax',
@@ -999,6 +1081,8 @@ const HERRING_POOL = [
   'liquidity-locked-long',
   'pool-top-holder',
   'real-audit-findings',
+  'young-token',
+  'two-person-team',
 ] as const;
 
 const FLAG_BLURB: Record<string, string> = {
@@ -1017,6 +1101,8 @@ const FLAG_BLURB: Record<string, string> = {
   'liquidity-unlocked': 'the liquidity lock was about to end (or never began)',
   'whale-concentration': 'three whales were funded from one wallet in one block',
   'fake-audit': 'the audit was a certificate, not an audit',
+  'proxy-admin': 'the proxy admin could swap the code at will',
+  'wash-trading': 'the volume was two wallets talking to each other',
 };
 
 export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
@@ -1042,6 +1128,9 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
       CONTRACT_FLAGS.filter((f) => f !== 'unverified-contract').forEach((f) => flags.delete(f));
     else flags.delete('unverified-contract');
   }
+  // Whales and wash trading both fill the transfer table; one per file.
+  if (flags.has('wash-trading') && flags.has('whale-concentration'))
+    flags.delete(keep('whale-concentration') ? 'wash-trading' : 'whale-concentration');
   const herrings = new Set(take(rng, HERRING_POOL, p.herrings));
   // Contradictions: no clean renounce next to a fake one, no long lock next to an unlock.
   if (flags.has('fake-renounce')) {
@@ -1083,12 +1172,19 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     ),
   );
   const wantTeam =
-    flags.has('anon-team-stock-photos') || herrings.has('doxxed-meme-name') || rng.chance(0.4);
+    flags.has('anon-team-stock-photos') ||
+    herrings.has('doxxed-meme-name') ||
+    herrings.has('two-person-team') ||
+    rng.chance(0.4);
   if (wantTeam)
     docs.push(
       teamDoc(
         rng,
-        { stock: flags.has('anon-team-stock-photos'), meme: herrings.has('doxxed-meme-name') },
+        {
+          stock: flags.has('anon-team-stock-photos'),
+          meme: herrings.has('doxxed-meme-name'),
+          duo: herrings.has('two-person-team'),
+        },
         fine,
       ),
     );
@@ -1121,8 +1217,10 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
       {
         unlocked: flags.has('liquidity-unlocked'),
         whales: flags.has('whale-concentration'),
+        wash: flags.has('wash-trading'),
         lockedLong: herrings.has('liquidity-locked-long'),
         poolTop: herrings.has('pool-top-holder'),
+        young: herrings.has('young-token'),
       },
       fine,
     ),
