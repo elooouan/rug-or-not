@@ -7,7 +7,6 @@ import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
-import { shareText } from '@/systems/share';
 import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
 import { solvedRegular, startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
@@ -20,7 +19,7 @@ import { playableCases, secretUnlocked } from '@/systems/secretCase';
 import { confetti } from '@/ui/confetti';
 import { attachScroll } from '@/ui/dragScroll';
 import { toast } from '@/ui/Toast';
-import { StickyNote } from '@/ui/StickyNote';
+import { SharePopover } from '@/ui/SharePopover';
 import { LucienBubble } from '@/ui/LucienBubble';
 import { localDateKey } from '@/systems/dailyCase';
 import { BADGE_BY_ID } from '@/data/badges';
@@ -328,67 +327,12 @@ export class ReportScene extends Phaser.Scene {
     return L;
   }
 
-  private sharePopover?: Phaser.GameObjects.Container;
-
   /** Two ways to share: the text for the clipboard, or a picture of the report. */
   private shareMenu(bx: number, by: number): void {
-    if (this.sharePopover) {
-      this.sharePopover.destroy();
-      this.sharePopover = undefined;
-      return;
-    }
-    audio.play('ui');
-    const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
-    const close = () => {
-      c.destroy();
-      if (this.sharePopover === c) this.sharePopover = undefined;
-    };
-    const outside = this.add.zone(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0);
-    outside.setInteractive({ useHandCursor: false });
-    outside.on('pointerdown', close);
-    this.children.remove(outside);
-    c.add(outside);
-    const w = 96;
-    const h = 96;
-    const px = bx - 20;
-    const py = by - h - 6;
-    c.add(this.add.rectangle(px + 3, py + 4, w, h, HEX.bg, 0.5).setOrigin(0));
-    c.add(this.add.rectangle(px - 2, py - 2, w + 4, h + 4, HEX.woodDark).setOrigin(0));
-    c.add(this.add.rectangle(px, py, w, h, HEX.paper).setOrigin(0));
-    const mk = (label: string, y: number, fn: () => void) => {
-      const b = new PixelButton(
-        this,
-        px + 6,
-        y,
-        label,
-        () => {
-          close();
-          fn();
-        },
-        { width: w - 12, variant: 'ink' },
-      );
-      this.children.remove(b);
-      c.add(b);
-    };
-    mk('Copy text', py + 5, () => this.share());
-    mk('Save card', py + 27, () => this.saveCard());
-    const intent = (build: (text: string, url: string) => string) => () => {
-      const lines = this.shareLines();
-      const url = lines.find((l) => l.startsWith('http')) ?? '';
-      const text = lines.filter((l) => l !== url).join('\n');
-      window.open(build(encodeURIComponent(text), encodeURIComponent(url)), '_blank', 'noopener');
-    };
-    mk(
-      'Post on X',
-      py + 49,
-      intent((text, url) => `https://twitter.com/intent/tweet?text=${text}&url=${url}`),
-    );
-    mk(
-      'Telegram',
-      py + 71,
-      intent((text, url) => `https://t.me/share/url?url=${url}&text=${text}`),
-    );
-    this.sharePopover = c;
+    SharePopover.toggle(this, bx, by, {
+      lines: () => this.shareLines(),
+      extra: { label: 'Save card', run: () => this.saveCard() },
+    });
   }
 
   /** A 1280x720 PNG of the result, for posting. */
@@ -445,15 +389,6 @@ export class ReportScene extends Phaser.Scene {
       `${location.origin}${location.pathname}#${isDaily ? 'daily' : gameState.mode === 'cold' ? `cold=${gameState.coldSeed ?? ''}` : `case=${c.id}`}`,
       '#RugOrNot',
     ].filter(Boolean);
-  }
-
-  private share(): void {
-    const text = this.shareLines().join('\n');
-    void shareText(text).then((how) => {
-      if (how === 'shared') toast(this, 'SHARED', 'off it goes');
-      else if (how === 'copied') toast(this, 'COPIED', 'result on the clipboard');
-      else new StickyNote(this, 160, 100, 'share text', text, 320);
-    });
   }
 
   /** A quick verdict on your verdict, every time. */

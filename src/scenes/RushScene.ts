@@ -25,7 +25,6 @@ import {
   type RushState,
 } from '@/systems/rush';
 import { saveStore } from '@/systems/save';
-import { shareText } from '@/systems/share';
 import { holderPerks, wallet } from '@/systems/wallet';
 import { DeskBackground, floatText } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -36,8 +35,7 @@ import { escTaken } from '@/ui/escGuard';
 import { LucienBubble } from '@/ui/LucienBubble';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
-import { StickyNote } from '@/ui/StickyNote';
-import { toast } from '@/ui/Toast';
+import { SharePopover } from '@/ui/SharePopover';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 
@@ -532,9 +530,17 @@ export class RushScene extends Phaser.Scene {
     );
     const share = this.drill
       ? null
-      : new PixelButton(this, x + 12 + bw + 6, y + h - 42, 'Share', () => this.share(), {
-          width: bw,
-        });
+      : new PixelButton(
+          this,
+          x + 12 + bw + 6,
+          y + h - 42,
+          'Share',
+          () =>
+            SharePopover.toggle(this, x + 12 + bw + 6, y + h - 42, {
+              lines: () => this.shareLines(),
+            }),
+          { width: bw },
+        );
     const menu = new PixelButton(
       this,
       x + w - 12 - bw,
@@ -579,18 +585,13 @@ export class RushScene extends Phaser.Scene {
   }
 
   /** Result text for the clipboard, with a fallback note. */
-  private share(): void {
+  private shareLines(): string[] {
     const s = this.state;
-    const text = [
+    return [
       `Rug or Not? Red Flag Rush: ${s.score} pts, ${s.rounds} pages, best streak ${s.bestStreak}, grade ${rushGrade(s.score)}`,
       `${location.origin}${location.pathname}#rush`,
       '#RugOrNot',
-    ].join('\n');
-    void shareText(text).then((how) => {
-      if (how === 'shared') toast(this, 'SHARED', 'off it goes');
-      else if (how === 'copied') toast(this, 'COPIED', 'result on the clipboard');
-      else new StickyNote(this, 160, 100, 'share text', text, 320);
-    });
+    ];
   }
 
   private bindKeys(): void {

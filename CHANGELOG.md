@@ -41,7 +41,8 @@
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
 - Snow and fog nights get a low wind bed with slow gusts.
-- The report's share menu has "Post on X" and "Telegram" (prefilled intents in a new tab).
+- Share menus (report and rush) offer copy / share sheet, "Post on X" and "Telegram"
+  (prefilled intents in a new tab); the report's also saves the card.
 - Share uses the phone's share sheet where there is one; the clipboard elsewhere; a note
   with the text if neither works.
 - Deleted chat messages leave a ghost of their text that only the lens can read.
