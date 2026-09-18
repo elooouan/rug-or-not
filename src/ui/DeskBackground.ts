@@ -111,6 +111,7 @@ export class DeskBackground {
   private flickerOn = true;
   private motion = true;
   private lampOn = true;
+  private dark!: Phaser.GameObjects.Rectangle;
   private dust?: Phaser.GameObjects.Particles.ParticleEmitter;
   private lampClicks = 0;
   private sipping = false;
@@ -208,7 +209,13 @@ export class DeskBackground {
       .setDepth(DEPTH.light)
       .setBlendMode(Phaser.BlendModes.ADD);
     this.vignette = scene.add.image(0, 0, TEX.vignette).setOrigin(0).setDepth(DEPTH.vignette);
-    this.overlays = [this.light, this.vignette, this.flash];
+    // With the lamp off the desk really goes dark; only the window and the HUD keep their light.
+    this.dark = scene.add
+      .rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, HEX.bg, 0.45)
+      .setOrigin(0)
+      .setDepth(DEPTH.light)
+      .setVisible(false);
+    this.overlays = [this.light, this.vignette, this.flash, this.dark];
     // Dust in the lamplight: a handful of faint motes drifting through the beam.
     if (this.motion) {
       this.dust = scene.add.particles(0, 0, TEX.pixel, {
@@ -810,6 +817,7 @@ export class DeskBackground {
       floatText(this.scene, DESK.lamp.x + 58, DESK.lamp.y + 20, line);
       this.light.setVisible(this.lampOn);
       this.dust?.setVisible(this.lampOn);
+      this.dark.setVisible(!this.lampOn);
       this.vignette.setAlpha(this.lampOn ? 1 : 1.4);
       this.vignette.setTint(this.lampOn ? 0xffffff : HEX.bg);
     });
