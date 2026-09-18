@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { DEPTH } from '@/config/depth';
 import { RUSH } from '@/config/gameConfig';
 import { DESK, FONT, GAME_HEIGHT, GAME_WIDTH, NOTEBOOK, PAPER } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, PALETTE } from '@/config/palette';
 import { HERRINGS, isFlagClue, type Clue } from '@/data/schema';
 import { FLAG_IDS, FLAGS, isFlagId, type FlagId } from '@/data/flags';
 import { audio } from '@/systems/audio';
@@ -249,7 +249,9 @@ export class RushScene extends Phaser.Scene {
     this.hud.score.setText(String(s.score));
     const m = rushMultiplier(s.streak);
     this.hud.mult.setText(`x${m.toFixed(2).replace(/0$/, '')}`);
-    this.hud.mult.setColor(m >= RUSH.maxMultiplier ? '#c9503f' : m > 1 ? '#e0b566' : '#6b5140');
+    this.hud.mult.setColor(
+      m >= RUSH.maxMultiplier ? PALETTE.stampRed : m > 1 ? PALETTE.amber : PALETTE.woodMid,
+    );
     this.hud.streak.setText(`streak  ${s.streak}`);
     this.hud.pages.setText(`pages   ${s.rounds}`);
     if (this.drill)

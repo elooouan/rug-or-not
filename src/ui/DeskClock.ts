@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DESK, FONT } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, PALETTE } from '@/config/palette';
 import { makeText } from './text';
 
 /** A small desk clock that doubles as the case timer. */
@@ -43,7 +43,7 @@ export class DeskClock extends Phaser.GameObjects.Container {
       this.label.setText(
         `${String(now.getHours()).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
       );
-      this.label.setColor('#d8c9a8');
+      this.label.setColor(PALETTE.paper);
       const g = this.hands;
       g.clear();
       const ha = -Math.PI / 2 + ((h + m / 60) / 12) * Math.PI * 2;
@@ -99,7 +99,7 @@ export class DeskClock extends Phaser.GameObjects.Container {
   private refresh(): void {
     const s = this.timeLeft;
     this.label.setText(`${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`);
-    this.label.setColor(s <= 15 ? '#e0b566' : '#d8c9a8');
+    this.label.setColor(s <= 15 ? PALETTE.amber : PALETTE.paper);
     this.drawHands(this.total > 0 ? 1 - this.left / this.total : 0);
   }
 

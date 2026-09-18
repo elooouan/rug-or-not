@@ -1,3 +1,4 @@
+import { HEX } from '@/config/palette';
 import Phaser from 'phaser';
 
 /** A Rectangle not yet added to the display list (for containers). Origin top-left. */
@@ -46,7 +47,7 @@ export function difficultyPips(
   const c = new Phaser.GameObjects.Container(scene, x, y);
   for (let i = 0; i < 5; i++) {
     const on = i < level;
-    c.add(rect(scene, i * 7, on ? 0 : 2, 5, on ? 5 : 3, on ? 0xe0b566 : 0x8c6d52));
+    c.add(rect(scene, i * 7, on ? 0 : 2, 5, on ? 5 : 3, on ? HEX.amber : HEX.woodLight));
   }
   return c;
 }

@@ -280,7 +280,9 @@ export class NotebookScene extends Phaser.Scene {
   private select(i: number): void {
     this.selected = i;
     this.entries.forEach((t, idx) =>
-      t.setColor(idx === i ? '#5b6f8a' : this.known(this.ids[idx]) ? '#2b2530' : '#b8a88a'),
+      t.setColor(
+        idx === i ? PALETTE.ink : this.known(this.ids[idx]) ? PALETTE.shadow : PALETTE.paperShadow,
+      ),
     );
     this.detail.removeAll(true);
     const id = this.ids[i];

@@ -13,6 +13,7 @@ import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
 import { syncDiscovery } from '@/systems/discovery';
+import { applyTheme } from '@/config/palette';
 import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
@@ -51,6 +52,7 @@ export class BootScene extends Phaser.Scene {
     // A wallet linked on a previous visit reconnects silently (no popup); optional either way.
     void wallet.reconnect();
     const s = saveStore.get().settings;
+    applyTheme(s.theme);
     audio.setVolume(s.volume);
     applyWeatherAudio(s.weather);
     audio.setMusic(s.music);

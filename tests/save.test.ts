@@ -98,3 +98,25 @@ describe('export / import', () => {
     expect(importSave(b, 'RON1:!!!')).toBe(false);
   });
 });
+
+describe('office colours', () => {
+  it('keeps a known theme and falls back to noir', async () => {
+    const { sanitizeSettings } = await import('@/systems/settings');
+    expect(sanitizeSettings({ theme: 'midnight' }).theme).toBe('midnight');
+    expect(sanitizeSettings({ theme: 'neon' }).theme).toBe('noir');
+    expect(sanitizeSettings({}).theme).toBe('noir');
+  });
+
+  it('applyTheme swaps the live palette and its numeric twin, and goes back', async () => {
+    const { PALETTE, HEX, applyTheme, currentTheme, THEMES } = await import('@/config/palette');
+    const noirPaper = PALETTE.paper;
+    applyTheme('sepia');
+    expect(currentTheme()).toBe('sepia');
+    expect(PALETTE.paper).toBe(THEMES.sepia.colors.paper);
+    expect(HEX.paper).toBe(parseInt(THEMES.sepia.colors.paper!.slice(1), 16));
+    expect(PALETTE.phantom).toBe('#ab9ff2'); // the brand mark never changes
+    applyTheme('noir');
+    expect(PALETTE.paper).toBe(noirPaper);
+    expect(HEX.paper).toBe(parseInt(noirPaper.slice(1), 16));
+  });
+});

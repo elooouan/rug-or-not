@@ -11,6 +11,9 @@
   (lens, pins, tabs, stamping, scoring, hints, notebook, daily, drawer, cold cases, weekly,
   rush, the phone, the coin, badges, sharing, desk toys). "How to play" on the title opens
   it; pages about things not yet on the desk say when they turn up.
+- Office colours: five looks for the whole place (Noir, Old file, Blue hour, Newsprint,
+  Speakeasy) under Settings. Everything is redrawn in the new palette on the spot; a change
+  made from a paused file waits for the title.
 - Phantom's mark on the wallet buttons; buttons can carry an icon. The title chip says
   which wallet it will connect.
 - Fixed: closing the pause menu or the phone with a click over the paper dropped a stray

@@ -169,7 +169,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   settings: [
     {
-      text: 'Relaxed mode kills the timer. No-magnifier mode prints the fine print for you. No shame in either.',
+      text: 'Relaxed mode kills the timer. No-magnifier mode prints the fine print for you. No shame in either. Office colours repaints the place.',
     },
   ],
   coffee: [

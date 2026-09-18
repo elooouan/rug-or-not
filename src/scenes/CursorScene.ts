@@ -1,3 +1,4 @@
+import { HEX } from '@/config/palette';
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { CURSOR_SIZE } from '@/art/magnifier';
@@ -51,9 +52,17 @@ export class CursorScene extends Phaser.Scene {
     this.mode = mode;
   }
 
+  /** The lens and pointer textures were redrawn (theme, cosmetics): point at the new ones. */
+  retexture(): void {
+    this.rim.setTexture(this.glow ? TEX.lensRimGlow : TEX.lensRim);
+    this.innerVignette.setTexture(TEX.lensVignette);
+    this.glint.setTexture(TEX.lensGlint);
+    this.cursor.setTexture(TEX.cursor);
+  }
+
   /** Tint the pointer for a while (ink pad easter egg). */
   setInked(ms: number): void {
-    this.cursor.setTint(0x9a3b3b);
+    this.cursor.setTint(HEX.stampRed);
     this.inkTimer?.remove(false);
     this.inkTimer = this.time.delayedCall(ms, () => this.cursor.clearTint());
   }

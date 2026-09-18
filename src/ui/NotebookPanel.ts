@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { FONT, NOTEBOOK } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, PALETTE } from '@/config/palette';
 import { makeText } from './text';
 import { rect } from '@/ui/shapes';
 
@@ -82,7 +82,7 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
         new Phaser.Geom.Rectangle(-14, -1, NOTEBOOK.w - padding * 2, NOTEBOOK.lineHeight),
         Phaser.Geom.Rectangle.Contains,
       );
-      t.on('pointerover', () => this.shownIds[i] && t.setColor('#5b6f8a'));
+      t.on('pointerover', () => this.shownIds[i] && t.setColor(PALETTE.ink));
       t.on('pointerout', () => this.recolor(i));
       t.on('pointerdown', () => {
         const id = this.shownIds[i];
@@ -99,13 +99,13 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
   setExamined(n: number, total: number): void {
     if (n < 0) {
       this.examinedText.setText("detective's honour");
-      this.examinedText.setColor('#9a3b3b');
+      this.examinedText.setColor(PALETTE.stampRed);
       return;
     }
     this.examinedText.setText(
       `examined ${n}/${total}${n >= total && total > 0 ? '  all seen' : ''}`,
     );
-    this.examinedText.setColor(n >= total && total > 0 ? '#4f7a5a' : '#6b5140');
+    this.examinedText.setColor(n >= total && total > 0 ? PALETTE.stampGreen : PALETTE.woodMid);
   }
 
   setEntries(entries: SuspicionEntry[]): void {
@@ -135,6 +135,6 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
 
   private recolor(i: number): void {
     const id = this.shownIds[i];
-    this.lines[i].setColor(id?.startsWith('stray-') ? '#5b6f8a' : '#2b2530');
+    this.lines[i].setColor(id?.startsWith('stray-') ? PALETTE.ink : PALETTE.shadow);
   }
 }

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, PALETTE } from '@/config/palette';
 import type { UnlockCategory } from '@/data/unlockables';
 import { audio } from '@/systems/audio';
 import { exportSave, importSave, saveStore, type CosmeticSelection } from '@/systems/save';
@@ -18,6 +18,8 @@ import { resetHints } from '@/systems/hints';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
+import { currentTheme, THEME_IDS, THEMES } from '@/config/palette';
+import { syncTheme } from '@/systems/theme';
 
 interface SettingsInit {
   overlay?: boolean;
@@ -48,6 +50,8 @@ export class SettingsScene extends Phaser.Scene {
   private confirmReset = false;
   private hintText!: Phaser.GameObjects.Text;
   private cosmeticsDirty = false;
+  /** Row to land on after a theme change restarts the page. */
+  private static reselect = -1;
 
   constructor() {
     super(SettingsScene.KEY);
@@ -60,6 +64,7 @@ export class SettingsScene extends Phaser.Scene {
 
   create(): void {
     setupScene(this);
+    if (!this.overlay) syncTheme(this);
     this.confirmReset = false;
     this.cosmeticsDirty = false;
     this.rows = [];
@@ -160,6 +165,25 @@ export class SettingsScene extends Phaser.Scene {
           (st) =>
             (st.musicVolume = Phaser.Math.Clamp(Math.round(st.musicVolume * 10 + d) / 10, 0, 1)),
         ),
+    });
+    this.rows.push({
+      label: 'Office colours',
+      value: () => THEMES[s().theme].name,
+      change: (d) => {
+        set(
+          (st) =>
+            (st.theme =
+              THEME_IDS[(THEME_IDS.indexOf(st.theme) + d + THEME_IDS.length) % THEME_IDS.length]),
+        );
+        // Redraw everything in the new colours: this page restarts and repaints in its
+        // create() once the old desk is gone. Over a paused file the desk underneath still
+        // holds the old textures, so that case waits for the title.
+        if (this.overlay) return;
+        SettingsScene.reselect = this.selected;
+        this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo });
+      },
+      hint: () =>
+        this.overlay && s().theme !== currentTheme() ? 'repainted once this file is closed' : '',
     });
     this.rows.push({
       label: 'Weather outside',
@@ -325,7 +349,8 @@ export class SettingsScene extends Phaser.Scene {
     kb?.on('keydown-LEFT', () => this.rows[this.selected].change(-1));
     kb?.on('keydown-ENTER', () => this.rows[this.selected].change(1));
     kb?.on('keydown-SPACE', () => this.rows[this.selected].change(1));
-    this.select(0);
+    this.select(SettingsScene.reselect >= 0 ? SettingsScene.reselect : 0);
+    SettingsScene.reselect = -1;
     if (!this.overlay) lucienSays(this, 'settings');
 
     // The quick mute (M) is global; keep the volume row honest while it's on.
@@ -348,7 +373,7 @@ export class SettingsScene extends Phaser.Scene {
       const rt = this.rowTexts[i];
       rt.value.setText(row.value());
       rt.ring.setVisible(i === this.selected);
-      rt.label.setColor(i === this.selected ? '#5b6f8a' : '#2b2530');
+      rt.label.setColor(i === this.selected ? PALETTE.ink : PALETTE.shadow);
     });
     this.hintText.setText(this.rows[this.selected].hint?.() ?? '');
   }

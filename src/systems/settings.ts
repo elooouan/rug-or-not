@@ -1,3 +1,4 @@
+import { THEME_IDS, type ThemeId } from '@/config/palette';
 export const WEATHERS = ['rain', 'storm', 'snow', 'clear', 'fog'] as const;
 export type Weather = (typeof WEATHERS)[number];
 export const WEATHER_LABEL: Record<Weather, string> = {
@@ -23,6 +24,8 @@ export interface Settings {
   quips: boolean;
   /** Detective's honour: no nudges, no counters, no hover highlights, x1.25 score. */
   hardMode: boolean;
+  /** Office colours (see config/palette THEMES). */
+  theme: ThemeId;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -37,6 +40,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hints: true,
   quips: true,
   hardMode: false,
+  theme: 'noir',
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -65,5 +69,8 @@ export function sanitizeSettings(raw: unknown): Settings {
     hints: bool(r.hints, DEFAULT_SETTINGS.hints),
     quips: bool(r.quips, DEFAULT_SETTINGS.quips),
     hardMode: bool(r.hardMode, DEFAULT_SETTINGS.hardMode),
+    theme: (THEME_IDS as readonly string[]).includes(r.theme as string)
+      ? (r.theme as ThemeId)
+      : DEFAULT_SETTINGS.theme,
   };
 }

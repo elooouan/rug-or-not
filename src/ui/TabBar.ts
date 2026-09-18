@@ -5,7 +5,7 @@ import type { CaseDocument } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { makeText } from './text';
 import { rect } from './shapes';
-import { HEX } from '@/config/palette';
+import { HEX, PALETTE } from '@/config/palette';
 
 const SHORT: Record<CaseDocument['type'], string> = {
   contract: 'Code',
@@ -72,7 +72,7 @@ export class TabBar extends Phaser.GameObjects.Container {
     this.tabs[i]?.dot.setVisible(false);
     this.tabs.forEach((t, idx) => {
       t.bg.setTexture(idx === i ? TEX.tabActive : TEX.tab).setY(0);
-      t.label.setColor(idx === i ? '#2b2530' : '#6b5140');
+      t.label.setColor(idx === i ? PALETTE.shadow : PALETTE.woodMid);
       t.label.setY(idx === i ? 4 : 5);
     });
   }

@@ -33,6 +33,7 @@ import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
 import { markDiscovered, pendingDiscovery, unlocked, type Feature } from '@/systems/discovery';
+import { syncTheme } from '@/systems/theme';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 
@@ -170,6 +171,8 @@ export class TitleScene extends Phaser.Scene {
 
   create(): void {
     setupScene(this);
+    // A theme picked mid-file applies here, before the desk is drawn.
+    syncTheme(this);
     const desk = new DeskBackground(this, { props: true, stamps: true });
     const save = saveStore.get();
     const reduced = save.settings.reducedMotion;
