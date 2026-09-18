@@ -161,4 +161,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Five pages that all hide the same flag, printed on demand from the notebook. Practice, with a clock.',
   },
+  {
+    file: '21-v06-tram',
+    version: 'v0.6',
+    date: '2026-09-18',
+    title: 'Night tram',
+    caption:
+      'Case fifteen: honest code behind a proxy, two wallets passing the same bag back and forth. New tells, same desk.',
+  },
 ];
