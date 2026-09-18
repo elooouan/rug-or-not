@@ -349,7 +349,7 @@ export class ReportScene extends Phaser.Scene {
     this.children.remove(outside);
     c.add(outside);
     const w = 96;
-    const h = 52;
+    const h = 74;
     const px = bx - 20;
     const py = by - h - 6;
     c.add(this.add.rectangle(px + 3, py + 4, w, h, HEX.bg, 0.5).setOrigin(0));
@@ -372,6 +372,16 @@ export class ReportScene extends Phaser.Scene {
     };
     mk('Copy text', py + 5, () => this.share());
     mk('Save card', py + 27, () => this.saveCard());
+    mk('Post on X', py + 49, () => {
+      const lines = this.shareLines();
+      const url = lines.find((l) => l.startsWith('http')) ?? '';
+      const text = lines.filter((l) => l !== url).join('\n');
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+        '_blank',
+        'noopener',
+      );
+    });
     this.sharePopover = c;
   }
 
@@ -413,12 +423,13 @@ export class ReportScene extends Phaser.Scene {
   }
 
   /** Wordle-style result text for the clipboard (falls back to a note you can read). */
-  private share(): void {
+  /** The result as text, for the clipboard, the share sheet and the X intent. */
+  private shareLines(): string[] {
     const { caseData: c, verdict, breakdown: b } = this.payload;
     const flags = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
     const isDaily = gameState.mode === 'daily';
     const save = saveStore.get();
-    const lines = [
+    return [
       `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? `Cold case ${c.ticker}` : `Case: ${c.ticker}`} "${c.title}"`,
       `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts${this.payload.elapsedSec === null ? '' : `  in ${Math.floor(this.payload.elapsedSec / 60)}:${String(this.payload.elapsedSec % 60).padStart(2, '0')}`}`,
       c.verdict === 'rug'
@@ -428,7 +439,10 @@ export class ReportScene extends Phaser.Scene {
       `${location.origin}${location.pathname}#${isDaily ? 'daily' : gameState.mode === 'cold' ? `cold=${gameState.coldSeed ?? ''}` : `case=${c.id}`}`,
       '#RugOrNot',
     ].filter(Boolean);
-    const text = lines.join('\n');
+  }
+
+  private share(): void {
+    const text = this.shareLines().join('\n');
     void shareText(text).then((how) => {
       if (how === 'shared') toast(this, 'SHARED', 'off it goes');
       else if (how === 'copied') toast(this, 'COPIED', 'result on the clipboard');
