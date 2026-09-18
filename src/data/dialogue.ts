@@ -63,6 +63,8 @@ export const DOC_TIPS: Record<string, string> = {
 
 /** What changed, in Lucien's words, for players coming back after an update. */
 export const WHATS_NEW: Record<string, string> = {
+  'v0.7':
+    'New tonight: a wallet chip on the desk (read-only; the phone explains), a streak freeze every seventh night, clouds over the moon. The safe has the rest.',
   'v0.6':
     'New on the desk: the pile (cold cases that never run out), drills in the notebook, a weekly file. The safe has the details.',
 };

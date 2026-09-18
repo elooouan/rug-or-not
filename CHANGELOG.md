@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.7 — night shift (unreleased)
+## v0.7 — night shift
 
 - Wallet: a "Connect wallet" chip on the title (it opens the coin page on the phone), silent
   reconnect for a wallet you linked before, plain messages for cancelled or locked wallets,

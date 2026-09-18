@@ -61,7 +61,7 @@ export const RUSH = {
 } as const;
 
 /** Shown on the title and the About page; bump with CHANGELOG.md. */
-export const GAME_VERSION = 'v0.6';
+export const GAME_VERSION = 'v0.7';
 
 export const SAVE_KEY = 'rug-or-not:save:v1';
 export const SAVE_VERSION = 1;
