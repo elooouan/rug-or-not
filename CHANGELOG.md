@@ -38,7 +38,7 @@
   and $LNTRN (a loud, fee-charging festival token that is entirely fine). The drawer is three
   rows deep.
 - Rush plays the loop faster, has a Share button and a `#rush` deep link; the daily button
-  counts down to tomorrow's case; notebook flag pages remember how often you missed them.
+  counts down to tomorrow's case; notebook flag pages keep your record (pinned vs missed) for each flag.
 - A fly visits the lamp now and then (swat it); shooting stars on clear nights (catch one);
   more typed words on the title screen.
 - The coin page accepts any injected Solana wallet with Phantom's connect shape (Solflare,

@@ -287,12 +287,13 @@ export class NotebookScene extends Phaser.Scene {
       add('How to spot it', { size: FONT.size.tiny, color: 'paperShadow' });
       wrapMono(flag.howToSpot, maxChars).forEach((l) => add(l, { font: 'body', color: 'ink' }));
       const misses = saveStore.get().stats.flagMisses[id] ?? 0;
-      if (misses > 0) {
+      const hits = saveStore.get().stats.flagHits[id] ?? 0;
+      if (misses + hits > 0) {
         y += 6;
-        add(`You have missed this one ${misses === 1 ? 'once' : `${misses} times`}.`, {
-          font: 'body',
-          color: 'stampRed',
-        });
+        add(
+          `Your record: pinned ${hits}, missed ${misses}${misses > hits ? '. Look harder.' : '.'}`,
+          { font: 'body', color: misses > hits ? 'stampRed' : 'stampGreen' },
+        );
       }
       // Drill: five generated pages that all hide this flag. Not from an overlay,
       // where it would abandon the case underneath.

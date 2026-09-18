@@ -569,6 +569,10 @@ export class InvestigationScene extends Phaser.Scene {
         if (isFlagClue(m.clue))
           d.stats.flagMisses[m.clue.flagId] = (d.stats.flagMisses[m.clue.flagId] ?? 0) + 1;
       }
+      for (const f of breakdown.flagsFound) {
+        if (isFlagClue(f.clue))
+          d.stats.flagHits[f.clue.flagId] = (d.stats.flagHits[f.clue.flagId] ?? 0) + 1;
+      }
     });
 
     // Badges (toasts are shown by the report scene).

@@ -49,8 +49,9 @@ export interface SaveData {
     pagesSeen: string[];
     runs: number;
     correct: number;
-    /** How often each red flag was missed, for the personal record page. */
+    /** How often each red flag was missed / found, for the record and the notebook. */
     flagMisses: Record<string, number>;
+    flagHits: Record<string, number>;
     /** Red Flag Rush. */
     rushRuns: number;
     rushBest: number;
@@ -101,6 +102,7 @@ export function defaultSave(): SaveData {
       runs: 0,
       correct: 0,
       flagMisses: {},
+      flagHits: {},
       rushRuns: 0,
       rushBest: 0,
       rushBestStreak: 0,
@@ -159,6 +161,12 @@ export function sanitizeSave(raw: unknown): SaveData {
       typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
     const strs = (v: unknown) =>
       Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+    const counts = (v: unknown): Record<string, number> =>
+      Object.fromEntries(
+        Object.entries((v as Record<string, unknown>) ?? {}).filter(
+          (e): e is [string, number] => typeof e[1] === 'number',
+        ),
+      );
     d.stats = {
       sips: num(st.sips),
       pets: num(st.pets),
@@ -169,11 +177,8 @@ export function sanitizeSave(raw: unknown): SaveData {
       pagesSeen: strs(st.pagesSeen),
       runs: num(st.runs),
       correct: num(st.correct),
-      flagMisses: Object.fromEntries(
-        Object.entries((st.flagMisses as Record<string, unknown>) ?? {}).filter(
-          (e): e is [string, number] => typeof e[1] === 'number',
-        ),
-      ),
+      flagMisses: counts(st.flagMisses),
+      flagHits: counts(st.flagHits),
       rushRuns: num(st.rushRuns),
       rushBest: num(st.rushBest),
       rushBestStreak: num(st.rushBestStreak),
