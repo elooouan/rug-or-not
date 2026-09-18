@@ -291,8 +291,11 @@ export class ReportScene extends Phaser.Scene {
     L.push({
       text: `Verdict ${fmt(b.verdictPoints)}   Flags ${fmt(b.flagPoints)}   Penalties ${fmt(b.penaltyPoints)}${b.hintPoints ? `   Hints ${fmt(b.hintPoints)}` : ''}   Time ${fmt(b.timeBonus)}`,
     });
+    const el = this.payload.elapsedSec;
+    const clock =
+      el === null ? '' : `   closed in ${Math.floor(el / 60)}:${String(el % 60).padStart(2, '0')}`;
     L.push({
-      text: `TOTAL ${b.total} / ${b.maxPossible}${b.multiplier !== 1 ? `   (honour x${b.multiplier})` : ''}${bestImproved ? '   new best!' : ''}`,
+      text: `TOTAL ${b.total} / ${b.maxPossible}${b.multiplier !== 1 ? `   (honour x${b.multiplier})` : ''}${clock}${bestImproved ? '   new best!' : ''}`,
       font: 'ui',
       size: 12,
       color: 'shadow',
@@ -416,7 +419,7 @@ export class ReportScene extends Phaser.Scene {
     const save = saveStore.get();
     const lines = [
       `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? `Cold case ${c.ticker}` : `Case: ${c.ticker}`} "${c.title}"`,
-      `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts`,
+      `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts${this.payload.elapsedSec === null ? '' : `  in ${Math.floor(this.payload.elapsedSec / 60)}:${String(this.payload.elapsedSec % 60).padStart(2, '0')}`}`,
       c.verdict === 'rug'
         ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`
         : `Yellow herrings pinned: ${b.falseAccusations.length}`,

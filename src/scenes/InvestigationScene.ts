@@ -55,6 +55,8 @@ export interface ReportPayload {
   rankUp: string | null;
   /** The rogue who just got a WANTED poster (first correct RUG verdict on this case). */
   caughtName: string | null;
+  /** Seconds spent on the file, or null in relaxed mode. */
+  elapsedSec: number | null;
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -626,6 +628,7 @@ export class InvestigationScene extends Phaser.Scene {
           ? rankForScore(saveStore.get().totalScore)
           : null,
       caughtName,
+      elapsedSec: relaxed || !this.clock ? null : c.timeLimitSec - this.clock.timeLeft,
     };
     this.scene.start('ReportScene', payload);
   }
