@@ -28,7 +28,8 @@ export type ScriptId =
   | 'wallet'
   | 'leaderboard'
   | 'konami'
-  | 'all-cases';
+  | 'all-cases'
+  | 'wall';
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -136,6 +137,11 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   konami: [
     { text: 'A cheat code? In my office? Cute. No points for you, but here is some confetti.' },
+  ],
+  wall: [
+    {
+      text: 'Every case leaves a photo on the wall. This one is ours: how the office came together, night by night.',
+    },
   ],
   'all-cases': [
     {

@@ -8,7 +8,7 @@ import { claimHint } from '@/systems/hints';
 import { saveStore } from '@/systems/save';
 import { rect } from './shapes';
 import { makeText } from './text';
-import { markEscConsumed } from './escGuard';
+import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 
 export const LUCIEN_TEX = 'lucien';
 export const LUCIEN_FACE_TEX = 'lucien-face';
@@ -39,7 +39,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   private waiting = false;
   private conditions: Conditions;
   private onDone?: () => void;
-  private keys: Phaser.Input.Keyboard.Key[] = [];
+  private keyBindings: { key: Phaser.Input.Keyboard.Key; fn: () => void }[] = [];
   private finished = false;
 
   constructor(scene: Phaser.Scene, lines: DialogueLine[], opts: DialogueOpts = {}) {
@@ -121,10 +121,12 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     );
     const kb = scene.input.keyboard;
     if (kb) {
+      // Keys are shared per scene (addKey returns the same object), so we only
+      // ever add and remove our own listeners, never destroy the Key.
       const bind = (code: number, fn: () => void) => {
-        const k = kb.addKey(code, false);
-        k.on('down', fn);
-        this.keys.push(k);
+        const key = kb.addKey(code, false);
+        key.on('down', fn);
+        this.keyBindings.push({ key, fn });
       };
       bind(Phaser.Input.Keyboard.KeyCodes.ENTER, () => this.advance());
       bind(Phaser.Input.Keyboard.KeyCodes.SPACE, () => this.advance());
@@ -147,6 +149,9 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       this.setY(40).setAlpha(0);
       scene.tweens.add({ targets: this, y: 0, alpha: 1, duration: 260, ease: 'Back.easeOut' });
     }
+    pushOverlay();
+    // A scene shutdown can destroy us without finish(); keep the overlay count honest.
+    this.once(Phaser.GameObjects.Events.DESTROY, () => this.releaseOverlay());
     audio.play('slide');
     scene.events.emit('dialogue:open');
     this.nextLine();
@@ -256,11 +261,20 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.arrow.setVisible(Math.floor(this.scene.time.now / 400) % 2 === 0);
   }
 
+  private overlayHeld = true;
+
+  private releaseOverlay(): void {
+    if (!this.overlayHeld) return;
+    this.overlayHeld = false;
+    popOverlay();
+  }
+
   finish(): void {
     if (this.finished) return;
     this.finished = true;
-    this.keys.forEach((k) => this.scene.input.keyboard?.removeKey(k, true));
-    this.keys = [];
+    this.releaseOverlay();
+    this.keyBindings.forEach(({ key, fn }) => key.off('down', fn));
+    this.keyBindings = [];
     const done = () => {
       const scene = this.scene;
       this.destroy();

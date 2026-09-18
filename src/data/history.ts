@@ -1,0 +1,103 @@
+/**
+ * The game's own case file: one photo per notable build, pinned to the wall
+ * behind the corkboard polaroid. Photos live in public/img/history/ and are
+ * taken with scripts/photograph.sh (see README, "Photographing the game").
+ * Add a frame here whenever the game changes enough to deserve one.
+ */
+export interface HistoryFrame {
+  /** File name without extension, in public/img/history/. */
+  file: string;
+  version: string;
+  date: string;
+  title: string;
+  caption: string;
+}
+
+export const HISTORY: HistoryFrame[] = [
+  {
+    file: '01-v01-title',
+    version: 'v0.1',
+    date: '2026-09-17',
+    title: 'Night one',
+    caption: 'A desk, a lamp, a title card. Pixel text, one folder, no cat yet.',
+  },
+  {
+    file: '02-v01-lens',
+    version: 'v0.1',
+    date: '2026-09-17',
+    title: 'The lens',
+    caption:
+      'A second camera zoomed 2x and masked to a circle. Fine print hides from the main one.',
+  },
+  {
+    file: '03-v02-cases',
+    version: 'v0.2',
+    date: '2026-09-17',
+    title: 'Ten files',
+    caption: 'The filing cabinet: ten cases, grades on the tabs, padlocks on the rest.',
+  },
+  {
+    file: '04-v02-report',
+    version: 'v0.2',
+    date: '2026-09-17',
+    title: 'The report',
+    caption: 'Typed-out verdicts: what you caught, what you missed, and why it mattered.',
+  },
+  {
+    file: '05-v03-window',
+    version: 'v0.3',
+    date: '2026-09-17',
+    title: 'Readable',
+    caption:
+      'Text rendered at 3x on top of the pixels, a city outside, a cat on the sill, fullscreen.',
+  },
+  {
+    file: '06-v03-lucien',
+    version: 'v0.3',
+    date: '2026-09-17',
+    title: 'Enter Lucien',
+    caption: 'Detective Lucien starts talking. Once per lesson, unless you poke him.',
+  },
+  {
+    file: '07-v04-weather',
+    version: 'v0.4',
+    date: '2026-09-17',
+    title: 'Weather',
+    caption: 'Snow, fog, storms on demand, and the corkboard starts handing out advice.',
+  },
+  {
+    file: '08-v04-netscope',
+    version: 'v0.4',
+    date: '2026-09-17',
+    title: 'NetScope',
+    caption: 'A phone on the desk runs a browser: explorer pages, the coin, the board, the news.',
+  },
+  {
+    file: '09-v04-badges',
+    version: 'v0.4',
+    date: '2026-09-17',
+    title: 'Badges',
+    caption: 'Twenty of them, some secret. The lamp has feelings after ten clicks.',
+  },
+  {
+    file: '10-v04-drawer',
+    version: 'v0.4',
+    date: '2026-09-17',
+    title: 'Twelve files',
+    caption: 'Two bonus cases, a goose and a library. The drawer goes six wide.',
+  },
+  {
+    file: '11-v04-notebook',
+    version: 'v0.4',
+    date: '2026-09-17',
+    title: 'Two chapters',
+    caption: 'Red flags on the left page, yellow herrings on the right. Report lines link to them.',
+  },
+  {
+    file: '12-v04-now',
+    version: 'v0.4',
+    date: '2026-09-18',
+    title: 'Tonight',
+    caption: 'Ask Lucien, share your results, hard mode, and the wall you are looking at.',
+  },
+];

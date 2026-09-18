@@ -155,6 +155,24 @@ npm run validate-cases
 Invalid files are also reported in the browser console at boot and skipped, so a broken
 case never crashes the game.
 
+## The wall (how the game evolved)
+
+There is a polaroid pinned to the corkboard. Click it (or NetScope > Home > The wall) for
+the evidence wall: one photo per notable build, joined by red string, each clickable for a
+closer look and a caption. Frames are listed in `src/data/history.ts`; photos live in
+`public/img/history/` (480×270 JPEG).
+
+To photograph a build for the wall:
+
+```bash
+scripts/photograph.sh <commit-or-HEAD> [scratch-dir]   # serves that checkout on :5180
+```
+
+then in the browser console on http://localhost:5180 drive the game to the screen you want
+and run `__debug.snapshot('13-v05-something')`. The dev server writes the file straight into
+`public/img/history/`; add an entry to `HISTORY` with a version, date, title and caption.
+(Without the snapshot server, `__debug.snapshot` downloads the JPEG instead.)
+
 ## Adding Lucien lines, tips, news, badges
 
 - Dialogue scripts: `src/data/dialogue.ts` (`LUCIEN`, keyed by `ScriptId`; lines with

@@ -9,7 +9,9 @@ import { InvestigationScene } from '@/scenes/InvestigationScene';
 import { ReportScene } from '@/scenes/ReportScene';
 import { NotebookScene } from '@/scenes/NotebookScene';
 import { SettingsScene } from '@/scenes/SettingsScene';
+import { HistoryScene } from '@/scenes/HistoryScene';
 import { audio } from '@/systems/audio';
+import { overlayDepth } from '@/ui/escGuard';
 import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
@@ -40,6 +42,7 @@ const game = new Phaser.Game({
     ReportScene,
     NotebookScene,
     SettingsScene,
+    HistoryScene,
   ],
 });
 
@@ -71,6 +74,8 @@ if (import.meta.env.DEV) {
       startCase(id: string): void;
       audioLevels(): Promise<Record<string, number>>;
       musicLevel(): Promise<{ peak: number; rms: number }>;
+      overlays(): number;
+      snapshot(name: string): Promise<string>;
     };
   };
   w.__game = game;
@@ -146,6 +151,43 @@ if (import.meta.env.DEV) {
         peak: Math.round(peak * 1000) / 1000,
         rms: Math.round(Math.sqrt(sum / d.length) * 1000) / 1000,
       };
+    },
+    overlays: () => overlayDepth(),
+    /**
+     * Photograph the current frame at 480x270 for the history wall. With the
+     * snapshot dev server (scripts/photograph.sh) it saves straight into
+     * public/img/history/; otherwise it downloads the JPEG.
+     */
+    async snapshot(name: string): Promise<string> {
+      const src = await new Promise<string>((resolve) =>
+        game.renderer.snapshot((img) => resolve((img as HTMLImageElement).src)),
+      );
+      const im = new Image();
+      im.src = src;
+      await new Promise((r) => (im.onload = r));
+      const c = document.createElement('canvas');
+      c.width = 480;
+      c.height = 270;
+      const ctx = c.getContext('2d') as CanvasRenderingContext2D;
+      ctx.imageSmoothingEnabled = im.width > 640;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(im, 0, 0, 480, 270);
+      const dataUrl = c.toDataURL('image/jpeg', 0.88);
+      try {
+        const res = await fetch('/__snapshot', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name, dataUrl }),
+        });
+        if (res.ok) return await res.text();
+      } catch {
+        /* no snapshot server: fall through to a download */
+      }
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `${name}.jpg`;
+      a.click();
+      return 'downloaded';
     },
     startCase(id: string) {
       const c = caseById(id);

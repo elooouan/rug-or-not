@@ -3,6 +3,7 @@ import { UI } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { makeText } from './text';
+import { escTaken } from './escGuard';
 import { rect } from '@/ui/shapes';
 
 export interface ButtonOpts {
@@ -70,13 +71,17 @@ export class PixelButton extends Phaser.GameObjects.Container {
     });
     if (opts.hotkey) {
       const k = scene.input.keyboard?.addKey(opts.hotkey);
-      k?.on('down', () => {
+      const onKey = () => {
+        // An overlay (dialogue, browser) that just ate Esc shouldn't also trigger Back.
+        if (opts.hotkey === 'ESC' && escTaken()) return;
         if (!this.disabled && this.active && this.visible) {
           audio.play('ui');
           onClick();
         }
-      });
-      this.once('destroy', () => k?.destroy());
+      };
+      k?.on('down', onKey);
+      // Keys are shared per scene: detach our listener, don't destroy the Key.
+      this.once('destroy', () => k?.off('down', onKey));
     }
     if (opts.disabled) this.setDisabled(true);
     scene.add.existing(this);

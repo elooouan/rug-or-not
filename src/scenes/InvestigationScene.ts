@@ -15,7 +15,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 import { LucienBubble } from '@/ui/LucienBubble';
-import { escConsumedRecently } from '@/ui/escGuard';
+import { escTaken } from '@/ui/escGuard';
 import { LUCIEN_FACE_TEX } from '@/ui/DialogueBox';
 import { SCORING } from '@/config/gameConfig';
 import { FONT } from '@/config/layout';
@@ -624,7 +624,7 @@ export class InvestigationScene extends Phaser.Scene {
     if (!kb) return;
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
-    on('ESC', () => noDialogue() && !this.browsing && !escConsumedRecently() && this.togglePause());
+    on('ESC', () => noDialogue() && !this.browsing && !escTaken() && this.togglePause());
     const inPlay = () => this.phase === 'investigating' && !this.paused && !this.browsing;
     const noDialogue = () => !this.dialogue?.isActive;
     on(

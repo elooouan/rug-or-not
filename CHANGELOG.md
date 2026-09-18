@@ -5,6 +5,11 @@
 - Notebook chapters (red flags + yellow herrings); report lines link to notebook pages.
 - Per-case Lucien intros, distant sirens, music fade-in, denser snow.
 - Export / import progress as a save code.
+- The wall: a polaroid on the corkboard opens the game's own history as an evidence board
+  (photos of every notable build joined by red string); `scripts/photograph.sh` +
+  `__debug.snapshot()` add new frames.
+- Fixed: closing an overlay with Esc no longer closes the screen behind it; shared keys are
+  no longer destroyed by the dialogue box / browser.
 
 - Detective Lucien: Pokémon-style dialogue, first-run tutorial, corner quips, report reviews,
   paid nudges ("Ask Lucien"), title-screen pokes.

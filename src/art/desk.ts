@@ -319,11 +319,27 @@ export function makeCorkboard(scene: Phaser.Scene): void {
     };
     note(10, 10, 28, 24, 'stampRed');
     note(46, 14, 22, 20, 'ink');
-    note(78, 8, 32, 28, 'stampRed');
+    // A polaroid of the office: click it for the history wall.
+    const px = 80;
+    const py = 9;
+    g.fillStyle(HEX.shadow, 0.4);
+    g.fillRect(px + 1, py + 2, 30, 30);
+    g.fillStyle(HEX.paper, 1);
+    g.fillRect(px, py, 30, 30);
+    g.fillStyle(HEX.woodMid, 1);
+    g.fillRect(px + 3, py + 3, 24, 19);
+    g.fillStyle(HEX.woodDark, 1);
+    g.fillRect(px + 3, py + 15, 24, 7);
+    g.fillStyle(HEX.amber, 1);
+    g.fillRect(px + 6, py + 5, 5, 3);
+    g.fillStyle(HEX.paper, 1);
+    g.fillRect(px + 12, py + 11, 8, 6);
+    g.fillStyle(HEX.stampRed, 1);
+    g.fillRect(px + 14, py - 1, 3, 3);
     // String between pins (red thread, classic corkboard).
     g.lineStyle(1, HEX.stampRed, 1);
     g.lineBetween(24, 10, 57, 14);
-    g.lineBetween(57, 14, 94, 8);
+    g.lineBetween(57, 14, px + 15, py);
   });
 }
 
@@ -347,6 +363,30 @@ export function makeClock(scene: Phaser.Scene): void {
     }
     g.fillStyle(HEX.amber, 1);
     g.fillRect(14, 0, 2, 3);
+  });
+}
+
+/** A full-screen cork texture for the evidence wall. */
+export function makeCork(scene: Phaser.Scene): void {
+  makeGraphicsTexture(scene, TEX.cork, GAME_WIDTH, GAME_HEIGHT, (g) => {
+    const rng = makeRng('big-cork');
+    g.fillStyle(HEX.woodDark, 1);
+    g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    g.fillStyle(HEX.woodLight, 1);
+    g.fillRect(6, 6, GAME_WIDTH - 12, GAME_HEIGHT - 12);
+    g.fillStyle(HEX.woodMid, 1);
+    for (let i = 0; i < 5200; i++)
+      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, GAME_HEIGHT - 8), 1, 1);
+    g.fillStyle(HEX.paperShadow, 0.35);
+    for (let i = 0; i < 900; i++)
+      g.fillRect(rng.int(7, GAME_WIDTH - 8), rng.int(7, GAME_HEIGHT - 8), 1, 1);
+    // Frame bevel.
+    g.fillStyle(HEX.paperShadow, 0.5);
+    g.fillRect(6, 6, GAME_WIDTH - 12, 1);
+    g.fillRect(6, 6, 1, GAME_HEIGHT - 12);
+    g.fillStyle(HEX.bg, 0.5);
+    g.fillRect(6, GAME_HEIGHT - 7, GAME_WIDTH - 12, 1);
+    g.fillRect(GAME_WIDTH - 7, 6, 1, GAME_HEIGHT - 12);
   });
 }
 

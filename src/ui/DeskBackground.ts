@@ -113,6 +113,22 @@ export class DeskBackground {
       .image(DESK.corkboard.x, DESK.corkboard.y, TEX.corkboard)
       .setOrigin(0)
       .setDepth(DEPTH.windowRain);
+    // The polaroid at the board's right end opens the history wall.
+    const polaroid = scene.add
+      .zone(DESK.corkboard.x + 78, DESK.corkboard.y + 8, 34, 32)
+      .setOrigin(0)
+      .setDepth(DEPTH.deskProps)
+      .setInteractive({ useHandCursor: false });
+    polaroid.on('pointerover', () => audio.play('hover'));
+    polaroid.on(
+      'pointerdown',
+      (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+        ev.stopPropagation();
+        audio.play('paper');
+        scene.scene.launch('HistoryScene', { returnTo: scene.scene.key });
+        scene.scene.pause();
+      },
+    );
     cork.setInteractive({ useHandCursor: false });
     cork.on('pointerdown', () => {
       this.note?.destroy();

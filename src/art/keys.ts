@@ -47,6 +47,7 @@ export const TEX = {
   phone: 'desk-phone',
   phoneGlow: 'desk-phone-glow',
   drawer: 'cabinet-drawer',
+  cork: 'wall-cork',
   button: 'ui-button',
   buttonHover: 'ui-button-hover',
 } as const;

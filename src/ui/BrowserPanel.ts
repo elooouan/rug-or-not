@@ -23,7 +23,7 @@ import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
-import { markEscConsumed } from './escGuard';
+import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 
 type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | '404';
 const ALL_PAGES: PageId[] = ['home', 'rugscan', 'coin', 'board', 'news', 'help', 'badges', '404'];
@@ -112,7 +112,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   private contentHeight = 0;
   private viewH: number;
   private unsubscribeWallet?: () => void;
-  private keys: Phaser.Input.Keyboard.Key[] = [];
+  private escBinding?: { key: Phaser.Input.Keyboard.Key; fn: () => void };
   private static openPanel: BrowserPanel | null = null;
   /** What the RugScan page shows: the current case, the token index, or a chosen token. */
   rugscanView: 'auto' | 'index' | CaseData = 'auto';
@@ -202,18 +202,21 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
 
     this.setDepth(DEPTH.overlay);
     scene.add.existing(this);
+    pushOverlay();
+    this.once(Phaser.GameObjects.Events.DESTROY, () => this.releaseOverlay());
     scene.events.emit('browser:open');
     audio.play('click');
 
     scene.input.on('wheel', this.onWheel, this);
     const kb = scene.input.keyboard;
     if (kb) {
-      const esc = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
-      esc.on('down', () => {
+      const key = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
+      const fn = () => {
         markEscConsumed();
         this.close();
-      });
-      this.keys.push(esc);
+      };
+      key.on('down', fn);
+      this.escBinding = { key, fn };
     }
     this.unsubscribeWallet = wallet.onChange(() => this.page === 'coin' && this.render());
 
@@ -263,13 +266,22 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     this.contentHeight = ctx.y;
   }
 
+  private overlayHeld = true;
+
+  private releaseOverlay(): void {
+    if (!this.overlayHeld) return;
+    this.overlayHeld = false;
+    popOverlay();
+  }
+
   close(): void {
     if (!this.scene) return;
     const scene = this.scene;
     scene.input.off('wheel', this.onWheel, this);
-    this.keys.forEach((k) => scene.input.keyboard?.removeKey(k, true));
+    this.escBinding?.key.off('down', this.escBinding.fn);
     this.unsubscribeWallet?.();
     if (BrowserPanel.openPanel === this) BrowserPanel.openPanel = null;
+    this.releaseOverlay();
     scene.events.emit('browser:close');
     audio.play('click');
     this.destroy();
@@ -289,6 +301,16 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button('Leaderboard', () => ctx.panel.go('board'));
     ctx.button('The news', () => ctx.panel.go('news'));
     ctx.button('Help', () => ctx.panel.go('help'));
+    ctx.button(
+      'The wall (how this game was built)',
+      () => {
+        const scene = ctx.scene;
+        ctx.panel.close();
+        scene.scene.launch('HistoryScene', { returnTo: scene.scene.key });
+        scene.scene.pause();
+      },
+      { variant: 'paper' },
+    );
     ctx.gap();
     ctx.small('tip: click the lost page link if you enjoy 404s');
     ctx.button('nowhere.example', () => ctx.panel.go('404'), { variant: 'paper' });

@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import {
   DEFAULT_WOOD,
   makeClock,
+  makeCork,
   makeCorkboard,
   makeDrawer,
   makeFolders,
@@ -39,6 +40,7 @@ export function generateAllTextures(scene: Phaser.Scene): void {
   makePhone(scene);
   makeClock(scene);
   makeDrawer(scene);
+  makeCork(scene);
   makePaper(scene);
   makeMagnifier(scene, DEFAULT_RIM);
   makeIcons(scene);

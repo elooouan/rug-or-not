@@ -137,6 +137,23 @@ export const DRAWER = {
   gapY: 40,
 } as const;
 
+/** The evidence wall (history storyboard). */
+export const WALL = {
+  cols: 4,
+  thumbW: 112,
+  thumbH: 63,
+  frame: 4,
+  frameBottom: 16,
+  x0: 46,
+  y0: 30,
+  dx: 150,
+  dy: 96,
+  /** Odd rows shift right so the string zig-zags. */
+  stagger: 18,
+  bigW: 400,
+  bigH: 225,
+} as const;
+
 export const BROWSER = {
   x: 80,
   y: 24,

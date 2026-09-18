@@ -70,6 +70,12 @@ export const BADGES: Badge[] = [
     description: 'Connect a wallet that holds the coin.',
     secret: true,
   },
+  {
+    id: 'historian',
+    name: 'Historian',
+    description: 'Find the photo on the corkboard.',
+    secret: true,
+  },
 ];
 
 export const BADGE_BY_ID: Record<string, Badge> = Object.fromEntries(BADGES.map((b) => [b.id, b]));
