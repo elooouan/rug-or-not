@@ -107,4 +107,11 @@ export const HISTORY: HistoryFrame[] = [
     title: 'The wall',
     caption: 'A photo of the wall, on the wall. The Historian badge for finding the polaroid.',
   },
+  {
+    file: '14-v04-safe',
+    version: 'v0.4',
+    date: '2026-09-18',
+    title: 'The safe',
+    caption: 'A floor safe with a three-dial lock. The combination is in the notebook. Inside: the ledger.',
+  },
 ];

@@ -401,11 +401,12 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   private onPinToggle(clue: Clue, pinned: boolean): void {
-    if (pinned) this.suspicions.push({ id: clue.id, label: clue.label });
-    if (pinned && this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.');
-    if (pinned && this.suspicions.length >= 7)
-      this.mutter('many-pins', 'Pinning everything is not a strategy. Some of that is fine.');
-    else this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
+    if (pinned) {
+      this.suspicions.push({ id: clue.id, label: clue.label });
+      if (this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.');
+      if (this.suspicions.length >= 7)
+        this.mutter('many-pins', 'Pinning everything is not a strategy. Some of that is fine.');
+    } else this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
     this.refreshNotebook();
   }
 
