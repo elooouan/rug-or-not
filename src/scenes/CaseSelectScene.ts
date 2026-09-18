@@ -47,7 +47,7 @@ export class CaseSelectScene extends Phaser.Scene {
       this,
       GAME_WIDTH / 2,
       GAME_HEIGHT - 26,
-      `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed`,
+      `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed  ·  P: the pile  W: weekly`,
       {
         size: FONT.size.small,
         color: 'paperShadow',
@@ -92,6 +92,15 @@ export class CaseSelectScene extends Phaser.Scene {
     kb?.on('keydown-UP', () => this.moveFocus(-DRAWER.cols));
     kb?.on('keydown-TAB', () => this.moveFocus(1));
     kb?.on('keydown-ENTER', () => this.open(this.focus));
+    // The two folders at the end of the drawer, for keyboard players.
+    kb?.on('keydown-P', () => {
+      audio.play('paper');
+      startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
+    });
+    kb?.on('keydown-W', () => {
+      audio.play('paper');
+      startColdCase(this, `week-${weekKey()}`);
+    });
     this.focus = Math.max(0, this.unlocked.lastIndexOf(true));
     this.refreshFocus();
     lucienSays(this, 'case-files');
