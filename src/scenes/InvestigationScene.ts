@@ -88,6 +88,7 @@ export class InvestigationScene extends Phaser.Scene {
   private said = new Set<string>();
   private hintsUsed = 0;
   private askLabel?: Phaser.GameObjects.Text;
+  private idleMs = 0;
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -793,5 +794,11 @@ export class InvestigationScene extends Phaser.Scene {
     // The lens only lives while the paper is in play: not under the pause dim, the phone,
     // or the stamp animation (suspend() would be undone a frame later otherwise).
     if (this.phase === 'investigating' && !this.paused && !this.browsing) this.magnifier.update();
+    // A rookie staring at the first page for a while gets a nudge toward the lens.
+    if (this.phase === 'investigating' && !this.paused && this.examined.size === 0) {
+      this.idleMs += delta;
+      if (this.idleMs > 30000)
+        this.mutter('idle', 'Move the lens over the paper. Reading is the whole job.', true);
+    } else this.idleMs = 0;
   }
 }
