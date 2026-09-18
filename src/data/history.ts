@@ -139,7 +139,7 @@ export const HISTORY: HistoryFrame[] = [
   },
   {
     file: '18-v05-noname',
-    version: 'v0.5',
+    version: 'v0.6',
     date: '2026-09-18',
     title: 'No name',
     caption:
@@ -147,7 +147,7 @@ export const HISTORY: HistoryFrame[] = [
   },
   {
     file: '19-v05-cold',
-    version: 'v0.5',
+    version: 'v0.6',
     date: '2026-09-18',
     title: 'The pile',
     caption:
@@ -155,7 +155,7 @@ export const HISTORY: HistoryFrame[] = [
   },
   {
     file: '20-v05-drill',
-    version: 'v0.5',
+    version: 'v0.6',
     date: '2026-09-18',
     title: 'Drill',
     caption:
