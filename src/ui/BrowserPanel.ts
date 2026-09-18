@@ -5,7 +5,7 @@ import { BROWSER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { shortAddress, TOKEN } from '@/config/token';
 import { GAME_VERSION } from '@/config/gameConfig';
-import { NEWS } from '@/data/news';
+import { LATE_NEWS, NEWS } from '@/data/news';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
@@ -718,7 +718,9 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   news(ctx) {
     ctx.heading('The Ledger - Late Edition', 'ink');
     const rng = makeRng(new Date().toDateString());
-    const picks = [...NEWS].sort(() => rng.next() - 0.5).slice(0, 6);
+    const seen = new Set(saveStore.get().seenHints);
+    const late = LATE_NEWS.filter((n) => seen.has(n.after)).map((n) => n.headline);
+    const picks = [...late, ...[...NEWS].sort(() => rng.next() - 0.5)].slice(0, 6);
     for (const h of picks) {
       const t = makeText(ctx.scene, 0, ctx.y, `> ${h.title}`, {
         font: 'body',

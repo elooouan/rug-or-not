@@ -46,3 +46,28 @@ export const NEWS: Headline[] = [
     body: 'A spokesperson for the army said "100x guaranteed, get in now" and then said it again.',
   },
 ];
+
+/** Headlines that only run once the story has caught up with them (see STORY_BEATS). */
+export const LATE_NEWS: { after: string; headline: Headline }[] = [
+  {
+    after: 'story-2',
+    headline: {
+      title: 'Same three "founders" spotted on fourth token this month',
+      body: 'Stock-photo agency confirms the trio are "Business Team 4471" and have never met.',
+    },
+  },
+  {
+    after: 'story-3',
+    headline: {
+      title: 'Chat mods keep deleting one word. Nobody will say which.',
+      body: 'Screenshots suggest a name that starts with T. The mods say it was "a typo, nine times."',
+    },
+  },
+  {
+    after: 'secret-solved',
+    headline: {
+      title: 'Seamless settles nothing; registrar wallet drains in one block',
+      body: 'A detective stamped the file hours earlier. "Read it twice," they said. The Tailor was not available.',
+    },
+  },
+];
