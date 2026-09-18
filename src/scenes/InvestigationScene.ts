@@ -261,6 +261,14 @@ export class InvestigationScene extends Phaser.Scene {
     this.showDocument(0, false);
 
     this.notebook = new NotebookPanel(this);
+    this.notebook.onSelect = (id) => {
+      if (this.phase !== 'investigating' || this.paused || this.browsing) return;
+      const i = this.caseData.documents.findIndex((d) => d.clues.some((c) => c.id === id));
+      if (i < 0) return;
+      this.showDocument(i);
+      this.docs[i]?.focusClue(id);
+      audio.play('tick');
+    };
     this.notebook.setDepth(DEPTH.notebook);
     this.totalSpots = c.documents.reduce((n, d) => n + d.clues.length, 0);
     if (s.hardMode) this.notebook.setExamined(-1, 0);

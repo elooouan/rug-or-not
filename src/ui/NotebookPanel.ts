@@ -19,6 +19,10 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
   private emptyText: Phaser.GameObjects.Text;
   private examinedText: Phaser.GameObjects.Text;
 
+  /** Entry ids in the order shown; clicking a line jumps to that clue. */
+  private shownIds: string[] = [];
+  onSelect?: (id: string) => void;
+
   constructor(scene: Phaser.Scene) {
     super(scene, NOTEBOOK.x, NOTEBOOK.y);
     const { w, h, padding } = NOTEBOOK;
@@ -73,6 +77,17 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
         font: 'body',
         color: 'shadow',
       });
+      // A suspicion is a link back to the evidence it points at.
+      t.setInteractive(
+        new Phaser.Geom.Rectangle(-14, -1, NOTEBOOK.w - padding * 2, NOTEBOOK.lineHeight),
+        Phaser.Geom.Rectangle.Contains,
+      );
+      t.on('pointerover', () => this.shownIds[i] && t.setColor('#5b6f8a'));
+      t.on('pointerout', () => this.recolor(i));
+      t.on('pointerdown', () => {
+        const id = this.shownIds[i];
+        if (id && !id.startsWith('stray-')) this.onSelect?.(id);
+      });
       this.pinIcons.push(icon);
       this.lines.push(t);
       this.add([icon, t]);
@@ -99,11 +114,17 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
     const maxChars = 22;
     // Show the most recent entries if the list overflows.
     const shown = entries.slice(-NOTEBOOK.maxLines);
+    this.shownIds = shown.map((e) => e.id);
     for (let i = 0; i < NOTEBOOK.maxLines; i++) {
       const e = shown[i];
       this.lines[i].setText(e ? e.label.slice(0, maxChars) : '');
-      this.lines[i].setColor(e?.stray ? '#5b6f8a' : '#2b2530');
+      this.recolor(i);
       this.pinIcons[i].setVisible(!!e).setTexture(e?.stray ? TEX.pinStray : TEX.pin);
     }
+  }
+
+  private recolor(i: number): void {
+    const id = this.shownIds[i];
+    this.lines[i].setColor(id?.startsWith('stray-') ? '#5b6f8a' : '#2b2530');
   }
 }

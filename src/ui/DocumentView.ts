@@ -405,6 +405,16 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     }
   }
 
+  /** Focus a clue by id (from the suspicions list) and scroll it into view. */
+  focusClue(id: string): boolean {
+    const spots = this.allSpots();
+    const idx = spots.findIndex((s) => s.clue.id === id);
+    if (idx < 0) return false;
+    this.focusIndex = idx - 1;
+    this.focusMove(1);
+    return true;
+  }
+
   activateFocused(): void {
     const spots = this.allSpots();
     const spot = spots[this.focusIndex];
