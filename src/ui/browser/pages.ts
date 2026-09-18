@@ -55,6 +55,9 @@ export const URLS: Record<PageId, string> = {
 
 // ---- pages ------------------------------------------------------------------------
 
+/** How many rows each board list held when last fetched (see the board page). */
+const boardRows = new Map<string, number>();
+
 export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   home(ctx) {
     ctx.heading('NetScope', 'ink');
@@ -382,6 +385,16 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   },
 
   board(ctx) {
+    // Rows to leave for a list that hasn't loaded yet: what it held last time (a fresh
+    // board reserves one line, so the sections below aren't pushed off the screen).
+    const rows = (key: string, max: number) => Math.max(1, Math.min(max, boardRows.get(key) ?? 1));
+    const settle = (key: string, n: number, max: number) => {
+      const shown = Math.max(1, Math.min(max, n));
+      if (boardRows.get(key) === shown) return false;
+      boardRows.set(key, shown);
+      ctx.panel.render();
+      return true;
+    };
     const save = saveStore.get();
     ctx.heading('Hall of Detectives', 'ink');
     ctx.line(
@@ -493,6 +506,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       placeholder.destroy();
       let y = startY;
       const entries = (holdersOnly ? all.filter((e) => e.holder) : all).slice(0, 10);
+      if (settle(`case:${holdersOnly}`, entries.length, 10)) return;
       if (entries.length === 0) {
         ctx.content.add(
           makeText(
@@ -521,7 +535,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         y += BROWSER.lineH;
       });
     });
-    ctx.y += BROWSER.lineH * 11;
+    ctx.y += BROWSER.lineH * (rows(`case:${holdersOnly}`, 10) + 1);
     ctx.rule();
     ctx.line(
       `Red Flag Rush: best ${st.rushBest}  ·  longest streak ${st.rushBestStreak}  ·  ${st.rushRuns} runs`,
@@ -530,6 +544,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const rushY = ctx.y;
     void leaderboard.list(5, 'rush').then((entries: ScoreEntry[]) => {
       if (!ctx.content.active) return;
+      if (settle('rush', entries.length, 5)) return;
       if (entries.length === 0) {
         ctx.content.add(
           makeText(ctx.scene, 0, rushY, 'No rush runs yet. Sixty seconds, one page at a time.', {
@@ -551,7 +566,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         );
       });
     });
-    ctx.y += BROWSER.lineH * 5;
+    ctx.y += BROWSER.lineH * rows('rush', 5);
     ctx.rule();
     ctx.line(
       `Cold cases: ${st.coldRuns} closed  ·  ${st.coldCorrect} called right  ·  best ${st.coldBest}`,
@@ -560,6 +575,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const coldY = ctx.y;
     void leaderboard.list(5, 'cold').then((entries: ScoreEntry[]) => {
       if (!ctx.content.active) return;
+      if (settle('cold', entries.length, 5)) return;
       if (entries.length === 0) {
         ctx.content.add(
           makeText(ctx.scene, 0, coldY, 'No cold cases yet. The pile never ends.', {
@@ -581,7 +597,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         );
       });
     });
-    ctx.y += BROWSER.lineH * 5;
+    ctx.y += BROWSER.lineH * rows('cold', 5);
     // This week's file: everyone gets the same generated case, so the scores compare.
     ctx.rule();
     const wk = `cold-week-${weekKey()}`;
@@ -589,6 +605,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const weekY = ctx.y;
     void leaderboard.list(5, 'cold', wk).then((week: ScoreEntry[]) => {
       if (!ctx.content.active) return;
+      if (settle('week', week.length, 5)) return;
       if (week.length === 0) {
         ctx.content.add(
           makeText(
@@ -616,7 +633,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         );
       });
     });
-    ctx.y += BROWSER.lineH * 5;
+    ctx.y += BROWSER.lineH * rows('week', 5);
     lucienSays(ctx.scene, 'leaderboard');
   },
 
