@@ -49,8 +49,8 @@ Hover the coffee to take a sip. Click the lamp (it has feelings after ten clicks
 Biscuit the cat on the sill. The title card has a few typed-word and Konami surprises, and the
 version number hides the credits. There is also a floor safe with a three-digit combination
 (the notebook counts the answer) holding the developer's ledger, and a radio under the lamp
-that tunes between lo-fi, static and off; sit with the static long enough and you'll hear a
-numbers station tapping the combination in morse. Badges track all of it (NetScope > Badges).
+that tunes between lo-fi, late jazz, static and off; sit with the static long enough and
+you'll hear a numbers station tapping the combination in morse. Badges track all of it (NetScope > Badges).
 
 ## NetScope (the phone)
 

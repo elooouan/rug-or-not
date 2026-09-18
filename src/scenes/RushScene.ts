@@ -107,7 +107,7 @@ export class RushScene extends Phaser.Scene {
 
     this.bindKeys();
     audio.setTension(false);
-    audio.setTempo(RUSH.musicBpm);
+    audio.setTempo(audio.baseTempo + RUSH.musicBpmBoost);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       audio.setTension(false);
       audio.setTempo();

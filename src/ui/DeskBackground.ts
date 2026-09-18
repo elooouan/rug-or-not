@@ -53,24 +53,28 @@ export function floatText(
 /** Texture key for the snapshot taken when the wall opens (see HistoryScene). */
 export const LIVE_PHOTO_KEY = 'history-live';
 
-type Station = 'lofi' | 'static' | 'off';
+type Station = 'lofi' | 'jazz' | 'static' | 'off';
 const STATION_LABEL: Record<Station, string> = {
   lofi: '88.5  lo-fi',
+  jazz: '92.1  late jazz',
   static: '104.3  ...static',
   off: 'off',
 };
-const STATIONS: Station[] = ['lofi', 'static', 'off'];
+const STATIONS: Station[] = ['lofi', 'jazz', 'static', 'off'];
 
 /** What the radio is tuned to; the music setting is the source of truth unless we're on static. */
 function currentStation(): Station {
   if (audio.staticOn) return 'static';
-  return saveStore.get().settings.music ? 'lofi' : 'off';
+  if (!saveStore.get().settings.music) return 'off';
+  return audio.musicStyle === 'jazz' ? 'jazz' : 'lofi';
 }
 
 function tuneRadio(): Station {
   const next = STATIONS[(STATIONS.indexOf(currentStation()) + 1) % STATIONS.length];
-  saveStore.update((d) => (d.settings.music = next === 'lofi'));
-  audio.setMusic(next === 'lofi');
+  const playing = next === 'lofi' || next === 'jazz';
+  saveStore.update((d) => (d.settings.music = playing));
+  if (playing) audio.setStyle(next);
+  audio.setMusic(playing);
   audio.setStatic(next === 'static', VAULT_COMBO);
   return next;
 }

@@ -42,6 +42,16 @@ const CHORDS: { pad: number[]; bass: number }[] = [
   { pad: [52, 56, 59, 62], bass: 40 }, // E7 (turnaround)
 ];
 const PENTATONIC = [69, 72, 74, 76, 79, 81, 84];
+/** A dorian handful for the jazz station's noodling. */
+const DORIAN = [69, 71, 72, 74, 76, 78, 79, 81, 83, 84];
+const JAZZ_BPM = 104;
+export type MusicStyle = 'lofi' | 'jazz';
+/** A sustained pad chord tone; `level` is remembered so the release never reads AudioParam.value. */
+interface PadVoice {
+  osc: OscillatorNode[];
+  gain: GainNode;
+  level: number;
+}
 
 /** Just enough morse for the numbers station. */
 export const MORSE: Record<string, string> = {
@@ -75,11 +85,12 @@ export class AudioManager {
   private musicTimer: number | null = null;
   private nextStepTime = 0;
   private step = 0;
-  private padVoices: { osc: OscillatorNode[]; gain: GainNode }[] = [];
+  private padVoices: PadVoice[] = [];
   private noiseBuf: AudioBuffer | null = null;
   private tension = false;
   private musicVolume = 0.55;
   private bpm = DEFAULT_BPM;
+  private style: MusicStyle = 'lofi';
   private staticWanted = false;
   private staticNode: AudioBufferSourceNode | null = null;
   private morseText = '';
@@ -144,9 +155,24 @@ export class AudioManager {
     this.tension = on;
   }
 
-  /** Loop tempo; the scheduler picks it up on the next step. Pass nothing to go back to lo-fi speed. */
-  setTempo(bpm = DEFAULT_BPM): void {
+  /** The current arrangement's natural tempo. */
+  get baseTempo(): number {
+    return this.style === 'jazz' ? JAZZ_BPM : DEFAULT_BPM;
+  }
+
+  /** Loop tempo; the scheduler picks it up on the next step. Pass nothing to go back to normal. */
+  setTempo(bpm = this.baseTempo): void {
     this.bpm = Math.max(40, Math.min(160, bpm));
+  }
+
+  /** Which arrangement the loop plays: the lo-fi bed or the late-night jazz station. */
+  setStyle(style: MusicStyle): void {
+    this.style = style;
+    this.bpm = this.baseTempo;
+  }
+
+  get musicStyle(): MusicStyle {
+    return this.style;
   }
 
   setMusic(on: boolean): void {
@@ -471,8 +497,9 @@ export class AudioManager {
   private schedule(): void {
     if (!this.ctx) return;
     while (this.nextStepTime < this.ctx.currentTime + 0.25) {
-      // Light swing on the off-eighths.
-      const swing = this.step % 4 === 2 ? this.sixteenth * 0.18 : 0;
+      // Light swing on the off-eighths; the jazz station leans on it harder.
+      const amount = this.style === 'jazz' ? 0.3 : 0.18;
+      const swing = this.step % 4 === 2 ? this.sixteenth * amount : 0;
       this.playStep(this.step, this.nextStepTime + swing);
       this.step = (this.step + 1) % LOOP_STEPS;
       this.nextStepTime += this.sixteenth;
@@ -481,6 +508,10 @@ export class AudioManager {
 
   private playStep(step: number, t: number): void {
     if (!this.ctx || !this.musicBus) return;
+    if (this.style === 'jazz') {
+      this.playJazzStep(step, t);
+      return;
+    }
     const bus = this.musicBus;
     const chord = CHORDS[Math.floor(step / (STEPS_PER_BAR * 2)) % CHORDS.length];
     const inBar = step % STEPS_PER_BAR;
@@ -516,12 +547,40 @@ export class AudioManager {
     }
   }
 
-  private padVoice(note: number, t: number): { osc: OscillatorNode[]; gain: GainNode } {
+  /** Late jazz: walking bass on every beat, ride on the eighths, soft pads, busier noodling. */
+  private playJazzStep(step: number, t: number): void {
+    const bus = this.musicBus as GainNode;
+    const chord = CHORDS[Math.floor(step / (STEPS_PER_BAR * 2)) % CHORDS.length];
+    const inBar = step % STEPS_PER_BAR;
+    if (step % (STEPS_PER_BAR * 2) === 0) {
+      for (const v of this.padVoices) this.releasePad(v, t);
+      this.padVoices = chord.pad.map((n) => this.padVoice(n + 12, t, 0.032));
+    }
+    // Walking bass: root, fifth, sixth, fifth (or a chromatic approach on beat four).
+    if (inBar % 4 === 0) {
+      const beat = inBar / 4;
+      const walk = [0, 7, 9, beat === 3 && Math.random() < 0.5 ? -1 : 7][beat];
+      const n = midi(chord.bass + walk);
+      this.tone(t, 'triangle', n, n * 0.995, 0.34, 0.24, bus);
+    }
+    // Ride: every eighth, accent on 2 and 4; brushes on the snare.
+    if (inBar % 2 === 0)
+      this.noise(t, 0.05, inBar % 8 === 4 ? 0.036 : 0.022, 6000, 'highpass', undefined, bus);
+    if (inBar === 4 || inBar === 12) this.noise(t, 0.09, 0.04, 2400, 'bandpass', undefined, bus);
+    if (inBar === 0) this.tone(t, 'sine', 95, 40, 0.1, 0.22, bus);
+    // Noodling: short runs from the dorian scale.
+    if (step % 2 === 0 && Math.random() < 0.28) {
+      const n = DORIAN[Math.floor(Math.random() * DORIAN.length)];
+      this.melodyNote(midi(n), t);
+    }
+  }
+
+  private padVoice(note: number, t: number, level = 0.045): PadVoice {
     const ctx = this.ctx as AudioContext;
     const bus = this.musicBus as GainNode;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.045, t + 0.6);
+    g.gain.exponentialRampToValueAtTime(level, t + 0.6);
     const filt = ctx.createBiquadFilter();
     filt.type = 'lowpass';
     filt.frequency.value = 650;
@@ -535,12 +594,14 @@ export class AudioManager {
       return o;
     });
     filt.connect(g).connect(bus);
-    return { osc: oscs, gain: g };
+    return { osc: oscs, gain: g, level };
   }
 
-  private releasePad(v: { osc: OscillatorNode[]; gain: GainNode }, t: number): void {
+  private releasePad(v: PadVoice, t: number): void {
+    // Ramp from the level we asked for: AudioParam.value is 1 (the default) when the
+    // automation hasn't run yet, which turned releases into a burst in offline renders.
     v.gain.gain.cancelScheduledValues(t);
-    v.gain.gain.setValueAtTime(Math.max(0.0001, v.gain.gain.value), t);
+    v.gain.gain.setValueAtTime(v.level, t);
     v.gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
     v.osc.forEach((o) => o.stop(t + 0.85));
   }

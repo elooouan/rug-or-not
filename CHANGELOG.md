@@ -4,8 +4,12 @@
 
 - Red Flag Rush: an arcade mode. Sixty seconds, one page at a time, streak multipliers,
   its own board, three badges, Lucien's rules talk, a 3-2-1 countdown.
-- A radio under the lamp: lo-fi / static / off. The static hides a numbers station beeping
-  the safe combination in morse; Lucien explains dots and dashes if you sit with it.
+- A radio under the lamp: lo-fi / late jazz / static / off. The jazz station is a second
+  arrangement of the loop (walking bass, ride, dorian noodling at 104 bpm); the static hides a
+  numbers station beeping the safe combination in morse, and Lucien explains dots and dashes
+  if you sit with it.
+- Fixed: pad releases in the music loop ramped from AudioParam.value (a burst in offline
+  renders); they now ramp from their own level.
 - Rogues gallery: a third notebook chapter with a WANTED poster for every rug you've called
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
 - Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
