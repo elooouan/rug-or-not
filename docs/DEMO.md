@@ -12,8 +12,8 @@ below works on a fresh save; times are rough.
 
 ## 0:45 — A case
 
-4. **Play**. Open the folder (Enter). Hover the paper: the lens zooms, and the fine print on
-   line 15 only reads through it.
+4. **Play**. Open the folder (Enter). Hover the paper: the lens zooms, and the fine print
+   near the bottom of the contract (scroll with the wheel) only reads through it.
 5. Pin two red flags, switch tabs with the number keys, then stamp **RUG** (R). Watch the
    report: what you caught, what you missed, every line is a link into the notebook.
 6. On the report, **Share → Save card** for the PNG, or **Post on X**.
