@@ -48,6 +48,17 @@ export const STORY_BEATS: Record<number, ScriptId> = {
   12: 'story-4',
 };
 
+/** One-off reading tips, the first time each kind of document lands on the desk. */
+export const DOC_TIPS: Record<string, string> = {
+  contract:
+    'Code first. Who can mint, who can change fees, who can freeze. Names lie, functions do not.',
+  tokenomics: 'Percentages are fine. Vesting is the column that matters.',
+  team: 'Faces can be bought. Check whether the bios could belong to anyone.',
+  chat: 'Count how many people say the same thing at the same minute.',
+  liquidity: 'Locks have expiry dates. Read them. Then read who funded the whales.',
+  audit: 'An audit names a file. Make sure it is this file, and that it found something.',
+};
+
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
   'The coffee is not for sharing.',

@@ -31,6 +31,8 @@
   covers what you're reading; no arrow cursor under a finger; the "more" / "up" hints at the
   foot of a document are tap targets that scroll it; the wall, NetScope pages, the report and
   the ledger all scroll by dragging.
+- Lucien gives a one-off reading tip the first time each kind of document lands on the desk
+  (six tips; they never repeat).
 - Campaign story beats: Lucien connects the files after cases 2, 5, 10 and 13 (someone is
   running a template; the chats keep deleting a name). Confetti on an S grade; the title
   counts points to the next rank; Lucien fidgets and reviews the radio.

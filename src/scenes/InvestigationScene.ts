@@ -24,6 +24,8 @@ import { leaderboard } from '@/systems/leaderboard';
 import { holderPerks, wallet } from '@/systems/wallet';
 import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
 import { FLAG_IDS } from '@/data/flags';
+import { DOC_TIPS } from '@/data/dialogue';
+import { claimHint, hintSeen } from '@/systems/hints';
 import { DeskClock } from '@/ui/DeskClock';
 import type { DocumentView } from '@/ui/DocumentView';
 import { createDocumentView } from '@/ui/documents';
@@ -349,6 +351,19 @@ export class InvestigationScene extends Phaser.Scene {
     this.tabs?.setCurrent(i);
     this.hoveringSpot = 0;
     this.magnifier.setGlow(false);
+    // First time a kind of document lands on the desk, a reading tip.
+    const kind = this.caseData.documents[i]?.type;
+    if (kind && !hintSeen(`tip-doc-${kind}`))
+      this.time.delayedCall(animate ? 400 : 1600, () => {
+        // Claimed only when it actually shows, so a tutorial box doesn't eat it.
+        if (
+          this.phase === 'investigating' &&
+          !this.dialogue?.isActive &&
+          this.current === i &&
+          claimHint(`tip-doc-${kind}`)
+        )
+          LucienBubble.say(this, DOC_TIPS[kind], 5000);
+      });
     if (changed && animate) {
       audio.play('paper');
       const doc = this.docs[i];
