@@ -11,6 +11,8 @@ export interface RimStyle {
 }
 export const DEFAULT_RIM: RimStyle = { rim: 'amber', rimDark: 'woodDark', handle: 'woodDark' };
 
+/** Ring + handle, 20x20; the texture is two pixels bigger for the halo. */
+export const CURSOR_SIZE = 22;
 const CURSOR = [
   '......bbbbbb........',
   '....bb......bb......',
@@ -35,8 +37,20 @@ const CURSOR = [
 ];
 
 export function makeMagnifier(scene: Phaser.Scene, style: RimStyle = DEFAULT_RIM): void {
-  makeGraphicsTexture(scene, TEX.cursor, 20, 20, (g) => {
-    drawPixels(g, CURSOR, { b: style.rim, p: 'paper', h: style.handle });
+  // The pointer gets a one-pixel dark halo so the ring reads on paper and on the wall alike.
+  makeGraphicsTexture(scene, TEX.cursor, CURSOR_SIZE, CURSOR_SIZE, (g) => {
+    const solid = (x: number, y: number) => {
+      const row = CURSOR[y];
+      return !!row && row[x] !== undefined && row[x] !== '.';
+    };
+    g.fillStyle(HEX.bg, 0.85);
+    for (let y = -1; y <= CURSOR.length; y++)
+      for (let x = -1; x <= CURSOR[0].length; x++) {
+        if (solid(x, y)) continue;
+        if (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1))
+          g.fillRect(x + 1, y + 1, 1, 1);
+      }
+    drawPixels(g, CURSOR, { b: style.rim, p: 'paper', h: style.handle }, 1, 1);
   });
 
   const r = LENS.radius;

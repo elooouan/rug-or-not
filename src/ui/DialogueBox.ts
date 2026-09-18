@@ -6,6 +6,7 @@ import { LUCIEN, type DialogueLine, type ScriptId } from '@/data/dialogue';
 import { audio } from '@/systems/audio';
 import { claimHint } from '@/systems/hints';
 import { saveStore } from '@/systems/save';
+import { squish } from './squish';
 import { rect } from './shapes';
 import { makeText } from './text';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
@@ -175,16 +176,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.textObj.setText('');
     this.arrow.setVisible(false);
     this.promptObj.setText('');
-    if (!saveStore.get().settings.reducedMotion) {
-      this.mascot.setScale(this.mascot.scaleX * 1.06, this.mascot.scaleY * 0.94);
-      this.scene.tweens.add({
-        targets: this.mascot,
-        scaleX: this.mascot.scaleX / 1.06,
-        scaleY: this.mascot.scaleY / 0.94,
-        duration: 220,
-        ease: 'Back.easeOut',
-      });
-    }
+    if (!saveStore.get().settings.reducedMotion) squish(this.scene, this.mascot);
   }
 
   /** Click / Enter: finish typing, or move on when allowed. */

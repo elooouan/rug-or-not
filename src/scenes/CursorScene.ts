@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
+import { CURSOR_SIZE } from '@/art/magnifier';
 import { GAME_HEIGHT, GAME_WIDTH, LENS, RENDER_SCALE } from '@/config/layout';
 import { saveStore } from '@/systems/save';
 import { lensLift } from '@/ui/lensLift';
@@ -35,10 +36,14 @@ export class CursorScene extends Phaser.Scene {
     this.glint = this.add.image(0, 0, TEX.lensGlint).setOrigin(0.5).setVisible(false);
     this.cursor = this.add
       .image(0, 0, TEX.cursor)
-      .setOrigin(LENS.cursorHotspot.x / 20, LENS.cursorHotspot.y / 20);
+      .setOrigin(LENS.cursorHotspot.x / CURSOR_SIZE, LENS.cursorHotspot.y / CURSOR_SIZE);
     this.input.setDefaultCursor('none');
     this.input.on(Phaser.Input.Events.GAME_OUT, () => (this.inside = false));
     this.input.on(Phaser.Input.Events.GAME_OVER, () => (this.inside = true));
+    // A move over the canvas means the pointer is inside, whether or not the browser
+    // sent a mouseover (it doesn't after a fullscreen toggle or a resize under the pointer).
+    this.input.on(Phaser.Input.Events.POINTER_MOVE, () => (this.inside = true));
+    this.input.on(Phaser.Input.Events.POINTER_DOWN, () => (this.inside = true));
     this.scene.bringToTop();
   }
 

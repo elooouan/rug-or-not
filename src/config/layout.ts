@@ -96,7 +96,8 @@ export const LENS = {
   /** On touch screens the lens floats this far above the finger so the finger doesn't hide it. */
   touchLift: 64,
   /** How far the cursor sprite's hotspot sits from its texture origin. */
-  cursorHotspot: { x: 8, y: 8 },
+  /** Centre of the ring inside the 22px cursor texture (20px art drawn at +1,+1). */
+  cursorHotspot: { x: 9, y: 9 },
 } as const;
 
 export const STAMP = {

@@ -20,6 +20,7 @@ import { floatText } from '@/ui/DeskBackground';
 import { awardBadge, badgeCount, checkAggregateBadges } from '@/systems/badges';
 import { LUCIEN_TEX } from '@/ui/DialogueBox';
 import { LucienBubble } from '@/ui/LucienBubble';
+import { squish } from '@/ui/squish';
 import { toast } from '@/ui/Toast';
 import { DIALOGUE } from '@/config/layout';
 import { LUCIEN_QUIPS, WHATS_NEW } from '@/data/dialogue';
@@ -325,16 +326,7 @@ export class TitleScene extends Phaser.Scene {
     idle.on('pointerdown', () => {
       quip = (quip + 1) % quips.length;
       LucienBubble.say(this, quips[quip], 3600);
-      if (!reduced) {
-        idle.setScale(idle.scaleX * 1.06, idle.scaleY * 0.94);
-        this.tweens.add({
-          targets: idle,
-          scaleX: idle.scaleX / 1.06,
-          scaleY: idle.scaleY / 0.94,
-          duration: 220,
-          ease: 'Back.easeOut',
-        });
-      }
+      if (!reduced) squish(this, idle);
     });
     if (!reduced)
       this.tweens.add({
@@ -367,9 +359,10 @@ export class TitleScene extends Phaser.Scene {
       this.time.delayedCall(Phaser.Math.Between(12000, 28000), () => {
         if (!this.scene.isActive()) return;
         if (idle.visible && !reduced) {
+          // A mirrored detective reads as a glitch (the hat and the coin swap sides), so
+          // he bounces on his heels instead of turning around.
           if (Math.random() < 0.5) {
-            idle.setFlipX(true);
-            this.time.delayedCall(1800, () => idle.setFlipX(false));
+            squish(this, idle, 1.04, 0.92, 320);
           } else {
             // The bob tween owns y, so wobble instead of hopping.
             this.tweens.add({

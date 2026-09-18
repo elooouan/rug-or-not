@@ -2,6 +2,13 @@
 
 ## v0.7 — night shift (unreleased)
 
+- Fixed: the pointer could vanish after a fullscreen toggle or a resize under the mouse
+  (the cursor overlay now trusts any move over the canvas); the pointer ring has a dark
+  halo so it reads on the wall as well as on paper.
+- Fixed: Lucien could end up squashed or stretched after fast clicks through a dialogue
+  (every squish now returns to his resting size); on the title his corner bubble sat a
+  second head on top of him; the "glance at the window" mirror-flip is now a heel bounce.
+
 - Streak freezes: every seventh daily in a row earns one (two at most); a freeze quietly
   bridges a single missed night. The report says when one is earned or spent; the board
   shows what's in hand.

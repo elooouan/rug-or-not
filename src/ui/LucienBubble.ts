@@ -4,7 +4,7 @@ import { FONT, GAME_HEIGHT } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
-import { LUCIEN_FACE_TEX } from './DialogueBox';
+import { LUCIEN_FACE_TEX, LUCIEN_TEX } from './DialogueBox';
 import { rect } from './shapes';
 import { charWidth, makeText, wrapMono } from './text';
 
@@ -29,17 +29,23 @@ export class LucienBubble extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, text: string, ms: number, lift = 0) {
     super(scene, 0, -lift);
+    // Scenes with the whole detective on the desk (the title) get the bubble beside him;
+    // everywhere else his face comes with the bubble. Never both heads at once.
+    const onDesk = scene.children.list.find(
+      (o): o is Phaser.GameObjects.Image =>
+        o instanceof Phaser.GameObjects.Image && o.texture.key === LUCIEN_TEX && o.visible,
+    );
     const faceH = 40;
-    const face = scene.make
-      .image({ x: 6, y: GAME_HEIGHT - 4, key: LUCIEN_FACE_TEX }, false)
-      .setOrigin(0, 1);
-    face.setDisplaySize(Math.round(face.width * (faceH / face.height)), faceH);
+    const face = onDesk
+      ? null
+      : scene.make.image({ x: 6, y: GAME_HEIGHT - 4, key: LUCIEN_FACE_TEX }, false).setOrigin(0, 1);
+    face?.setDisplaySize(Math.round(face.width * (faceH / face.height)), faceH);
     const cw = charWidth(scene, 'body', FONT.size.body);
     const maxW = 220;
     const lines = wrapMono(text, Math.floor((maxW - 12) / cw));
     const bw = Math.min(maxW, Math.max(...lines.map((l) => l.length)) * cw + 12);
     const bh = lines.length * 12 + 10;
-    const bx = 6 + face.displayWidth + 4;
+    const bx = onDesk ? onDesk.x + onDesk.displayWidth + 4 : 6 + (face?.displayWidth ?? 0) + 4;
     const by = GAME_HEIGHT - 8 - bh;
     this.add(rect(scene, bx + 2, by + 2, bw, bh, HEX.bg, 0.4));
     this.add(rect(scene, bx - 1, by - 1, bw + 2, bh + 2, HEX.woodDark));
@@ -55,7 +61,7 @@ export class LucienBubble extends Phaser.GameObjects.Container {
         }),
       ),
     );
-    this.add(face);
+    if (face) this.add(face);
     this.setDepth(DEPTH.toast);
     scene.add.existing(this);
     // Don't linger over a pause overlay.
