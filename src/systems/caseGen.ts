@@ -1201,7 +1201,7 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     herrings.delete('timelocked-admin');
   }
   if (flags.has('liquidity-unlocked')) herrings.delete('liquidity-locked-long');
-  if (flags.has('fake-audit')) herrings.delete('real-audit-findings');
+  if (flags.has('fake-audit') || p.verdict === 'rug') herrings.delete('real-audit-findings');
   if (flags.has('unverified-contract')) CONTRACT_HERRINGS.forEach((h) => herrings.delete(h));
   if (flags.has('sell-tax-adjustable')) herrings.delete('small-fixed-tax');
   if (p.verdict === 'rug' && flags.size === 0) flags.add('mint-unlimited');
