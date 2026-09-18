@@ -6,7 +6,7 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { FLAG_IDS } from '@/data/flags';
 import { audio } from '@/systems/audio';
-import { awardBadge } from '@/systems/badges';
+import { awardBadge, hasBadge } from '@/systems/badges';
 import { saveStore } from '@/systems/save';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 import { LucienBubble } from './LucienBubble';
@@ -198,6 +198,20 @@ export class Vault extends Phaser.GameObjects.Container {
       else lines.push(raw);
     }
     let cy = 0;
+    // After the nameless file: a folded note on top of the ledger.
+    if (hasBadge('tailor-made')) {
+      const note = [
+        'A folded note, in a hand you do not recognise:',
+        '"You read it twice. Next time I will use smaller stitches. - T."',
+      ];
+      for (const l of note.flatMap((n) => wrapMono(n, maxChars))) {
+        content.add(
+          makeText(scene, 0, cy, l, { font: 'body', size: FONT.size.body, color: 'stampRed' }),
+        );
+        cy += 12;
+      }
+      cy += 8;
+    }
     for (const raw of lines) {
       const line = raw.replace(/^#+\s*/, '').replace(/`/g, '');
       if (raw.startsWith('#')) {
