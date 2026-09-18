@@ -404,7 +404,9 @@ export class InvestigationScene extends Phaser.Scene {
 
   /** A paid nudge: points at a document with spots you haven't examined. Never names a flag. */
   private askLucien(): void {
-    if (this.phase !== 'investigating' || this.paused || this.browsing) return;
+    // Not while he's already talking (the dialogue box covers the face anyway).
+    if (this.phase !== 'investigating' || this.paused || this.browsing || this.dialogue?.isActive)
+      return;
     if (saveStore.get().settings.hardMode) {
       LucienBubble.say(this, "Detective's honour. You're on your own tonight.");
       return;
