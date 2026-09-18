@@ -85,7 +85,9 @@ every squish returns to rest), make interactions respond immediately, check UI e
   stub `fetch` for the RPC, then drive `__debug.wallet`; `VITE_TOKEN_MOCK_BALANCE` fakes a
   holder balance for perks.
 - In the browser pane drive the game with synthetic DOM events on the canvas (world→canvas
-  scaling by the canvas rect); synthetic `KeyboardEvent`s must define `keyCode`. The pane's
+  scaling by the canvas rect); synthetic `KeyboardEvent`s must define `keyCode`, and send
+  them one per frame (Phaser re-runs its whole key queue on every DOM key event until the
+  next game step, so several keys fired in one JS tick reach handlers more than once). The pane's
   document is usually hidden: a dev-only worker pump keeps the game loop running, but page
   `setTimeout`s are throttled to about a second, so don't time anything under 1 s with them
   (read game state instead).
