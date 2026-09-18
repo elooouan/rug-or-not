@@ -55,6 +55,8 @@ export class RushScene extends Phaser.Scene {
   private clock!: DeskClock;
   private dialogue: DialogueBox | null = null;
   private locked = false;
+  /** The window lost focus mid-run: the clock waits until it comes back. */
+  private held = false;
   private strayCount = 0;
   private lastTickSecond = -1;
   /** Herrings pinned this run, for the debrief on the results card. */
@@ -126,7 +128,23 @@ export class RushScene extends Phaser.Scene {
     this.bindKeys();
     audio.setTension(false);
     audio.setTempo(audio.baseTempo + RUSH.musicBpmBoost);
+    // Alt-tabbing mid-run holds the clock; it picks up again when the window is back.
+    const onBlur = () => {
+      if (this.phase !== 'playing' || this.held) return;
+      this.held = true;
+      this.clock.pause(true);
+      LucienBubble.say(this, "I'll hold the clock. It runs again when you're back.", 3000);
+    };
+    const onFocus = () => {
+      if (!this.held) return;
+      this.held = false;
+      if (this.phase === 'playing') this.clock.pause(false);
+    };
+    this.game.events.on(Phaser.Core.Events.BLUR, onBlur);
+    this.game.events.on(Phaser.Core.Events.FOCUS, onFocus);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(Phaser.Core.Events.BLUR, onBlur);
+      this.game.events.off(Phaser.Core.Events.FOCUS, onFocus);
       audio.setTension(false);
       audio.setTempo();
     });
@@ -313,7 +331,7 @@ export class RushScene extends Phaser.Scene {
   }
 
   private onPin(clue: Clue, pinned: boolean): void {
-    if (this.phase !== 'playing' || this.locked || !pinned || !this.doc) return;
+    if (this.phase !== 'playing' || this.locked || this.held || !pinned || !this.doc) return;
     if (isFlagClue(clue)) {
       this.locked = true;
       const next = applyFlag(this.state);
@@ -364,7 +382,7 @@ export class RushScene extends Phaser.Scene {
   }
 
   private onStray(count: number): void {
-    if (this.phase !== 'playing' || this.locked) return;
+    if (this.phase !== 'playing' || this.locked || this.held) return;
     if (count <= this.strayCount) {
       this.strayCount = count;
       return;
@@ -606,7 +624,7 @@ export class RushScene extends Phaser.Scene {
     if (!kb) return;
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
-    const inPlay = () => this.phase === 'playing' && !this.locked && !!this.doc;
+    const inPlay = () => this.phase === 'playing' && !this.locked && !this.held && !!this.doc;
     on('ESC', () => !this.dialogue?.isActive && !escTaken() && this.quit());
     on('TAB', (e?: KeyboardEvent) => inPlay() && this.doc?.focusMove(e?.shiftKey ? -1 : 1));
     on('DOWN', () => inPlay() && this.doc?.focusMove(1));
