@@ -217,6 +217,14 @@ export class NotebookScene extends Phaser.Scene {
             color: SEV_COLOR[sev],
           }),
         );
+        // A green tick at the end of the row once the drill is done.
+        if (known && saveStore.get().stats.drilled.includes(id))
+          this.listPage.add(
+            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * BOOK.rowH, 'drilled', {
+              size: FONT.size.tiny,
+              color: 'stampGreen',
+            }).setOrigin(1, 0),
+          );
       } else if (ch === 'rogues') {
         this.listPage.add(
           makeText(this, 0, 18 + i * BOOK.rowH, known ? 'x' : '', {
