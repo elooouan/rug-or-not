@@ -41,7 +41,9 @@ export class ChatDoc extends DocumentView {
         (c) => c.anchor.kind === 'message' && c.anchor.index === i,
       );
       const fine = clues.find((c) => c.finePrint);
-      const h = this.lh * (1 + lines.length) + (fine ? this.lh : 0) + 2;
+      // Deleted messages keep a ghost of their text for the lens.
+      const ghost = m.deleted ? m.text : '';
+      const h = this.lh * (1 + lines.length) + (fine ? this.lh : 0) + (ghost ? this.lh : 0) + 2;
       this.addRow(h, (row) => {
         row.add(this.text(0, 0, head, { color: ROLE_COLOR[m.role] }));
         lines.forEach((l, li) =>
@@ -49,6 +51,8 @@ export class ChatDoc extends DocumentView {
             this.text(8, this.lh * (1 + li), l, { color: m.deleted ? 'paperShadow' : 'shadow' }),
           ),
         );
+        if (ghost)
+          this.addGhost(row, `"${ghost}"`, 8, this.lh * (1 + lines.length) - 2, this.contentW - 8);
         for (const clue of clues) {
           let rect = { x: -2, y: 0, w: this.contentW + 4, h: this.lh * (1 + lines.length) };
           if (clue.finePrint) {

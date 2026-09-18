@@ -14,6 +14,7 @@ import {
 import { makePortrait } from '@/art/portraits';
 import { isFlagClue, type CaseData } from '@/data/schema';
 import { rogueOf } from '@/systems/rogues';
+import { secretUnlocked } from '@/systems/secretCase';
 import { audio } from '@/systems/audio';
 import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
@@ -350,8 +351,11 @@ export class NotebookScene extends Phaser.Scene {
           color: 'woodDark',
         }).setOrigin(0.5, 0),
       );
+      const hidden = c.secret && !secretUnlocked(saveStore.get(), gameState.cases);
       wrapMono(
-        `Last seen behind ${c.ticker}. Stamp the right verdict on that file to put a face here.`,
+        hidden
+          ? 'No file, no ticker, no face. Some folders only turn up when the rest are closed.'
+          : `Last seen behind ${c.ticker}. Stamp the right verdict on that file to put a face here.`,
         maxChars,
       ).forEach((l, i) =>
         d.add(makeText(this, 6, 124 + i * BOOK.lineH, l, { font: 'body', color: 'woodMid' })),

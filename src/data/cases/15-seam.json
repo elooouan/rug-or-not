@@ -1,0 +1,438 @@
+{
+  "id": "seam",
+  "title": "The Tailor",
+  "ticker": "$SEAM",
+  "pitch": "Seamless: cross-chain settlement with a human face. Every box ticked.",
+  "intro": "No name on the folder. Everything in it checks out. That's the problem. Read it twice.",
+  "difficulty": 5,
+  "verdict": "rug",
+  "timeLimitSec": 360,
+  "secret": true,
+  "debrief": "Seamless was the Tailor's best suit. Ownership renounced, but every transfer runs through a library the registrar can swap out from under it. The audit covered the token and politely skipped that library. Six 'community' wallets, funded in one block, hold a third of the supply. One bio was lifted word for word from the Harbor co-op, and three fans posted the same sentence at 20:14. The lock, the auditor, the answered questions: all real, all stitched on. You read it twice. That's the whole job.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "SeamToken.sol",
+      "content": {
+        "fileName": "contracts/SeamToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract SeamToken is ERC20, Ownable {",
+          "  uint256 public constant MAX_SUPPLY = 60_000_000e18;",
+          "  address public registrar;",
+          "  address public seamLib; // settlement logic, upgradeable",
+          "",
+          "  constructor(address _registrar, address _lib) ERC20(\"Seamless\", \"SEAM\") {",
+          "    registrar = _registrar; seamLib = _lib;",
+          "    _mint(msg.sender, MAX_SUPPLY);",
+          "    renounceOwnership();",
+          "  }",
+          "",
+          "  function setSeamLib(address lib) external {",
+          "    require(msg.sender == registrar, \"registrar\");",
+          "    seamLib = lib;",
+          "  }",
+          "",
+          "  function _update(address f, address t, uint256 v)",
+          "    internal override {",
+          "    (bool ok, ) = seamLib.delegatecall(",
+          "      abi.encodeWithSignature(\"settle(address,address,uint256)\", f, t, v));",
+          "    require(ok, \"settle\");",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "sm-registrar",
+          "label": "Registrar swaps lib",
+          "flagId": "fake-renounce",
+          "finePrint": true,
+          "text": "// delegatecall runs whatever seamLib says, with this contract's storage",
+          "anchor": {
+            "kind": "line",
+            "line": 13
+          }
+        },
+        {
+          "id": "sm-renounce",
+          "label": "Renounced (for show)",
+          "flagId": "fake-renounce",
+          "anchor": {
+            "kind": "line",
+            "line": 10
+          }
+        },
+        {
+          "id": "sm-supply",
+          "label": "Hard cap, minted once",
+          "herring": true,
+          "herringId": "immutable-supply-note",
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "60,000,000 SEAM",
+        "allocations": [
+          {
+            "label": "Community stream",
+            "pct": 35,
+            "vesting": "streamed"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 28,
+            "vesting": "locked 2y"
+          },
+          {
+            "label": "Settlement reserve",
+            "pct": 20,
+            "vesting": "protocol"
+          },
+          {
+            "label": "Team",
+            "pct": 12,
+            "vesting": "1y cliff+2y"
+          },
+          {
+            "label": "Marketing",
+            "pct": 5,
+            "vesting": "24 months, multisig"
+          }
+        ],
+        "notes": [
+          "Roadmap: two more settlement partners this quarter. Monthly reserve reports. Nothing else.",
+          "The community stream releases 1% per month to holders who stake."
+        ]
+      },
+      "clues": [
+        {
+          "id": "sm-stream",
+          "label": "Stream has an owner",
+          "flagId": "team-allocation-unvested",
+          "finePrint": true,
+          "text": "stream contract owner: registrar. rate is a variable, not a constant.",
+          "anchor": {
+            "kind": "row",
+            "row": 0
+          }
+        },
+        {
+          "id": "sm-marketing",
+          "label": "5% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": {
+            "kind": "row",
+            "row": 4
+          }
+        },
+        {
+          "id": "sm-roadmap",
+          "label": "Dull roadmap",
+          "herring": true,
+          "herringId": "boring-roadmap",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Team",
+      "content": {
+        "members": [
+          {
+            "name": "Ines Okafor-Reyes",
+            "role": "Treasurer",
+            "bio": "Runs the harbour co-op's books since 2019. Publishes monthly treasury minutes on the co-op site.",
+            "portraitSeed": "tailor-ines",
+            "style": "normal"
+          },
+          {
+            "name": "Tomas Lindqvist",
+            "role": "Protocol lead",
+            "bio": "Twelve years in payments infrastructure. Speaks at the regional fintech meetup.",
+            "portraitSeed": "tailor-tomas",
+            "style": "normal"
+          },
+          {
+            "name": "V.",
+            "role": "Registrar",
+            "bio": "Handles partner onboarding. Prefers to stay out of photos.",
+            "portraitSeed": "tailor-v",
+            "style": "anon"
+          }
+        ],
+        "note": "Team members are verified by our partners under NDA."
+      },
+      "clues": [
+        {
+          "id": "sm-bio",
+          "label": "Bio lifted from Harbor",
+          "flagId": "copied-whitepaper",
+          "finePrint": true,
+          "text": "word for word the Harbor co-op treasurer's bio. Different harbour, apparently.",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "bio"
+          }
+        },
+        {
+          "id": "sm-registrar-anon",
+          "label": "Registrar has no face",
+          "flagId": "anon-team-stock-photos",
+          "anchor": {
+            "kind": "row",
+            "row": 2,
+            "table": "photo"
+          }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Discord: #seamless",
+      "content": {
+        "channel": "seamless",
+        "messages": [
+          {
+            "user": "tomas_l",
+            "role": "admin",
+            "time": "20:02",
+            "text": "reserve report for August is up. reserve grew 4%, all on-chain, links in #reports."
+          },
+          {
+            "user": "needle_and_thread",
+            "time": "20:09",
+            "text": "the tailor says hi",
+            "deleted": true
+          },
+          {
+            "user": "cold_read",
+            "time": "20:11",
+            "text": "what stops the registrar from pointing seamLib at something that just keeps every transfer?"
+          },
+          {
+            "user": "tomas_l",
+            "role": "admin",
+            "time": "20:13",
+            "text": "the registrar is a partner-vetted role and the lib is audited. we'd never do that."
+          },
+          {
+            "user": "stitch_01",
+            "time": "20:14",
+            "text": "smoothest settlement layer I've used, hands down"
+          },
+          {
+            "user": "hem_line",
+            "time": "20:14",
+            "text": "smoothest settlement layer I've used, hands down!!"
+          },
+          {
+            "user": "bobbin_b",
+            "time": "20:14",
+            "text": "Smoothest settlement layer I've used. hands down"
+          },
+          {
+            "user": "cold_read",
+            "time": "20:16",
+            "text": "'we'd never' is not a require statement"
+          },
+          {
+            "user": "pin_cushion",
+            "time": "20:20",
+            "text": "I hold SEAM because my tailor told me to. he also told me about the pants."
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "sm-bots",
+          "label": "3 fans, one sentence",
+          "flagId": "bot-chat",
+          "anchor": {
+            "kind": "message",
+            "index": 5
+          }
+        },
+        {
+          "id": "sm-question",
+          "label": "cold_read asks re: lib",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": {
+            "kind": "message",
+            "index": 2
+          }
+        },
+        {
+          "id": "sm-joke",
+          "label": "The pants joke",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": {
+            "kind": "message",
+            "index": 8
+          }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "SEAM / USDC",
+        "liquidityUsd": "$1,400,000",
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Sep 2028 (2y)",
+          "pct": 100
+        },
+        "holders": [
+          {
+            "label": "Liquidity pool",
+            "pct": 28,
+            "tag": "pool"
+          },
+          {
+            "label": "Settlement reserve",
+            "pct": 20,
+            "tag": "contract"
+          },
+          {
+            "label": "0x5a1...c07",
+            "pct": 5.5
+          },
+          {
+            "label": "0x5a1...c19",
+            "pct": 5.5
+          },
+          {
+            "label": "0x5a1...c2b",
+            "pct": 5.5
+          },
+          {
+            "label": "3 more 0x5a1... wallets",
+            "pct": 16.5
+          },
+          {
+            "label": "Everyone else",
+            "pct": 19
+          }
+        ],
+        "transfers": [
+          {
+            "when": "11d ago",
+            "from": "Registrar",
+            "to": "0x5a1...c07",
+            "amount": "3,300,000"
+          },
+          {
+            "when": "11d ago",
+            "from": "Registrar",
+            "to": "0x5a1...c19",
+            "amount": "3,300,000"
+          },
+          {
+            "when": "11d ago",
+            "from": "Registrar",
+            "to": "0x5a1...c2b",
+            "amount": "3,300,000"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "sm-whales",
+          "label": "Six wallets, one block",
+          "flagId": "whale-concentration",
+          "finePrint": true,
+          "text": "six 0x5a1... wallets, 33% between them, all funded by the registrar in block 19,502,004",
+          "anchor": {
+            "kind": "row",
+            "row": 2,
+            "table": "holders"
+          }
+        },
+        {
+          "id": "sm-lock",
+          "label": "Locked two years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
+        },
+        {
+          "id": "sm-pool",
+          "label": "Pool is top holder",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "holders"
+          }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Report",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "SeamToken.sol (0x77c...e10)",
+        "date": "30 Aug",
+        "score": "Pass - 1 medium, 2 low",
+        "summary": "Manual review of SeamToken.sol. Scope: the token contract as deployed. One medium finding fixed before deployment.",
+        "findings": [
+          "Missing zero-address check in constructor (medium) - fixed.",
+          "Unused import (low).",
+          "Scope note: SeamLib.sol was not provided for review."
+        ]
+      },
+      "clues": [
+        {
+          "id": "sm-scope",
+          "label": "SeamLib never audited",
+          "flagId": "fake-audit",
+          "finePrint": true,
+          "text": "the contract that actually moves the tokens is the one they didn't hand over",
+          "anchor": {
+            "kind": "row",
+            "row": 2,
+            "table": "findings"
+          }
+        },
+        {
+          "id": "sm-findings",
+          "label": "Real audit, findings",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
+        }
+      ]
+    }
+  ]
+}

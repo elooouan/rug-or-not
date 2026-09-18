@@ -11,6 +11,7 @@ const rugCase: CaseData = {
   difficulty: 1,
   verdict: 'rug',
   timeLimitSec: 100,
+  secret: false,
   debrief: 'debrief',
   documents: [
     {

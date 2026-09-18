@@ -6,6 +6,7 @@ import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
+import { secretUnlocked } from '@/systems/secretCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -54,7 +55,8 @@ export class CaseSelectScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
 
     this.folders = [];
-    this.unlocked = cases.map((_c, i) => i < save.campaignUnlocked);
+    const secretOpen = secretUnlocked(save, cases);
+    this.unlocked = cases.map((c, i) => i < save.campaignUnlocked && (!c.secret || secretOpen));
     cases.forEach((c, i) => {
       const col = i % DRAWER.cols;
       const row = Math.floor(i / DRAWER.cols);
@@ -107,7 +109,7 @@ export class CaseSelectScene extends Phaser.Scene {
       }).setOrigin(0.5, 0),
     );
     cont.add(
-      makeText(this, 40, 30, unlocked ? c.title.slice(0, 15) : 'locked', {
+      makeText(this, 40, 30, unlocked ? c.title.slice(0, 15) : c.secret ? 'no name' : 'locked', {
         size: FONT.size.tiny,
         color: 'woodDark',
       }).setOrigin(0.5, 0),
@@ -167,7 +169,12 @@ export class CaseSelectScene extends Phaser.Scene {
             ? `best: ${best.bestScore} pts (${best.bestGrade})  ·  played ${best.completions}x`
             : 'not played yet',
         ]
-      : wrapMono(`Locked. Close case #${i} to open this folder.`, maxChars);
+      : wrapMono(
+          c.secret
+            ? 'No name on this one. Stamp every other file correctly and it opens.'
+            : `Locked. Close case #${i} to open this folder.`,
+          maxChars,
+        );
     const h = 10 + lines.length * 12;
     const tx = Phaser.Math.Clamp(x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
     const ty = y + DRAWER.folderH + 8;

@@ -6,6 +6,7 @@ import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
 import { gameState } from '@/systems/gameState';
+import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
@@ -187,14 +188,13 @@ export class TitleScene extends Phaser.Scene {
 
     // Menu.
     const cases = gameState.cases;
-    const dailyId = pickDailyCaseId(
-      localDateKey(),
-      cases.map((c) => c.id),
-    );
+    const dailyId = pickDailyCaseId(localDateKey(), dailyPool(cases));
     const dailyDone = save.daily.lastPlayed === localDateKey();
     const streak = currentStreak(save.daily, localDateKey());
-    const nextIndex = Math.min(save.campaignUnlocked - 1, cases.length - 1);
-    const allDone = Object.keys(save.caseResults).length >= cases.length;
+    // The secret file sits at the end; "Continue" never walks into it while it's locked.
+    const playable = playableCases(save, cases);
+    const nextIndex = Math.min(save.campaignUnlocked - 1, playable.length - 1);
+    const allDone = playable.every((c) => save.caseResults[c.id]);
     const bx = GAME_WIDTH / 2 - 62;
     let by = cy + 90;
     const mk = (label: string, fn: () => void) => {

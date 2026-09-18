@@ -213,6 +213,40 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     return { x, y, w: Math.ceil(t.width), h: Math.ceil(t.height) };
   }
 
+  /**
+   * Faint text that only the lens picks up (deleted chat messages linger in the
+   * cache). Like fine print, but flavour rather than a clue: no spot, no points.
+   */
+  protected addGhost(
+    rowRef: Phaser.GameObjects.Container | Row,
+    text: string,
+    x: number,
+    y: number,
+    maxW: number,
+  ): void {
+    const row = this.rowOf(rowRef);
+    if (this.ctx.noMagnifier) {
+      row.container.add(
+        makeText(this.scene, x, y, text, {
+          size: FONT.size.body,
+          font: 'body',
+          color: 'paperShadow',
+          wrap: maxW,
+        }),
+      );
+      return;
+    }
+    const t = makeText(this.scene, x, y, text, {
+      size: FONT.size.finePrint,
+      font: 'body',
+      color: 'paperShadow',
+      wrap: maxW,
+      resolution: LENS.zoom * RENDER_SCALE,
+    });
+    row.container.add(t);
+    this.ctx.registerFinePrint(t);
+  }
+
   protected text(x: number, y: number, str: string, opts: TextOpts = {}): Phaser.GameObjects.Text {
     return makeText(this.scene, x, y, str, {
       font: 'body',

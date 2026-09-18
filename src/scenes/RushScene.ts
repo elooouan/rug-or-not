@@ -7,6 +7,7 @@ import { isFlagClue, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
+import { playableCases } from '@/systems/secretCase';
 import { leaderboard } from '@/systems/leaderboard';
 import {
   applyFlag,
@@ -75,7 +76,7 @@ export class RushScene extends Phaser.Scene {
     this.lastTickSecond = -1;
     this.doc = undefined;
     this.page = undefined;
-    this.deck = shuffle(rushPages(gameState.cases));
+    this.deck = shuffle(rushPages(playableCases(saveStore.get(), gameState.cases)));
 
     new DeskBackground(this, { props: true, stamps: false });
     addText(this, DESK.caseHeader.x, DESK.caseHeader.y, 'RED FLAG RUSH  ·  one page at a time', {
@@ -212,7 +213,8 @@ export class RushScene extends Phaser.Scene {
   }
 
   private dealPage(): void {
-    if (this.deck.length === 0) this.deck = shuffle(rushPages(gameState.cases));
+    if (this.deck.length === 0)
+      this.deck = shuffle(rushPages(playableCases(saveStore.get(), gameState.cases)));
     // Never deal the same page twice in a row when there's a choice.
     let next = this.deck.pop() as RushPage;
     if (this.page && next.doc === this.page.doc && this.deck.length > 0) {

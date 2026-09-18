@@ -37,7 +37,8 @@ export type ScriptId =
   | 'story-1'
   | 'story-2'
   | 'story-3'
-  | 'story-4';
+  | 'story-4'
+  | 'secret-unlocked';
 
 /** Campaign story beats: shown on the report after the case at this index (0-based) is closed. */
 export const STORY_BEATS: Record<number, ScriptId> = {
@@ -213,6 +214,12 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: 'One file left on the desk tonight. Read it twice. Nothing about it is what it looks like.',
     },
+  ],
+  'secret-unlocked': [
+    {
+      text: 'Every ordinary file on this desk, stamped right. Which is when this one showed up. No name on it.',
+    },
+    { text: 'Case files, bottom drawer. Take your coffee. Read it twice.' },
   ],
   'all-cases': [
     {

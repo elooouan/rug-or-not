@@ -5,6 +5,7 @@ import { PALETTE } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { applyWeatherAudio } from '@/systems/weather';
 import { localDateKey, pickDailyCaseId } from '@/systems/dailyCase';
+import { dailyPool, playableCases } from '@/systems/secretCase';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
@@ -66,16 +67,12 @@ export class BootScene extends Phaser.Scene {
     // Deep links: #case=<id> or #daily jump straight to a file (shared results include them).
     const hash = typeof location !== 'undefined' ? location.hash.slice(1) : '';
     const m = /^case=([a-z0-9-]+)$/.exec(hash);
+    const openable = playableCases(saveStore.get(), loaded.cases);
     const linked = m
-      ? loaded.cases.find((c) => c.id === m[1])
+      ? openable.find((c) => c.id === m[1])
       : hash === 'daily'
         ? loaded.cases.find(
-            (c) =>
-              c.id ===
-              pickDailyCaseId(
-                localDateKey(),
-                loaded.cases.map((x) => x.id),
-              ),
+            (c) => c.id === pickDailyCaseId(localDateKey(), dailyPool(loaded.cases)),
           )
         : undefined;
     if (linked) {

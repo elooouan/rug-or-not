@@ -7,6 +7,7 @@ import { shortAddress, TOKEN } from '@/config/token';
 import { NEWS } from '@/data/news';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
+import { secretUnlocked } from '@/systems/secretCase';
 import type { CaseData } from '@/data/schema';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
@@ -328,7 +329,10 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       ctx.line('Tokens on record. Open files can be launched straight from here.', {
         color: 'woodMid',
       });
+      const secretOpen = secretUnlocked(save, gameState.cases);
       gameState.cases.forEach((cs, i) => {
+        // The nameless file only exists here once it's open.
+        if (cs.secret && !secretOpen) return;
         const unlocked = i < save.campaignUnlocked;
         const grade = save.caseResults[cs.id]?.bestGrade;
         const b = ctx.button(

@@ -188,6 +188,8 @@ export const CaseSchema = z
     difficulty: z.number().int().min(1).max(5),
     verdict: z.enum(['rug', 'legit']),
     timeLimitSec: z.number().int().min(30).max(900),
+    /** Hidden until every other case has been solved; never the daily. */
+    secret: z.boolean().default(false),
     documents: z.array(DocumentSchema).min(2).max(6),
     debrief: z.string().min(1),
   })

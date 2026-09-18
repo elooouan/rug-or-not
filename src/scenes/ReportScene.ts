@@ -14,6 +14,7 @@ import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { LUCIEN_TEX, lucienSays } from '@/ui/DialogueBox';
 import { STORY_BEATS } from '@/data/dialogue';
+import { playableCases, secretUnlocked } from '@/systems/secretCase';
 import { confetti } from '@/ui/confetti';
 import { toast } from '@/ui/Toast';
 import { StickyNote } from '@/ui/StickyNote';
@@ -93,7 +94,7 @@ export class ReportScene extends Phaser.Scene {
     const buttons: PixelButton[] = [];
     const isDaily = gameState.mode === 'daily';
     const nextIndex = gameState.currentIndex + 1;
-    const hasNext = !isDaily && nextIndex < gameState.cases.length;
+    const hasNext = !isDaily && nextIndex < playableCases(saveStore.get(), gameState.cases).length;
     if (hasNext) {
       buttons.push(
         new PixelButton(
@@ -476,9 +477,17 @@ export class ReportScene extends Phaser.Scene {
       const box = allDone ? lucienSays(this, 'all-cases') : null;
       if (!box) this.lucienComment();
     };
-    const story = () => {
-      const box = beat ? lucienSays(this, beat, { onDone: finale }) : null;
+    // The moment the last ordinary file is solved, a folder with no name shows up.
+    const reveal = () => {
+      const box =
+        !this.payload.caseData.secret && secretUnlocked(saveStore.get(), gameState.cases)
+          ? lucienSays(this, 'secret-unlocked', { onDone: finale })
+          : null;
       if (!box) finale();
+    };
+    const story = () => {
+      const box = beat ? lucienSays(this, beat, { onDone: reveal }) : null;
+      if (!box) reveal();
     };
     const follow = () => {
       const box = !b.verdictCorrect
