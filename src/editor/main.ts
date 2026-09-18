@@ -209,7 +209,10 @@ function renderSaved(): void {
   }
   for (const c of list) {
     const li = document.createElement('li');
-    li.innerHTML = `<span>${c.ticker} "${c.title}" · ${c.verdict} · d${c.difficulty}</span>`;
+    // textContent, never innerHTML: a loaded JSON file is untrusted text.
+    const label = document.createElement('span');
+    label.textContent = `${c.ticker} "${c.title}" · ${c.verdict} · d${c.difficulty}`;
+    li.appendChild(label);
     const load = document.createElement('button');
     load.className = 'paper';
     load.textContent = 'edit';
