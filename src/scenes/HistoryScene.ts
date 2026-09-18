@@ -7,7 +7,7 @@ import { HEX } from '@/config/palette';
 import { HISTORY, type HistoryFrame } from '@/data/history';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
-import { lucienSaysNow } from '@/ui/DialogueBox';
+import { lucienSays } from '@/ui/DialogueBox';
 import { awardBadge, badgeCount } from '@/systems/badges';
 import { rankForScore } from '@/systems/ranks';
 import { WEATHER_LABEL } from '@/systems/settings';
@@ -152,7 +152,7 @@ export class HistoryScene extends Phaser.Scene {
     ).setDepth(DEPTH.hud);
 
     this.time.delayedCall(reduced ? 0 : 1200 + frames.length * 130, () => {
-      if (!this.big && this.scene.isActive()) lucienSaysNow(this, 'wall');
+      if (!this.big && this.scene.isActive()) lucienSays(this, 'wall');
       awardBadge(this, 'historian');
     });
   }
