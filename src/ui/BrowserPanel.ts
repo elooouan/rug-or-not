@@ -28,6 +28,7 @@ import { LUCIEN_TEX, lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { attachScroll } from './dragScroll';
+import { isNameAllowed } from '@/systems/names';
 import { downloadCanvas, renderIdCard } from '@/systems/shareCard';
 import { toast } from './Toast';
 import { StickyNote } from './StickyNote';
@@ -1001,6 +1002,11 @@ class NamePicker extends Phaser.GameObjects.Container {
             .map((s) => NamePicker.CHARS[s])
             .join('')
             .replace(/_+$/, '') || 'ANON';
+        if (!isNameAllowed(name)) {
+          audio.play('wrong');
+          toast(scene, 'NOT THAT ONE', 'pick a handle fit for the board');
+          return;
+        }
         saveStore.update((d) => (d.detectiveName = name));
         audio.play('correct');
         this.destroy();

@@ -15,6 +15,38 @@ const GRADES = new Set(['S', 'A', 'B', 'C', 'D']);
 const KEEP = 200; // entries kept per board
 const MAX_SCORE = 20000;
 const RATE_PER_MINUTE = 12; // posts per IP per minute
+// Mirrors src/systems/names.ts in the game: the obvious words only.
+const BLOCKED = [
+  'FUCK',
+  'SHIT',
+  'CUNT',
+  'NIGG',
+  'FAGG',
+  'KIKE',
+  'SPIC',
+  'RAPE',
+  'NAZI',
+  'HITLER',
+  'PENIS',
+  'VAGIN',
+  'DICK',
+  'COCK',
+  'WHORE',
+  'SLUT',
+  'RETARD',
+];
+function nameAllowed(name) {
+  const up = String(name).toUpperCase();
+  const flat = up.replace(/[^A-Z]/g, '');
+  const leet = up
+    .replace(/0/g, 'O')
+    .replace(/1/g, 'I')
+    .replace(/3/g, 'E')
+    .replace(/4/g, 'A')
+    .replace(/5/g, 'S')
+    .replace(/[^A-Z]/g, '');
+  return !BLOCKED.some((w) => flat.includes(w) || leet.includes(w));
+}
 
 export default {
   async fetch(request, env) {
@@ -80,6 +112,7 @@ function sanitize(r) {
     .slice(0, 12);
   const score = Math.round(Number(r.score));
   if (!name || !Number.isFinite(score) || score < 0 || score > MAX_SCORE) return null;
+  if (!nameAllowed(name)) return null;
   if (!GRADES.has(r.grade)) return null;
   const caseId = String(r.caseId || '')
     .replace(/[^a-z0-9-]/g, '')
