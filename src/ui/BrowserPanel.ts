@@ -773,9 +773,8 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const wk = `cold-week-${weekKey()}`;
     ctx.line(`This week's file (${weekKey()}):`, { color: 'woodMid' });
     const weekY = ctx.y;
-    void leaderboard.list(50, 'cold').then((entries: ScoreEntry[]) => {
+    void leaderboard.list(5, 'cold', wk).then((week: ScoreEntry[]) => {
       if (!ctx.content.active) return;
-      const week = entries.filter((e) => e.caseId === wk).slice(0, 5);
       if (week.length === 0) {
         ctx.content.add(
           makeText(

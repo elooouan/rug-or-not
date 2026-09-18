@@ -21,7 +21,8 @@ export type BoardMode = 'case' | 'rush' | 'cold';
 
 export interface LeaderboardProvider {
   readonly kind: 'local' | 'remote';
-  list(limit?: number, mode?: BoardMode): Promise<ScoreEntry[]>;
+  /** Top entries of a board; `caseId` narrows it to one file (the weekly, a case). */
+  list(limit?: number, mode?: BoardMode, caseId?: string): Promise<ScoreEntry[]>;
   submit(entry: ScoreEntry): Promise<void>;
 }
 
@@ -78,8 +79,9 @@ export class LocalLeaderboard implements LeaderboardProvider {
     }
   }
 
-  async list(limit = 10, mode: BoardMode = 'case'): Promise<ScoreEntry[]> {
-    return rankEntries(this.read(), limit, mode);
+  async list(limit = 10, mode: BoardMode = 'case', caseId?: string): Promise<ScoreEntry[]> {
+    const pool = caseId ? this.read().filter((e) => e.caseId === caseId) : this.read();
+    return rankEntries(pool, limit, mode);
   }
 
   async submit(entry: ScoreEntry): Promise<void> {
@@ -104,13 +106,20 @@ export class RemoteLeaderboard implements LeaderboardProvider {
   private fallback = new LocalLeaderboard();
   constructor(private url: string) {}
 
-  async list(limit = 10, mode: BoardMode = 'case'): Promise<ScoreEntry[]> {
+  async list(limit = 10, mode: BoardMode = 'case', caseId?: string): Promise<ScoreEntry[]> {
     try {
-      const res = await fetch(`${this.url}?limit=${limit}&mode=${mode}`);
+      const q = `?limit=${limit}&mode=${mode}${caseId ? `&caseId=${encodeURIComponent(caseId)}` : ''}`;
+      const res = await fetch(`${this.url}${q}`);
       if (!res.ok) throw new Error(String(res.status));
-      return rankEntries(sanitizeEntries(await res.json()), limit, mode);
+      const entries = sanitizeEntries(await res.json());
+      // Older servers ignore the filter; apply it here too.
+      return rankEntries(
+        caseId ? entries.filter((e) => e.caseId === caseId) : entries,
+        limit,
+        mode,
+      );
     } catch {
-      return this.fallback.list(limit, mode);
+      return this.fallback.list(limit, mode, caseId);
     }
   }
 

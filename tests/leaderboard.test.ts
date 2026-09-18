@@ -70,6 +70,13 @@ describe('leaderboard', () => {
     expect(await board.list()).toHaveLength(1);
   });
 
+  it('narrows a board to one file', async () => {
+    const board = new LocalLeaderboard(new MemoryStorage());
+    await board.submit({ ...e('w1', 50), mode: 'cold', caseId: 'cold-week-2026-w38' });
+    await board.submit({ ...e('other', 99), mode: 'cold', caseId: 'cold-zzz' });
+    expect((await board.list(5, 'cold', 'cold-week-2026-w38')).map((x) => x.name)).toEqual(['w1']);
+  });
+
   it('sanitises mode and holder flags', () => {
     const [a, b] = sanitizeEntries([
       { ...e('a', 1), mode: 'rush', holder: true },

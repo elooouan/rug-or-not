@@ -40,7 +40,9 @@ async function list(request, env, cors) {
   const url = new URL(request.url);
   const mode = MODES.has(url.searchParams.get('mode')) ? url.searchParams.get('mode') : 'case';
   const limit = Math.min(50, Math.max(1, Number(url.searchParams.get('limit')) || 10));
-  const entries = (await env.BOARD.get(`board:${mode}`, 'json')) || [];
+  const caseId = String(url.searchParams.get('caseId') || '').replace(/[^a-z0-9-]/g, '');
+  let entries = (await env.BOARD.get(`board:${mode}`, 'json')) || [];
+  if (caseId) entries = entries.filter((e) => e.caseId === caseId);
   return json(entries.slice(0, limit), 200, { ...cors, 'cache-control': 'public, max-age=15' });
 }
 

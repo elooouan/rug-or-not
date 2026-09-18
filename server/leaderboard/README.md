@@ -18,7 +18,8 @@ VITE_LEADERBOARD_URL=https://rug-or-not-board.<you>.workers.dev
 
 ## What it does
 
-- `GET /?limit=10&mode=case|rush|cold` returns the top entries for that board, highest first.
+- `GET /?limit=10&mode=case|rush|cold` returns the top entries for that board, highest first;
+  `&caseId=<id>` narrows it to one file (the game uses this for the weekly cold case).
 - `POST /` accepts one `ScoreEntry` (the shape in `src/systems/leaderboard.ts`), sanitises it,
   inserts it, and keeps the top 200 per board.
 - Twelve posts per IP per minute; names are trimmed to 12 printable characters; scores are

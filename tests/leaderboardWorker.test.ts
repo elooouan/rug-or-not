@@ -62,6 +62,18 @@ describe('leaderboard worker', () => {
     expect(rush[0]).toMatchObject({ mode: 'rush', hard: true, score: 5000 });
   });
 
+  it('filters a board by caseId', async () => {
+    const e = env();
+    await worker.fetch(post(entry({ mode: 'cold', caseId: 'cold-week-2026-w38', score: 40 })), e);
+    await worker.fetch(post(entry({ mode: 'cold', caseId: 'cold-abc123', score: 90 })), e);
+    const res = await worker.fetch(
+      new Request('https://board.test/?mode=cold&caseId=cold-week-2026-w38'),
+      e,
+    );
+    const list = (await res.json()) as { caseId: string }[];
+    expect(list.map((x) => x.caseId)).toEqual(['cold-week-2026-w38']);
+  });
+
   it('rejects nonsense and rate-limits an address', async () => {
     const e = env();
     expect((await worker.fetch(post(entry({ score: 1e9 })), e)).status).toBe(400);
