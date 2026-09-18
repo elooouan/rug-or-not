@@ -48,9 +48,11 @@ export class DialogueBox extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, lines: DialogueLine[], opts: DialogueOpts = {}) {
     super(scene, 0, 0);
-    // One Lucien at a time: whatever he was saying ends now, before this box opens.
-    OPEN.get(scene)?.finish(true);
+    // One Lucien at a time: whatever he was saying ends now, before this box opens. This
+    // box claims the slot first so a box opened from the old one's onDone replaces it too.
+    const prev = OPEN.get(scene);
     OPEN.set(scene, this);
+    prev?.finish(true);
     this.lines = lines;
     this.conditions = opts.conditions ?? {};
     this.onDone = opts.onDone;
@@ -157,6 +159,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       scene.tweens.add({ targets: this, y: 0, alpha: 1, duration: 260, ease: 'Back.easeOut' });
     }
     pushOverlay();
+    this.overlayHeld = true;
     // A scene shutdown can destroy us without finish(); keep the overlay count honest.
     this.once(Phaser.GameObjects.Events.DESTROY, () => this.releaseOverlay());
     audio.play('slide');
@@ -259,7 +262,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.arrow.setVisible(Math.floor(this.scene.time.now / 400) % 2 === 0);
   }
 
-  private overlayHeld = true;
+  private overlayHeld = false;
 
   private releaseOverlay(): void {
     if (!this.overlayHeld) return;
