@@ -314,7 +314,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         awardBadge(ctx.scene, 'shareholder');
         lucienSays(ctx.scene, 'holder');
       }
-      ctx.button('Refresh balances', () => void wallet.refresh(), { sameLine: true });
+      ctx.button(s.busy ? 'Refreshing...' : 'Refresh balances', () => void wallet.refresh(true), {
+        sameLine: true,
+      });
       ctx.button('Disconnect', () => void wallet.disconnect(), { x: 130, variant: 'paper' });
     }
     if (s.error) ctx.line(s.error, { color: 'stampRed' });

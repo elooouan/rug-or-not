@@ -192,10 +192,18 @@ export class WalletService {
     if (forget) saveStore.update((d) => (d.wallet.linked = false));
   }
 
-  /** Read SOL and (if a mint is configured) token balance. Public data only. */
-  async refresh(): Promise<void> {
+  private lastRefresh = 0;
+
+  /**
+   * Read SOL and (if a mint is configured) token balance. Public data only. A `manual`
+   * refresh (the button) is throttled so a nervous clicker doesn't get the public RPC to
+   * rate-limit them; account switches and connects always read.
+   */
+  async refresh(manual = false): Promise<void> {
     const address = this.state.address;
     if (!address) return;
+    if (manual && (this.state.busy || Date.now() - this.lastRefresh < 3000)) return;
+    this.lastRefresh = Date.now();
     this.set({ busy: true, error: null });
     try {
       await this.checkNetwork();

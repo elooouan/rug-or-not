@@ -129,6 +129,19 @@ describe('wallet service', () => {
     expect(saveStore.get().wallet.linked).toBe(false);
   });
 
+  it('throttles the refresh button but not account switches', async () => {
+    const stub = rpcStub();
+    vi.stubGlobal('fetch', stub);
+    const p = fakeProvider();
+    const w = install(p);
+    await w.connect();
+    const afterConnect = stub.mock.calls.length;
+    await w.refresh(true);
+    expect(stub.mock.calls.length).toBe(afterConnect); // too soon after the connect's read
+    p.emit('accountChanged', { toString: () => 'OTHERKEY00000000000000' });
+    await vi.waitFor(() => expect(stub.mock.calls.length).toBeGreaterThan(afterConnect));
+  });
+
   it('warns when the RPC is on another network', async () => {
     vi.stubGlobal('fetch', rpcStub(GENESIS_HASH.devnet));
     const w = install(fakeProvider());
