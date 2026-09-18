@@ -19,6 +19,8 @@
   names the flag on every hit; the help page covers the weekly, drills and custom files.
 - Seasonal dressing: a pumpkin by the mug in the last week of October, fairy lights in the
   window from December 10th. PixelForge carries the young-token herring.
+- The case clock waits while Lucien is talking, so the tutorial no longer eats the timer.
+  With the lamp off the desk actually goes dark.
 - Suspicions in the desk notebook are links: click one to jump back to that clue. Buttons
   press down a pixel; screens fade up from the dark; dust drifts through the lamplight.
 - M mutes from any screen (the volume setting is kept for when it comes back).

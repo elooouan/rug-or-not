@@ -767,7 +767,9 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   override update(_t: number, delta: number): void {
-    if (this.phase === 'investigating' && !this.paused && this.clock) {
+    // The clock waits while Lucien is talking: a first-timer shouldn't lose the tutorial's
+    // minute to the timer.
+    if (this.phase === 'investigating' && !this.paused && this.clock && !this.dialogue?.isActive) {
       this.clock.tick(delta);
       // Ticking in the last ten seconds.
       const left = this.clock.timeLeft;
