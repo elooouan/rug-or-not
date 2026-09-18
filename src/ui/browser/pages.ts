@@ -274,6 +274,13 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       ctx.line('Nothing is signed, nothing is sent, and the game never sees a seed phrase.', {
         color: 'woodMid',
       });
+      if (TOKEN.leaderboardUrl)
+        ctx.line(
+          'Scores you post to the shared board carry the address, so holders can be told apart.',
+          {
+            color: 'woodMid',
+          },
+        );
       ctx.gap(4);
       if (s.available) {
         ctx.line(`${walletName()} detected.`, { color: 'lampGreen' });
