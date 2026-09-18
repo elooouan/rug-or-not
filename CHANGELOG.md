@@ -17,7 +17,9 @@
   so it reads on the wall as well as on paper.
 - Fixed: Lucien could end up squashed or stretched after fast clicks through a dialogue
   (every squish now returns to his resting size); on the title his corner bubble sat a
-  second head on top of him; the "glance at the window" mirror-flip is now a heel bounce.
+  second head on top of him; the "glance at the window" mirror-flip is now a heel bounce;
+  a new dialogue replaces the one on screen instead of stacking a second box (and a second
+  Lucien) on top of it.
 
 - Streak freezes: every seventh daily in a row earns one (two at most); a freeze quietly
   bridges a single missed night. The report says when one is earned or spent; the board

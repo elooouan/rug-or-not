@@ -27,6 +27,9 @@ export interface DialogueOpts {
  * type out with blips, click/Enter/Space advances, and some lines wait for
  * the player to actually do the thing.
  */
+/** The box each scene is showing, so a new one replaces it instead of stacking. */
+const OPEN = new WeakMap<Phaser.Scene, DialogueBox>();
+
 export class DialogueBox extends Phaser.GameObjects.Container {
   private lines: DialogueLine[];
   private index = -1;
@@ -45,6 +48,9 @@ export class DialogueBox extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, lines: DialogueLine[], opts: DialogueOpts = {}) {
     super(scene, 0, 0);
+    // One Lucien at a time: whatever he was saying ends now, before this box opens.
+    OPEN.get(scene)?.finish(true);
+    OPEN.set(scene, this);
     this.lines = lines;
     this.conditions = opts.conditions ?? {};
     this.onDone = opts.onDone;
@@ -261,10 +267,12 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     popOverlay();
   }
 
-  finish(): void {
+  /** Close the box; `now` skips the slide-out (another box is taking the spot). */
+  finish(now = false): void {
     if (this.finished) return;
     this.finished = true;
     this.releaseOverlay();
+    if (OPEN.get(this.scene) === this) OPEN.delete(this.scene);
     this.keyBindings.forEach(({ key, fn }) => key.off('down', fn));
     this.keyBindings = [];
     const done = () => {
@@ -273,7 +281,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       scene?.events.emit('dialogue:close');
       this.onDone?.();
     };
-    if (saveStore.get().settings.reducedMotion) done();
+    if (now || saveStore.get().settings.reducedMotion) done();
     else
       this.scene.tweens.add({
         targets: this,
