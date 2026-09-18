@@ -2,6 +2,9 @@
 
 ![Rug or Not? - the detective's desk](public/img/og.png)
 
+**Play:** https://elooouan.github.io/rug-or-not/ (once GitHub Pages is enabled, see below) ·
+**Write a case:** `/editor.html` on the same host.
+
 A pixel-art noir detective game about spotting crypto scams, with Detective Lucien as your guide. Each case is a folder of
 evidence on your desk: a contract snippet, tokenomics, a team page, a community chat log,
 a liquidity report and sometimes an audit certificate. Read it through the magnifying
