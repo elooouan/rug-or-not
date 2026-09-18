@@ -242,6 +242,16 @@ export class DeskBackground {
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.destroy());
   }
 
+  /** Clickable props lift a pixel under the pointer so the desk reads as touchable. */
+  private liftOnHover(obj: Phaser.GameObjects.Image, sound = true): void {
+    const y0 = obj.y;
+    obj.on('pointerover', () => {
+      if (sound) audio.play('hover');
+      obj.setY(y0 - 1);
+    });
+    obj.on('pointerout', () => obj.setY(y0));
+  }
+
   // ---- the fly ----------------------------------------------------------------
 
   /** Now and then a fly finds the lamp. Swat it for a badge. */
@@ -845,6 +855,7 @@ export class DeskBackground {
       .setOrigin(0)
       .setDepth(DEPTH.folderStack);
     stack.setInteractive({ useHandCursor: false });
+    this.liftOnHover(stack, false);
     const lines = [
       'cold cases',
       'nothing new',
@@ -895,7 +906,7 @@ export class DeskBackground {
     }
     const phone = scene.add.image(x, y, TEX.phone).setOrigin(0).setDepth(DEPTH.deskProps);
     phone.setInteractive({ useHandCursor: false });
-    phone.on('pointerover', () => audio.play('hover'));
+    this.liftOnHover(phone);
     phone.on('pointerdown', () => {
       glow.setAlpha(0);
       scene.tweens.killTweensOf(glow);
@@ -1025,7 +1036,7 @@ export class DeskBackground {
     const { x, y } = DESK.safe;
     const safe = this.scene.add.image(x, y, TEX.safe).setOrigin(0).setDepth(DEPTH.deskProps);
     safe.setInteractive({ useHandCursor: false });
-    safe.on('pointerover', () => audio.play('hover'));
+    this.liftOnHover(safe);
     safe.on('pointerdown', () => new Vault(this.scene));
   }
 
@@ -1035,6 +1046,7 @@ export class DeskBackground {
       .setOrigin(0)
       .setDepth(DEPTH.deskProps);
     pad.setInteractive({ useHandCursor: false });
+    this.liftOnHover(pad, false);
     pad.on('pointerdown', () => {
       audio.play('pin');
       floatText(this.scene, DESK.inkPad.x + 31, DESK.inkPad.y - 4, 'ink on your thumb');
