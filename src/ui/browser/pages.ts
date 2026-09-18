@@ -698,6 +698,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.line(
       'Your own files: write one in the editor (About page) and it shows up under RugScan > Your files.',
     );
+    ctx.line(
+      `Wallet: the chip on the title opens the ${TOKEN.symbol} page. Optional, read-only; the game never asks you to sign anything.`,
+    );
     ctx.gap();
     ctx.line(
       'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio (four stations), the safe.',
