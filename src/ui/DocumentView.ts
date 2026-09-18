@@ -49,7 +49,8 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
   protected readonly contentW = PAPER.w - PAPER.padding * 2;
   protected readonly contentH = PAPER.h - PAPER.padding * 2 - PAPER.titleHeight;
   private strayPins: Phaser.GameObjects.Image[] = [];
-  private scrollHint: Phaser.GameObjects.Text;
+  private scrollDown: Phaser.GameObjects.Text;
+  private scrollUp: Phaser.GameObjects.Text;
   private focusIndex = -1;
   /** Extra rows drawn absolutely (pie charts etc.) live here, unaffected by scrolling. */
   protected fixed: Phaser.GameObjects.Container;
@@ -120,13 +121,36 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     this.scrollArea = scene.make.container({ x: 0, y: 0 }, false);
     this.fixed = scene.make.container({ x: 0, y: 0 }, false);
     this.add([this.scrollArea, this.fixed]);
-    this.scrollHint = makeText(scene, PAPER.w / 2, PAPER.h - PAPER.padding + 2, 'v  more  v', {
-      size: 8,
-      color: 'woodMid',
-    })
-      .setOrigin(0.5, 0)
-      .setVisible(false);
-    this.add(this.scrollHint);
+    // Scroll hints double as tap targets for touch screens (no wheel there).
+    const hint = (x: number, label: string, originX: number, dir: number) => {
+      const t = makeText(scene, x, PAPER.h - PAPER.padding + 2, label, {
+        size: 8,
+        color: 'woodMid',
+      })
+        .setOrigin(originX, 0)
+        .setVisible(false);
+      // A fatter hit box than the 8px text, for thumbs.
+      t.setInteractive(
+        new Phaser.Geom.Rectangle(-8, -8, t.width + 16, t.height + 16),
+        Phaser.Geom.Rectangle.Contains,
+      );
+      t.on(
+        'pointerdown',
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) =>
+          ev.stopPropagation(),
+      );
+      t.on(
+        'pointerup',
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+          ev.stopPropagation();
+          this.scroll(dir);
+        },
+      );
+      this.add(t);
+      return t;
+    };
+    this.scrollUp = hint(PAPER.padding, '^  up', 0, -1);
+    this.scrollDown = hint(PAPER.w - PAPER.padding, 'v  more', 1, 1);
 
     this.build();
     this.layout();
@@ -275,8 +299,8 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
         lastVisible = i;
       }
     }
-    this.scrollHint.setVisible(lastVisible < this.rows.length - 1);
-    this.scrollHint.setText(this.firstRow > 0 ? '^  more  v' : 'v  more  v');
+    this.scrollDown.setVisible(lastVisible < this.rows.length - 1);
+    this.scrollUp.setVisible(this.firstRow > 0);
   }
 
   scroll(dir: number): boolean {
