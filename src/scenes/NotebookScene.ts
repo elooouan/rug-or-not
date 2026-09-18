@@ -273,7 +273,10 @@ export class NotebookScene extends Phaser.Scene {
     }
     if (this.chapter === 'flags') {
       const flag = FLAGS[id as FlagId];
-      add(flag.title.toUpperCase(), { size: FONT.size.body, color: 'woodDark' });
+      // Titles in the UI font are wider than the body font; wrap them by words.
+      wrapMono(flag.title.toUpperCase(), 26).forEach((l) =>
+        add(l, { size: FONT.size.body, color: 'woodDark' }),
+      );
       add(`severity: ${flag.severity}  ${SEV_MARK[flag.severity]}`, {
         size: FONT.size.tiny,
         color: SEV_COLOR[flag.severity],
@@ -321,7 +324,9 @@ export class NotebookScene extends Phaser.Scene {
       }
     } else {
       const h = HERRINGS[id as HerringId];
-      add(h.title.toUpperCase(), { size: FONT.size.body, color: 'woodDark' });
+      wrapMono(h.title.toUpperCase(), 26).forEach((l) =>
+        add(l, { size: FONT.size.body, color: 'woodDark' }),
+      );
       add('yellow herring: looks scary, is fine', { size: FONT.size.tiny, color: 'stampGreen' });
       y += 6;
       add('Why it is fine', { size: FONT.size.tiny, color: 'paperShadow' });
