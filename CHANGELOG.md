@@ -31,8 +31,9 @@
   window from December 10th. PixelForge carries the young-token herring.
 - Promotions get confetti; unlock toasts say where to equip the thing; Lucien's rookie
   remarks (first pin, unpin, idle nudge toward the lens) stop after the first few files.
-- The case clock waits while Lucien is talking, so the tutorial no longer eats the timer.
-  With the lamp off the desk actually goes dark.
+- The case clock waits while Lucien is talking, so the tutorial no longer eats the timer,
+  and the pause menu opens by itself when another window takes the focus mid-file. With
+  the lamp off the desk actually goes dark.
 - Suspicions in the desk notebook are links: click one to jump back to that clue. Buttons
   press down a pixel (and take a slightly bigger tap on touch screens); tabs and the drawer's
   special folders lift under the pointer; screens fade up from the dark; dust drifts through

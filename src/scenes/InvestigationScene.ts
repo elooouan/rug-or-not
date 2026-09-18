@@ -145,7 +145,22 @@ export class InvestigationScene extends Phaser.Scene {
     this.said = new Set();
     this.hintsUsed = 0;
     audio.setTension(false);
+    // Looking away (another window on top) opens the pause menu, so the clock doesn't run
+    // down while nobody is reading. The phone and Lucien's lessons already hold it.
+    const onBlur = () => {
+      if (
+        this.phase === 'investigating' &&
+        !this.paused &&
+        !this.browsing &&
+        !this.dialogue?.isActive &&
+        !saveStore.get().settings.relaxed &&
+        this.scene.isActive()
+      )
+        this.togglePause();
+    };
+    this.game.events.on(Phaser.Core.Events.BLUR, onBlur);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(Phaser.Core.Events.BLUR, onBlur);
       audio.setTension(false);
       // Hands the pointer back to the cursor overlay; otherwise a lens left active on the
       // paper follows the mouse into the report.
