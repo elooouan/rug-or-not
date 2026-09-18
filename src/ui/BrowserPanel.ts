@@ -879,6 +879,15 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.line(
       'Cold cases: files the printer makes up on the spot, endless. Same rules, their own board; the seed in the share link brings the same file back.',
     );
+    ctx.line(
+      'The WEEKLY folder is the same cold case for everyone this week. Every other daily is a generated file too.',
+    );
+    ctx.line(
+      'Drills: every red-flag page in the notebook can print five pages that hide that flag. Clear them all to log it.',
+    );
+    ctx.line(
+      'Your own files: write one in the editor (About page) and it shows up under RugScan > Your files.',
+    );
     ctx.gap();
     ctx.line(
       'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio (four stations), the safe.',
