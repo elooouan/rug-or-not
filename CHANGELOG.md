@@ -32,8 +32,8 @@
   the board, and a word from Lucien. Perks use the last balance the coin page saw. The coin
   page accepts any injected Solana wallet with Phantom's connect shape (Solflare, Backpack),
   still read-only.
-- Rush decks mix in four generated pages a day; the results card explains the herrings you
-  fell for; drills reuse the rush desk.
+- Rush decks mix in four generated pages a day; every hit names the flag as it goes by; the
+  results card explains the herrings you fell for; drills reuse the rush desk.
 - The board page can save a Detective ID card (PNG); NetScope has an About page; the report
   shows how long a file took and the drawer remembers your fastest correct call per case;
   notebook flag pages keep your record (pinned vs missed).

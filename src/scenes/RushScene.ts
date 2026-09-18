@@ -324,6 +324,8 @@ export class RushScene extends Phaser.Scene {
         `+${next.gained}${m > 1 ? `  (x${m.toFixed(2).replace(/0$/, '')})` : ''}  +${RUSH.flagTimeBonus}s`,
         'amber',
       );
+      // Name the tell as it goes by: the arcade is still a lesson.
+      floatText(this, PAPER.x + PAPER.w / 2, PAPER.y + 58, FLAGS[clue.flagId].title, 'stampGreen');
       if (next.streak === 5)
         LucienBubble.say(this, 'Five in a row. Keep that pencil moving.', 2200);
       if (next.streak === 10) {
