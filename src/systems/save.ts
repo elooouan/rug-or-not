@@ -8,6 +8,8 @@ export interface CaseResult {
   lastVerdictCorrect: boolean;
   /** Ever stamped the right verdict on this case (rogues gallery, badges). */
   solved?: boolean;
+  /** Fastest correct verdict in seconds (timed runs only). */
+  bestTimeSec?: number;
 }
 
 export interface CosmeticSelection {
@@ -141,6 +143,9 @@ export function sanitizeSave(raw: unknown): SaveData {
         completions: typeof cr.completions === 'number' ? cr.completions : 1,
         lastVerdictCorrect: cr.lastVerdictCorrect === true,
         solved: cr.solved === true || cr.lastVerdictCorrect === true,
+        ...(typeof cr.bestTimeSec === 'number' && Number.isFinite(cr.bestTimeSec)
+          ? { bestTimeSec: Math.max(0, Math.floor(cr.bestTimeSec)) }
+          : {}),
       };
     }
   }

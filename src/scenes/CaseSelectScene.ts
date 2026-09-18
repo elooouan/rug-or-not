@@ -173,7 +173,7 @@ export class CaseSelectScene extends Phaser.Scene {
       ? [
           ...wrapMono(`"${c.pitch}"`, maxChars),
           best
-            ? `best: ${best.bestScore} pts (${best.bestGrade})  ·  played ${best.completions}x`
+            ? `best: ${best.bestScore} pts (${best.bestGrade})${best.bestTimeSec !== undefined ? `  ·  fastest ${Math.floor(best.bestTimeSec / 60)}:${String(best.bestTimeSec % 60).padStart(2, '0')}` : ''}  ·  ${best.completions}x`
             : 'not played yet',
         ]
       : wrapMono(

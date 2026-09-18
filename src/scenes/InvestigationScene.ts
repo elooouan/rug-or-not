@@ -545,6 +545,12 @@ export class InvestigationScene extends Phaser.Scene {
         lastVerdictCorrect: breakdown.verdictCorrect,
         solved: (prev?.solved ?? false) || breakdown.verdictCorrect,
       };
+      // Fastest correct call, timed runs only.
+      if (breakdown.verdictCorrect && !relaxed && this.clock) {
+        const t = c.timeLimitSec - this.clock.timeLeft;
+        const best = prev?.bestTimeSec;
+        if (best === undefined || t < best) d.caseResults[c.id].bestTimeSec = t;
+      }
       if (gameState.mode === 'daily') {
         const next = recordDailyPlay(d.daily, localDateKey());
         d.daily = { ...next, played: next.played ?? [] };
