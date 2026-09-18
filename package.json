@@ -27,6 +27,7 @@
     "@types/node": "^22.20.3",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
+    "gifenc": "^1.0.3",
     "globals": "^17.12.0",
     "prettier": "^3.9.7",
     "tsx": "^4.23.13",
