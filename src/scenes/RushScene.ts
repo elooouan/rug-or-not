@@ -3,7 +3,7 @@ import { DEPTH } from '@/config/depth';
 import { RUSH } from '@/config/gameConfig';
 import { DESK, FONT, GAME_HEIGHT, GAME_WIDTH, NOTEBOOK, PAPER } from '@/config/layout';
 import { HEX } from '@/config/palette';
-import { isFlagClue, type Clue } from '@/data/schema';
+import { HERRINGS, isFlagClue, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
@@ -36,7 +36,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { StickyNote } from '@/ui/StickyNote';
 import { toast } from '@/ui/Toast';
-import { addText, makeText } from '@/ui/text';
+import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'over';
@@ -57,6 +57,8 @@ export class RushScene extends Phaser.Scene {
   private locked = false;
   private strayCount = 0;
   private lastTickSecond = -1;
+  /** Herrings pinned this run, for the debrief on the results card. */
+  private herringsHit: string[] = [];
   private hud!: {
     score: Phaser.GameObjects.Text;
     mult: Phaser.GameObjects.Text;
@@ -76,6 +78,7 @@ export class RushScene extends Phaser.Scene {
     this.locked = false;
     this.strayCount = 0;
     this.lastTickSecond = -1;
+    this.herringsHit = [];
     this.doc = undefined;
     this.page = undefined;
     this.deck = shuffle(rushPages(this.rushCases()));
@@ -298,6 +301,8 @@ export class RushScene extends Phaser.Scene {
       return;
     }
     // A yellow herring: the pin stays in as a reminder, the clock pays for it.
+    if (!isFlagClue(clue) && !this.herringsHit.includes(clue.herringId))
+      this.herringsHit.push(clue.herringId);
     this.state = applyHerring(this.state);
     this.penalty(this.state.timeDelta, 'herring');
   }
@@ -360,8 +365,9 @@ export class RushScene extends Phaser.Scene {
 
   private showResults(grade: string, improved: boolean): void {
     const s = this.state;
-    const w = 240;
-    const h = 170;
+    const lessons = this.herringsHit.slice(0, 2);
+    const w = 270;
+    const h = 170 + (lessons.length ? 18 + lessons.length * 36 : 0);
     const x = PAPER.x + (PAPER.w - w) / 2;
     const y = PAPER.y + (PAPER.h - h) / 2 - 10;
     const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
@@ -394,6 +400,40 @@ export class RushScene extends Phaser.Scene {
         }),
       ),
     );
+    // The herrings that cost you seconds, and why they were fine.
+    if (lessons.length) {
+      const cw = charWidth(this, 'body', FONT.size.body);
+      const maxChars = Math.floor((w - 32) / cw);
+      c.add(
+        makeText(this, x + 16, y + 120, 'looked scary, was fine:', {
+          size: FONT.size.tiny,
+          color: 'paperShadow',
+        }),
+      );
+      lessons.forEach((id, i) => {
+        const hr = HERRINGS[id as keyof typeof HERRINGS];
+        if (!hr) return;
+        const ly = y + 132 + i * 36;
+        c.add(
+          makeText(this, x + 16, ly, hr.title, {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'stampGreen',
+          }),
+        );
+        wrapMono(hr.reassurance, maxChars)
+          .slice(0, 2)
+          .forEach((l, k) =>
+            c.add(
+              makeText(this, x + 16, ly + 11 + k * 11, l, {
+                font: 'body',
+                size: FONT.size.body,
+                color: 'woodMid',
+              }),
+            ),
+          );
+      });
+    }
     // Grade stamp in the corner.
     const mark = this.add.container(x + w - 34, y + 46).setAngle(-12);
     mark.add(rect(this, 0, 0, 30, 30).setStrokeStyle(2, HEX.stampRed).setOrigin(0.5));
