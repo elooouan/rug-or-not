@@ -412,7 +412,7 @@ export function makeDrawer(scene: Phaser.Scene): void {
     g.fillRect(6, 6, w - 12, 1);
     // Hanging rails, one per folder row.
     g.fillStyle(HEX.paperShadow, 1);
-    g.fillRect(14, 30, w - 28, 2);
-    g.fillRect(14, 30 + DRAWER.folderH + DRAWER.gapY, w - 28, 2);
+    for (let r = 0; r < DRAWER.rows; r++)
+      g.fillRect(14, 30 + r * (DRAWER.folderH + DRAWER.gapY), w - 28, 2);
   });
 }

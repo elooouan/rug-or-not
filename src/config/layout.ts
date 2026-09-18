@@ -126,17 +126,18 @@ export const DIALOGUE = {
   textWidth: 470,
 } as const;
 
-/** Filing-cabinet drawer on the case select screen: six folders per row. */
+/** Filing-cabinet drawer on the case select screen: six folders per row, three rows deep. */
 export const DRAWER = {
   x: 40,
-  y: 60,
+  y: 36,
   w: 560,
-  h: 250,
+  h: 292,
   cols: 6,
+  rows: 3,
   folderW: 80,
   folderH: 56,
   gapX: 8,
-  gapY: 40,
+  gapY: 28,
 } as const;
 
 /** The evidence wall (history storyboard). */

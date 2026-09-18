@@ -10,6 +10,9 @@
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
 - Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
   for posting, next to the clipboard text.
+- Two new cases: $NAPKIN (a renounce with an operator behind it, an audit for the wrong file)
+  and $LNTRN (a loud, fee-charging festival token that is entirely fine). The drawer is three
+  rows deep.
 - A fly visits the lamp now and then (swat it); more typed words on the title screen.
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid

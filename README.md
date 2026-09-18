@@ -70,7 +70,7 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 
 ## Modes
 
-- **Campaign**: twelve cases in order (seven rugs, five legit, difficulty 1→5); each verdict unlocks the next folder.
+- **Campaign**: fourteen cases in order (eight rugs, six legit, difficulty 1→5); each verdict unlocks the next folder.
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Daily plays don't unlock campaign folders.
 - **Red Flag Rush**: sixty seconds, one evidence page at a time. Every page hides at least

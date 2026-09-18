@@ -1,0 +1,324 @@
+{
+  "id": "napkin",
+  "title": "The Napkin Deal",
+  "ticker": "$NAPKIN",
+  "pitch": "NapkinPay: restaurant rewards on-chain. Renounced, audited, 20% monthly from tips.",
+  "intro": "Renounced and audited, they say. Read who can still mint, and what exactly got audited.",
+  "difficulty": 4,
+  "verdict": "rug",
+  "timeLimitSec": 300,
+  "debrief": "NapkinPay renounced ownership on stage and kept an 'operator' backstage who can mint rewards to anyone. The audit certificate was for a different file with a perfect score and no findings. The liquidity lock had four days left, and '20% monthly, guaranteed' came straight from the admin. The fixed 1% tip fee and a well-vested marketing wallet were the parts they wanted you to read.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "NapkinPay.sol",
+      "content": {
+        "fileName": "contracts/NapkinPay.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract NapkinPay is ERC20, Ownable {",
+          "  uint256 public constant TIP_FEE_BPS = 100; // 1%, fixed",
+          "  address public operator;",
+          "  address public treasury;",
+          "",
+          "  constructor() ERC20(\"NapkinPay\", \"NAPKIN\") {",
+          "    _mint(msg.sender, 100_000_000e18);",
+          "    operator = msg.sender;",
+          "    renounceOwnership();",
+          "  }",
+          "",
+          "  // Restaurant rewards are settled off-chain and minted here.",
+          "  function rewardMint(address to, uint256 amount) external {",
+          "    require(msg.sender == operator, \"operator\");",
+          "    _mint(to, amount);",
+          "  }",
+          "",
+          "  function _update(address f, address t, uint256 v)",
+          "    internal override {",
+          "    uint256 fee = v * TIP_FEE_BPS / 10_000;",
+          "    super._update(f, treasury, fee);",
+          "    super._update(f, t, v - fee);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "np-operator",
+          "label": "Operator survives",
+          "flagId": "fake-renounce",
+          "anchor": {
+            "kind": "line",
+            "line": 10
+          }
+        },
+        {
+          "id": "np-mint",
+          "label": "Operator mints at will",
+          "flagId": "mint-unlimited",
+          "finePrint": true,
+          "text": "// no cap, no schedule, no event. 'rewards' can be anything.",
+          "anchor": {
+            "kind": "line",
+            "line": 14
+          }
+        },
+        {
+          "id": "np-fee",
+          "label": "1% fee, constant",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Certificate",
+      "content": {
+        "auditor": "ChainSure Labs",
+        "contractName": "NapkinToken.sol (0x91a...c02)",
+        "date": "2 Sep",
+        "score": "100 / 100",
+        "summary": "Automated scan complete. No vulnerabilities detected. Contract is SAFU.",
+        "findings": []
+      },
+      "clues": [
+        {
+          "id": "np-audit-name",
+          "label": "Audits the wrong file",
+          "flagId": "fake-audit",
+          "finePrint": true,
+          "text": "deployed contract is NapkinPay.sol at 0x4d2...e88, not this one",
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "field"
+          }
+        },
+        {
+          "id": "np-audit-score",
+          "label": "100/100, zero findings",
+          "flagId": "fake-audit",
+          "anchor": {
+            "kind": "row",
+            "row": 3,
+            "table": "field"
+          }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "100,000,000 NAPKIN (plus rewards)",
+        "allocations": [
+          {
+            "label": "Diner rewards",
+            "pct": 45,
+            "vesting": "minted as earned"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 30,
+            "vesting": "locked (see lock)"
+          },
+          {
+            "label": "Restaurants",
+            "pct": 15,
+            "vesting": "6 months"
+          },
+          {
+            "label": "Team",
+            "pct": 6,
+            "vesting": "12 months"
+          },
+          {
+            "label": "Marketing",
+            "pct": 4,
+            "vesting": "18 months, multisig"
+          }
+        ],
+        "notes": [
+          "Roadmap: 40 partner restaurants in the city by spring. Menu QR codes. Nothing exotic."
+        ]
+      },
+      "clues": [
+        {
+          "id": "np-marketing",
+          "label": "4% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": {
+            "kind": "row",
+            "row": 4
+          }
+        },
+        {
+          "id": "np-roadmap",
+          "label": "Boring roadmap",
+          "herring": true,
+          "herringId": "boring-roadmap",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Telegram: NapkinPay Diners",
+      "content": {
+        "channel": "napkinpay-diners",
+        "messages": [
+          {
+            "user": "NapkinChef",
+            "role": "admin",
+            "time": "19:02",
+            "text": "welcome new diners! quick recap: 20% monthly from restaurant tips. guaranteed, it's math, tips never stop."
+          },
+          {
+            "user": "forkbender",
+            "time": "19:04",
+            "text": "I put my whole lunch budget in. living on napkins now"
+          },
+          {
+            "user": "ledger_lucy",
+            "time": "19:09",
+            "text": "who is the operator address? renounced doesn't matter if operator can mint"
+          },
+          {
+            "user": "NapkinChef",
+            "role": "admin",
+            "time": "19:11",
+            "text": "operator is the rewards bot, fully automated, totally safe. audit says 100/100."
+          },
+          {
+            "user": "ledger_lucy",
+            "time": "19:12",
+            "text": "the audit is for NapkinToken.sol. that's not the deployed file."
+          },
+          {
+            "user": "NapkinChef",
+            "role": "admin",
+            "time": "19:13",
+            "text": "same code, renamed. moving on. lock renewal announcement friday!"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "np-guaranteed",
+          "label": "20%/month guaranteed",
+          "flagId": "guaranteed-returns",
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
+        },
+        {
+          "id": "np-lucy",
+          "label": "Lucy asks re: operator",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": {
+            "kind": "message",
+            "index": 2
+          }
+        },
+        {
+          "id": "np-joke",
+          "label": "'Living on napkins'",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": {
+            "kind": "message",
+            "index": 1
+          }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "NAPKIN / USDC",
+        "liquidityUsd": "$210,000",
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Sep 22 (4 days)",
+          "pct": 100
+        },
+        "holders": [
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "Rewards wallet",
+            "pct": 22,
+            "tag": "operator"
+          },
+          {
+            "label": "Restaurants vesting",
+            "pct": 15,
+            "tag": "contract"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 33
+          }
+        ],
+        "transfers": [
+          {
+            "when": "2d ago",
+            "from": "Operator",
+            "to": "0x7aa...b31",
+            "amount": "2,400,000"
+          },
+          {
+            "when": "2d ago",
+            "from": "0x7aa...b31",
+            "to": "Pool",
+            "amount": "2,400,000"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "np-lock",
+          "label": "Lock ends in 4 days",
+          "flagId": "liquidity-unlocked",
+          "finePrint": true,
+          "text": "lock created 30 days ago for 34 days. 'renewal' has been announced twice.",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
+        },
+        {
+          "id": "np-pool",
+          "label": "Pool is top holder",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "holders"
+          }
+        }
+      ]
+    }
+  ]
+}

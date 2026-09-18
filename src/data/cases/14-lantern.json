@@ -1,0 +1,325 @@
+{
+  "id": "lantern",
+  "title": "Lantern Night",
+  "ticker": "$LNTRN",
+  "pitch": "Lantern: a night-market festival token. 3% fee, loud chat, an audit with findings.",
+  "intro": "Everything about this one looks like trouble at a glance. Look twice. That's the whole job.",
+  "difficulty": 5,
+  "verdict": "legit",
+  "timeLimitSec": 300,
+  "debrief": "Lantern is loud, fee-charging and run by someone called Captain Noodle, and none of that is a crime. The 3% fee is a constant that pays the festival's stall fund, the supply is fixed, ownership is renounced with no operator or proxy left behind, liquidity is locked for four years, the audit found two real issues and the fixes shipped, and the angriest person in chat got straight answers. Scary is not the same as guilty.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "LanternToken.sol",
+      "content": {
+        "fileName": "contracts/LanternToken.sol",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "contract LanternToken is ERC20 {",
+          "  uint256 public constant FEE_BPS = 300; // 3%, immutable",
+          "  address public immutable stallFund;",
+          "  uint256 public constant MAX_SUPPLY = 8_000_000e18;",
+          "",
+          "  constructor(address _stallFund) ERC20(\"Lantern\", \"LNTRN\") {",
+          "    stallFund = _stallFund;",
+          "    _mint(msg.sender, MAX_SUPPLY);",
+          "  }",
+          "",
+          "  // No owner, no operator, no proxy. What you see is what runs.",
+          "  function _update(address f, address t, uint256 v)",
+          "    internal override {",
+          "    uint256 fee = v * FEE_BPS / 10_000;",
+          "    super._update(f, stallFund, fee);",
+          "    super._update(f, t, v - fee);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "ln-fee",
+          "label": "3% fee, constant",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
+        },
+        {
+          "id": "ln-supply",
+          "label": "Fixed supply, no mint",
+          "herring": true,
+          "herringId": "immutable-supply-note",
+          "anchor": {
+            "kind": "line",
+            "line": 5
+          }
+        },
+        {
+          "id": "ln-noowner",
+          "label": "No owner, no operator",
+          "herring": true,
+          "herringId": "renounced-cleanly",
+          "anchor": {
+            "kind": "line",
+            "line": 12
+          }
+        }
+      ]
+    },
+    {
+      "type": "tokenomics",
+      "title": "Tokenomics",
+      "content": {
+        "totalSupply": "8,000,000 LNTRN",
+        "allocations": [
+          {
+            "label": "Stall fund (by vote)",
+            "pct": 50,
+            "vesting": "by vote"
+          },
+          {
+            "label": "Liquidity",
+            "pct": 30,
+            "vesting": "locked 4y"
+          },
+          {
+            "label": "Organisers",
+            "pct": 12,
+            "vesting": "1y cliff+2y"
+          },
+          {
+            "label": "Marketing",
+            "pct": 8,
+            "vesting": "24 months, multisig"
+          }
+        ],
+        "notes": [
+          "Roadmap: run the spring festival. Publish stall payouts. Run the autumn festival. That's it."
+        ]
+      },
+      "clues": [
+        {
+          "id": "ln-marketing",
+          "label": "8% marketing, vested",
+          "herring": true,
+          "herringId": "small-vested-marketing",
+          "anchor": {
+            "kind": "row",
+            "row": 3
+          }
+        },
+        {
+          "id": "ln-roadmap",
+          "label": "'That's it' roadmap",
+          "herring": true,
+          "herringId": "boring-roadmap",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "notes"
+          }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Organisers",
+      "content": {
+        "members": [
+          {
+            "name": "Captain Noodle",
+            "role": "Festival lead",
+            "bio": "Mei Tanaka. Has run the night market for six years; the handle is on the market's own posters.",
+            "portraitSeed": "mei",
+            "style": "normal"
+          },
+          {
+            "name": "Rafael Duarte",
+            "role": "Contract dev",
+            "bio": "Wrote the stall-fund contracts. Public repo, public commits, public arguments about them.",
+            "portraitSeed": "rafael",
+            "style": "normal"
+          }
+        ],
+        "note": "Both organisers appear in the city's festival permit filing."
+      },
+      "clues": [
+        {
+          "id": "ln-noodle",
+          "label": "Captain Noodle: doxxed",
+          "herring": true,
+          "herringId": "doxxed-meme-name",
+          "anchor": {
+            "kind": "row",
+            "row": 0
+          }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Discord: #lantern-general",
+      "content": {
+        "channel": "lantern-general",
+        "messages": [
+          {
+            "user": "CaptainNoodle",
+            "role": "admin",
+            "time": "21:40",
+            "text": "stall payouts for week 3 are posted. 41 stalls, 2,180 LNTRN total. spreadsheet in #payouts."
+          },
+          {
+            "user": "grumpy_ghost",
+            "time": "21:44",
+            "text": "3% fee is theft. what stops you raising it to 30%?"
+          },
+          {
+            "user": "CaptainNoodle",
+            "role": "admin",
+            "time": "21:46",
+            "text": "the compiler. FEE_BPS is a constant, there's no setter and no owner. read line 4."
+          },
+          {
+            "user": "grumpy_ghost",
+            "time": "21:47",
+            "text": "and the 'stall fund' is just your wallet with a fancy name"
+          },
+          {
+            "user": "rafael_d",
+            "role": "mod",
+            "time": "21:49",
+            "text": "it's a contract that only pays addresses on the vote list. address is in the audit, go check."
+          },
+          {
+            "user": "dumpling_dan",
+            "time": "21:52",
+            "text": "I only hold this so I can say I'm invested in noodles"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "ln-ghost",
+          "label": "Ghost asks re: the fee",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": {
+            "kind": "message",
+            "index": 1
+          }
+        },
+        {
+          "id": "ln-joke",
+          "label": "'Invested in noodles'",
+          "herring": true,
+          "herringId": "community-jokes",
+          "anchor": {
+            "kind": "message",
+            "index": 5
+          }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "LNTRN / USDC",
+        "liquidityUsd": "$96,000",
+        "lock": {
+          "locked": true,
+          "provider": "LockBox",
+          "expires": "Sep 2030 (4y)",
+          "pct": 100
+        },
+        "holders": [
+          {
+            "label": "Stall fund contract",
+            "pct": 48,
+            "tag": "contract"
+          },
+          {
+            "label": "Liquidity pool",
+            "pct": 30,
+            "tag": "pool"
+          },
+          {
+            "label": "Organisers vesting",
+            "pct": 12,
+            "tag": "contract"
+          },
+          {
+            "label": "Everyone else",
+            "pct": 10
+          }
+        ],
+        "transfers": [
+          {
+            "when": "3d ago",
+            "from": "Stall fund",
+            "to": "41 stall wallets",
+            "amount": "2,180"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "ln-lock",
+          "label": "Locked four years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
+        },
+        {
+          "id": "ln-pool",
+          "label": "Pool holds 30%",
+          "herring": true,
+          "herringId": "pool-top-holder",
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "holders"
+          }
+        }
+      ]
+    },
+    {
+      "type": "audit",
+      "title": "Audit Report",
+      "content": {
+        "auditor": "Kestrel Security",
+        "contractName": "LanternToken.sol (0x5e1...9a4)",
+        "date": "14 Aug",
+        "score": "Pass - 2 medium, 1 low",
+        "summary": "Manual review of LanternToken.sol and StallFund.sol. Two medium findings, both fixed and re-reviewed before deployment.",
+        "findings": [
+          "Fee rounding could dust-lock tiny transfers (medium) - fixed.",
+          "Stall fund vote list had no removal path (medium) - fixed.",
+          "Event missing on payout (low) - fixed."
+        ]
+      },
+      "clues": [
+        {
+          "id": "ln-findings",
+          "label": "Audit found 2 mediums",
+          "herring": true,
+          "herringId": "real-audit-findings",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "findings"
+          }
+        }
+      ]
+    }
+  ]
+}
