@@ -76,8 +76,13 @@ export interface SaveData {
     /** Week keys whose weekly cold case has been closed. */
     weeklyDone: string[];
   };
-  /** Last known wallet snapshot (public address + token balance) for holder perks. */
-  wallet: { address: string | null; token: number | null; checkedAt: string | null };
+  /** Last known wallet snapshot (public address + token balance) for holder perks; `linked` asks for a silent reconnect on boot. */
+  wallet: {
+    address: string | null;
+    token: number | null;
+    checkedAt: string | null;
+    linked: boolean;
+  };
 }
 
 export const DEFAULT_COSMETICS: CosmeticSelection = {
@@ -124,7 +129,7 @@ export function defaultSave(): SaveData {
       drilled: [],
       weeklyDone: [],
     },
-    wallet: { address: null, token: null, checkedAt: null },
+    wallet: { address: null, token: null, checkedAt: null, linked: false },
   };
 }
 
@@ -211,6 +216,7 @@ export function sanitizeSave(raw: unknown): SaveData {
       address: typeof w.address === 'string' ? w.address : null,
       token: typeof w.token === 'number' && Number.isFinite(w.token) ? w.token : null,
       checkedAt: typeof w.checkedAt === 'string' ? w.checkedAt : null,
+      linked: w.linked === true,
     };
   }
   if (Array.isArray(r.seenHints))

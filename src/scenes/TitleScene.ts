@@ -31,6 +31,9 @@ import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
+import { wallet } from '@/systems/wallet';
+import { shortAddress, TOKEN } from '@/config/token';
+import { BrowserPanel } from '@/ui/BrowserPanel';
 
 /** Whole hours until the next daily case (local midnight), never less than one. */
 function hoursToMidnight(): number {
@@ -321,6 +324,26 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
+    // The wallet lives on the phone (NetScope > coin page); this is the way in from the desk.
+    // Optional: the game plays the same without it.
+    const walletLabel = () => {
+      const w = wallet.state;
+      if (w.connected && w.address) return `${TOKEN.symbol} · ${shortAddress(w.address)}`;
+      return w.busy ? 'Wallet...' : 'Connect wallet';
+    };
+    const walletBtn = new PixelButton(
+      this,
+      GAME_WIDTH - 134,
+      GAME_HEIGHT - 48,
+      walletLabel(),
+      () => BrowserPanel.toggle(this, 'coin'),
+      { variant: 'paper', width: 128 },
+    );
+    walletBtn.setDepth(DEPTH.hud);
+    const unsubWallet = wallet.onChange(
+      () => walletBtn.active && walletBtn.setLabel(walletLabel()),
+    );
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubWallet);
     const version = addText(this, 6, GAME_HEIGHT - 12, GAME_VERSION, {
       size: 8,
       color: 'woodLight',

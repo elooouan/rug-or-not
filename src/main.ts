@@ -12,6 +12,7 @@ import { SettingsScene } from '@/scenes/SettingsScene';
 import { HistoryScene } from '@/scenes/HistoryScene';
 import { RushScene } from '@/scenes/RushScene';
 import { audio } from '@/systems/audio';
+import { wallet } from '@/systems/wallet';
 import { toast } from '@/ui/Toast';
 import { overlayDepth } from '@/ui/escGuard';
 import { caseById, gameState } from '@/systems/gameState';
@@ -103,6 +104,7 @@ if (import.meta.env.DEV) {
       musicLevel(): Promise<{ peak: number; rms: number }>;
       overlays(): number;
       snapshot(name: string): Promise<string>;
+      wallet: typeof wallet;
       /** The live audio manager (station, static, levels). */
       audio: typeof audio;
     };
@@ -125,6 +127,8 @@ if (import.meta.env.DEV) {
   }
   w.__debug = {
     audio,
+    /** The game's wallet service (so a fake provider can be driven from the console). */
+    wallet,
     /** Render every SFX (and a few bars of music) offline and report peak levels. */
     async audioLevels(): Promise<Record<string, number>> {
       const { AudioManager } = await import('@/systems/audio');

@@ -8,19 +8,19 @@ import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
 import { readCustomCases } from '@/systems/customCases';
-import { startCustomCase } from '@/systems/coldCase';
+import { startColdCase, startCustomCase } from '@/systems/coldCase';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
 import { currentStreak, localDateKey, playedStrip, weekKey } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
-import { wallet, walletName } from '@/systems/wallet';
+import { PHANTOM_URL, wallet, walletName } from '@/systems/wallet';
+import { currentBalance, currentTier, hasEntitlement, TIERS } from '@/systems/entitlements';
 import { fetchPrice, formatPrice } from '@/systems/price';
 import { awardBadge, badgeCount, badgeProgress } from '@/systems/badges';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
-import { UNLOCKABLES } from '@/data/unlockables';
 import { LUCIEN_TEX, lucienSays } from '../DialogueBox';
 import { PixelButton } from '../PixelButton';
 import { rect } from '../shapes';
@@ -33,6 +33,13 @@ import type { PageCtx } from './PageCtx';
 import { ALL_PAGES, type PageId } from './PageCtx';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
+
+/** One line per tier on the coin page. */
+const TIER_BLURB: Record<number, string> = {
+  1: "gilded rim, board mark, aurora, holders' file",
+  2: 'mahogany desk',
+  3: 'coin-gold shade, your tier on the ID card',
+};
 
 export const URLS: Record<PageId, string> = {
   home: 'netscope://home',
@@ -234,7 +241,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const s = wallet.state;
     ctx.heading(`${TOKEN.name} (${TOKEN.symbol})`, 'ink');
     ctx.line(
-      "The precinct's own coin. Holding it unlocks cosmetic gear in the office. It changes nothing about scoring, ever.",
+      "The precinct's own coin. Holding it opens extra dressing for the office and a weekly file; it changes nothing about scoring, ever, and you never need it to play.",
     );
     ctx.gap();
     if (!TOKEN.mint) {
@@ -260,55 +267,88 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     }
     ctx.rule();
     if (!s.connected) {
-      ctx.line(
-        s.available
-          ? `${walletName()} detected.`
-          : 'No Solana wallet detected in this browser (Phantom, Solflare, Backpack).',
-        {
-          color: s.available ? 'lampGreen' : 'woodMid',
-        },
-      );
-      ctx.button(s.busy ? 'Connecting...' : `Connect ${walletName()}`, () => {
-        lucienSays(ctx.scene, 'wallet');
-        void wallet.connect();
+      // What connecting does, before the button that does it.
+      ctx.line('Connecting shares your public address so the game can read balances.', {
+        color: 'woodMid',
       });
+      ctx.line('Nothing is signed, nothing is sent, and the game never sees a seed phrase.', {
+        color: 'woodMid',
+      });
+      ctx.gap(4);
+      if (s.available) {
+        ctx.line(`${walletName()} detected.`, { color: 'lampGreen' });
+        ctx.button(s.busy ? 'Waiting for the wallet...' : `Connect ${walletName()}`, () => {
+          if (s.busy) return;
+          lucienSays(ctx.scene, 'wallet');
+          void wallet.connect();
+        });
+      } else {
+        ctx.line('No Solana wallet in this browser.', { color: 'woodMid' });
+        ctx.button(
+          'Get Phantom (opens a new tab)',
+          () => window.open(PHANTOM_URL, '_blank', 'noopener'),
+          { variant: 'paper', sameLine: true },
+        );
+        ctx.button(
+          'Check again',
+          () => {
+            void wallet.connect();
+            ctx.panel.render();
+          },
+          { x: 190, variant: 'paper' },
+        );
+      }
     } else {
       ctx.line(`Connected: ${shortAddress(s.address ?? '')}`, { color: 'lampGreen' });
       ctx.line(`SOL balance:   ${s.sol === null ? '...' : s.sol.toFixed(3)}`);
       ctx.line(
         `${TOKEN.symbol} balance: ${TOKEN.mint ? (s.token === null ? '...' : s.token.toLocaleString()) : 'n/a (no mint configured)'}`,
       );
-      const holder = wallet.isHolder;
+      if (s.networkWarning) ctx.line(s.networkWarning, { color: 'stampRed' });
+      const tier = currentTier();
       ctx.line(
-        `Holder perks:  ${holder ? 'unlocked' : `need ${TOKEN.holderMin.toLocaleString()}+ ${TOKEN.symbol}`}`,
-        { color: holder ? 'lampGreen' : 'woodMid' },
+        `Holder tier:   ${tier ? `${tier.level} · ${tier.name}` : `none yet (${TIERS[0].min.toLocaleString()}+ ${TOKEN.symbol} for the first)`}`,
+        { color: tier ? 'lampGreen' : 'woodMid' },
       );
-      ctx.small(
-        'Perks: the aurora over the city on clear nights, a $ after your name on the board, the cosmetics below.',
-      );
-      // Remember the snapshot so the unlock survives reloads.
-      saveStore.update(
-        (d) =>
-          (d.wallet = { address: s.address, token: s.token, checkedAt: new Date().toISOString() }),
-      );
-      if (holder) {
+      if (tier) {
         awardBadge(ctx.scene, 'shareholder');
         lucienSays(ctx.scene, 'holder');
-      }
-      ctx.gap(4);
-      ctx.line('Holder tiers:', { color: 'woodMid' });
-      for (const u of UNLOCKABLES.filter((x) => x.source.type === 'holder')) {
-        const need = u.source.type === 'holder' ? u.source.value : 0;
-        const got = (s.token ?? 0) >= need;
-        ctx.line(
-          `${got ? '[x]' : '[ ]'} ${u.name.padEnd(16)} ${need.toLocaleString()}+ ${TOKEN.symbol}`,
-          { color: got ? 'lampGreen' : 'shadow' },
-        );
       }
       ctx.button('Refresh balances', () => void wallet.refresh(), { sameLine: true });
       ctx.button('Disconnect', () => void wallet.disconnect(), { x: 130, variant: 'paper' });
     }
     if (s.error) ctx.line(s.error, { color: 'stampRed' });
+    ctx.gap(4);
+    ctx.line('What holding opens:', { color: 'woodMid' });
+    const bal = currentBalance();
+    for (const t of TIERS) {
+      const got = bal >= t.min;
+      ctx.line(
+        `${got ? '[x]' : '[ ]'} Tier ${t.level} · ${t.name.padEnd(12)} ${t.min.toLocaleString()}+  ${TIER_BLURB[t.level]}`,
+        { color: got ? 'lampGreen' : 'shadow' },
+      );
+    }
+    // The weekly holders' file: extra content, never a scoring edge.
+    ctx.gap(4);
+    const wk = weekKey();
+    const done = saveStore.get().stats.weeklyDone.includes(`holders-${wk}`);
+    if (hasEntitlement('holders-file')) {
+      ctx.button(
+        done
+          ? `Holders' file ${wk} · closed (play again)`
+          : `Open this week's holders' file (${wk})`,
+        () => {
+          ctx.panel.close();
+          startColdCase(ctx.scene, `holders-${wk}`);
+        },
+      );
+    } else {
+      ctx.small(`Holders' file ${wk}: a second weekly cold case, for tier 1 and up.`);
+    }
+    if (TOKEN.mockBalance > 0)
+      ctx.small(
+        `dev: VITE_TOKEN_MOCK_BALANCE pretends you hold ${TOKEN.mockBalance.toLocaleString()}.`,
+      );
     if (TOKEN.buyUrl) {
       ctx.gap();
       ctx.button(
@@ -361,6 +401,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             .slice(0, 4),
           url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
           mascot,
+          tierTitle: hasEntitlement('board-title') ? currentTier()?.name : undefined,
         });
         const ok = downloadCanvas(
           canvas,

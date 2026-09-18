@@ -162,6 +162,8 @@ export interface IdCardData {
   coldBest: number;
   /** Badge names to print, already trimmed to a handful. */
   badgeNames: string[];
+  /** Holder tier title, when the tier grants it (board-title). */
+  tierTitle?: string;
   url: string;
   mascot?: HTMLImageElement | HTMLCanvasElement | null;
 }
@@ -226,7 +228,10 @@ export function renderIdCard(data: IdCardData, canvas?: HTMLCanvasElement): HTML
     fy += big ? 88 : 68;
   };
   field('Detective', data.detective, true);
-  field('Rank', `${data.rank}  ·  ${data.score} pts`);
+  field(
+    'Rank',
+    `${data.rank}  ·  ${data.score} pts${data.tierTitle ? `  ·  ${data.tierTitle}` : ''}`,
+  );
   field(
     'Record',
     `${data.casesSolved}/${data.casesTotal} files  ·  ${data.badges}/${data.badgesTotal} badges  ·  streak ${data.streak}`,

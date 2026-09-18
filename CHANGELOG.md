@@ -2,6 +2,14 @@
 
 ## v0.7 — night shift (unreleased)
 
+- Wallet: a "Connect wallet" chip on the title (it opens the coin page on the phone), silent
+  reconnect for a wallet you linked before, plain messages for cancelled or locked wallets,
+  a warning when the RPC is on the wrong network, and the page says what connecting does
+  before you do it. Still read-only.
+- Token foundation: one entitlement layer decides what holding unlocks (three tiers), with a
+  dev-only mock balance to try it before launch. First real utility: a second weekly cold
+  case for holders, plus your tier title on the ID card.
+
 - Fixed: the pointer could vanish after a fullscreen toggle or a resize under the mouse
   (the cursor overlay now trusts any move over the canvas); the lens could re-activate under
   the pause dim or the phone and follow the mouse into the report (it now only runs while

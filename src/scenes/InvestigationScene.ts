@@ -550,9 +550,13 @@ export class InvestigationScene extends Phaser.Scene {
       }
       if (generated) {
         d.stats.coldRuns++;
-        const wk = `week-${weekKey()}`;
-        if (gameState.coldSeed === wk && !d.stats.weeklyDone.includes(wk))
-          d.stats.weeklyDone.push(wk);
+        // Both weekly files (everyone's and the holders') are ticked off by seed.
+        const seed = gameState.coldSeed ?? '';
+        if (
+          (seed === `week-${weekKey()}` || seed === `holders-${weekKey()}`) &&
+          !d.stats.weeklyDone.includes(seed)
+        )
+          d.stats.weeklyDone.push(seed);
         if (breakdown.verdictCorrect) d.stats.coldCorrect++;
         if (breakdown.total > d.stats.coldBest) {
           d.stats.coldBest = breakdown.total;

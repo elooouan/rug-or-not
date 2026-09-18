@@ -66,12 +66,19 @@ you'll hear a numbers station tapping the combination in morse. Badges track all
 The phone on the desk opens an in-game browser:
 
 - **RugScan** - an explorer page for the current case (flavour only, never a verdict).
-- **The coin** - connect a Phantom wallet (Solflare and Backpack work too; read-only: public address, SOL and token balance
-  via public RPC). Holder tiers unlock cosmetics: `VITE_TOKEN_HOLDER_MIN`+ tokens → gilded
-  magnifier rim, 5× → mahogany desk, 10× → coin-gold lamp shade, plus the Shareholder badge,
-  an aurora over the city on clear nights and a `$` after your name on the board. The last
-  balance seen is remembered, so the perks survive reloads. The game never requests signatures
-  or transactions; nothing about scoring changes.
+- **The coin** - the "Connect wallet" chip on the title opens this page. Phantom's injected
+  provider (Solflare and Backpack work the same way) is used read-only: the game learns your
+  public address and reads SOL and token balances over the configured RPC. A wallet you've
+  linked reconnects silently on later visits (`connect({ onlyIfTrusted })`), rejected or
+  locked wallets get a plain message, and the page warns when the RPC answers for a different
+  network than `VITE_SOLANA_CLUSTER`. The game never requests signatures or transactions and
+  never sees a seed phrase. Everything holding unlocks goes through one entitlement layer
+  (`src/systems/entitlements.ts`, tiers at 1×/5×/10× `VITE_TOKEN_HOLDER_MIN`): tier 1 gives
+  the gilded magnifier rim, the `$` mark on the board, the aurora on clear nights and a
+  second weekly cold case (the holders' file); tier 2 the mahogany desk; tier 3 the coin-gold
+  lamp shade and your tier title on the ID card. The last balance seen is remembered so
+  perks survive reloads; `VITE_TOKEN_MOCK_BALANCE` (dev builds only) fakes a balance to try
+  all of it before launch. Nothing about scoring changes and nothing needs the coin.
 - **Board** - Hall of Detectives. Local by default; set `VITE_LEADERBOARD_URL` to a JSON
   endpoint (`GET ?limit=N&mode=case|rush|cold` returns entries, `POST` accepts one) for a
   shared board. A ready-made Cloudflare Worker lives in

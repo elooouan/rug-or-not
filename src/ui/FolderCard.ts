@@ -35,7 +35,9 @@ export class FolderCard extends Phaser.GameObjects.Container {
             ? gameState.coldSeed
               ? gameState.coldSeed.startsWith('week-')
                 ? `THIS WEEK'S FILE  ${gameState.coldSeed.slice(5)}`
-                : `COLD CASE  ${gameState.coldSeed}`
+                : gameState.coldSeed.startsWith('holders-')
+                  ? `HOLDERS' FILE  ${gameState.coldSeed.slice(8)}`
+                  : `COLD CASE  ${gameState.coldSeed}`
               : 'YOUR FILE'
             : `CASE #${String(gameState.currentIndex + 1).padStart(2, '0')}`,
         {

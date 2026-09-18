@@ -11,6 +11,7 @@ import { readCustomCases } from '@/systems/customCases';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
+import { wallet } from '@/systems/wallet';
 import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
@@ -43,6 +44,8 @@ export class BootScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     installToasts();
+    // A wallet linked on a previous visit reconnects silently (no popup); optional either way.
+    void wallet.reconnect();
     const s = saveStore.get().settings;
     audio.setVolume(s.volume);
     applyWeatherAudio(s.weather);

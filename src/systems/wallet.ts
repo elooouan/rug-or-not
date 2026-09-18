@@ -1,10 +1,16 @@
-import { TOKEN } from '@/config/token';
+import { GENESIS_HASH, TOKEN } from '@/config/token';
 import { saveStore } from './save';
 
 /**
- * Phantom wallet integration, read-only. Connecting shares the public key;
- * balances come from public RPC calls. The game never requests signatures
- * or transactions.
+ * Wallet connection, read-only. Connecting shares the public key; balances come
+ * from public RPC calls against the configured cluster. The game never requests
+ * signatures or transactions, and never sees a seed phrase or private key.
+ *
+ * Phantom's injected provider (`window.phantom.solana`) is the documented
+ * integration surface; other injected Solana wallets with the same shape
+ * (Solflare, Backpack) work identically. Reconnection uses Phantom's
+ * `connect({ onlyIfTrusted: true })`, which is silent when the site has been
+ * approved before and rejects without a popup otherwise.
  */
 export interface WalletState {
   available: boolean;
@@ -13,10 +19,13 @@ export interface WalletState {
   sol: number | null;
   token: number | null;
   busy: boolean;
+  /** A short, human message: rejected connection, RPC trouble, wrong network. */
   error: string | null;
+  /** Set when the RPC's genesis hash doesn't match TOKEN.cluster. */
+  networkWarning: string | null;
 }
 
-interface PhantomProvider {
+interface SolanaProvider {
   isPhantom?: boolean;
   isSolflare?: boolean;
   isBackpack?: boolean;
@@ -24,21 +33,19 @@ interface PhantomProvider {
   connect(opts?: { onlyIfTrusted?: boolean }): Promise<{ publicKey: { toString(): string } }>;
   disconnect(): Promise<void>;
   on?(event: string, handler: (...args: unknown[]) => void): void;
+  off?(event: string, handler: (...args: unknown[]) => void): void;
+  removeListener?(event: string, handler: (...args: unknown[]) => void): void;
 }
 
 type Listener = (s: WalletState) => void;
 
-/**
- * Phantom first; any other injected Solana wallet with the same connect()/publicKey
- * shape (Solflare, Backpack...) works the same read-only way.
- */
-function getProvider(): PhantomProvider | null {
+function getProvider(): SolanaProvider | null {
   if (typeof window === 'undefined') return null;
   const w = window as unknown as {
-    phantom?: { solana?: PhantomProvider };
-    solflare?: PhantomProvider;
-    backpack?: PhantomProvider;
-    solana?: PhantomProvider;
+    phantom?: { solana?: SolanaProvider };
+    solflare?: SolanaProvider;
+    backpack?: SolanaProvider;
+    solana?: SolanaProvider;
   };
   const p = w.phantom?.solana ?? w.solflare ?? w.backpack ?? w.solana;
   return p && typeof p.connect === 'function' ? p : null;
@@ -54,6 +61,9 @@ export function walletName(): string {
   return 'wallet';
 }
 
+/** Where to get a wallet when none is installed. */
+export const PHANTOM_URL = 'https://phantom.app/download';
+
 async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   const res = await fetch(TOKEN.rpcUrl, {
     method: 'POST',
@@ -66,6 +76,18 @@ async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   return json.result as T;
 }
 
+/** Wallet errors as a player would read them. */
+export function describeWalletError(e: unknown): string {
+  const err = e as { code?: number; message?: string } | undefined;
+  const msg = (err?.message ?? '').toLowerCase();
+  if (err?.code === 4001 || msg.includes('user rejected') || msg.includes('rejected the request'))
+    return 'Connection cancelled in the wallet. Nothing was shared.';
+  if (err?.code === -32002 || msg.includes('already pending'))
+    return 'The wallet is already asking. Check its window.';
+  if (msg.includes('locked')) return 'The wallet is locked. Unlock it and try again.';
+  return err?.message ? `Wallet said: ${err.message}` : 'The wallet did not answer.';
+}
+
 export class WalletService {
   state: WalletState = {
     available: false,
@@ -75,8 +97,11 @@ export class WalletService {
     token: null,
     busy: false,
     error: null,
+    networkWarning: null,
   };
   private listeners = new Set<Listener>();
+  private bound: SolanaProvider | null = null;
+  private genesisChecked = false;
 
   constructor() {
     this.state.available = getProvider() !== null;
@@ -95,27 +120,61 @@ export class WalletService {
     this.listeners.forEach((l) => l(this.state));
   }
 
+  /** The wallet asked for approval; the site is now trusted, so later visits reconnect silently. */
   async connect(): Promise<void> {
     const p = getProvider();
     if (!p) {
       this.set({
         available: false,
-        error: 'No Solana wallet found. Install Phantom (or Solflare, Backpack) and reload.',
+        error: 'No Solana wallet found. Install Phantom and reload this page.',
       });
       return;
     }
+    await this.link(p, false);
+  }
+
+  /**
+   * Silent reconnect on boot for a wallet the player linked before. Never opens a
+   * popup: `onlyIfTrusted` rejects quietly when the site is no longer approved.
+   */
+  async reconnect(): Promise<void> {
+    if (!saveStore.get().wallet.linked) return;
+    const p = getProvider();
+    if (!p) return;
+    await this.link(p, true);
+  }
+
+  private async link(p: SolanaProvider, onlyIfTrusted: boolean): Promise<void> {
     this.set({ busy: true, error: null });
     try {
-      const res = await p.connect();
+      const res = await p.connect(onlyIfTrusted ? { onlyIfTrusted: true } : undefined);
       const address = res.publicKey.toString();
+      this.bind(p);
       this.set({ connected: true, address, busy: false });
-      p.on?.('disconnect', () =>
-        this.set({ connected: false, address: null, sol: null, token: null }),
-      );
+      saveStore.update((d) => (d.wallet.linked = true));
       await this.refresh();
     } catch (e) {
-      this.set({ busy: false, error: (e as Error).message || 'Connection rejected.' });
+      // A silent attempt that isn't trusted any more just means "not linked"; say nothing.
+      this.set({ busy: false, error: onlyIfTrusted ? null : describeWalletError(e) });
+      if (onlyIfTrusted) saveStore.update((d) => (d.wallet.linked = false));
     }
+  }
+
+  /** Follow the wallet: a switched account re-reads balances, a disconnect clears us. */
+  private bind(p: SolanaProvider): void {
+    if (this.bound === p) return;
+    this.bound = p;
+    p.on?.('disconnect', () => this.clear(false));
+    p.on?.('accountChanged', (...args: unknown[]) => {
+      const key = args[0] as { toString(): string } | null | undefined;
+      if (key) {
+        this.set({ address: key.toString(), sol: null, token: null });
+        void this.refresh();
+      } else {
+        // Phantom switched to an account this site isn't approved for: try a silent reconnect.
+        void this.link(p, true);
+      }
+    });
   }
 
   async disconnect(): Promise<void> {
@@ -124,7 +183,12 @@ export class WalletService {
     } catch {
       /* already gone */
     }
+    this.clear(true);
+  }
+
+  private clear(forget: boolean): void {
     this.set({ connected: false, address: null, sol: null, token: null, error: null });
+    if (forget) saveStore.update((d) => (d.wallet.linked = false));
   }
 
   /** Read SOL and (if a mint is configured) token balance. Public data only. */
@@ -133,6 +197,7 @@ export class WalletService {
     if (!address) return;
     this.set({ busy: true, error: null });
     try {
+      await this.checkNetwork();
       const lamports = await rpc<{ value: number }>('getBalance', [address]);
       let token: number | null = null;
       if (TOKEN.mint) {
@@ -147,8 +212,30 @@ export class WalletService {
         );
       }
       this.set({ sol: lamports.value / 1e9, token, busy: false });
+      // Remember the snapshot so perks survive reloads without a live connection.
+      saveStore.update(
+        (d) => (d.wallet = { ...d.wallet, address, token, checkedAt: new Date().toISOString() }),
+      );
     } catch (e) {
       this.set({ busy: false, error: `Balance lookup failed: ${(e as Error).message}` });
+    }
+  }
+
+  /** Once per session: is the RPC on the cluster the token is configured for? */
+  private async checkNetwork(): Promise<void> {
+    if (this.genesisChecked) return;
+    this.genesisChecked = true;
+    try {
+      const hash = await rpc<string>('getGenesisHash', []);
+      const expected = GENESIS_HASH[TOKEN.cluster];
+      this.set({
+        networkWarning:
+          hash === expected
+            ? null
+            : `The RPC answers for a different network than ${TOKEN.cluster}; balances here may not be the coin's.`,
+      });
+    } catch {
+      /* the balance calls will report the RPC trouble */
     }
   }
 
@@ -162,8 +249,10 @@ export const wallet = new WalletService();
 /**
  * Holder perks (aurora, the mark on the board) use the last balance the coin
  * page saw, so they survive reloads without a live wallet connection.
+ * Kept as a thin alias over the entitlement layer for the existing call sites.
  */
 export function holderPerks(): boolean {
   if (wallet.isHolder) return true;
-  return (saveStore.get().wallet.token ?? 0) >= TOKEN.holderMin;
+  const saved = saveStore.get().wallet.token ?? 0;
+  return saved >= TOKEN.holderMin || TOKEN.mockBalance >= TOKEN.holderMin;
 }

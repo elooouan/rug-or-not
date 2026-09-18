@@ -34,7 +34,7 @@ export function contextFromSave(save: SaveData): UnlockContext {
     gradeCounts,
     bestStreak: save.daily.bestStreak,
     flagsLearned: save.unlockedFlags.length,
-    tokenBalance: save.wallet?.token ?? 0,
+    tokenBalance: Math.max(save.wallet?.token ?? 0, TOKEN.mockBalance),
   };
 }
 
