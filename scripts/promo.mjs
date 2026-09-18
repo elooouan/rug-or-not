@@ -99,7 +99,6 @@ async function boot(page, save, hash = '', extraInit = '') {
     ({ save, extraInit }) => {
       localStorage.setItem('rug-or-not:save:v1', JSON.stringify(save));
       localStorage.setItem('rug-or-not:dev-mute', '1');
-      // eslint-disable-next-line no-new-func
       if (extraInit) new Function(extraInit)();
     },
     { save, extraInit },
@@ -117,9 +116,6 @@ async function boot(page, save, hash = '', extraInit = '') {
   );
   await sleep(2200);
 }
-
-const scenes = (page) =>
-  page.evaluate(() => window.__game.scene.getScenes(true).map((s) => s.scene.key));
 
 const skipTalk = (page) =>
   page.evaluate(() => {
@@ -574,8 +570,15 @@ const CLIPS = {
 };
 
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
-const wanted = (name) => !only || only === name || (only === 'clips' && name in CLIPS) || (only === 'shots' && name in SHOTS);
+const context = await browser.newContext({
+  viewport: { width: W, height: H },
+  deviceScaleFactor: 1,
+});
+const wanted = (name) =>
+  !only ||
+  only === name ||
+  (only === 'clips' && name in CLIPS) ||
+  (only === 'shots' && name in SHOTS);
 for (const [name, run] of Object.entries(SHOTS)) {
   if (!wanted(name) || only === 'clips') continue;
   const page = await context.newPage();
