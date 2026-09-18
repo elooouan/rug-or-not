@@ -188,7 +188,10 @@ export class RushScene extends Phaser.Scene {
     for (let rx = 10; rx < w - 6; rx += 12) c.add(rect(this, rx, -6, 3, 8, HEX.paperShadow));
     c.add(rect(this, padding + 8, 4, 1, h - 8, HEX.stampRed, 0.35));
     c.add(
-      makeText(this, padding, padding - 2, 'RUSH', { size: FONT.size.small, color: 'woodDark' }),
+      makeText(this, padding, padding - 2, this.drill ? 'DRILL' : 'RUSH', {
+        size: FONT.size.small,
+        color: 'woodDark',
+      }),
     );
     const score = makeText(this, w / 2, padding + 14, '0', {
       size: FONT.size.title,
@@ -206,7 +209,10 @@ export class RushScene extends Phaser.Scene {
       });
     const streak = mk(0, 'streak  0');
     const pages = mk(1, 'pages   0');
-    const best = mk(2, `best    ${saveStore.get().stats.rushBest}`);
+    const best = mk(
+      2,
+      this.drill ? `pages   ${RUSH.drillPages} to go` : `best    ${saveStore.get().stats.rushBest}`,
+    );
     c.add([score, mult, streak, pages, best]);
     c.add(
       makeText(this, padding, h - padding - 6, 'hits buy 3s', {
