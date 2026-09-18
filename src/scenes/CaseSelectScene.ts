@@ -5,7 +5,8 @@ import { DRAWER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
-import { gameState } from '@/systems/gameState';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { startColdCase } from '@/systems/coldCase';
 import { secretUnlocked } from '@/systems/secretCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
@@ -57,15 +58,18 @@ export class CaseSelectScene extends Phaser.Scene {
     this.folders = [];
     const secretOpen = secretUnlocked(save, cases);
     this.unlocked = cases.map((c, i) => i < save.campaignUnlocked && (!c.secret || secretOpen));
+    const slot = (i: number) => ({
+      x: DRAWER.x + 18 + (i % DRAWER.cols) * (DRAWER.folderW + DRAWER.gapX),
+      y: DRAWER.y + 36 + Math.floor(i / DRAWER.cols) * (DRAWER.folderH + DRAWER.gapY),
+    });
     cases.forEach((c, i) => {
-      const col = i % DRAWER.cols;
-      const row = Math.floor(i / DRAWER.cols);
-      const fx = DRAWER.x + 18 + col * (DRAWER.folderW + DRAWER.gapX);
-      const fy = DRAWER.y + 36 + row * (DRAWER.folderH + DRAWER.gapY);
+      const { x: fx, y: fy } = slot(i);
       this.folders.push(
         this.makeFolder(c, i, fx, fy, this.unlocked[i], save.caseResults[c.id]?.bestGrade),
       );
     });
+    // The pile: a blank folder at the end of the drawer that prints a cold case.
+    if (cases.length < DRAWER.cols * DRAWER.rows) this.makePile(slot(cases.length));
 
     const back = new PixelButton(
       this,
@@ -217,6 +221,59 @@ export class CaseSelectScene extends Phaser.Scene {
             (i === this.focus ? 4 : 0),
         ),
       );
+    });
+  }
+
+  private makePile(at: { x: number; y: number }): void {
+    const cont = this.add.container(at.x, at.y).setDepth(DEPTH.pins);
+    // Two folders peeking out behind the top one.
+    cont.add(this.make.image({ x: 4, y: -6, key: TEX.folder }, false).setOrigin(0).setAlpha(0.6));
+    cont.add(this.make.image({ x: 2, y: -3, key: TEX.folder }, false).setOrigin(0).setAlpha(0.8));
+    cont.add(this.make.image({ x: 0, y: 0, key: TEX.folder }, false).setOrigin(0));
+    cont.add(makeText(this, 3, -1, 'the pile', { size: FONT.size.tiny, color: 'woodDark' }));
+    cont.add(
+      makeText(this, 40, 14, 'COLD', { size: FONT.size.body, color: 'ink' }).setOrigin(0.5, 0),
+    );
+    cont.add(
+      makeText(this, 40, 30, `${saveStore.get().stats.coldRuns} closed`, {
+        size: FONT.size.tiny,
+        color: 'woodDark',
+      }).setOrigin(0.5, 0),
+    );
+    cont.setSize(DRAWER.folderW, DRAWER.folderH);
+    cont.setInteractive(
+      new Phaser.Geom.Rectangle(
+        DRAWER.folderW / 2,
+        DRAWER.folderH / 2,
+        DRAWER.folderW,
+        DRAWER.folderH,
+      ),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    cont.on('pointerover', () => {
+      audio.play('hover');
+      this.hideTip();
+      const w = 220;
+      const tx = Phaser.Math.Clamp(at.x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
+      const ty = at.y + DRAWER.folderH + 8;
+      const tip = this.add.container(0, 0).setDepth(DEPTH.toast);
+      tip.add(rect(this, tx + 2, ty + 3, w, 34, HEX.bg, 0.5));
+      tip.add(rect(this, tx, ty, w, 34, HEX.paper));
+      ['Cold cases: files the printer makes up.', 'Endless. Their own board.'].forEach((l, i) =>
+        tip.add(
+          makeText(this, tx + 6, ty + 5 + i * 12, l, {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'shadow',
+          }),
+        ),
+      );
+      this.tip = tip;
+    });
+    cont.on('pointerout', () => this.hideTip());
+    cont.on('pointerdown', () => {
+      audio.play('paper');
+      startColdCase(this, newColdSeed());
     });
   }
 
