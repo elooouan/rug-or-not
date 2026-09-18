@@ -45,6 +45,8 @@ export const RUSH = {
   flagTimeBonus: 3,
   herringPenaltySec: 5,
   strayPenaltySec: 2,
+  /** The lo-fi loop runs a little faster during a rush. */
+  musicBpm: 92,
   /** Score thresholds for the grade on the results card and the board. */
   grades: [
     { grade: 'S', min: 3000 },

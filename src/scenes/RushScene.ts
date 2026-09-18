@@ -31,6 +31,8 @@ import { escTaken } from '@/ui/escGuard';
 import { LucienBubble } from '@/ui/LucienBubble';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
+import { StickyNote } from '@/ui/StickyNote';
+import { toast } from '@/ui/Toast';
 import { addText, makeText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 
@@ -105,7 +107,11 @@ export class RushScene extends Phaser.Scene {
 
     this.bindKeys();
     audio.setTension(false);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => audio.setTension(false));
+    audio.setTempo(RUSH.musicBpm);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      audio.setTension(false);
+      audio.setTempo();
+    });
 
     // Lucien explains the rules once, then a short countdown.
     this.dialogue = lucienSays(this, 'first-rush', {
@@ -383,31 +389,28 @@ export class RushScene extends Phaser.Scene {
     );
     this.children.remove(mark);
     c.add(mark);
-    const again = new PixelButton(
-      this,
-      x + 16,
-      y + h - 32,
-      'Again [Enter]',
-      () => this.scene.restart(),
-      {
-        width: 100,
-        hotkey: 'ENTER',
-      },
-    );
-    const menu = new PixelButton(
-      this,
-      x + w - 16 - 100,
-      y + h - 32,
-      'Menu [Esc]',
-      () => this.quit(),
-      {
-        width: 100,
-        variant: 'ink',
-      },
-    );
+    const bw = 66;
+    const again = new PixelButton(this, x + 12, y + h - 42, 'Again', () => this.scene.restart(), {
+      width: bw,
+      hotkey: 'ENTER',
+    });
+    const share = new PixelButton(this, x + 12 + bw + 6, y + h - 42, 'Share', () => this.share(), {
+      width: bw,
+    });
+    const menu = new PixelButton(this, x + w - 12 - bw, y + h - 42, 'Menu', () => this.quit(), {
+      width: bw,
+      variant: 'ink',
+    });
     this.children.remove(again);
+    this.children.remove(share);
     this.children.remove(menu);
-    c.add([again, menu]);
+    c.add([again, share, menu]);
+    c.add(
+      makeText(this, x + w / 2, y + h - 10, 'Enter: again  ·  Esc: menu', {
+        size: FONT.size.tiny,
+        color: 'paperShadow',
+      }).setOrigin(0.5, 1),
+    );
     if (!saveStore.get().settings.reducedMotion) {
       c.setScale(0.9).setAlpha(0);
       this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 200, ease: 'Back.easeOut' });
@@ -428,6 +431,24 @@ export class RushScene extends Phaser.Scene {
 
   private quit(): void {
     this.scene.start('TitleScene');
+  }
+
+  /** Result text for the clipboard, with a fallback note. */
+  private share(): void {
+    const s = this.state;
+    const text = [
+      `Rug or Not? Red Flag Rush: ${s.score} pts, ${s.rounds} pages, best streak ${s.bestStreak}, grade ${rushGrade(s.score)}`,
+      `${location.origin}${location.pathname}#rush`,
+      '#RugOrNot',
+    ].join('\n');
+    const fallback = () => new StickyNote(this, 160, 100, 'share text', text, 320);
+    try {
+      void navigator.clipboard
+        .writeText(text)
+        .then(() => toast(this, 'COPIED', 'result on the clipboard'), fallback);
+    } catch {
+      fallback();
+    }
   }
 
   private bindKeys(): void {

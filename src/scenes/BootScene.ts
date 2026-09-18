@@ -86,6 +86,11 @@ export class BootScene extends Phaser.Scene {
       this.scene.start('InvestigationScene');
       return;
     }
+    if (hash === 'rush') {
+      history.replaceState(null, '', location.pathname + location.search);
+      this.scene.start('RushScene');
+      return;
+    }
     this.scene.start(TitleScene.KEY);
   }
 

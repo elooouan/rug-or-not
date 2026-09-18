@@ -13,6 +13,8 @@
 - Two new cases: $NAPKIN (a renounce with an operator behind it, an audit for the wrong file)
   and $LNTRN (a loud, fee-charging festival token that is entirely fine). The drawer is three
   rows deep.
+- Rush plays the loop faster, has a Share button and a `#rush` deep link; the daily button
+  counts down to tomorrow's case; notebook flag pages remember how often you missed them.
 - A fly visits the lamp now and then (swat it); more typed words on the title screen.
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid

@@ -24,6 +24,13 @@ import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
 
+/** Whole hours until the next daily case (local midnight), never less than one. */
+function hoursToMidnight(): number {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  return Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 3_600_000));
+}
+
 export class TitleScene extends Phaser.Scene {
   static readonly KEY = 'TitleScene';
   private static seenIntro = false;
@@ -232,7 +239,7 @@ export class TitleScene extends Phaser.Scene {
       ),
       mk(
         dailyDone
-          ? `Daily ${cases.find((x) => x.id === dailyId)?.ticker ?? ''} (done)`
+          ? `Daily done  ·  next in ${hoursToMidnight()}h`
           : `Daily ${cases.find((x) => x.id === dailyId)?.ticker ?? 'case'}${streak > 0 ? ` · ${streak}` : ''}`,
         () => {
           const c = cases.find((x) => x.id === dailyId);

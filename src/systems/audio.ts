@@ -27,7 +27,7 @@ export type SoundName =
 const midi = (n: number): number => 440 * Math.pow(2, (n - 69) / 12);
 
 // Lo-fi loop: 4 chords x 2 bars, A minor-ish, 74 bpm.
-const BPM = 74;
+const DEFAULT_BPM = 74;
 const STEPS_PER_BAR = 16;
 const LOOP_STEPS = STEPS_PER_BAR * 16; // A section (8 bars) then B section (8 bars)
 const CHORDS: { pad: number[]; bass: number }[] = [
@@ -79,6 +79,7 @@ export class AudioManager {
   private noiseBuf: AudioBuffer | null = null;
   private tension = false;
   private musicVolume = 0.55;
+  private bpm = DEFAULT_BPM;
   private staticWanted = false;
   private staticNode: AudioBufferSourceNode | null = null;
   private morseText = '';
@@ -141,6 +142,11 @@ export class AudioManager {
   /** Last-seconds mode: busier hats and a driving bass. */
   setTension(on: boolean): void {
     this.tension = on;
+  }
+
+  /** Loop tempo; the scheduler picks it up on the next step. Pass nothing to go back to lo-fi speed. */
+  setTempo(bpm = DEFAULT_BPM): void {
+    this.bpm = Math.max(40, Math.min(160, bpm));
   }
 
   setMusic(on: boolean): void {
@@ -432,7 +438,7 @@ export class AudioManager {
   // ---- lo-fi loop ---------------------------------------------------------------------
 
   private get sixteenth(): number {
-    return 60 / BPM / 4;
+    return 60 / this.bpm / 4;
   }
 
   private startMusic(): void {

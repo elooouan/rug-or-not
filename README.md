@@ -104,7 +104,7 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 
-Deep links: `#case=<id>` opens a file directly and `#daily` opens today's case (the Share button
+Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case and `#rush` starts a rush (the Share button
 includes one in its clipboard text; its "Save card" option downloads a 1280x720 PNG of the
 report instead). Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.
 
