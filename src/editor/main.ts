@@ -271,6 +271,17 @@ $('save').onclick = () => {
     report(false, (e as Error).message);
   }
 };
+$('play').onclick = () => {
+  const raw = validate() as { id?: string } | null;
+  if (raw === null) return;
+  try {
+    saveCustomCase(raw);
+    renderSaved();
+    window.open(`./#custom=${encodeURIComponent(raw.id ?? '')}`, '_blank', 'noopener');
+  } catch (e) {
+    report(false, (e as Error).message);
+  }
+};
 $('download').onclick = () => {
   const raw = validate() as { id?: string } | null;
   if (raw === null) return;
