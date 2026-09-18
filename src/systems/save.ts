@@ -6,6 +6,8 @@ export interface CaseResult {
   bestGrade: Grade;
   completions: number;
   lastVerdictCorrect: boolean;
+  /** Ever stamped the right verdict on this case (rogues gallery, badges). */
+  solved?: boolean;
 }
 
 export interface CosmeticSelection {
@@ -123,6 +125,7 @@ export function sanitizeSave(raw: unknown): SaveData {
         bestGrade: cr.bestGrade as Grade,
         completions: typeof cr.completions === 'number' ? cr.completions : 1,
         lastVerdictCorrect: cr.lastVerdictCorrect === true,
+        solved: cr.solved === true || cr.lastVerdictCorrect === true,
       };
     }
   }

@@ -9,6 +9,7 @@ import { saveStore } from '@/systems/save';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
 import { newlyUnlocked, stampInk } from '@/systems/unlocks';
 import { rankForScore } from '@/systems/ranks';
+import { rogueOf } from '@/systems/rogues';
 import { TEX } from '@/art/keys';
 import { HEX } from '@/config/palette';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -50,6 +51,8 @@ export interface ReportPayload {
   newBadges: string[];
   /** Set when this run crossed a rank threshold. */
   rankUp: string | null;
+  /** The rogue who just got a WANTED poster (first correct RUG verdict on this case). */
+  caughtName: string | null;
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -480,6 +483,10 @@ export class InvestigationScene extends Phaser.Scene {
     );
     const newFlagIds = [...new Set(caseFlagIds)].filter((id) => !prevFlags.has(id));
     let bestImproved = false;
+    const caughtName =
+      c.verdict === 'rug' && breakdown.verdictCorrect && !before.caseResults[c.id]?.solved
+        ? rogueOf(c).name
+        : null;
 
     saveStore.update((d) => {
       const prev = d.caseResults[c.id];
@@ -499,6 +506,7 @@ export class InvestigationScene extends Phaser.Scene {
         bestGrade,
         completions: (prev?.completions ?? 0) + 1,
         lastVerdictCorrect: breakdown.verdictCorrect,
+        solved: (prev?.solved ?? false) || breakdown.verdictCorrect,
       };
       for (const id of newFlagIds) if (FLAGS[id as keyof typeof FLAGS]) d.unlockedFlags.push(id);
       for (const doc of c.documents)
@@ -577,6 +585,7 @@ export class InvestigationScene extends Phaser.Scene {
         rankForScore(saveStore.get().totalScore) !== rankBefore
           ? rankForScore(saveStore.get().totalScore)
           : null,
+      caughtName,
     };
     this.scene.start('ReportScene', payload);
   }

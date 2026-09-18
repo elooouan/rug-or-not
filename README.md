@@ -81,8 +81,10 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
   highlights; every run scores ×1.25 and is starred on the board.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a
   no-magnifier accessibility mode (fine print shown inline with a dotted underline) live there too.
-- **Detective's Notebook**: two chapters. Every red flag you meet in a report unlocks its
-  glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter.
+- **Detective's Notebook**: three chapters. Every red flag you meet in a report unlocks its
+  glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter;
+  and every rug you call correctly pins a WANTED poster (procedural mugshot, charges, reward)
+  in the rogues gallery.
   Flag and herring lines in a report are links straight to the page.
 - **Progress**: everything lives in `localStorage`; Settings can export a save code to the
   clipboard and import one on another device.

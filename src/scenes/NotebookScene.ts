@@ -11,7 +11,12 @@ import {
   type HerringId,
   type Severity,
 } from '@/data/flags';
+import { makePortrait } from '@/art/portraits';
+import { isFlagClue, type CaseData } from '@/data/schema';
+import { rogueOf } from '@/systems/rogues';
 import { audio } from '@/systems/audio';
+import { awardBadge } from '@/systems/badges';
+import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
@@ -28,11 +33,13 @@ const SEV_COLOR: Record<Severity, PaletteKey> = {
 const SEV_MARK: Record<Severity, string> = { minor: '!', major: '!!', critical: '!!!' };
 const HERRING_IDS = Object.keys(HERRINGS) as HerringId[];
 
-type Chapter = 'flags' | 'herrings';
+type Chapter = 'flags' | 'herrings' | 'rogues';
+const CHAPTERS: Chapter[] = ['flags', 'herrings', 'rogues'];
 
 /**
- * The Detective's Notebook: two chapters. Red flags (unlocked as you meet
- * them) and yellow herrings (the scary-looking things that are fine).
+ * The Detective's Notebook: three chapters. Red flags (unlocked as you meet
+ * them), yellow herrings (the scary-looking things that are fine) and the
+ * rogues gallery (wanted posters for every rug you've called correctly).
  */
 export class NotebookScene extends Phaser.Scene {
   static readonly KEY = 'NotebookScene';
@@ -68,12 +75,18 @@ export class NotebookScene extends Phaser.Scene {
     } else this.scene.start(this.returnTo);
   }
 
+  private get rugs(): CaseData[] {
+    return gameState.cases.filter((c) => c.verdict === 'rug');
+  }
+
   private get ids(): string[] {
+    if (this.chapter === 'rogues') return this.rugs.map((c) => c.id);
     return this.chapter === 'flags' ? FLAG_IDS : HERRING_IDS;
   }
 
   private known(id: string): boolean {
     const save = saveStore.get();
+    if (this.chapter === 'rogues') return save.caseResults[id]?.solved === true;
     return this.chapter === 'flags'
       ? save.unlockedFlags.includes(id)
       : save.unlockedHerrings.includes(id);
@@ -120,7 +133,11 @@ export class NotebookScene extends Phaser.Scene {
       b.setDepth(DEPTH.hud);
       return b;
     };
-    this.tabButtons = [tab('Red flags', 'flags', x), tab('Yellow herrings', 'herrings', x + 124)];
+    this.tabButtons = [
+      tab('Red flags', 'flags', x),
+      tab('Yellow herrings', 'herrings', x + 124),
+      tab('Rogues', 'rogues', x + 248),
+    ];
 
     this.listPage = this.add.container(x + BOOK.pad, y + BOOK.pad).setDepth(DEPTH.pins);
     this.detail = this.add
@@ -145,8 +162,12 @@ export class NotebookScene extends Phaser.Scene {
     kb?.on('keydown-UP', () =>
       this.select((this.selected - 1 + this.ids.length) % this.ids.length),
     );
-    kb?.on('keydown-LEFT', () => this.setChapter('flags'));
-    kb?.on('keydown-RIGHT', () => this.setChapter('herrings'));
+    const step = (d: number) =>
+      this.setChapter(
+        CHAPTERS[(CHAPTERS.indexOf(this.chapter) + d + CHAPTERS.length) % CHAPTERS.length],
+      );
+    kb?.on('keydown-LEFT', () => step(-1));
+    kb?.on('keydown-RIGHT', () => step(1));
     this.setChapter(this.openAt?.chapter ?? 'flags');
     if (this.openAt) {
       const idx = this.ids.indexOf(this.openAt.id);
@@ -157,25 +178,28 @@ export class NotebookScene extends Phaser.Scene {
 
   private setChapter(ch: Chapter): void {
     this.chapter = ch;
-    this.tabButtons.forEach((b, i) => b.setAlpha((i === 0) === (ch === 'flags') ? 1 : 0.6));
+    this.tabButtons.forEach((b, i) => b.setAlpha(CHAPTERS[i] === ch ? 1 : 0.6));
     this.listPage.removeAll(true);
     const learned = this.ids.filter((id) => this.known(id)).length;
     const pageW = BOOK.w / 2 - BOOK.gutter;
+    const verb = ch === 'flags' ? 'learned' : ch === 'herrings' ? 'met' : 'caught';
     this.listPage.add(
-      makeText(
-        this,
-        pageW - BOOK.pad * 2,
-        2,
-        `${learned}/${this.ids.length} ${ch === 'flags' ? 'learned' : 'met'}`,
-        {
-          size: FONT.size.tiny,
-          color: 'paperShadow',
-        },
-      ).setOrigin(1, 0),
+      makeText(this, pageW - BOOK.pad * 2, 2, `${learned}/${this.ids.length} ${verb}`, {
+        size: FONT.size.tiny,
+        color: 'paperShadow',
+      }).setOrigin(1, 0),
     );
+    if (ch === 'rogues' && learned === this.ids.length && this.ids.length > 0)
+      awardBadge(this, 'most-wanted');
+    if (ch === 'rogues') lucienSays(this, 'rogues');
     this.entries = this.ids.map((id, i) => {
       const known = this.known(id);
-      const title = ch === 'flags' ? FLAGS[id as FlagId].title : HERRINGS[id as HerringId].title;
+      const title =
+        ch === 'flags'
+          ? FLAGS[id as FlagId].title
+          : ch === 'herrings'
+            ? HERRINGS[id as HerringId].title
+            : this.rogueTitle(id);
       const t = makeText(this, 14, 16 + i * BOOK.rowH, known ? title : '? ? ? ? ?', {
         size: FONT.size.body,
         font: 'body',
@@ -190,6 +214,13 @@ export class NotebookScene extends Phaser.Scene {
           makeText(this, 0, 18 + i * BOOK.rowH, known ? SEV_MARK[sev] : '', {
             size: FONT.size.tiny,
             color: SEV_COLOR[sev],
+          }),
+        );
+      } else if (ch === 'rogues') {
+        this.listPage.add(
+          makeText(this, 0, 18 + i * BOOK.rowH, known ? 'x' : '', {
+            size: FONT.size.tiny,
+            color: 'stampRed',
           }),
         );
       } else {
@@ -224,6 +255,11 @@ export class NotebookScene extends Phaser.Scene {
       y += BOOK.lineH;
       return t;
     };
+    if (this.chapter === 'rogues') {
+      this.wantedPoster(id, known, pageW);
+      audio.play('tick');
+      return;
+    }
     if (!known) {
       add('UNKNOWN PATTERN', { size: FONT.size.body, color: 'paperShadow' });
       y += 4;
@@ -258,5 +294,118 @@ export class NotebookScene extends Phaser.Scene {
       wrapMono(h.reassurance, maxChars).forEach((l) => add(l, { font: 'body', color: 'shadow' }));
     }
     audio.play('tick');
+  }
+
+  private rogueTitle(caseId: string): string {
+    const c = gameState.cases.find((x) => x.id === caseId);
+    if (!c) return caseId;
+    return `${c.ticker}  ${rogueOf(c).name}`;
+  }
+
+  /** A WANTED poster on the right-hand page: mugshot, charges, reward, and a CAUGHT stamp. */
+  private wantedPoster(caseId: string, known: boolean, pageW: number): void {
+    const c = gameState.cases.find((x) => x.id === caseId);
+    if (!c) return;
+    const d = this.detail;
+    const w = pageW;
+    const cw = charWidth(this, 'body', 12);
+    const maxChars = Math.floor((w - 8) / cw);
+    d.add(this.add.rectangle(2, 2, w, 252, HEX.bg, 0.25).setOrigin(0));
+    d.add(this.add.rectangle(0, 0, w, 252, HEX.paperShadow, 0.35).setOrigin(0));
+    d.add(
+      this.add
+        .rectangle(3, 3, w - 6, 246)
+        .setOrigin(0)
+        .setStrokeStyle(1, HEX.woodDark),
+    );
+    d.add(
+      makeText(this, w / 2, 8, 'WANTED', { size: FONT.size.heading, color: 'stampRed' }).setOrigin(
+        0.5,
+        0,
+      ),
+    );
+    d.add(
+      makeText(this, w / 2, 30, known ? 'for questioning' : 'still at large', {
+        size: FONT.size.tiny,
+        color: 'woodMid',
+      }).setOrigin(0.5, 0),
+    );
+    const rogue = rogueOf(c);
+    const key = makePortrait(this, known ? rogue.seed : caseId, known ? rogue.style : 'anon');
+    const img = this.add.image(w / 2, 70, key).setDisplaySize(56, 56);
+    d.add(this.add.rectangle(w / 2, 70, 60, 60, HEX.woodDark).setOrigin(0.5));
+    d.add(img);
+    if (!known) {
+      d.add(
+        makeText(this, w / 2, 104, '? ? ? ? ?', {
+          size: FONT.size.body,
+          color: 'woodDark',
+        }).setOrigin(0.5, 0),
+      );
+      wrapMono(
+        `Last seen behind ${c.ticker}. Stamp the right verdict on that file to put a face here.`,
+        maxChars,
+      ).forEach((l, i) =>
+        d.add(makeText(this, 6, 124 + i * BOOK.lineH, l, { font: 'body', color: 'woodMid' })),
+      );
+      return;
+    }
+    d.add(
+      makeText(this, w / 2, 104, rogue.name.toUpperCase(), {
+        size: FONT.size.body,
+        color: 'woodDark',
+      }).setOrigin(0.5, 0),
+    );
+    d.add(
+      makeText(this, w / 2, 118, `${rogue.role}  ·  ${c.ticker}`, {
+        size: FONT.size.tiny,
+        color: 'ink',
+      }).setOrigin(0.5, 0),
+    );
+    const charges = [
+      ...new Set(
+        c.documents.flatMap((doc) =>
+          doc.clues.filter(isFlagClue).map((cl) => FLAGS[cl.flagId as FlagId].title),
+        ),
+      ),
+    ];
+    let y = 134;
+    d.add(makeText(this, 6, y, 'charges', { size: FONT.size.tiny, color: 'paperShadow' }));
+    y += 11;
+    for (const ch of charges.slice(0, 5)) {
+      d.add(makeText(this, 6, y, `- ${ch}`.slice(0, maxChars), { font: 'body', color: 'shadow' }));
+      y += 12;
+    }
+    if (charges.length > 5)
+      d.add(
+        makeText(this, 6, y, `...and ${charges.length - 5} more`, {
+          font: 'body',
+          color: 'woodMid',
+        }),
+      );
+    const r = saveStore.get().caseResults[caseId];
+    d.add(
+      makeText(
+        this,
+        w / 2,
+        232,
+        `reward  ${r?.bestScore ?? 0} pts  ·  grade ${r?.bestGrade ?? '-'}`,
+        {
+          size: FONT.size.tiny,
+          color: 'woodMid',
+        },
+      ).setOrigin(0.5, 0),
+    );
+    // CAUGHT, stamped across the mugshot.
+    const stamp = this.add
+      .container(w / 2 + 34, 86)
+      .setAngle(-18)
+      .setAlpha(0.85);
+    stamp.add(this.add.rectangle(0, 0, 58, 16).setStrokeStyle(2, HEX.stampRed).setOrigin(0.5));
+    stamp.add(
+      makeText(this, 0, 0, 'CAUGHT', { size: FONT.size.small, color: 'stampRed' }).setOrigin(0.5),
+    );
+    this.children.remove(stamp);
+    d.add(stamp);
   }
 }

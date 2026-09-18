@@ -9,8 +9,22 @@ import { saveStore } from '@/systems/save';
 import { rect } from './shapes';
 import { makeText } from './text';
 
-/** A small card that slides in at the top-right and leaves on its own. */
+const SHOW_MS = 3000;
+const SLIDE_MS = 260;
+/** When each scene's toast slot frees up, so back-to-back toasts queue instead of stacking. */
+const busyUntil = new WeakMap<Phaser.Scene, number>();
+
+/** A small card that slides in at the top-right and leaves on its own. Queued per scene. */
 export function toast(scene: Phaser.Scene, title: string, body: string): void {
+  const now = scene.time.now;
+  const at = Math.max(now, busyUntil.get(scene) ?? 0);
+  busyUntil.set(scene, at + SHOW_MS + SLIDE_MS * 2 + 150);
+  if (at > now)
+    scene.time.delayedCall(at - now, () => scene.scene.isActive() && show(scene, title, body));
+  else show(scene, title, body);
+}
+
+function show(scene: Phaser.Scene, title: string, body: string): void {
   const w = 170;
   const h = 34;
   const x = GAME_WIDTH - w - 8;
@@ -32,14 +46,14 @@ export function toast(scene: Phaser.Scene, title: string, body: string): void {
   const reduced = saveStore.get().settings.reducedMotion;
   if (reduced) {
     c.setY(0);
-    scene.time.delayedCall(3000, () => c.destroy());
+    scene.time.delayedCall(SHOW_MS, () => c.destroy());
     return;
   }
   scene.tweens.chain({
     targets: c,
     tweens: [
-      { y: 0, duration: 260, ease: 'Back.easeOut' },
-      { y: -h - 10, duration: 220, delay: 3000, ease: 'Quad.easeIn' },
+      { y: 0, duration: SLIDE_MS, ease: 'Back.easeOut' },
+      { y: -h - 10, duration: 220, delay: SHOW_MS, ease: 'Quad.easeIn' },
     ],
     onComplete: () => c.destroy(),
   });

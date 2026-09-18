@@ -163,11 +163,11 @@ export class ReportScene extends Phaser.Scene {
         audio.play('caseClosed');
       });
     }
-    this.payload.newUnlockNames.forEach((name, i) => {
-      this.time.delayedCall(2400 + i * 3600, () => toast(this, 'UNLOCKED', name));
-    });
-    this.payload.newBadges.forEach((id, i) => {
-      this.time.delayedCall((this.payload.rankUp ? 4600 : 1200) + i * 3600, () =>
+    // Toasts queue themselves; only the first needs a beat after the stamp.
+    this.time.delayedCall(this.payload.rankUp ? 1400 : 1200, () => {
+      if (this.payload.caughtName) toast(this, 'WANTED POSTER', this.payload.caughtName);
+      this.payload.newUnlockNames.forEach((name) => toast(this, 'UNLOCKED', name));
+      this.payload.newBadges.forEach((id) =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),
       );
     });
@@ -291,6 +291,14 @@ export class ReportScene extends Phaser.Scene {
     }
     if (newUnlockNames.length > 0)
       L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'amber'));
+    if (this.payload.caughtName)
+      L.push(
+        ...wrap(
+          `${this.payload.caughtName} goes up in the rogues gallery (Notebook > Rogues).`,
+          0,
+          'stampRed',
+        ),
+      );
     if (this.payload.rankUp)
       L.push({ text: `PROMOTED: ${this.payload.rankUp}`, font: 'ui', size: 12, color: 'amber' });
     if (this.payload.newBadges.length > 0)

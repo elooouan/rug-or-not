@@ -31,7 +31,8 @@ export type ScriptId =
   | 'all-cases'
   | 'wall'
   | 'first-rush'
-  | 'radio';
+  | 'radio'
+  | 'rogues';
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -151,6 +152,11 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
     {
       text: 'Long beep is a dash, short is a dot. Five dashes make a zero. Work out the other two, then check under the desk.',
+    },
+  ],
+  rogues: [
+    {
+      text: "Every face in this chapter walked off with somebody's savings. Fictional savings. Still: remember them.",
     },
   ],
   'first-rush': [
