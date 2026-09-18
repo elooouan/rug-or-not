@@ -364,6 +364,8 @@ export class InvestigationScene extends Phaser.Scene {
         if (
           this.phase === 'investigating' &&
           !this.dialogue?.isActive &&
+          !this.paused &&
+          !this.browsing &&
           this.current === i &&
           claimHint(`tip-doc-${kind}`)
         )
@@ -418,7 +420,7 @@ export class InvestigationScene extends Phaser.Scene {
 
   /** A one-time quip per case, shown in Lucien's corner bubble. */
   private mutter(key: string, text: string): void {
-    if (this.said.has(key) || this.dialogue?.isActive) return;
+    if (this.said.has(key) || this.dialogue?.isActive || this.paused) return;
     this.said.add(key);
     LucienBubble.say(this, text);
   }
@@ -692,6 +694,11 @@ export class InvestigationScene extends Phaser.Scene {
         this.scene.pause();
       },
       onQuit: () => this.scene.start('TitleScene'),
+      subtitle: `${this.caseData.ticker}  ·  ${this.caseData.title}${
+        this.clock && !saveStore.get().settings.relaxed
+          ? `  ·  ${Math.floor(this.clock.timeLeft / 60)}:${String(this.clock.timeLeft % 60).padStart(2, '0')} left`
+          : ''
+      }`,
     });
     this.magnifier.ignore(this.pauseMenu);
   }

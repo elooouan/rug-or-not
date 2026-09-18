@@ -13,6 +13,8 @@ export interface PauseActions {
   onSettings: () => void;
   onNotebook: () => void;
   onQuit: () => void;
+  /** A line under the title: which file, how long is left. */
+  subtitle?: string;
 }
 
 /** Esc overlay. */
@@ -34,6 +36,13 @@ export class PauseMenu extends Phaser.GameObjects.Container {
         color: 'shadow',
       }).setOrigin(0.5, 0),
     );
+    if (actions.subtitle)
+      this.add(
+        makeText(scene, GAME_WIDTH / 2, y + 34, actions.subtitle, {
+          size: FONT.size.tiny,
+          color: 'woodMid',
+        }).setOrigin(0.5, 0),
+      );
     const buttons = [
       new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 48, 'Resume', actions.onResume, {
         width: 100,
