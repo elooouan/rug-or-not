@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
-import { GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
@@ -88,6 +88,23 @@ export class TitleScene extends Phaser.Scene {
         typed = '';
       } else if (typed.endsWith('lucien')) {
         lucienSaysNow(this, 'title-intro');
+        typed = '';
+      } else if (typed.endsWith('wagmi')) {
+        LucienBubble.say(
+          this,
+          'We are all going to make... a careful decision after reading the audit.',
+          4200,
+        );
+        typed = '';
+      } else if (typed.endsWith('moon')) {
+        audio.play('unlock');
+        floatText(this, DESK.window.x + DESK.window.w - 60, 14, 'to the moon (and back, usually)');
+        typed = '';
+      } else if (typed.endsWith('wen')) {
+        LucienBubble.say(this, 'Wen? When you have read the tokenomics.', 3600);
+        typed = '';
+      } else if (typed.endsWith('gm')) {
+        LucienBubble.say(this, 'gm. Now read the contract.', 3000);
         typed = '';
       }
     });

@@ -10,6 +10,7 @@
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
 - Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
   for posting, next to the clipboard text.
+- A fly visits the lamp now and then (swat it); more typed words on the title screen.
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid
   is now a live photo of your own desk, taken as you open it. Scrolling moves the wall, not

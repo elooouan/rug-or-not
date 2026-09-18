@@ -202,7 +202,77 @@ export class DeskBackground {
     this.overlays = [this.light, this.vignette, this.flash];
 
     this.setFlicker(s.lampFlicker && this.motion);
+    if (this.motion && opts.props !== false) this.scheduleFly();
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.destroy());
+  }
+
+  // ---- the fly ----------------------------------------------------------------
+
+  /** Now and then a fly finds the lamp. Swat it for a badge. */
+  private scheduleFly(): void {
+    this.scene.time.delayedCall(Phaser.Math.Between(12000, 40000), () => {
+      if (!this.lampOn) {
+        this.scheduleFly();
+        return;
+      }
+      this.spawnFly();
+    });
+  }
+
+  private spawnFly(): void {
+    const scene = this.scene;
+    const cx = DESK.lamp.x + 62;
+    const cy = DESK.lamp.y + 30;
+    const fly = scene.add
+      .rectangle(cx, cy, 3, 2, HEX.bg)
+      .setOrigin(0.5)
+      .setDepth(DEPTH.deskProps + 1);
+    // A generous hit box: the fly is two pixels wide.
+    fly.setInteractive(new Phaser.Geom.Rectangle(-5, -5, 12, 12), Phaser.Geom.Rectangle.Contains);
+    const born = scene.time.now;
+    const life = Phaser.Math.Between(9000, 16000);
+    let alive = true;
+    const step = () => {
+      if (!alive || !fly.active) return;
+      const t = (scene.time.now - born) / 1000;
+      // Two slow loops around the shade plus a jitter so it never looks tweened.
+      fly.setPosition(
+        Math.round(cx + Math.cos(t * 2.1) * 34 + Math.sin(t * 9.7) * 3),
+        Math.round(cy + Math.sin(t * 3.3) * 12 + Math.cos(t * 11.3) * 2),
+      );
+      // Wing blur: the body flickers between two and three pixels wide.
+      fly.setSize(Math.floor(t * 30) % 2 === 0 ? 3 : 2, 2);
+      if (scene.time.now - born > life || !this.lampOn) leave();
+    };
+    const leave = () => {
+      if (!alive) return;
+      alive = false;
+      scene.events.off(Phaser.Scenes.Events.UPDATE, step);
+      scene.tweens.add({
+        targets: fly,
+        x: GAME_WIDTH + 10,
+        y: -10,
+        duration: 700,
+        ease: 'Quad.easeIn',
+        onComplete: () => fly.destroy(),
+      });
+      this.scheduleFly();
+    };
+    fly.on('pointerdown', () => {
+      if (!alive) return;
+      alive = false;
+      scene.events.off(Phaser.Scenes.Events.UPDATE, step);
+      audio.play('click');
+      floatText(scene, fly.x, fly.y - 4, 'swat', 'amber');
+      fly.destroy();
+      awardBadge(scene, 'swatter');
+      this.scheduleFly();
+    });
+    scene.events.on(Phaser.Scenes.Events.UPDATE, step);
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      alive = false;
+      scene.events.off(Phaser.Scenes.Events.UPDATE, step);
+    });
   }
 
   // ---- window -----------------------------------------------------------------
