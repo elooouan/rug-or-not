@@ -71,6 +71,11 @@ export const BADGES: Badge[] = [
     secret: true,
   },
   { id: 'most-wanted', name: 'Most Wanted', description: 'Fill every page of the rogues gallery.' },
+  {
+    id: 'drill-sergeant',
+    name: 'Drill Sergeant',
+    description: 'Complete the drill for every red flag.',
+  },
   { id: 'cold-one', name: 'Cold One', description: 'Close a cold case (a generated file).' },
   { id: 'cold-ten', name: 'Night Desk', description: 'Call ten cold cases correctly.' },
   { id: 'rush-hour', name: 'Rush Hour', description: 'Finish a Red Flag Rush.' },

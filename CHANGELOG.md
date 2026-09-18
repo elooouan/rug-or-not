@@ -6,6 +6,8 @@
   liquidity, audits assembled from the red-flag and herring libraries; difficulty sets how
   many flags and how much fine print). Endless play with its own board and badges, seeds
   shareable as `#cold=<seed>`.
+- Drills: from any red-flag page in the notebook, five generated pages that all hide that
+  flag. Clearing them logs the drill; all fifteen earn Drill Sergeant.
 - Rush decks mix in four generated pages a day, so the pages change daily; the results card
   explains the herrings you fell for.
 - `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board

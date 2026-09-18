@@ -93,6 +93,9 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
   highlights; every run scores ×1.25 and is starred on the board.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a
   no-magnifier accessibility mode (fine print shown inline with a dotted underline) live there too.
+- **Drills**: every red-flag page in the notebook has a "Drill this flag" button: five generated
+  pages that all hide that flag, on a gentle clock. Clearing all five logs the drill (Drill
+  Sergeant badge for the full set).
 - **Detective's Notebook**: three chapters. Every red flag you meet in a report unlocks its
   glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter;
   and every rug you call correctly pins a WANTED poster (procedural mugshot, charges, reward)

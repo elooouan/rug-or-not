@@ -198,6 +198,8 @@ const CONTRACT_HERRINGS: ContractHerring[] = [
 export interface GenOptions {
   verdict?: GenVerdict;
   difficulty?: number;
+  /** Red flags that must appear (drills). Implies a rug. */
+  forceFlags?: string[];
 }
 
 interface Plan {
@@ -966,13 +968,26 @@ const FLAG_BLURB: Record<string, string> = {
 export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   const rng = makeRng(`cold:${seed}`);
   const nm = names(rng);
-  const p = plan(rng, opts);
-  const flags = new Set(take(rng, FLAG_POOL, p.flags));
+  const forced = (opts.forceFlags ?? []).filter((f) =>
+    (FLAG_POOL as readonly string[]).includes(f),
+  );
+  const p = plan(rng, forced.length ? { ...opts, verdict: 'rug' } : opts);
+  const flags = new Set<string>([...forced, ...take(rng, FLAG_POOL, p.flags)]);
   // A contract can carry at most one exit mechanism worth of confusion; keep it readable.
-  const contractFlags = CONTRACT_FLAGS.filter((f) => flags.has(f));
+  // Forced flags always survive the trimming.
+  const keep = (f: string) => forced.includes(f);
+  const contractFlags = CONTRACT_FLAGS.filter((f) => flags.has(f)).sort(
+    (a, b) => Number(keep(b)) - Number(keep(a)),
+  );
   if (contractFlags.length > 2) contractFlags.slice(2).forEach((f) => flags.delete(f));
-  if (flags.has('unverified-contract'))
-    CONTRACT_FLAGS.filter((f) => f !== 'unverified-contract').forEach((f) => flags.delete(f));
+  if (flags.has('unverified-contract')) {
+    if (
+      keep('unverified-contract') ||
+      !CONTRACT_FLAGS.some((f) => f !== 'unverified-contract' && keep(f))
+    )
+      CONTRACT_FLAGS.filter((f) => f !== 'unverified-contract').forEach((f) => flags.delete(f));
+    else flags.delete('unverified-contract');
+  }
   const herrings = new Set(take(rng, HERRING_POOL, p.herrings));
   // Contradictions: no clean renounce next to a fake one, no long lock next to an unlock.
   if (flags.has('fake-renounce')) {

@@ -47,6 +47,9 @@ export const RUSH = {
   strayPenaltySec: 2,
   /** The radio runs this much faster during a rush. */
   musicBpmBoost: 18,
+  /** Drills: this many pages, all carrying one flag, on a gentler clock. */
+  drillPages: 5,
+  drillTimeSec: 90,
   /** Score thresholds for the grade on the results card and the board. */
   grades: [
     { grade: 'S', min: 3000 },

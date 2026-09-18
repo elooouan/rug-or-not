@@ -294,6 +294,30 @@ export class NotebookScene extends Phaser.Scene {
           color: 'stampRed',
         });
       }
+      // Drill: five generated pages that all hide this flag. Not from an overlay,
+      // where it would abandon the case underneath.
+      if (!this.overlay) {
+        y += 8;
+        const drilled = saveStore.get().stats.drilled.includes(id);
+        const b = new PixelButton(
+          this,
+          0,
+          y,
+          drilled ? 'Drill again' : 'Drill this flag',
+          () => this.scene.start('RushScene', { drill: id }),
+          { variant: 'ink' },
+        );
+        this.children.remove(b);
+        this.detail.add(b);
+        if (drilled)
+          this.detail.add(
+            makeText(this, b.bw + 8, y + 4, 'drilled', {
+              size: FONT.size.tiny,
+              color: 'stampGreen',
+            }),
+          );
+        y += b.bh + 4;
+      }
     } else {
       const h = HERRINGS[id as HerringId];
       add(h.title.toUpperCase(), { size: FONT.size.body, color: 'woodDark' });

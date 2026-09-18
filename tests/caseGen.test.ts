@@ -23,6 +23,37 @@ describe('cold case generator', () => {
     expect(bad).toEqual([]);
   });
 
+  it('forces requested flags into the file (drills)', () => {
+    const pool = [
+      'mint-unlimited',
+      'sell-tax-adjustable',
+      'honeypot',
+      'blacklist',
+      'fake-renounce',
+      'unverified-contract',
+      'team-allocation-unvested',
+      'copied-whitepaper',
+      'anon-team-stock-photos',
+      'bot-chat',
+      'urgency-pressure',
+      'guaranteed-returns',
+      'liquidity-unlocked',
+      'whale-concentration',
+      'fake-audit',
+    ];
+    for (const flag of pool)
+      for (let i = 0; i < 20; i++) {
+        const c = generateCase(`drill-${flag}-${i}`, { forceFlags: [flag] });
+        const res = validateCase(c);
+        if (!res.ok) throw new Error(res.errors.join('\n'));
+        const ids = c.documents
+          .flatMap((d) => d.clues)
+          .filter(isFlagClue)
+          .map((cl) => cl.flagId);
+        expect(ids, `${flag} #${i}`).toContain(flag);
+      }
+  });
+
   it('honours requested verdict and difficulty', () => {
     const legit = generateCase('x', { verdict: 'legit', difficulty: 2 });
     expect(legit.verdict).toBe('legit');
