@@ -78,6 +78,7 @@ window.addEventListener('keydown', (e) => {
     window.setTimeout(() => {
       if (((game.registry.get('typedAt') as number | undefined) ?? 0) > at + 50) return;
       const muted = audio.toggleMute();
+      game.events.emit('mute', muted);
       const scene = game.scene.getScenes(true).find((s) => s.scene.key !== 'CursorScene');
       if (scene) toast(scene, muted ? 'MUTED' : 'SOUND ON', muted ? 'M to unmute' : '');
     }, 350);

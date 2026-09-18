@@ -97,9 +97,12 @@ export class SettingsScene extends Phaser.Scene {
     const onOff = (v: boolean) => (v ? 'on' : 'off');
     this.rows.push({
       label: 'Master volume',
-      value: () => `${Math.round(s().volume * 10) * 10}%`,
-      change: (d) =>
-        set((st) => (st.volume = Phaser.Math.Clamp(Math.round(st.volume * 10 + d) / 10, 0, 1))),
+      value: () => (audio.isMuted ? 'muted (M)' : `${Math.round(s().volume * 10) * 10}%`),
+      change: (d) => {
+        // Touching the volume while the quick mute is on is a request to hear something.
+        if (audio.isMuted) audio.toggleMute();
+        set((st) => (st.volume = Phaser.Math.Clamp(Math.round(st.volume * 10 + d) / 10, 0, 1)));
+      },
     });
     this.rows.push({
       label: 'Relaxed mode (no timers)',
@@ -325,7 +328,11 @@ export class SettingsScene extends Phaser.Scene {
     this.select(0);
     if (!this.overlay) lucienSays(this, 'settings');
 
+    // The quick mute (M) is global; keep the volume row honest while it's on.
+    const onMute = () => this.refresh();
+    this.game.events.on('mute', onMute);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off('mute', onMute);
       if (this.cosmeticsDirty) applyCosmetics(this, saveStore.get().cosmetics);
     });
   }
