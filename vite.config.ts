@@ -9,5 +9,11 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        // Phaser in its own file so game updates don't invalidate the big cached chunk.
+        manualChunks: { phaser: ['phaser'] },
+      },
+    },
   },
 });
