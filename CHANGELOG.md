@@ -17,6 +17,8 @@
   news headlines follow the story.
 - Campaign story beats: Lucien connects the files after cases 2, 5, 10 and 13 (someone is
   running a template; the chats keep deleting a name).
+- The coin page can show a price from an optional feed URL (plain, Jupiter or DexScreener
+  JSON), read-only, cached a minute.
 - Holder perks beyond cosmetics: northern lights over the city on clear nights, a `$` mark on
   the board, and a word from Lucien. Perks use the last balance the coin page saw. The coin
   page accepts any injected Solana wallet with Phantom's connect shape (Solflare, Backpack),

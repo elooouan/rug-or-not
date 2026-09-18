@@ -15,6 +15,8 @@ export const TOKEN = {
   buyUrl: import.meta.env.VITE_TOKEN_BUY_URL ?? '',
   /** Optional remote leaderboard endpoint (see src/systems/leaderboard.ts). */
   leaderboardUrl: import.meta.env.VITE_LEADERBOARD_URL ?? '',
+  /** Optional price feed for the coin page (see src/systems/price.ts). */
+  priceUrl: import.meta.env.VITE_TOKEN_PRICE_URL ?? '',
 } as const;
 
 export function shortAddress(addr: string): string {

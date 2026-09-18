@@ -19,6 +19,7 @@ import { makeRng } from '@/systems/rng';
 import { currentStreak, localDateKey, playedStrip, weekKey } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
 import { wallet, walletName } from '@/systems/wallet';
+import { fetchPrice, formatPrice } from '@/systems/price';
 import { awardBadge, badgeCount, badgeProgress, noteSeen } from '@/systems/badges';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
@@ -502,6 +503,21 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     if (!TOKEN.mint) {
       ctx.line('Status: not launched yet. Check back after the case files are closed.', {
         color: 'stampRed',
+      });
+      ctx.gap();
+    } else if (TOKEN.priceUrl) {
+      const priceLine = makeText(ctx.scene, 0, ctx.y, 'Price: looking...', {
+        font: 'body',
+        size: FONT.size.body,
+        color: 'woodMid',
+      });
+      ctx.content.add(priceLine);
+      ctx.y += BROWSER.lineH;
+      void fetchPrice().then((p) => {
+        if (!priceLine.active) return;
+        priceLine.setText(
+          p === null ? 'Price: no answer from the feed' : `Price: ${formatPrice(p)}`,
+        );
       });
       ctx.gap();
     }

@@ -72,7 +72,9 @@ The phone on the desk opens an in-game browser:
   (a PNG with your rank, record and badges) from there.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
-Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
+Configure the coin through env vars (see `.env.example`); nothing is hard-coded. An optional
+`VITE_TOKEN_PRICE_URL` (plain `{price}`, Jupiter or DexScreener JSON shapes) shows a price on
+the coin page once a mint is set; it's read-only and cached for a minute.
 
 ## Modes
 

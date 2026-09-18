@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_TOKEN_HOLDER_MIN?: string;
   readonly VITE_TOKEN_BUY_URL?: string;
   readonly VITE_LEADERBOARD_URL?: string;
+  readonly VITE_TOKEN_PRICE_URL?: string;
 }
 
 interface ImportMeta {
