@@ -193,4 +193,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       "Eighteen pages in the notebook on how the office works. The greyed ones are about things that haven't turned up on this desk yet: it opens up a piece at a time now.",
   },
+  {
+    file: '25-v08-bluehour',
+    version: 'v0.8',
+    date: '2026-09-19',
+    title: 'Blue hour',
+    caption:
+      'The same office in other colours: every texture is drawn from twelve named colours, so a theme is just twelve new values and a repaint. This one is Blue hour.',
+  },
 ];
