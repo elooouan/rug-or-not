@@ -395,6 +395,11 @@ export class DeskBackground {
       },
     );
     this.setWeather(weather);
+    // Life in the city: a night train along the horizon, a plane across the sky.
+    if (this.motion) {
+      this.scheduleTrain();
+      this.schedulePlane();
+    }
 
     // Cat on the sill: blinks, swishes its tail, and has opinions when clicked.
     this.cat = scene.add
@@ -482,6 +487,83 @@ export class DeskBackground {
       this.scheduleSiren();
       this.scheduleShootingStar();
     }
+  }
+
+  /** A lit night train crosses the horizon every few minutes. */
+  private scheduleTrain(): void {
+    const t = this.scene.time.delayedCall(Phaser.Math.Between(45000, 120000), () => {
+      if (this.weather !== 'fog') this.train();
+      this.scheduleTrain();
+    });
+    this.timers.push(t);
+  }
+
+  /** Send the night train across the window now. */
+  train(): void {
+    const scene = this.scene;
+    const { x, y, w, h } = DESK.window;
+    const horizon = y + h - 6 - 1; // just above the sill line of the skyline
+    const cars = 6;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const startX = dir > 0 ? x + 4 - cars * 6 : x + w - 4;
+    const endX = dir > 0 ? x + w - 4 : x + 4 - cars * 6;
+    const g = scene.add.graphics({ x: startX, y: horizon - 3 }).setDepth(DEPTH.windowRain);
+    for (let i = 0; i < cars; i++) {
+      g.fillStyle(HEX.amber, 0.9);
+      g.fillRect(i * 6, 0, 4, 2);
+      g.fillStyle(HEX.woodDark, 1);
+      g.fillRect(i * 6 + 4, 0, 2, 2);
+    }
+    // Only the glass shows the train; the frame masks the ends of its run.
+    const mask = scene.make.graphics({ x: 0, y: 0 }, false);
+    mask.fillRect(x + 4, y + 4, w - 8, h - 10);
+    g.setMask(new Phaser.Display.Masks.GeometryMask(scene, mask));
+    scene.tweens.add({
+      targets: g,
+      x: endX,
+      duration: Phaser.Math.Between(7000, 11000),
+      ease: 'Linear',
+      onComplete: () => {
+        g.destroy();
+        mask.destroy();
+      },
+    });
+  }
+
+  /** A plane's blinking light crosses the top of the sky, rarely. */
+  private schedulePlane(): void {
+    const t = this.scene.time.delayedCall(Phaser.Math.Between(90000, 240000), () => {
+      if (this.weather === 'clear' || this.weather === 'snow') this.plane();
+      this.schedulePlane();
+    });
+    this.timers.push(t);
+  }
+
+  /** Send a plane across the sky now. */
+  plane(): void {
+    const scene = this.scene;
+    const { x, y, w } = DESK.window;
+    const py = y + Phaser.Math.Between(6, 12);
+    const light = scene.add
+      .rectangle(x + 6, py, 1, 1, HEX.stampRed)
+      .setOrigin(0)
+      .setDepth(DEPTH.windowRain);
+    const blink = scene.time.addEvent({
+      delay: 500,
+      loop: true,
+      callback: () => light.setVisible(!light.visible),
+    });
+    this.timers.push(blink);
+    scene.tweens.add({
+      targets: light,
+      x: x + w - 8,
+      duration: 16000,
+      ease: 'Linear',
+      onComplete: () => {
+        blink.remove(false);
+        light.destroy();
+      },
+    });
   }
 
   /** On clear nights a star falls across the window now and then. Click it to make a wish. */
@@ -633,7 +715,7 @@ export class DeskBackground {
     }
   }
 
-  private petCat(): void {
+  petCat(): void {
     this.pets++;
     if (bumpStat('pets') >= 10) awardBadge(this.scene, 'cat-person');
     if (this.catAsleep) {

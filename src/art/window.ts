@@ -10,6 +10,41 @@ import { bayer4, drawPixels, makeGraphicsTexture } from './pixelUtil';
  * windows, a moon, and a sill for the cat. Lit windows are a separate layered
  * texture (two frames) so they can twinkle without redrawing the skyline.
  */
+/**
+ * Where the moon is in its cycle, 0 = new, 0.5 = full, from a known new moon
+ * (2000-01-06 18:14 UTC) and the synodic month. Good to a day, which is all a
+ * six-pixel moon can show.
+ */
+export function moonPhase(date: Date = new Date()): number {
+  const synodic = 29.530588853;
+  const days = (date.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000;
+  return (((days % synodic) + synodic) % synodic) / synodic;
+}
+
+/** A six-pixel moon: a lit disc with the night's shadow slid across it. */
+export function drawMoon(
+  g: Phaser.GameObjects.Graphics,
+  cx: number,
+  cy: number,
+  phase: number,
+): void {
+  const lit = (1 - Math.cos(phase * Math.PI * 2)) / 2; // 0 new .. 1 full
+  // Faint outline so a new moon still reads as a moon.
+  g.fillStyle(HEX.paperShadow, 0.35);
+  g.fillCircle(cx, cy, 6);
+  g.fillStyle(HEX.paper, 1);
+  g.fillCircle(cx, cy, 6);
+  if (lit < 0.97) {
+    // The shadow disc slides off to one side as the moon waxes, the other as it wanes.
+    const dir = phase < 0.5 ? 1 : -1;
+    const offset = Math.round(lit * 11);
+    g.fillStyle(HEX.bg, 1);
+    g.fillCircle(cx + dir * offset, cy - 1, 5.5);
+  }
+  g.fillStyle(HEX.paperShadow, 1);
+  g.fillRect(cx - 3, cy + 2, 1, 1);
+}
+
 export function makeWindow(scene: Phaser.Scene): void {
   const { w, h } = DESK.window;
   const frame = 4;
@@ -34,13 +69,8 @@ export function makeWindow(scene: Phaser.Scene): void {
         }
       }
     }
-    // Moon.
-    g.fillStyle(HEX.paper, 1);
-    g.fillCircle(w - 60, frame + 12, 6);
-    g.fillStyle(HEX.bg, 1);
-    g.fillCircle(w - 56, frame + 10, 5);
-    g.fillStyle(HEX.paperShadow, 1);
-    g.fillRect(w - 63, frame + 14, 1, 1);
+    // Moon (its phase follows the real calendar; see drawMoon).
+    drawMoon(g, w - 60, frame + 12, moonPhase());
     // Skyline: overlapping building silhouettes along the horizon.
     const horizon = frame + glassH;
     let x = frame;
@@ -66,13 +96,11 @@ export function makeWindow(scene: Phaser.Scene): void {
     g.fillRect(w - 108, horizon - 14, 1, 5);
     g.fillStyle(HEX.amber, 1);
     g.fillRect(frame + 190, horizon - 20, 3, 1);
-    // Moon glow.
-    g.fillStyle(HEX.ink, 0.35);
+    // Moon glow, then the moon again on top of the skyline.
+    const lit = (1 - Math.cos(moonPhase() * Math.PI * 2)) / 2;
+    g.fillStyle(HEX.ink, 0.15 + 0.25 * lit);
     g.fillCircle(w - 60, frame + 12, 10);
-    g.fillStyle(HEX.paper, 1);
-    g.fillCircle(w - 60, frame + 12, 6);
-    g.fillStyle(HEX.bg, 1);
-    g.fillCircle(w - 56, frame + 10, 5);
+    drawMoon(g, w - 60, frame + 12, moonPhase());
     // Rain on the glass: a few static droplets.
     g.fillStyle(HEX.ink, 0.7);
     for (let i = 0; i < 26; i++)

@@ -60,7 +60,13 @@ export class TitleScene extends Phaser.Scene {
   }
 
   /** Typed words, the Konami code, and other nonsense. */
-  private bindEasterEggs(cx: number, cy: number, cardW: number, cardH: number): void {
+  private bindEasterEggs(
+    cx: number,
+    cy: number,
+    cardW: number,
+    cardH: number,
+    desk: DeskBackground,
+  ): void {
     const kb = this.input.keyboard;
     if (!kb) return;
     let typed = '';
@@ -132,6 +138,25 @@ export class TitleScene extends Phaser.Scene {
         typed = '';
       } else if (typed.endsWith('gm')) {
         LucienBubble.say(this, 'gm. Now read the contract.', 3000);
+        typed = '';
+      } else if (typed.endsWith('biscuit')) {
+        desk.petCat();
+        LucienBubble.say(this, 'She knows her name. She just does not care.', 3000);
+        typed = '';
+      } else if (typed.endsWith('train')) {
+        desk.train();
+        audio.play('slide');
+        typed = '';
+      } else if (typed.endsWith('plane')) {
+        desk.plane();
+        floatText(this, DESK.window.x + 40, 14, 'red-eye to somewhere');
+        typed = '';
+      } else if (typed.endsWith('tailor')) {
+        audio.play('tick');
+        LucienBubble.say(this, "Don't say that name in here. He has people in the chats.", 4200);
+        typed = '';
+      } else if (typed.endsWith('safe')) {
+        LucienBubble.say(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
         typed = '';
       }
     });
@@ -313,7 +338,7 @@ export class TitleScene extends Phaser.Scene {
         );
       } else audio.play('hover');
     });
-    this.bindEasterEggs(cx, cy, cardW, cardH);
+    this.bindEasterEggs(cx, cy, cardW, cardH, desk);
 
     // Lucien hangs around the desk; poke him for a quip.
     const m = DIALOGUE.mascot;
