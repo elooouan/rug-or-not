@@ -1,5 +1,6 @@
 import { SAVE_KEY, SAVE_VERSION, type Grade } from '@/config/gameConfig';
 import { DEFAULT_SETTINGS, sanitizeSettings, type Settings } from './settings';
+import { isNameAllowed } from './names';
 
 export interface CaseResult {
   bestScore: number;
@@ -166,7 +167,7 @@ export function sanitizeSave(raw: unknown): SaveData {
   if (Array.isArray(r.unlockedFlags))
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
-    d.detectiveName = r.detectiveName.slice(0, 12);
+    d.detectiveName = isNameAllowed(r.detectiveName) ? r.detectiveName.slice(0, 12) : 'ANON';
   if (typeof r.lastSeenVersion === 'string') d.lastSeenVersion = r.lastSeenVersion.slice(0, 16);
   if (Array.isArray(r.badges))
     d.badges = r.badges.filter((x): x is string => typeof x === 'string');
