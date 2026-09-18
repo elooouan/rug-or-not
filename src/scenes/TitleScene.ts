@@ -6,8 +6,8 @@ import { GAME_VERSION } from '@/config/gameConfig';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
-import { gameState, newColdSeed } from '@/systems/gameState';
-import { startColdCase } from '@/systems/coldCase';
+import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
+import { solvedRegular, startColdCase } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
@@ -238,7 +238,7 @@ export class TitleScene extends Phaser.Scene {
       ),
       mk('Case files', () => this.scene.start('CaseSelectScene')),
       mk('Red Flag Rush', () => this.scene.start('RushScene')),
-      mk('Cold case', () => startColdCase(this, newColdSeed())),
+      mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())))),
       mk('Notebook', () => this.scene.start('NotebookScene'), 'left'),
       mk('Settings', () => this.scene.start('SettingsScene'), 'right'),
     ];

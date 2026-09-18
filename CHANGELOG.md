@@ -5,7 +5,8 @@
 - Cold cases: a procedural case generator (names, contracts, tokenomics, teams, chats,
   liquidity, audits assembled from the red-flag and herring libraries; difficulty sets how
   many flags and how much fine print). Endless play with its own board and badges, seeds
-  shareable as `#cold=<seed>`; "the pile" folder in the drawer prints one.
+  shareable as `#cold=<seed>`; "the pile" folder in the drawer prints one. Difficulty grows
+  with the number of campaign files you've solved (a `d<n>-` prefix in the seed pins it).
 - A WEEKLY folder in the drawer: this week's cold case, the same file for everyone
   (`#cold=week-<year>-w<week>`), marked closed once stamped.
 - Drills: from any red-flag page in the notebook, five generated pages that all hide that

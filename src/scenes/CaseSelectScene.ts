@@ -5,8 +5,8 @@ import { DRAWER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
-import { gameState, newColdSeed } from '@/systems/gameState';
-import { startColdCase } from '@/systems/coldCase';
+import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
+import { solvedRegular, startColdCase } from '@/systems/coldCase';
 import { secretUnlocked } from '@/systems/secretCase';
 import { weekKey } from '@/systems/dailyCase';
 import { rankForScore } from '@/systems/ranks';
@@ -276,7 +276,7 @@ export class CaseSelectScene extends Phaser.Scene {
     cont.on('pointerout', () => this.hideTip());
     cont.on('pointerdown', () => {
       audio.play('paper');
-      startColdCase(this, newColdSeed());
+      startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
     });
   }
 

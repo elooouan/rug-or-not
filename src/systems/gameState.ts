@@ -19,9 +19,20 @@ export const gameState: {
   coldSeed: null,
 };
 
-/** A fresh, shareable seed for a cold case. */
-export function newColdSeed(): string {
-  return Math.random().toString(36).slice(2, 8);
+/**
+ * A fresh, shareable seed for a cold case. A `d<1-5>-` prefix pins the
+ * difficulty, so the seed alone reproduces the file (see startColdCase).
+ */
+export function newColdSeed(difficulty?: number): string {
+  const body = Math.random().toString(36).slice(2, 8);
+  return difficulty ? `d${difficulty}-${body}` : body;
+}
+
+/** Cold-case difficulty that grows with the number of files the player has solved. */
+export function coldDifficultyFor(solvedRegular: number): number {
+  const base = 1 + Math.floor(solvedRegular / 3);
+  const wobble = Math.random() < 0.35 ? 1 : 0;
+  return Math.max(1, Math.min(5, base + wobble));
 }
 
 export function caseById(id: string): CaseData | undefined {
