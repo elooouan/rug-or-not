@@ -8,6 +8,16 @@ export function localDateKey(date: Date = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
+/** ISO-ish week key (Monday-based), e.g. "2026-w38": the seed for the weekly cold case. */
+export function weekKey(date: Date = new Date()): string {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()}-w${String(week).padStart(2, '0')}`;
+}
+
 /**
  * Deterministically pick one case id for a given date. Everyone with the same
  * case list gets the same case on the same day. Case ids are sorted first so

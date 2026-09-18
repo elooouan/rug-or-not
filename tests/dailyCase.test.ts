@@ -85,3 +85,12 @@ describe('streaks', () => {
     expect(localDateKey(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
 });
+
+describe('weekKey', () => {
+  it('is stable within a week and changes across weeks', async () => {
+    const { weekKey } = await import('@/systems/dailyCase');
+    expect(weekKey(new Date(2026, 8, 14))).toBe(weekKey(new Date(2026, 8, 20))); // Mon..Sun
+    expect(weekKey(new Date(2026, 8, 20))).not.toBe(weekKey(new Date(2026, 8, 21)));
+    expect(weekKey(new Date(2026, 8, 18))).toMatch(/^2026-w\d\d$/);
+  });
+});

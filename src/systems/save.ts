@@ -61,6 +61,8 @@ export interface SaveData {
     coldBest: number;
     /** Red flags whose drill (five pages in a row) has been completed. */
     drilled: string[];
+    /** Week keys whose weekly cold case has been closed. */
+    weeklyDone: string[];
   };
   /** Last known wallet snapshot (public address + token balance) for holder perks. */
   wallet: { address: string | null; token: number | null; checkedAt: string | null };
@@ -106,6 +108,7 @@ export function defaultSave(): SaveData {
       coldCorrect: 0,
       coldBest: 0,
       drilled: [],
+      weeklyDone: [],
     },
     wallet: { address: null, token: null, checkedAt: null },
   };
@@ -178,6 +181,7 @@ export function sanitizeSave(raw: unknown): SaveData {
       coldCorrect: num(st.coldCorrect),
       coldBest: num(st.coldBest),
       drilled: strs(st.drilled),
+      weeklyDone: strs(st.weeklyDone),
     };
   }
   if (r.wallet && typeof r.wallet === 'object') {

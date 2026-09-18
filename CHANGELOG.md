@@ -8,6 +8,8 @@
   shareable as `#cold=<seed>`.
 - Drills: from any red-flag page in the notebook, five generated pages that all hide that
   flag. Clearing them logs the drill; all fifteen earn Drill Sergeant.
+- A WEEKLY folder in the drawer: this week's cold case, the same file for everyone
+  (`#cold=week-<year>-w<week>`), marked closed once stamped.
 - Rush decks mix in four generated pages a day, so the pages change daily; the results card
   explains the herrings you fell for.
 - `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board

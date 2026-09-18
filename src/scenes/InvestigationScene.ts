@@ -3,7 +3,7 @@ import { DEPTH } from '@/config/depth';
 import { DESK, GAME_HEIGHT, GAME_WIDTH, PAPER, STAMP } from '@/config/layout';
 import { FLAGS, isFlagClue, type CaseData, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
-import { localDateKey, recordDailyPlay } from '@/systems/dailyCase';
+import { localDateKey, recordDailyPlay, weekKey } from '@/systems/dailyCase';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
@@ -514,6 +514,9 @@ export class InvestigationScene extends Phaser.Scene {
       if (cold) {
         // Cold cases keep their own tally and never touch the campaign or the rank.
         d.stats.coldRuns++;
+        const wk = `week-${weekKey()}`;
+        if (gameState.coldSeed === wk && !d.stats.weeklyDone.includes(wk))
+          d.stats.weeklyDone.push(wk);
         if (breakdown.verdictCorrect) d.stats.coldCorrect++;
         if (breakdown.total > d.stats.coldBest) {
           d.stats.coldBest = breakdown.total;

@@ -139,6 +139,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: 'Fourteen files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
     },
+    {
+      text: "The blank folders at the end are the pile: files the printer makes up, and this week's one, same for everyone.",
+    },
   ],
   settings: [
     {

@@ -8,6 +8,7 @@ import { audio } from '@/systems/audio';
 import { gameState, newColdSeed } from '@/systems/gameState';
 import { startColdCase } from '@/systems/coldCase';
 import { secretUnlocked } from '@/systems/secretCase';
+import { weekKey } from '@/systems/dailyCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -68,8 +69,10 @@ export class CaseSelectScene extends Phaser.Scene {
         this.makeFolder(c, i, fx, fy, this.unlocked[i], save.caseResults[c.id]?.bestGrade),
       );
     });
-    // The pile: a blank folder at the end of the drawer that prints a cold case.
+    // The pile: a blank folder at the end of the drawer that prints a cold case, and
+    // beside it this week's cold case, the same file for everyone.
     if (cases.length < DRAWER.cols * DRAWER.rows) this.makePile(slot(cases.length));
+    if (cases.length + 1 < DRAWER.cols * DRAWER.rows) this.makeWeekly(slot(cases.length + 1));
 
     const back = new PixelButton(
       this,
@@ -274,6 +277,68 @@ export class CaseSelectScene extends Phaser.Scene {
     cont.on('pointerdown', () => {
       audio.play('paper');
       startColdCase(this, newColdSeed());
+    });
+  }
+
+  private makeWeekly(at: { x: number; y: number }): void {
+    const wk = weekKey();
+    const seed = `week-${wk}`;
+    const done = saveStore.get().stats.weeklyDone.includes(seed);
+    const cont = this.add.container(at.x, at.y).setDepth(DEPTH.pins);
+    cont.add(this.make.image({ x: 0, y: 0, key: TEX.folder }, false).setOrigin(0));
+    cont.add(makeText(this, 3, -1, 'this week', { size: FONT.size.tiny, color: 'woodDark' }));
+    cont.add(
+      makeText(this, 40, 14, 'WEEKLY', { size: FONT.size.body, color: 'ink' }).setOrigin(0.5, 0),
+    );
+    cont.add(
+      makeText(this, 40, 30, done ? 'closed' : wk, {
+        size: FONT.size.tiny,
+        color: done ? 'stampGreen' : 'woodDark',
+      }).setOrigin(0.5, 0),
+    );
+    if (done) {
+      const box = rect(this, 68, 18, 14, 14).setStrokeStyle(1, HEX.stampGreen).setOrigin(0.5);
+      const t = makeText(this, 68, 18, 'ok', {
+        size: FONT.size.tiny,
+        color: 'stampGreen',
+      }).setOrigin(0.5);
+      cont.add([box, t]);
+    }
+    cont.setSize(DRAWER.folderW, DRAWER.folderH);
+    cont.setInteractive(
+      new Phaser.Geom.Rectangle(
+        DRAWER.folderW / 2,
+        DRAWER.folderH / 2,
+        DRAWER.folderW,
+        DRAWER.folderH,
+      ),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    cont.on('pointerover', () => {
+      audio.play('hover');
+      this.hideTip();
+      const w = 220;
+      const tx = Phaser.Math.Clamp(at.x + DRAWER.folderW / 2 - w / 2, 8, GAME_WIDTH - w - 8);
+      const ty = at.y + DRAWER.folderH + 8;
+      const tip = this.add.container(0, 0).setDepth(DEPTH.toast);
+      tip.add(rect(this, tx + 2, ty + 3, w, 34, HEX.bg, 0.5));
+      tip.add(rect(this, tx, ty, w, 34, HEX.paper));
+      [`The week's cold case (${wk}). Same file`, 'for everyone; compare on the board.'].forEach(
+        (l, i) =>
+          tip.add(
+            makeText(this, tx + 6, ty + 5 + i * 12, l, {
+              font: 'body',
+              size: FONT.size.body,
+              color: 'shadow',
+            }),
+          ),
+      );
+      this.tip = tip;
+    });
+    cont.on('pointerout', () => this.hideTip());
+    cont.on('pointerdown', () => {
+      audio.play('paper');
+      startColdCase(this, seed);
     });
   }
 

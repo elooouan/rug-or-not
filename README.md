@@ -85,7 +85,8 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
   from a seed, so a share link (`#cold=<seed>`) brings back the exact same file; every
   generated case passes the same schema as the handcrafted ones (400 seeds are validated in
   the tests). Cold cases unlock notebook pages but keep their own tally and board; they never
-  touch the campaign or your rank.
+  touch the campaign or your rank. The drawer ends with "the pile" (a fresh cold case) and a
+  WEEKLY folder: the week's cold case, identical for everyone, so boards can be compared.
 - **Red Flag Rush**: sixty seconds, one evidence page at a time. Every page hides at least
   one red flag; click it to clear the page (+3 s), herrings cost 5 s, blank paper 2 s, streaks
   multiply up to ×3. Fine print is shown inline (no lens). Best score, longest streak and a
