@@ -38,7 +38,8 @@
   crosses the horizon now and then (Biscuit watches it), a plane blinks across clear skies.
   The desk clock keeps real time on the title. New typed words on the title: biscuit, train,
   plane, tailor, safe; the footer hint rotates.
-- M mutes from any screen (the volume setting is kept for when it comes back).
+- M mutes from any screen (the volume setting is kept for when it comes back; the settings
+  page shows the mute and clears it when you touch the volume).
 - Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.
 - Once a mint is configured, the board page can show holders only.
 - Board handles pass a light word filter (client and worker); the weekly file sits at
