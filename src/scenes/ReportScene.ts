@@ -358,7 +358,9 @@ export class ReportScene extends Phaser.Scene {
       mode: isDaily
         ? `Daily ${localDateKey()}`
         : gameState.mode === 'cold'
-          ? `Cold case ${gameState.coldSeed ?? ''}`
+          ? gameState.coldSeed?.startsWith('week-')
+            ? `This week's file ${gameState.coldSeed.slice(5)}`
+            : `Cold case ${gameState.coldSeed ?? ''}`
           : `Case ${gameState.currentIndex + 1} of ${gameState.cases.length}`,
       detective: saveStore.get().detectiveName,
       url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
@@ -381,7 +383,7 @@ export class ReportScene extends Phaser.Scene {
     const isDaily = gameState.mode === 'daily';
     const save = saveStore.get();
     return [
-      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? `Cold case ${c.ticker}` : `Case: ${c.ticker}`} "${c.title}"`,
+      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? (gameState.coldSeed?.startsWith('week-') ? `Weekly ${gameState.coldSeed.slice(5)} ${c.ticker}` : `Cold case ${c.ticker}`) : `Case: ${c.ticker}`} "${c.title}"`,
       `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts${this.payload.elapsedSec === null ? '' : `  in ${Math.floor(this.payload.elapsedSec / 60)}:${String(this.payload.elapsedSec % 60).padStart(2, '0')}`}`,
       c.verdict === 'rug'
         ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`
