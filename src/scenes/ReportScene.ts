@@ -37,6 +37,7 @@ export class ReportScene extends Phaser.Scene {
   private content!: Phaser.GameObjects.Container;
   private scrollY = 0;
   private maxScroll = 0;
+  private moreHint?: Phaser.GameObjects.Text;
   private gradeMark?: Phaser.GameObjects.Container;
 
   constructor() {
@@ -88,6 +89,25 @@ export class ReportScene extends Phaser.Scene {
     attachScroll(this, { step: 26, onScroll: (d) => this.scrollBy(d) });
     this.input.keyboard?.on('keydown-PAGE_DOWN', () => this.scrollBy(60));
     this.input.keyboard?.on('keydown-PAGE_UP', () => this.scrollBy(-60));
+    // A tap target and a hint that there's more report below the fold.
+    this.moreHint = addText(this, x + w - pad, y + pad + viewH - 2, 'v  more', {
+      size: 8,
+      color: 'woodMid',
+    })
+      .setOrigin(1, 1)
+      .setDepth(DEPTH.hud)
+      .setVisible(this.maxScroll > 0);
+    this.moreHint.setInteractive(
+      new Phaser.Geom.Rectangle(-8, -8, this.moreHint.width + 16, this.moreHint.height + 16),
+      Phaser.Geom.Rectangle.Contains,
+    );
+    this.moreHint.on(
+      'pointerdown',
+      (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+        ev.stopPropagation();
+        this.scrollBy(60);
+      },
+    );
 
     // Buttons along the bottom of the paper.
     const by = y + h - pad - 18;
@@ -189,6 +209,7 @@ export class ReportScene extends Phaser.Scene {
   private scrollBy(dy: number): void {
     this.scrollY = Phaser.Math.Clamp(this.scrollY + dy, 0, this.maxScroll);
     this.content.setY(REPORT.y + 14 - this.scrollY);
+    this.moreHint?.setVisible(this.scrollY < this.maxScroll - 1);
   }
 
   private buildLines(width: number): TypedLine[] {
