@@ -82,8 +82,8 @@ the coin page once a mint is set; it's read-only and cached for a minute.
 
 ## Modes
 
-- **Campaign**: fourteen cases in order (eight rugs, six legit, difficulty 1→5); each verdict
-  unlocks the next folder. Stamp all fourteen correctly and a fifteenth folder with no name
+- **Campaign**: fifteen cases in order (nine rugs, six legit, difficulty 1→5); each verdict
+  unlocks the next folder. Stamp all fifteen correctly and a sixteenth folder with no name
   turns up in the drawer (`"secret": true` in its JSON keeps it out of the daily pool and
   RugScan until then).
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),

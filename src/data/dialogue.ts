@@ -143,7 +143,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   'case-files': [
     {
-      text: 'Fourteen files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
+      text: 'Fifteen files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
     },
     {
       text: "The blank folders at the end are the pile: files the printer makes up, and this week's one, same for everyone.",

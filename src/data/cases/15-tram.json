@@ -1,0 +1,259 @@
+{
+  "id": "tram",
+  "title": "The Night Tram",
+  "ticker": "$TRAM",
+  "pitch": "NightTram: ride credits for the late line. Two founders, readable code, busy chart.",
+  "intro": "A transit token with a busy chart and a small team. Read who holds the keys, and who's doing all that trading.",
+  "difficulty": 4,
+  "verdict": "rug",
+  "timeLimitSec": 300,
+  "secret": false,
+  "debrief": "NightTram's code was honest and the team was real, which is why it worked. The contract sat behind an upgradeable proxy whose admin was one wallet: every promise in the source lasted until the next upgrade. The 'volume' was two wallets passing the same 3.2 million credits back and forth every five minutes, both funded by the deployer the night before launch. The chat had a fake 'closing soon' countdown on a sale that had no end date. The two named founders, the long lock and the fixed fare fee were real, and none of them could stop an upgrade.",
+  "documents": [
+    {
+      "type": "contract",
+      "title": "NightTram.sol",
+      "content": {
+        "fileName": "contracts/NightTram.sol (implementation)",
+        "verified": true,
+        "lines": [
+          "// SPDX-License-Identifier: MIT",
+          "pragma solidity 0.8.24;",
+          "// deployed behind TransparentUpgradeableProxy",
+          "// proxy admin: 0x6c1...f0a",
+          "contract NightTram is",
+          "  ERC20Upgradeable, OwnableUpgradeable {",
+          "  uint256 public constant FARE_BPS = 100; // 1%, fixed",
+          "  address public depot;",
+          "",
+          "  function initialize() public initializer {",
+          "    __ERC20_init(\"NightTram\", \"TRAM\");",
+          "    __Ownable_init(msg.sender);",
+          "    _mint(msg.sender, 60_000_000e18);",
+          "  }",
+          "",
+          "  function _update(address f, address t, uint256 v)",
+          "    internal override {",
+          "    uint256 fare = v * FARE_BPS / 10_000;",
+          "    super._update(f, depot, fare);",
+          "    super._update(f, t, v - fare);",
+          "  }",
+          "}"
+        ]
+      },
+      "clues": [
+        {
+          "id": "tr-proxy",
+          "label": "Proxy, one admin key",
+          "flagId": "proxy-admin",
+          "finePrint": true,
+          "text": "// admin is a plain wallet. it can point the proxy at any code, any night.",
+          "anchor": {
+            "kind": "line",
+            "line": 3
+          }
+        },
+        {
+          "id": "tr-fare",
+          "label": "1% fare, constant",
+          "herring": true,
+          "herringId": "small-fixed-tax",
+          "anchor": {
+            "kind": "line",
+            "line": 6
+          }
+        }
+      ]
+    },
+    {
+      "type": "team",
+      "title": "Team",
+      "content": {
+        "members": [
+          {
+            "name": "Ravi Halvorsen",
+            "role": "CTO",
+            "bio": "Wrote the depot contracts. Public repo, public commits, answers in the chat at 2am.",
+            "portraitSeed": "ravi-halvorsen-7",
+            "style": "normal"
+          },
+          {
+            "name": "Greta Mensah",
+            "role": "Operations",
+            "bio": "Ran the night line's actual ticket office for nine years. Knows every driver by name.",
+            "portraitSeed": "greta-mensah-3",
+            "style": "normal"
+          }
+        ],
+        "note": "Two of us, full time, since the pilot. No advisors, no 'strategic partners'. Ask us anything in the chat."
+      },
+      "clues": [
+        {
+          "id": "tr-duo",
+          "label": "A team of two",
+          "herring": true,
+          "herringId": "two-person-team",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "note"
+          }
+        }
+      ]
+    },
+    {
+      "type": "chat",
+      "title": "Telegram: Night Line Riders",
+      "content": {
+        "channel": "night-line-riders",
+        "messages": [
+          {
+            "user": "TramOps",
+            "role": "admin",
+            "time": "23:02",
+            "text": "ride credit sale closes in 15 minutes. after that, market price only. don't miss the last tram!"
+          },
+          {
+            "user": "dockworker_9",
+            "time": "23:05",
+            "text": "it said 15 minutes yesterday too"
+          },
+          {
+            "user": "TramOps",
+            "role": "admin",
+            "time": "23:06",
+            "text": "extended for the late shift. final extension."
+          },
+          {
+            "user": "graph_paper",
+            "time": "23:10",
+            "text": "who holds the proxy admin key? is it a multisig?"
+          },
+          {
+            "user": "Ravi_H",
+            "role": "admin",
+            "time": "23:14",
+            "text": "ops wallet for now, moving to a timelock after the audit. code is public, read it."
+          },
+          {
+            "user": "nightshift",
+            "time": "23:20",
+            "text": "took the actual tram home with credits tonight. worked. driver laughed at the app"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "tr-countdown",
+          "label": "Countdown that resets",
+          "flagId": "urgency-pressure",
+          "finePrint": true,
+          "text": "the sale has no end date in the contract. the countdown is a graphic.",
+          "anchor": {
+            "kind": "message",
+            "index": 0
+          }
+        },
+        {
+          "id": "tr-question",
+          "label": "graph_paper asks",
+          "herring": true,
+          "herringId": "tough-questions",
+          "anchor": {
+            "kind": "message",
+            "index": 3
+          }
+        }
+      ]
+    },
+    {
+      "type": "liquidity",
+      "title": "Liquidity & Holders",
+      "content": {
+        "pool": "TRAM / USDC",
+        "liquidityUsd": "$140,000",
+        "lock": {
+          "locked": true,
+          "provider": "Vaultly",
+          "expires": "Sep 2029 (3y)",
+          "pct": 100
+        },
+        "holders": [
+          {
+            "label": "Liquidity pool",
+            "pct": 31,
+            "tag": "pool"
+          },
+          {
+            "label": "Depot (fares)",
+            "pct": 12,
+            "tag": "contract"
+          },
+          {
+            "label": "0x9b4...a17",
+            "pct": 9
+          },
+          {
+            "label": "0x2f0...c55",
+            "pct": 9
+          },
+          {
+            "label": "Everyone else",
+            "pct": 39
+          }
+        ],
+        "transfers": [
+          {
+            "when": "3m ago",
+            "from": "0x9b4...a17",
+            "to": "0x2f0...c55",
+            "amount": "3,200,000"
+          },
+          {
+            "when": "8m ago",
+            "from": "0x2f0...c55",
+            "to": "0x9b4...a17",
+            "amount": "3,200,000"
+          },
+          {
+            "when": "13m ago",
+            "from": "0x9b4...a17",
+            "to": "0x2f0...c55",
+            "amount": "3,200,000"
+          },
+          {
+            "when": "18m ago",
+            "from": "0x2f0...c55",
+            "to": "0x9b4...a17",
+            "amount": "3,200,000"
+          }
+        ]
+      },
+      "clues": [
+        {
+          "id": "tr-wash",
+          "label": "Same 2 wallets trading",
+          "flagId": "wash-trading",
+          "finePrint": true,
+          "text": "both wallets were funded by the deployer at 02:14 the night before launch",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "transfers"
+          }
+        },
+        {
+          "id": "tr-lock",
+          "label": "Locked three years",
+          "herring": true,
+          "herringId": "liquidity-locked-long",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "lock"
+          }
+        }
+      ]
+    }
+  ]
+}

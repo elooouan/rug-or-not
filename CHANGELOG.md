@@ -18,7 +18,9 @@
 - Two more red flags (an upgradeable proxy behind one admin key; wash trading between the
   same two wallets) and two more herrings (a token that is only weeks old; a team of two).
   The generator plants them; the notebook teaches them.
-- A hidden fifteenth file, "The Tailor" ($SEAM), opens once every ordinary case has been
+- A new case, $TRAM "The Night Tram" (d4): honest code behind an upgradeable proxy with one
+  admin key, wash-traded volume, a countdown that resets; a real team of two and a real lock.
+- A hidden sixteenth file, "The Tailor" ($SEAM), opens once every ordinary case has been
   stamped correctly: a difficulty-5 rug where everything is stitched to look right. Lucien
   announces it; the drawer shows a nameless folder until then; Tailor-Made badge and late
   news headlines follow the story.
