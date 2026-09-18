@@ -32,6 +32,8 @@
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
+- Share uses the phone's share sheet where there is one; the clipboard elsewhere; a note
+  with the text if neither works.
 - Deleted chat messages leave a ghost of their text that only the lens can read.
 - Offline: a network-first service worker (production builds) keeps a desk you've opened
   once playable without a connection. Phaser ships in its own chunk.

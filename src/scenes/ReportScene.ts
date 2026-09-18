@@ -7,6 +7,7 @@ import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
+import { shareText } from '@/systems/share';
 import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
 import { solvedRegular, startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
@@ -428,14 +429,11 @@ export class ReportScene extends Phaser.Scene {
       '#RugOrNot',
     ].filter(Boolean);
     const text = lines.join('\n');
-    const done = () => toast(this, 'COPIED', 'result on the clipboard');
-    try {
-      void navigator.clipboard
-        .writeText(text)
-        .then(done, () => new StickyNote(this, 160, 100, 'share text', text, 320));
-    } catch {
-      new StickyNote(this, 160, 100, 'share text', text, 320);
-    }
+    void shareText(text).then((how) => {
+      if (how === 'shared') toast(this, 'SHARED', 'off it goes');
+      else if (how === 'copied') toast(this, 'COPIED', 'result on the clipboard');
+      else new StickyNote(this, 160, 100, 'share text', text, 320);
+    });
   }
 
   /** A quick verdict on your verdict, every time. */

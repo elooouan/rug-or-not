@@ -25,6 +25,7 @@ import {
   type RushState,
 } from '@/systems/rush';
 import { saveStore } from '@/systems/save';
+import { shareText } from '@/systems/share';
 import { holderPerks, wallet } from '@/systems/wallet';
 import { DeskBackground, floatText } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -577,14 +578,11 @@ export class RushScene extends Phaser.Scene {
       `${location.origin}${location.pathname}#rush`,
       '#RugOrNot',
     ].join('\n');
-    const fallback = () => new StickyNote(this, 160, 100, 'share text', text, 320);
-    try {
-      void navigator.clipboard
-        .writeText(text)
-        .then(() => toast(this, 'COPIED', 'result on the clipboard'), fallback);
-    } catch {
-      fallback();
-    }
+    void shareText(text).then((how) => {
+      if (how === 'shared') toast(this, 'SHARED', 'off it goes');
+      else if (how === 'copied') toast(this, 'COPIED', 'result on the clipboard');
+      else new StickyNote(this, 160, 100, 'share text', text, 320);
+    });
   }
 
   private bindKeys(): void {
