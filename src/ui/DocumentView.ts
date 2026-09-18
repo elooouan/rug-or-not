@@ -69,9 +69,16 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
       .setAlpha(0.55);
     const paper = scene.make.image({ x: 0, y: 0, key: TEX.paper }, false).setOrigin(0);
     paper.setInteractive({ useHandCursor: false });
-    // Taps on empty paper drop a stray pin; drags (inspecting with the lens) don't.
+    // Taps on empty paper drop a stray pin; drags (inspecting with the lens) don't, and
+    // neither does a release whose press landed elsewhere: an overlay that closes on
+    // pointerdown (the pause menu's Resume, the phone's dim) must not pin the paper under it.
+    let pressedHere = false;
+    paper.on('pointerdown', () => (pressedHere = true));
+    paper.on('pointerout', () => (pressedHere = false));
     paper.on('pointerup', (p: Phaser.Input.Pointer, lx: number, ly: number) => {
-      if (p.rightButtonReleased() || p.getDistance() > 8) return;
+      const ok = pressedHere;
+      pressedHere = false;
+      if (!ok || p.rightButtonReleased() || p.getDistance() > 8) return;
       this.addStrayPin(Math.round(lx), Math.round(ly));
     });
     this.add([shadow, paper]);
@@ -134,15 +141,20 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
         new Phaser.Geom.Rectangle(-8, -8, t.width + 16, t.height + 16),
         Phaser.Geom.Rectangle.Contains,
       );
+      let pressed = false;
       t.on(
         'pointerdown',
-        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) =>
-          ev.stopPropagation(),
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+          pressed = true;
+          ev.stopPropagation();
+        },
       );
       t.on(
         'pointerup',
         (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
           ev.stopPropagation();
+          if (!pressed) return;
+          pressed = false;
           this.scroll(dir);
         },
       );

@@ -13,6 +13,8 @@
   it; pages about things not yet on the desk say when they turn up.
 - Phantom's mark on the wallet buttons; buttons can carry an icon. The title chip says
   which wallet it will connect.
+- Fixed: closing the pause menu or the phone with a click over the paper dropped a stray
+  pin (and cost 15 points) on the release; a release now only counts where the press began.
 
 ## v0.7 — night shift
 

@@ -46,6 +46,9 @@ export class ClueSpot extends Phaser.GameObjects.Container {
       .setVisible(false);
     const zone = mkZone(scene, rect.x, rect.y, rect.w, rect.h);
     zone.setInteractive({ useHandCursor: false });
+    // The press has to start on this spot too: a button that closes on pointerdown (the
+    // pause menu over the paper) would otherwise release onto the clue underneath and pin it.
+    let pressedHere = false;
     zone.on('pointerover', () => {
       audio.play('hover');
       this.hovered = true;
@@ -53,6 +56,7 @@ export class ClueSpot extends Phaser.GameObjects.Container {
       cb.onHover(this, true);
     });
     zone.on('pointerout', () => {
+      pressedHere = false;
       this.hovered = false;
       this.refresh();
       cb.onHover(this, false);
@@ -62,13 +66,16 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     zone.on(
       'pointerdown',
       (p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+        pressedHere = true;
         if (!p.rightButtonDown()) ev.stopPropagation();
       },
     );
     zone.on(
       'pointerup',
       (p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
-        if (p.rightButtonReleased() || p.getDistance() > 8) return;
+        const ok = pressedHere;
+        pressedHere = false;
+        if (!ok || p.rightButtonReleased() || p.getDistance() > 8) return;
         ev.stopPropagation();
         cb.onToggle(this);
       },
