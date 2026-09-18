@@ -73,6 +73,27 @@
           display: block;
         }
       }
+      /* Something to read while the engine downloads; BootScene removes it. */
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #d8c9a8;
+        font-family: 'Pixelify Sans', monospace;
+        font-size: 22px;
+        letter-spacing: 1px;
+        pointer-events: none;
+      }
+      #boot small {
+        font-family: 'VT323', monospace;
+        font-size: 16px;
+        color: #8b7d63;
+        letter-spacing: 0;
+      }
       /* Preload the fonts so the first Text object renders crisply. */
       .font-preload {
         position: absolute;
@@ -85,6 +106,7 @@
   </head>
   <body>
     <div id="game"></div>
+    <div id="boot" aria-hidden="true">RUG OR NOT?<small>opening the office...</small></div>
     <div id="rotate">
       Rotate your phone.<br /><small>The detective's desk needs the width.</small>
     </div>

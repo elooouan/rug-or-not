@@ -41,6 +41,7 @@
   clouds drift over the moon when it rains or snows.
   The desk clock keeps real time on the title. New typed words on the title: biscuit, train,
   plane, tailor, safe; the footer hint rotates.
+- The page shows the title while the engine downloads instead of a blank dark screen.
 - M mutes from any screen (the volume setting is kept for when it comes back; the settings
   page shows the mute and clears it when you touch the volume).
 - Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.

@@ -35,6 +35,8 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     setupScene(this);
     this.cameras.main.setBackgroundColor(PALETTE.bg);
+    // The engine is up: the page's own placeholder has done its job.
+    document.getElementById('boot')?.remove();
     const msg = this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'loading...', {
         fontFamily: 'monospace',
