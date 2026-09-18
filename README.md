@@ -83,7 +83,8 @@ the coin page once a mint is set; it's read-only and cached for a minute.
   turns up in the drawer (`"secret": true` in its JSON keeps it out of the daily pool and
   RugScan until then).
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
-  with a local streak counter. Daily plays don't unlock campaign folders.
+  with a local streak counter. Every other day the daily is a generated file seeded by the
+  date instead, so dailies never run dry. Daily plays don't unlock campaign folders.
 - **Cold cases**: an endless pile of generated files (`src/systems/caseGen.ts`). Each is built
   from a seed, so a share link (`#cold=<seed>`) brings back the exact same file; every
   generated case passes the same schema as the handcrafted ones (400 seeds are validated in

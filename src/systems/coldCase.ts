@@ -28,3 +28,12 @@ export function startCustomCase(scene: Phaser.Scene, c: CaseData): void {
   gameState.currentIndex = -1;
   scene.scene.start('InvestigationScene');
 }
+
+/** Today's daily (handcrafted or generated) goes on the desk. */
+export function startDaily(scene: Phaser.Scene, c: CaseData): void {
+  gameState.mode = 'daily';
+  gameState.coldSeed = null;
+  gameState.currentCase = c;
+  gameState.currentIndex = gameState.cases.indexOf(c);
+  scene.scene.start('InvestigationScene');
+}

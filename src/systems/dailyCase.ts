@@ -1,11 +1,43 @@
 import { hashString, mulberry32 } from './rng';
 
+import type { CaseData } from '@/data/schema';
+import { generateCase } from './caseGen';
+
 /** YYYY-MM-DD in the player's local timezone. */
 export function localDateKey(date: Date = new Date()): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+/**
+ * Every other day the daily is a generated file (seeded by the date, so it's still the
+ * same for everyone); the other days it's one of the handcrafted cases.
+ */
+export function dailyIsGenerated(dateKey: string): boolean {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const dayNumber = Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+  return dayNumber % 2 === 1;
+}
+
+export function dailySeed(dateKey: string): string {
+  return `day-${dateKey}`;
+}
+
+/**
+ * Today's file: one of the handcrafted cases in `pool`, or on generated days a
+ * cold case seeded by the date. Same answer for everyone on the same day.
+ */
+export function dailyCaseFor(
+  dateKey: string,
+  cases: readonly CaseData[],
+  poolIds: readonly string[],
+): CaseData | undefined {
+  if (dailyIsGenerated(dateKey)) return generateCase(dailySeed(dateKey));
+  if (poolIds.length === 0) return undefined;
+  const id = pickDailyCaseId(dateKey, poolIds);
+  return cases.find((c) => c.id === id);
 }
 
 /** ISO-ish week key (Monday-based), e.g. "2026-w38": the seed for the weekly cold case. */

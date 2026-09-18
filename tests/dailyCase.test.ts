@@ -94,3 +94,23 @@ describe('weekKey', () => {
     expect(weekKey(new Date(2026, 8, 18))).toMatch(/^2026-w\d\d$/);
   });
 });
+
+describe('generated dailies', () => {
+  it('alternate day by day and are the same file for the same date', async () => {
+    const { dailyIsGenerated, dailyCaseFor } = await import('@/systems/dailyCase');
+    expect(dailyIsGenerated('2026-09-18')).not.toBe(dailyIsGenerated('2026-09-19'));
+    expect(dailyIsGenerated('2026-09-18')).toBe(dailyIsGenerated('2026-09-20'));
+    const genDay = dailyIsGenerated('2026-09-18') ? '2026-09-18' : '2026-09-19';
+    const craftDay = genDay === '2026-09-18' ? '2026-09-19' : '2026-09-18';
+    const pool = [
+      { id: 'a', ticker: '$A' },
+      { id: 'b', ticker: '$B' },
+    ] as never[];
+    const g1 = dailyCaseFor(genDay, pool, ['a', 'b']);
+    const g2 = dailyCaseFor(genDay, pool, ['a', 'b']);
+    expect(g1?.id.startsWith('cold-day-')).toBe(true);
+    expect(JSON.stringify(g1)).toBe(JSON.stringify(g2));
+    const c = dailyCaseFor(craftDay, pool, ['a', 'b']);
+    expect(['a', 'b']).toContain(c?.id);
+  });
+});

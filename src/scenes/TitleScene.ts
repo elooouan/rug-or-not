@@ -5,9 +5,9 @@ import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { GAME_VERSION } from '@/config/gameConfig';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
-import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
+import { dailyCaseFor, localDateKey, currentStreak } from '@/systems/dailyCase';
 import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
-import { solvedRegular, startColdCase } from '@/systems/coldCase';
+import { solvedRegular, startColdCase, startDaily } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
@@ -190,7 +190,7 @@ export class TitleScene extends Phaser.Scene {
 
     // Menu.
     const cases = gameState.cases;
-    const dailyId = pickDailyCaseId(localDateKey(), dailyPool(cases));
+    const daily = dailyCaseFor(localDateKey(), cases, dailyPool(cases));
     const dailyDone = save.daily.lastPlayed === localDateKey();
     const streak = currentStreak(save.daily, localDateKey());
     // The secret file sits at the end; "Continue" never walks into it while it's locked.
@@ -226,14 +226,10 @@ export class TitleScene extends Phaser.Scene {
       mk(
         dailyDone
           ? `Daily done  ·  next in ${hoursToMidnight()}h`
-          : `Daily ${cases.find((x) => x.id === dailyId)?.ticker ?? 'case'}${streak > 0 ? ` · ${streak}` : ''}`,
+          : `Daily ${daily?.ticker ?? 'case'}${streak > 0 ? ` · ${streak}` : ''}`,
         () => {
-          const c = cases.find((x) => x.id === dailyId);
-          if (!c) return;
-          gameState.mode = 'daily';
-          gameState.currentCase = c;
-          gameState.currentIndex = cases.indexOf(c);
-          this.scene.start('InvestigationScene');
+          if (!daily) return;
+          startDaily(this, daily);
         },
       ),
       mk('Case files', () => this.scene.start('CaseSelectScene')),

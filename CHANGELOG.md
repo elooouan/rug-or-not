@@ -7,6 +7,9 @@
   many flags and how much fine print). Endless play with its own board and badges, seeds
   shareable as `#cold=<seed>`; "the pile" folder in the drawer prints one. Difficulty grows
   with the number of campaign files you've solved (a `d<n>-` prefix in the seed pins it).
+- Every other day the daily is a generated file seeded by the date (still the same for
+  everyone); generated dailies count for the streak and the cold-case tally, never for the
+  campaign or the rank.
 - A WEEKLY folder in the drawer: this week's cold case, the same file for everyone
   (`#cold=week-<year>-w<week>`), marked closed once stamped.
 - Drills: from any red-flag page in the notebook, five generated pages that all hide that

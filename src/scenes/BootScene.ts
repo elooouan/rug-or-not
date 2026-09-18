@@ -4,9 +4,9 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { PALETTE } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { applyWeatherAudio } from '@/systems/weather';
-import { localDateKey, pickDailyCaseId } from '@/systems/dailyCase';
+import { dailyCaseFor, localDateKey } from '@/systems/dailyCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
-import { startColdCase, startCustomCase } from '@/systems/coldCase';
+import { startColdCase, startCustomCase, startDaily } from '@/systems/coldCase';
 import { readCustomCases } from '@/systems/customCases';
 import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
@@ -70,16 +70,18 @@ export class BootScene extends Phaser.Scene {
     const hash = typeof location !== 'undefined' ? location.hash.slice(1) : '';
     const m = /^case=([a-z0-9-]+)$/.exec(hash);
     const openable = playableCases(saveStore.get(), loaded.cases);
-    const linked = m
-      ? openable.find((c) => c.id === m[1])
-      : hash === 'daily'
-        ? loaded.cases.find(
-            (c) => c.id === pickDailyCaseId(localDateKey(), dailyPool(loaded.cases)),
-          )
-        : undefined;
+    if (hash === 'daily') {
+      history.replaceState(null, '', location.pathname + location.search);
+      const daily = dailyCaseFor(localDateKey(), loaded.cases, dailyPool(loaded.cases));
+      if (daily) {
+        startDaily(this, daily);
+        return;
+      }
+    }
+    const linked = m ? openable.find((c) => c.id === m[1]) : undefined;
     if (linked) {
       history.replaceState(null, '', location.pathname + location.search);
-      gameState.mode = hash === 'daily' ? 'daily' : 'campaign';
+      gameState.mode = 'campaign';
       gameState.currentCase = linked;
       gameState.currentIndex = loaded.cases.indexOf(linked);
       this.scene.start('InvestigationScene');

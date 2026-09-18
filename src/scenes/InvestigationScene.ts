@@ -500,9 +500,14 @@ export class InvestigationScene extends Phaser.Scene {
     );
     const newFlagIds = [...new Set(caseFlagIds)].filter((id) => !prevFlags.has(id));
     let bestImproved = false;
-    const cold = gameState.mode === 'cold';
+    // Generated files (cold cases, and the generated half of the dailies) keep their own
+    // tally and never touch the campaign, the rank or the rogues gallery.
+    const generated = gameState.mode === 'cold' || c.id.startsWith('cold-');
     const caughtName =
-      !cold && c.verdict === 'rug' && breakdown.verdictCorrect && !before.caseResults[c.id]?.solved
+      !generated &&
+      c.verdict === 'rug' &&
+      breakdown.verdictCorrect &&
+      !before.caseResults[c.id]?.solved
         ? rogueOf(c).name
         : null;
 
@@ -513,8 +518,11 @@ export class InvestigationScene extends Phaser.Scene {
         for (const clue of doc.clues)
           if (!isFlagClue(clue) && !d.unlockedHerrings.includes(clue.herringId))
             d.unlockedHerrings.push(clue.herringId);
-      if (cold) {
-        // Cold cases keep their own tally and never touch the campaign or the rank.
+      if (gameState.mode === 'daily') {
+        const next = recordDailyPlay(d.daily, localDateKey());
+        d.daily = { ...next, played: next.played ?? [] };
+      }
+      if (generated) {
         d.stats.coldRuns++;
         const wk = `week-${weekKey()}`;
         if (gameState.coldSeed === wk && !d.stats.weeklyDone.includes(wk))
@@ -551,10 +559,8 @@ export class InvestigationScene extends Phaser.Scene {
         const best = prev?.bestTimeSec;
         if (best === undefined || t < best) d.caseResults[c.id].bestTimeSec = t;
       }
-      if (gameState.mode === 'daily') {
-        const next = recordDailyPlay(d.daily, localDateKey());
-        d.daily = { ...next, played: next.played ?? [] };
-      } else d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
+      if (gameState.mode !== 'daily')
+        d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
     });
 
     // Every run goes on the board (local by default; see src/systems/leaderboard.ts).
@@ -567,7 +573,7 @@ export class InvestigationScene extends Phaser.Scene {
       wallet: wallet.state.address ?? undefined,
       hard: saveStore.get().settings.hardMode || undefined,
       holder: holderPerks() || undefined,
-      mode: cold ? 'cold' : undefined,
+      mode: gameState.mode === 'cold' ? 'cold' : undefined,
     });
 
     saveStore.update((d) => {
@@ -585,7 +591,7 @@ export class InvestigationScene extends Phaser.Scene {
 
     // Badges (toasts are shown by the report scene).
     const badgesBefore = saveStore.get().badges.length;
-    if (cold) {
+    if (generated) {
       awardBadge(null, 'cold-one');
       if (saveStore.get().stats.coldCorrect >= 10) awardBadge(null, 'cold-ten');
     } else awardBadge(null, 'first-case');
