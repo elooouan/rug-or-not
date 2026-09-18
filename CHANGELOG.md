@@ -11,7 +11,8 @@
   everyone); generated dailies count for the streak and the cold-case tally, never for the
   campaign or the rank.
 - A WEEKLY folder in the drawer: this week's cold case, the same file for everyone
-  (`#cold=week-<year>-w<week>`), marked closed once stamped.
+  (`#cold=week-<year>-w<week>`), marked closed once stamped, with its own top five on the
+  board page.
 - Drills: from any red-flag page in the notebook, five generated pages that all hide that
   flag. Clearing them logs the drill; the full set earns Drill Sergeant.
 - Two more red flags (an upgradeable proxy behind one admin key; wash trading between the

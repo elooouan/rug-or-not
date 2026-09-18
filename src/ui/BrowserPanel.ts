@@ -768,6 +768,42 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       });
     });
     ctx.y += BROWSER.lineH * 5;
+    // This week's file: everyone gets the same generated case, so the scores compare.
+    ctx.rule();
+    const wk = `cold-week-${weekKey()}`;
+    ctx.line(`This week's file (${weekKey()}):`, { color: 'woodMid' });
+    const weekY = ctx.y;
+    void leaderboard.list(50, 'cold').then((entries: ScoreEntry[]) => {
+      if (!ctx.content.active) return;
+      const week = entries.filter((e) => e.caseId === wk).slice(0, 5);
+      if (week.length === 0) {
+        ctx.content.add(
+          makeText(
+            ctx.scene,
+            0,
+            weekY,
+            'Nobody has closed it yet. The WEEKLY folder is in the drawer.',
+            {
+              font: 'body',
+              size: FONT.size.body,
+              color: 'paperShadow',
+            },
+          ),
+        );
+        return;
+      }
+      week.forEach((e, i) => {
+        const line = `${String(i + 1).padStart(2, ' ')}. ${(e.name + (e.holder ? '$' : '')).padEnd(13)} ${String(e.score).padStart(4)}${e.hard ? '*' : ' '} ${e.grade}  ${e.date.slice(0, 10)}`;
+        ctx.content.add(
+          makeText(ctx.scene, 0, weekY + i * BROWSER.lineH, line, {
+            font: 'body',
+            size: FONT.size.body,
+            color: i === 0 ? 'amber' : 'shadow',
+          }),
+        );
+      });
+    });
+    ctx.y += BROWSER.lineH * 5;
     lucienSays(ctx.scene, 'leaderboard');
   },
 
