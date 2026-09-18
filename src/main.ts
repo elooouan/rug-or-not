@@ -67,6 +67,15 @@ window.addEventListener('keydown', (e) => {
   if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) toggleFullscreen();
 });
 
+// Offline fallback (production only): see public/sw.js.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {
+      /* no offline support here; the game runs the same */
+    });
+  });
+}
+
 if (import.meta.env.DEV) {
   // Handy for poking at scenes from the devtools console:
   //   __debug.startCase('kelp')  jumps straight into a case.

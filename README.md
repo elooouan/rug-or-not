@@ -27,7 +27,8 @@ Other scripts:
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
 
-The game is a static site: deploy `dist/` anywhere (paths are relative, so it works
+Production builds register a small network-first service worker (`public/sw.js`) so the game
+keeps working offline after one visit. The game is a static site: deploy `dist/` anywhere (paths are relative, so it works
 from a sub-folder). A GitHub Pages workflow is included in
 `.github/workflows/deploy.yml`: enable Pages (Settings → Pages → Source: _GitHub Actions_)
 and run the workflow from the Actions tab, or change its trigger to `push` to deploy on
