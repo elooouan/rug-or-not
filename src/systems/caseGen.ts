@@ -1292,8 +1292,11 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
       fine,
     ),
   );
+  // A real audit that missed a real rug would be a lie the game never tells; rugs only get
+  // an audit page when the audit itself is the tell.
   const wantAudit =
-    flags.has('fake-audit') || herrings.has('real-audit-findings') || rng.chance(0.35);
+    flags.has('fake-audit') ||
+    (p.verdict === 'legit' && (herrings.has('real-audit-findings') || rng.chance(0.35)));
   if (wantAudit && docs.length < 6)
     docs.push(
       auditDoc(
