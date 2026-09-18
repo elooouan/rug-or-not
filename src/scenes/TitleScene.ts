@@ -128,9 +128,9 @@ export class TitleScene extends Phaser.Scene {
 
     // Title card: a sheet of paper under the lamp.
     const cardW = 300;
-    const cardH = 282;
+    const cardH = 262;
     const cx = Math.round((GAME_WIDTH - cardW) / 2);
-    const cy = 54;
+    const cy = 56;
     const card = this.add.container(0, 0).setDepth(DEPTH.documents);
     const shadow = this.make
       .image({ x: cx + 4, y: cy + 5, key: TEX.paper }, false)
@@ -196,13 +196,15 @@ export class TitleScene extends Phaser.Scene {
     const playable = playableCases(save, cases);
     const nextIndex = Math.min(save.campaignUnlocked - 1, playable.length - 1);
     const allDone = playable.every((c) => save.caseResults[c.id]);
-    const bx = GAME_WIDTH / 2 - 62;
+    const bx = GAME_WIDTH / 2 - 75;
     let by = cy + 90;
-    const mk = (label: string, fn: () => void) => {
-      const b = new PixelButton(this, bx, by, label, fn, { width: 124 });
+    const mk = (label: string, fn: () => void, half: 'left' | 'right' | null = null) => {
+      const b = new PixelButton(this, half === 'right' ? bx + 77 : bx, by, label, fn, {
+        width: half ? 73 : 150,
+      });
       this.children.remove(b);
       card.add(b);
-      by += 23;
+      if (half !== 'left') by += 23;
       return b;
     };
     const play = () => {
@@ -236,8 +238,8 @@ export class TitleScene extends Phaser.Scene {
       mk('Case files', () => this.scene.start('CaseSelectScene')),
       mk('Red Flag Rush', () => this.scene.start('RushScene')),
       mk('Cold case', () => startColdCase(this, newColdSeed())),
-      mk('Notebook', () => this.scene.start('NotebookScene')),
-      mk('Settings', () => this.scene.start('SettingsScene')),
+      mk('Notebook', () => this.scene.start('NotebookScene'), 'left'),
+      mk('Settings', () => this.scene.start('SettingsScene'), 'right'),
     ];
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'));
     this.input.on('pointermove', () => group.clearFocus());
