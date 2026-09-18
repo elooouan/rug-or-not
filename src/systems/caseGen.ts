@@ -1312,11 +1312,20 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
       0,
       90,
     ),
-    intro: rng.pick([
-      'Cold one. No name I recognise. Read it like the others.',
-      'Fresh off the printer. Nobody has looked at this yet.',
-      'A file from the pile. Same rules: read, pin, stamp.',
-    ]),
+    intro: rng.pick(
+      p.difficulty >= 4
+        ? [
+            'Cold one, and a thick one. Whatever is wrong with it is written small.',
+            'Fresh off the printer and it already smells expensive. Take the lens everywhere.',
+            'A file from the pile with a five-star headache inside. Read twice, stamp once.',
+          ]
+        : [
+            'Cold one. No name I recognise. Read it like the others.',
+            'Fresh off the printer. Nobody has looked at this yet.',
+            'A file from the pile. Same rules: read, pin, stamp.',
+            'Somebody dropped this on the desk and left. Let us see why.',
+          ],
+    ),
     difficulty: p.difficulty,
     verdict: p.verdict,
     timeLimitSec: p.difficulty >= 4 ? 300 : 240,
