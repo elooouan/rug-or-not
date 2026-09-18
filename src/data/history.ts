@@ -188,7 +188,7 @@ export const HISTORY: HistoryFrame[] = [
   {
     file: '24-v08-handbook',
     version: 'v0.8',
-    date: '2026-09-19',
+    date: '2026-09-18',
     title: 'The handbook',
     caption:
       "Eighteen pages in the notebook on how the office works. The greyed ones are about things that haven't turned up on this desk yet: it opens up a piece at a time now.",
