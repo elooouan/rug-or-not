@@ -95,6 +95,10 @@ export function badgeProgress(
       return clamp(st.rushBest, 2000);
     case 'hot-streak':
       return clamp(st.rushBestStreak, 10);
+    case 'cold-ten':
+      return clamp(st.coldCorrect, 10);
+    case 'drill-sergeant':
+      return clamp(st.drilled.length, totals.flags);
     default:
       return null;
   }
