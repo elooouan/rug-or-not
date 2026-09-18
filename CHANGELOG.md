@@ -37,7 +37,8 @@
   press down a pixel; tabs and the drawer's special folders lift under the pointer; screens
   fade up from the dark; dust drifts through the lamplight.
 - The window has more life: the moon shows the real calendar phase, a lit night train
-  crosses the horizon now and then (Biscuit watches it), a plane blinks across clear skies.
+  crosses the horizon now and then (Biscuit watches it), a plane blinks across clear skies,
+  clouds drift over the moon when it rains or snows.
   The desk clock keeps real time on the title. New typed words on the title: biscuit, train,
   plane, tailor, safe; the footer hint rotates.
 - M mutes from any screen (the volume setting is kept for when it comes back; the settings

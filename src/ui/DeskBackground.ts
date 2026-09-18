@@ -95,6 +95,7 @@ export class DeskBackground {
   private rain?: Phaser.GameObjects.Particles.ParticleEmitter;
   private snow?: Phaser.GameObjects.Particles.ParticleEmitter;
   private aurora!: Phaser.GameObjects.Graphics;
+  private clouds!: Phaser.GameObjects.Graphics;
   private stars0!: Phaser.GameObjects.Image;
   private stars1!: Phaser.GameObjects.Image;
   private fogA!: Phaser.GameObjects.Image;
@@ -367,6 +368,29 @@ export class DeskBackground {
       .setVisible(false);
     // Northern lights for coin holders, on clear nights only.
     this.aurora = scene.add.graphics().setDepth(DEPTH.windowRain).setMask(mask).setVisible(false);
+    // Cloud cover: two shreds drifting over the moon whenever the night isn't clear (the
+    // moon is baked into the glass, so weather has to hide it from the front).
+    this.clouds = scene.add.graphics().setDepth(DEPTH.windowRain).setMask(mask).setVisible(false);
+    const moonX = x + w - 60;
+    const moonY = y + 4 + 12;
+    const shred = (cx: number, cy: number, len: number) => {
+      this.clouds.fillStyle(HEX.bg, 0.9);
+      this.clouds.fillRect(cx - len / 2, cy - 2, len, 5);
+      this.clouds.fillRect(cx - len / 2 + 5, cy - 4, len - 10, 2);
+      this.clouds.fillStyle(HEX.shadow, 0.7);
+      this.clouds.fillRect(cx - len / 2 + 3, cy - 4, len - 14, 1);
+    };
+    shred(moonX - 5, moonY - 3, 34);
+    shred(moonX + 9, moonY + 5, 26);
+    if (this.motion)
+      scene.tweens.add({
+        targets: this.clouds,
+        x: 10,
+        duration: 16000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
     this.flash = scene.add
       .image(x, y, TEX.windowFlash)
       .setOrigin(0)
@@ -733,6 +757,7 @@ export class DeskBackground {
     this.stars1.setVisible(clear && this.stars1.visible);
     this.aurora.setVisible(clear && this.motion && holderPerks());
     if (this.aurora.visible) this.drawAurora(this.scene.time.now / 1000);
+    this.clouds.setVisible(rainOn || w === 'snow');
     this.fogA.setVisible(w === 'fog');
     this.fogB.setVisible(w === 'fog');
     this.lights0.setAlpha(w === 'fog' ? 0.35 : 1);
