@@ -348,7 +348,8 @@ function contractDoc(
   }
   if (flags.includes('sell-tax-adjustable')) {
     push(`  uint256 public sellTaxBps = ${rng.int(2, 5) * 100};`);
-    const l = push('  function setSellTax(uint256 bps) external onlyOwner {');
+    const l = push('  function setSellTax(uint256 bps)');
+    push('    external onlyOwner {');
     push('    sellTaxBps = bps;');
     push('  }');
     clues.push(
@@ -363,7 +364,8 @@ function contractDoc(
   }
   if (flags.includes('blacklist')) {
     push('  mapping(address => bool) public flagged; // anti-bot');
-    const l = push('  function setFlagged(address a, bool b) external onlyOwner {');
+    const l = push('  function setFlagged(address a, bool b)');
+    push('    external onlyOwner {');
     push('    flagged[a] = b;');
     push('  }');
     clues.push(
@@ -412,9 +414,8 @@ function contractDoc(
   push('  }');
   if (flags.includes('mint-unlimited')) {
     push('');
-    const l = push(
-      `  function mint(address to, uint256 amount) external ${fakeRenounce ? '' : 'onlyOwner '}{`,
-    );
+    const l = push('  function mint(address to, uint256 amount)');
+    push(`    external ${fakeRenounce ? '' : 'onlyOwner '}{`);
     if (fakeRenounce) push("    require(msg.sender == operator, 'operator');");
     push('    _mint(to, amount);');
     push('  }');
