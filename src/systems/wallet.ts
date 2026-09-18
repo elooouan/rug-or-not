@@ -243,7 +243,12 @@ export class WalletService {
         (d) => (d.wallet = { ...d.wallet, address, token, checkedAt: new Date().toISOString() }),
       );
     } catch (e) {
-      this.set({ busy: false, error: `Balance lookup failed: ${(e as Error).message}` });
+      const err = e as Error;
+      const why =
+        err.name === 'TimeoutError' || err.name === 'AbortError'
+          ? 'the RPC did not answer in time'
+          : err.message;
+      this.set({ busy: false, error: `Balance lookup failed: ${why}` });
     }
   }
 
