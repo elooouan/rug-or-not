@@ -245,7 +245,13 @@ export class ReportScene extends Phaser.Scene {
     L.push(...wrap(c.debrief, 0, 'woodDark'));
 
     if (c.verdict === 'rug') {
-      L.push({ text: 'RED FLAGS', font: 'ui', size: 10, color: 'woodDark', gap: 6 });
+      L.push({
+        text: 'RED FLAGS  ·  click one for its notebook page',
+        font: 'ui',
+        size: 10,
+        color: 'woodDark',
+        gap: 6,
+      });
       for (const f of b.flagsFound) {
         if (!isFlagClue(f.clue)) continue;
         const flag = FLAGS[f.clue.flagId as keyof typeof FLAGS];
