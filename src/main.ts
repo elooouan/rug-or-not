@@ -78,10 +78,13 @@ if (import.meta.env.DEV) {
       musicLevel(): Promise<{ peak: number; rms: number }>;
       overlays(): number;
       snapshot(name: string): Promise<string>;
+      /** The live audio manager (station, static, levels). */
+      audio: typeof audio;
     };
   };
   w.__game = game;
   w.__debug = {
+    audio,
     /** Render every SFX (and a few bars of music) offline and report peak levels. */
     async audioLevels(): Promise<Record<string, number>> {
       const { AudioManager } = await import('@/systems/audio');

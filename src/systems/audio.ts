@@ -43,6 +43,23 @@ const CHORDS: { pad: number[]; bass: number }[] = [
 ];
 const PENTATONIC = [69, 72, 74, 76, 79, 81, 84];
 
+/** Just enough morse for the numbers station. */
+export const MORSE: Record<string, string> = {
+  '0': '-----',
+  '1': '.----',
+  '2': '..---',
+  '3': '...--',
+  '4': '....-',
+  '5': '.....',
+  '6': '-....',
+  '7': '--...',
+  '8': '---..',
+  '9': '----.',
+  R: '.-.',
+  U: '..-',
+  G: '--.',
+};
+
 export class AudioManager {
   ctx: AudioContext | null = null;
   private master: GainNode | null = null;
@@ -62,6 +79,10 @@ export class AudioManager {
   private noiseBuf: AudioBuffer | null = null;
   private tension = false;
   private musicVolume = 0.55;
+  private staticWanted = false;
+  private staticNode: AudioBufferSourceNode | null = null;
+  private morseText = '';
+  private morseTimer: number | null = null;
 
   /** Must be called from a user gesture (pointer/keyboard) to satisfy autoplay rules. */
   unlock(existing?: BaseAudioContext): void {
@@ -87,6 +108,7 @@ export class AudioManager {
       this.musicBus.connect(this.master);
       if (this.rainWanted) this.startRain();
       if (this.musicWanted) this.startMusic();
+      if (this.staticWanted) this.startStatic();
     } catch {
       this.ctx = null;
     }
@@ -126,6 +148,22 @@ export class AudioManager {
     if (!this.ctx) return;
     if (on) this.startMusic();
     else this.stopMusic();
+  }
+
+  /**
+   * The radio between stations: a static bed with a numbers station underneath
+   * that beeps `morse` (letters/digits) on a loop.
+   */
+  setStatic(on: boolean, morse = ''): void {
+    this.staticWanted = on;
+    this.morseText = morse;
+    if (!this.ctx) return;
+    if (on) this.startStatic();
+    else this.stopStatic();
+  }
+
+  get staticOn(): boolean {
+    return this.staticWanted;
   }
 
   // ---- one-shots -------------------------------------------------------------------
@@ -311,6 +349,84 @@ export class AudioManager {
     }
     this.rainNode = null;
     this.rainGain = null;
+  }
+
+  // ---- radio static + numbers station ------------------------------------------------
+
+  private startStatic(): void {
+    if (!this.ctx || !this.sfx || this.staticNode) return;
+    const buf = this.noiseBuffer();
+    if (!buf) return;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const filt = this.ctx.createBiquadFilter();
+    filt.type = 'bandpass';
+    filt.frequency.value = 1400;
+    filt.Q.value = 0.5;
+    const g = this.ctx.createGain();
+    g.gain.value = 0.04;
+    src.connect(filt).connect(g).connect(this.sfx);
+    src.start();
+    this.staticNode = src;
+    this.scheduleMorse(this.ctx.currentTime + 1.2);
+  }
+
+  private stopStatic(): void {
+    try {
+      this.staticNode?.stop();
+    } catch {
+      /* already stopped */
+    }
+    this.staticNode = null;
+    if (this.morseTimer !== null) window.clearTimeout(this.morseTimer);
+    this.morseTimer = null;
+  }
+
+  /** A four-note call sign, then the message in morse, then silence; repeat. */
+  private scheduleMorse(at: number): void {
+    if (!this.ctx || !this.sfx || !this.staticNode) return;
+    let t = at;
+    for (const n of [76, 79, 81, 76]) {
+      this.beep(t, 0.22, midi(n), 0.05);
+      t += 0.28;
+    }
+    t += 0.6;
+    const unit = 0.09;
+    for (const ch of this.morseText.toUpperCase()) {
+      const code = MORSE[ch];
+      if (!code) {
+        t += unit * 7;
+        continue;
+      }
+      for (const sym of code) {
+        const dur = sym === '-' ? unit * 3 : unit;
+        this.beep(t, dur, 760, 0.07);
+        t += dur + unit;
+      }
+      t += unit * 2;
+    }
+    const wait = Math.max(0.5, t + 2.5 - this.ctx.currentTime) * 1000;
+    this.morseTimer = window.setTimeout(() => {
+      this.morseTimer = null;
+      if (this.ctx && this.staticNode) this.scheduleMorse(this.ctx.currentTime + 0.05);
+    }, wait);
+  }
+
+  /** A held tone with a short attack and release (tone() decays the whole way). */
+  private beep(t: number, dur: number, freq: number, gain: number): void {
+    if (!this.ctx || !this.sfx) return;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.008);
+    g.gain.setValueAtTime(gain, t + dur - 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g).connect(this.sfx);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
   }
 
   // ---- lo-fi loop ---------------------------------------------------------------------

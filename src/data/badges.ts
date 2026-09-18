@@ -74,6 +74,12 @@ export const BADGES: Badge[] = [
   { id: 'hot-streak', name: 'Hot Streak', description: 'Ten red flags in a row in Rush.' },
   { id: 'speed-reader', name: 'Speed Reader', description: 'Score 2000 in a single Rush.' },
   {
+    id: 'night-radio',
+    name: 'Night Radio',
+    description: 'Sit with the numbers station a while.',
+    secret: true,
+  },
+  {
     id: 'historian',
     name: 'Historian',
     description: 'Find the photo on the corkboard.',

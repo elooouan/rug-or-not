@@ -49,6 +49,7 @@ export const TEX = {
   drawer: 'cabinet-drawer',
   cork: 'wall-cork',
   safe: 'desk-safe',
+  radio: 'desk-radio',
   button: 'ui-button',
   buttonHover: 'ui-button-hover',
 } as const;

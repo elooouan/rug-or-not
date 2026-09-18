@@ -673,7 +673,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     );
     ctx.gap();
     ctx.line(
-      'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock.',
+      'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio, the safe.',
       { color: 'woodMid' },
     );
     ctx.gap();

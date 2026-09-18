@@ -30,7 +30,8 @@ export type ScriptId =
   | 'konami'
   | 'all-cases'
   | 'wall'
-  | 'first-rush';
+  | 'first-rush'
+  | 'radio';
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -142,6 +143,14 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   wall: [
     {
       text: 'Every case leaves a photo on the wall. This one is ours: how the office came together, night by night.',
+    },
+  ],
+  radio: [
+    {
+      text: 'Numbers station. Someone out there has been tapping the same three digits all night.',
+    },
+    {
+      text: 'Long beep is a dash, short is a dot. Five dashes make a zero. Work out the other two, then check under the desk.',
     },
   ],
   'first-rush': [

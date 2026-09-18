@@ -11,7 +11,7 @@ import { TIPS } from '@/data/tips';
 import { StickyNote } from './StickyNote';
 import { CursorScene } from '@/scenes/CursorScene';
 import { BrowserPanel } from './BrowserPanel';
-import { Vault } from './Vault';
+import { Vault, VAULT_COMBO } from './Vault';
 import { lucienSays } from './DialogueBox';
 import { localDateKey } from '@/systems/dailyCase';
 import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
@@ -48,6 +48,28 @@ export function floatText(
     ease: 'Sine.easeOut',
     onComplete: () => t.destroy(),
   });
+}
+
+type Station = 'lofi' | 'static' | 'off';
+const STATION_LABEL: Record<Station, string> = {
+  lofi: '88.5  lo-fi',
+  static: '104.3  ...static',
+  off: 'off',
+};
+const STATIONS: Station[] = ['lofi', 'static', 'off'];
+
+/** What the radio is tuned to; the music setting is the source of truth unless we're on static. */
+function currentStation(): Station {
+  if (audio.staticOn) return 'static';
+  return saveStore.get().settings.music ? 'lofi' : 'off';
+}
+
+function tuneRadio(): Station {
+  const next = STATIONS[(STATIONS.indexOf(currentStation()) + 1) % STATIONS.length];
+  saveStore.update((d) => (d.settings.music = next === 'lofi'));
+  audio.setMusic(next === 'lofi');
+  audio.setStatic(next === 'static', VAULT_COMBO);
+  return next;
 }
 
 /**
@@ -150,6 +172,7 @@ export class DeskBackground {
       this.buildMug();
       this.buildPhone();
       this.buildSafe();
+      this.buildRadio();
     }
     if (opts.stamps !== false) this.buildInkPad();
 
@@ -574,6 +597,58 @@ export class DeskBackground {
       glow.setAlpha(0);
       scene.tweens.killTweensOf(glow);
       BrowserPanel.toggle(scene);
+    });
+  }
+
+  /** The desk radio: lo-fi, static (with a numbers station underneath), off. */
+  private buildRadio(): void {
+    const scene = this.scene;
+    const { x, y } = DESK.radio;
+    const radio = scene.add.image(x, y, TEX.radio).setOrigin(0).setDepth(DEPTH.deskProps);
+    const light = scene.add
+      .rectangle(x + 30, y + 22, 2, 2, HEX.amber)
+      .setOrigin(0)
+      .setDepth(DEPTH.deskProps);
+    let lucienTimer: Phaser.Time.TimerEvent | undefined;
+    const apply = (st: Station) => {
+      light.setVisible(st !== 'off');
+      scene.tweens.killTweensOf(light);
+      if (st === 'static' && this.motion)
+        scene.tweens.add({
+          targets: light,
+          alpha: { from: 1, to: 0.3 },
+          duration: 90,
+          yoyo: true,
+          repeat: -1,
+        });
+      else light.setAlpha(1);
+      lucienTimer?.remove(false);
+      lucienTimer = undefined;
+      if (st === 'static')
+        lucienTimer = scene.time.delayedCall(12000, () => {
+          if (currentStation() !== 'static') return;
+          awardBadge(scene, 'night-radio');
+          lucienSays(scene, 'radio');
+        });
+    };
+    apply(currentStation());
+    radio.setInteractive({ useHandCursor: false });
+    radio.on('pointerover', () => audio.play('hover'));
+    radio.on('pointerdown', () => {
+      const next = tuneRadio();
+      audio.play('click');
+      apply(next);
+      floatText(scene, x + 22, y - 2, STATION_LABEL[next]);
+      if (this.motion) {
+        radio.setScale(1.06, 0.94);
+        scene.tweens.add({
+          targets: radio,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 160,
+          ease: 'Back.easeOut',
+        });
+      }
     });
   }
 

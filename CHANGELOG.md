@@ -4,6 +4,8 @@
 
 - Red Flag Rush: an arcade mode. Sixty seconds, one page at a time, streak multipliers,
   its own board, three badges, Lucien's rules talk, a 3-2-1 countdown.
+- A radio under the lamp: lo-fi / static / off. The static hides a numbers station beeping
+  the safe combination in morse; Lucien explains dots and dashes if you sit with it.
 - The wall gets photos of the safe and the rush.
 - Fixed: pinned clues stay listed in the desk notebook (a quip had eaten the else branch).
 

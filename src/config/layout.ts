@@ -43,6 +43,7 @@ export const DESK = {
   caseHeader: { x: 632, y: 38 },
   phone: { x: 118, y: 296 },
   safe: { x: 70, y: 314 },
+  radio: { x: 24, y: 108 },
   clock: { x: 104, y: 214 },
   inkPad: { x: 516, y: 300 },
   stampRug: { x: 520, y: 262 },

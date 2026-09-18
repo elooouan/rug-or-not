@@ -17,6 +17,7 @@ import { makeIcons } from './icons';
 import { makeCat, makeWindow } from './window';
 import { makePhone } from './phone';
 import { makeSafe } from './safe';
+import { makeRadio } from './radio';
 import { TEX } from './keys';
 import { DEFAULT_RIM, makeMagnifier } from './magnifier';
 import { makePaper } from './paper';
@@ -40,6 +41,7 @@ export function generateAllTextures(scene: Phaser.Scene): void {
   makeCat(scene);
   makePhone(scene);
   makeSafe(scene);
+  makeRadio(scene);
   makeClock(scene);
   makeDrawer(scene);
   makeCork(scene);

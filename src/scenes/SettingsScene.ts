@@ -89,6 +89,8 @@ export class SettingsScene extends Phaser.Scene {
       applyWeatherAudio(s.weather);
       audio.setMusic(s.music);
       audio.setMusicVolume(s.musicVolume);
+      // Turning the music on from here tunes the desk radio off the static.
+      if (s.music) audio.setStatic(false);
       this.refresh();
     };
     const s = () => saveStore.get().settings;
