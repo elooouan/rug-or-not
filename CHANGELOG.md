@@ -34,8 +34,9 @@
 - The case clock waits while Lucien is talking, so the tutorial no longer eats the timer.
   With the lamp off the desk actually goes dark.
 - Suspicions in the desk notebook are links: click one to jump back to that clue. Buttons
-  press down a pixel; tabs and the drawer's special folders lift under the pointer; screens
-  fade up from the dark; dust drifts through the lamplight.
+  press down a pixel (and take a slightly bigger tap on touch screens); tabs and the drawer's
+  special folders lift under the pointer; screens fade up from the dark; dust drifts through
+  the lamplight.
 - The window has more life: the moon shows the real calendar phase, a lit night train
   crosses the horizon now and then (Biscuit watches it), a plane blinks across clear skies,
   clouds drift over the moon when it rains or snows.
