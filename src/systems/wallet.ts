@@ -18,6 +18,8 @@ export interface WalletState {
 
 interface PhantomProvider {
   isPhantom?: boolean;
+  isSolflare?: boolean;
+  isBackpack?: boolean;
   publicKey?: { toString(): string } | null;
   connect(opts?: { onlyIfTrusted?: boolean }): Promise<{ publicKey: { toString(): string } }>;
   disconnect(): Promise<void>;
@@ -26,14 +28,30 @@ interface PhantomProvider {
 
 type Listener = (s: WalletState) => void;
 
+/**
+ * Phantom first; any other injected Solana wallet with the same connect()/publicKey
+ * shape (Solflare, Backpack...) works the same read-only way.
+ */
 function getProvider(): PhantomProvider | null {
   if (typeof window === 'undefined') return null;
   const w = window as unknown as {
     phantom?: { solana?: PhantomProvider };
+    solflare?: PhantomProvider;
+    backpack?: PhantomProvider;
     solana?: PhantomProvider;
   };
-  const p = w.phantom?.solana ?? w.solana;
-  return p?.isPhantom ? p : null;
+  const p = w.phantom?.solana ?? w.solflare ?? w.backpack ?? w.solana;
+  return p && typeof p.connect === 'function' ? p : null;
+}
+
+/** What to call the injected wallet in the UI. */
+export function walletName(): string {
+  const p = getProvider();
+  if (!p) return 'Phantom';
+  if (p.isPhantom) return 'Phantom';
+  if (p.isSolflare) return 'Solflare';
+  if (p.isBackpack) return 'Backpack';
+  return 'wallet';
 }
 
 async function rpc<T>(method: string, params: unknown[]): Promise<T> {
@@ -80,7 +98,10 @@ export class WalletService {
   async connect(): Promise<void> {
     const p = getProvider();
     if (!p) {
-      this.set({ available: false, error: 'Phantom not found. Install the extension and reload.' });
+      this.set({
+        available: false,
+        error: 'No Solana wallet found. Install Phantom (or Solflare, Backpack) and reload.',
+      });
       return;
     }
     this.set({ busy: true, error: null });

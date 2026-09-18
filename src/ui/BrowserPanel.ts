@@ -15,7 +15,7 @@ import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
 import { currentStreak, localDateKey, playedStrip } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
-import { wallet } from '@/systems/wallet';
+import { wallet, walletName } from '@/systems/wallet';
 import { awardBadge, badgeCount, badgeProgress, noteSeen } from '@/systems/badges';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
@@ -454,10 +454,15 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     }
     ctx.rule();
     if (!s.connected) {
-      ctx.line(s.available ? 'Phantom detected.' : 'Phantom wallet not detected in this browser.', {
-        color: s.available ? 'lampGreen' : 'woodMid',
-      });
-      ctx.button(s.busy ? 'Connecting...' : 'Connect Phantom', () => {
+      ctx.line(
+        s.available
+          ? `${walletName()} detected.`
+          : 'No Solana wallet detected in this browser (Phantom, Solflare, Backpack).',
+        {
+          color: s.available ? 'lampGreen' : 'woodMid',
+        },
+      );
+      ctx.button(s.busy ? 'Connecting...' : `Connect ${walletName()}`, () => {
         lucienSays(ctx.scene, 'wallet');
         void wallet.connect();
       });

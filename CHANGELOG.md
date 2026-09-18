@@ -35,6 +35,8 @@
   counts down to tomorrow's case; notebook flag pages remember how often you missed them.
 - A fly visits the lamp now and then (swat it); shooting stars on clear nights (catch one);
   more typed words on the title screen.
+- The coin page accepts any injected Solana wallet with Phantom's connect shape (Solflare,
+  Backpack), still read-only.
 - Holder perks beyond cosmetics: northern lights over the city on clear nights, a `$` mark on
   the board, and a word from Lucien. Perks use the last balance the coin page saw.
 - A hidden fifteenth file, "The Tailor" ($SEAM), opens once every ordinary case has been

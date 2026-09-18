@@ -57,7 +57,7 @@ you'll hear a numbers station tapping the combination in morse. Badges track all
 The phone on the desk opens an in-game browser:
 
 - **RugScan** - an explorer page for the current case (flavour only, never a verdict).
-- **The coin** - connect a Phantom wallet (read-only: public address, SOL and token balance
+- **The coin** - connect a Phantom wallet (Solflare and Backpack work too; read-only: public address, SOL and token balance
   via public RPC). Holder tiers unlock cosmetics: `VITE_TOKEN_HOLDER_MIN`+ tokens → gilded
   magnifier rim, 5× → mahogany desk, 10× → coin-gold lamp shade, plus the Shareholder badge,
   an aurora over the city on clear nights and a `$` after your name on the board. The last
