@@ -18,6 +18,7 @@ import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
 import { holderPerks } from '@/systems/wallet';
 import { WEATHERS } from '@/systems/settings';
 import { addText } from './text';
+import { drawPixels } from '@/art/pixelUtil';
 
 export interface DeskOptions {
   /** Draw mug, folder stack, ink pad (title/select scenes want a tidier desk). */
@@ -196,6 +197,7 @@ export class DeskBackground {
       this.buildPhone();
       this.buildSafe();
       this.buildRadio();
+      this.buildSeasonal();
     }
     if (opts.stamps !== false) this.buildInkPad();
 
@@ -776,6 +778,71 @@ export class DeskBackground {
   }
 
   /** The desk radio: lo-fi, static (with a numbers station underneath), off. */
+  // ---- seasonal dressing ----------------------------------------------------------
+
+  /** A pumpkin on the desk for the last week of October, fairy lights in the window for December. */
+  private buildSeasonal(now: Date = new Date()): void {
+    const scene = this.scene;
+    const month = now.getMonth();
+    const day = now.getDate();
+    if (month === 9 && day >= 24) {
+      const g = scene.add
+        .graphics({ x: DESK.mug.x + 40, y: DESK.mug.y + 4 })
+        .setDepth(DEPTH.deskProps);
+      drawPixels(
+        g,
+        [
+          '.....gg.....',
+          '.....g......',
+          '..oooooooo..',
+          '.oooooooooo.',
+          'ooo.oooo.ooo',
+          'oooooooooooo',
+          'oo.oooooo.oo',
+          'ooo......ooo',
+          '.oooooooooo.',
+          '..oooooooo..',
+        ],
+        { o: 'amber', g: 'stampGreen' },
+        0,
+        0,
+        2,
+      );
+      g.setInteractive(new Phaser.Geom.Rectangle(0, 0, 24, 20), Phaser.Geom.Rectangle.Contains);
+      g.on('pointerdown', () => {
+        audio.play('sip');
+        floatText(
+          scene,
+          g.x + 6,
+          g.y - 6,
+          ['boo.', 'seasonal.', 'not a coin.'][Phaser.Math.Between(0, 2)],
+        );
+      });
+      return;
+    }
+    if (month === 11 && day >= 10) {
+      // A string of lights along the top of the window, each on its own slow blink.
+      const colours: PaletteKey[] = ['stampRed', 'amber', 'stampGreen', 'ink'];
+      for (let i = 0; i < 14; i++) {
+        const x = DESK.window.x + 12 + i * 28;
+        const y = DESK.window.y + 3 + (i % 2);
+        const bulb = scene.add
+          .rectangle(x, y, 2, 3, HEX[colours[i % colours.length]])
+          .setOrigin(0)
+          .setDepth(DEPTH.deskProps);
+        if (this.motion)
+          scene.tweens.add({
+            targets: bulb,
+            alpha: { from: 1, to: 0.25 },
+            duration: 700 + (i % 5) * 180,
+            yoyo: true,
+            repeat: -1,
+            delay: i * 90,
+          });
+      }
+    }
+  }
+
   private buildRadio(): void {
     const scene = this.scene;
     const { x, y } = DESK.radio;

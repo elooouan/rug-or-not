@@ -49,7 +49,9 @@
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
-- Snow and fog nights get a low wind bed with slow gusts.
+- Snow and fog nights get a low wind bed with slow gusts. Seasonal dressing: a pumpkin by
+  the mug in the last week of October, fairy lights in the window from December 10th.
+
 - Share menus (report and rush) offer copy / share sheet, "Post on X" and "Telegram"
   (prefilled intents in a new tab); the report's also saves the card.
 - Share uses the phone's share sheet where there is one; the clipboard elsewhere; a note
