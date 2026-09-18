@@ -109,6 +109,16 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
   }
 
   setEntries(entries: SuspicionEntry[]): void {
+    if (this.countText.text !== String(entries.length)) {
+      // The tally pops when a pin lands or leaves.
+      this.countText.setScale(1.35);
+      this.scene.tweens.add({
+        targets: this.countText,
+        scale: 1,
+        duration: 150,
+        ease: 'Back.easeOut',
+      });
+    }
     this.countText.setText(String(entries.length));
     this.emptyText.setVisible(entries.length === 0);
     const maxChars = 22;

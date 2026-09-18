@@ -223,6 +223,11 @@ export class RushScene extends Phaser.Scene {
 
   private refreshHud(): void {
     const s = this.state;
+    if (this.hud.score.text !== String(s.score) && !saveStore.get().settings.reducedMotion) {
+      // The score pops when it changes; origin is centred so it grows in place.
+      this.hud.score.setScale(1.3);
+      this.tweens.add({ targets: this.hud.score, scale: 1, duration: 160, ease: 'Back.easeOut' });
+    }
     this.hud.score.setText(String(s.score));
     const m = rushMultiplier(s.streak);
     this.hud.mult.setText(`x${m.toFixed(2).replace(/0$/, '')}`);
