@@ -33,6 +33,32 @@ export class DeskClock extends Phaser.GameObjects.Container {
     this.drawHands(0.75);
   }
 
+  /** Off duty: show the real local time, hour and minute hands, updated every few seconds. */
+  setRealTime(): void {
+    this.running = false;
+    const paint = () => {
+      const now = new Date();
+      const h = now.getHours() % 12;
+      const m = now.getMinutes();
+      this.label.setText(
+        `${String(now.getHours()).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+      );
+      this.label.setColor('#d8c9a8');
+      const g = this.hands;
+      g.clear();
+      const ha = -Math.PI / 2 + ((h + m / 60) / 12) * Math.PI * 2;
+      const ma = -Math.PI / 2 + (m / 60) * Math.PI * 2;
+      g.lineStyle(1, HEX.shadow, 1);
+      g.lineBetween(0, 0, Math.round(Math.cos(ha) * 5), Math.round(Math.sin(ha) * 5));
+      g.lineBetween(0, 0, Math.round(Math.cos(ma) * 8), Math.round(Math.sin(ma) * 8));
+      g.fillStyle(HEX.shadow, 1);
+      g.fillRect(-1, -1, 2, 2);
+    };
+    paint();
+    const ev = this.scene.time.addEvent({ delay: 5000, loop: true, callback: paint });
+    this.once(Phaser.GameObjects.Events.DESTROY, () => ev.remove(false));
+  }
+
   start(totalSec: number): void {
     this.total = totalSec;
     this.left = totalSec;

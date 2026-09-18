@@ -13,6 +13,7 @@ import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
+import { DeskClock } from '@/ui/DeskClock';
 import { lucienSays, lucienSaysNow } from '@/ui/DialogueBox';
 import { StickyNote } from '@/ui/StickyNote';
 import { StampMark } from '@/ui/Stamp';
@@ -339,6 +340,29 @@ export class TitleScene extends Phaser.Scene {
       } else audio.play('hover');
     });
     this.bindEasterEggs(cx, cy, cardW, cardH, desk);
+
+    // The desk clock keeps real time between cases. Click it for the hour's mood.
+    const clock = new DeskClock(this);
+    clock.setDepth(DEPTH.deskProps);
+    clock.setRealTime();
+    clock.setInteractive(new Phaser.Geom.Rectangle(0, 0, 30, 34), Phaser.Geom.Rectangle.Contains);
+    clock.on('pointerdown', () => {
+      audio.play('tick');
+      const h = new Date().getHours();
+      const line =
+        h < 5
+          ? 'far too late'
+          : h < 9
+            ? 'far too early'
+            : h < 12
+              ? 'morning shift'
+              : h < 18
+                ? 'daylight. suspicious.'
+                : h < 22
+                  ? 'evening. proper.'
+                  : 'night shift';
+      floatText(this, DESK.clock.x + 15, DESK.clock.y - 4, line);
+    });
 
     // Lucien hangs around the desk; poke him for a quip.
     const m = DIALOGUE.mascot;
