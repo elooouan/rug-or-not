@@ -487,10 +487,13 @@ export class ReportScene extends Phaser.Scene {
     };
     // The moment the last ordinary file is solved, a folder with no name shows up.
     const reveal = () => {
+      const c = this.payload.caseData;
       const box =
-        !this.payload.caseData.secret && secretUnlocked(saveStore.get(), gameState.cases)
-          ? lucienSays(this, 'secret-unlocked', { onDone: finale })
-          : null;
+        c.secret && b.verdictCorrect
+          ? lucienSays(this, 'secret-solved', { onDone: finale })
+          : !c.secret && secretUnlocked(saveStore.get(), gameState.cases)
+            ? lucienSays(this, 'secret-unlocked', { onDone: finale })
+            : null;
       if (!box) finale();
     };
     const story = () => {

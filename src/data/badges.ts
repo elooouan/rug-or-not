@@ -90,6 +90,12 @@ export const BADGES: Badge[] = [
     secret: true,
   },
   {
+    id: 'tailor-made',
+    name: 'Tailor-Made',
+    description: 'Stamp the file with no name correctly.',
+    secret: true,
+  },
+  {
     id: 'historian',
     name: 'Historian',
     description: 'Find the photo on the corkboard.',

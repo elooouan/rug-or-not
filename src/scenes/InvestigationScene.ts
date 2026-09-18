@@ -574,6 +574,7 @@ export class InvestigationScene extends Phaser.Scene {
       awardBadge(null, 'cold-one');
       if (saveStore.get().stats.coldCorrect >= 10) awardBadge(null, 'cold-ten');
     } else awardBadge(null, 'first-case');
+    if (c.secret && breakdown.verdictCorrect) awardBadge(null, 'tailor-made');
     const flagsTotal = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
     const noFalse = breakdown.falseAccusations.length === 0 && breakdown.strayPins === 0;
     if (

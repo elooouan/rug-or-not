@@ -38,7 +38,8 @@ export type ScriptId =
   | 'story-2'
   | 'story-3'
   | 'story-4'
-  | 'secret-unlocked';
+  | 'secret-unlocked'
+  | 'secret-solved';
 
 /** Campaign story beats: shown on the report after the case at this index (0-based) is closed. */
 export const STORY_BEATS: Record<number, ScriptId> = {
@@ -231,6 +232,12 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
       text: 'Every ordinary file on this desk, stamped right. Which is when this one showed up. No name on it.',
     },
     { text: 'Case files, bottom drawer. Take your coffee. Read it twice.' },
+  ],
+  'secret-solved': [
+    {
+      text: "The Tailor's best suit, on your desk, stamped. Every thread of it stitched to look right.",
+    },
+    { text: "He'll cut another one. Different name, same seams. Now you know where to look." },
   ],
   'all-cases': [
     {
