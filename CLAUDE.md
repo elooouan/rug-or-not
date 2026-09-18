@@ -80,7 +80,10 @@ every squish returns to rest), make interactions respond immediately, check UI e
 ## Testing tips
 
 - Dev server: `npm run dev` (port 5173). Dev builds expose `window.__game` and `__debug`
-  (`startCase(id)`, `snapshot(name)`, `audio`, `audioLevels()`).
+  (`startCase(id)`, `snapshot(name)`, `audio`, `audioLevels()`, `wallet`). To test wallet
+  flows without Phantom, inject a fake `window.phantom.solana` (connect/disconnect/on) and
+  stub `fetch` for the RPC, then drive `__debug.wallet`; `VITE_TOKEN_MOCK_BALANCE` fakes a
+  holder balance for perks.
 - In the browser pane drive the game with synthetic DOM events on the canvas (world→canvas
   scaling by the canvas rect); synthetic `KeyboardEvent`s must define `keyCode`. The pane's
   document is usually hidden: a dev-only worker pump keeps the game loop running, but page
