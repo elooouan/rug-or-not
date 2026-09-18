@@ -19,6 +19,8 @@ export type ScriptId =
   | 'first-legit'
   | 'first-wrong'
   | 'first-daily'
+  | 'first-cold'
+  | 'first-weekly'
   | 'notebook'
   | 'case-files'
   | 'settings'
@@ -146,13 +148,23 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   notebook: [
     { text: 'This is where the knowledge lives. Locked pages open as you run into new tricks.' },
+    {
+      text: 'The last chapter is the handbook: how everything on this desk works, in case I mumble.',
+    },
   ],
   'case-files': [
     {
       text: 'Fifteen files, easy to nasty. Each verdict unlocks the next folder. Grades stick around, so replays count.',
     },
+  ],
+  'first-cold': [
     {
-      text: "The blank folders at the end are the pile: files the printer makes up, and this week's one, same for everyone.",
+      text: 'This one came off the printer a second ago. New name, new contract, same tricks. It has its own tally and its own board.',
+    },
+  ],
+  'first-weekly': [
+    {
+      text: "The weekly: one printed file, the same for every detective in the city until Monday. Its own top five, so don't rush it.",
     },
   ],
   settings: [

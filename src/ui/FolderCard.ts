@@ -8,7 +8,7 @@ import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
 import { gameState } from '@/systems/gameState';
 import { PixelButton } from './PixelButton';
-import { makeText } from './text';
+import { charWidth, makeText, wrapMono } from './text';
 import { difficultyPips, rect } from '@/ui/shapes';
 
 /** Case intake: a manila folder slides onto the desk with the token's pitch. */
@@ -48,12 +48,20 @@ export class FolderCard extends Phaser.GameObjects.Container {
     );
     this.add(makeText(scene, 28, 36, c.ticker, { size: FONT.size.heading, color: 'shadow' }));
     this.add(makeText(scene, 28, 60, c.title, { size: FONT.size.body, color: 'ink' }));
+    // The label holds two lines of pitch; a printed file's longer ones get cut with dots.
+    const pitchLines = wrapMono(
+      `"${c.pitch}"`,
+      Math.floor((w - 56) / charWidth(scene, 'body', FONT.size.body)),
+    );
+    const pitch =
+      pitchLines.length > 2
+        ? [pitchLines[0], `${pitchLines[1].replace(/[\s"]*$/, '').slice(0, -3)}..."`]
+        : pitchLines;
     this.add(
-      makeText(scene, 28, 76, `"${c.pitch}"`, {
+      makeText(scene, 28, 76, pitch.join('\n'), {
         size: FONT.size.body,
         font: 'body',
         color: 'woodDark',
-        wrap: w - 56,
       }),
     );
     this.add(makeText(scene, 20, 110, 'difficulty', { size: FONT.size.small, color: 'woodDark' }));

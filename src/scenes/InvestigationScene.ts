@@ -201,6 +201,14 @@ export class InvestigationScene extends Phaser.Scene {
       this.setDialogue(lucienSays(this, 'first-daily', { onDone: () => intake() }));
       if (this.dialogue) return;
     }
+    // Printed files get a word the first time: the pile, then the weekly.
+    if (gameState.mode === 'cold') {
+      const weekly = /^cold-(week|holders)-/.test(c.id);
+      this.setDialogue(
+        lucienSays(this, weekly ? 'first-weekly' : 'first-cold', { onDone: () => intake() }),
+      );
+      if (this.dialogue) return;
+    }
     intake();
     // Lucien's take on the file, every time, unless he's already mid-lesson.
     if (c.intro && !this.dialogue?.isActive)
