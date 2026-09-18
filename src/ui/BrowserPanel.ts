@@ -14,7 +14,7 @@ import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
-import { currentStreak, localDateKey, playedStrip } from '@/systems/dailyCase';
+import { currentStreak, localDateKey, playedStrip, weekKey } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
 import { wallet, walletName } from '@/systems/wallet';
 import { awardBadge, badgeCount, badgeProgress, noteSeen } from '@/systems/badges';
@@ -312,6 +312,17 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   home(ctx) {
     ctx.heading('NetScope', 'ink');
     ctx.line("The detective's browser. Slow, ad-free, mostly honest.");
+    // Tonight at a glance.
+    const save = saveStore.get();
+    const today = localDateKey();
+    const wk = `week-${weekKey()}`;
+    const dailyDone = save.daily.lastPlayed === today;
+    const weeklyDone = save.stats.weeklyDone.includes(wk);
+    const streak = currentStreak(save.daily, today);
+    ctx.line(
+      `${today}  ·  daily ${dailyDone ? 'done' : 'open'}  ·  weekly cold case ${weeklyDone ? 'closed' : 'open'}${streak > 0 ? `  ·  streak ${streak}` : ''}`,
+      { color: 'woodMid' },
+    );
     ctx.gap();
     ctx.line('Bookmarks:', { color: 'woodMid' });
     ctx.button('RugScan explorer', () => ctx.panel.go('rugscan'));
