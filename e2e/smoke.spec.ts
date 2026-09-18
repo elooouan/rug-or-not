@@ -255,3 +255,61 @@ test('a wallet connects read-only and the title chip shows the address', async (
   ).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+test('the desk opens up as files close', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  const menu = () =>
+    page.evaluate(() => {
+      const title = window.__game.scene.getScene('TitleScene') as {
+        children: { list: unknown[] };
+      };
+      const labels: string[] = [];
+      const walk = (list: unknown[]) =>
+        list.forEach((o) => {
+          const c = o as { constructor: { name: string }; list?: unknown[] };
+          if (c.constructor.name === 'PixelButton')
+            labels.push(
+              String(
+                (c.list?.find((x) => (x as { type: string }).type === 'Text') as { text: string })
+                  .text,
+              ),
+            );
+          else if (c.list) walk(c.list);
+        });
+      walk(title.children.list);
+      return labels;
+    });
+  const fresh = await menu();
+  expect(fresh).toContain('Play');
+  expect(fresh).toContain('How to play');
+  expect(fresh).not.toContain('Case files');
+  expect(fresh).not.toContain('Red Flag Rush');
+  expect(fresh).not.toContain('Cold case');
+
+  // Three closed files later: drawer, rush and the pile are on the desk.
+  await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string);
+    for (const id of ['a', 'b', 'c'])
+      save.caseResults[id] = {
+        bestScore: 100,
+        bestGrade: 'B',
+        completions: 1,
+        lastVerdictCorrect: true,
+      };
+    localStorage.setItem('rug-or-not:save:v1', JSON.stringify(save));
+  });
+  await page.reload();
+  await page.waitForFunction(
+    () => window.__game?.scene.getScenes(true).some((s) => s.scene.key === 'TitleScene'),
+    null,
+    { timeout: SLOW },
+  );
+  await page.waitForTimeout(800);
+  await skipTalk(page);
+  const later = await menu();
+  expect(later).toContain('Case files');
+  expect(later).toContain('Red Flag Rush');
+  expect(later).toContain('Cold case');
+  expect(errors).toEqual([]);
+});
