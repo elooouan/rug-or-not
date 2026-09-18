@@ -401,10 +401,26 @@ export class TitleScene extends Phaser.Scene {
         audio.play('slide');
         this.tweens.add({ targets: card, y: 0, alpha: 1, duration: 520, ease: 'Back.easeOut' });
       });
-      this.time.delayedCall(1400, () => lucienSays(this, 'title-intro'));
+      this.time.delayedCall(1400, () => this.greet(streak, dailyDone));
     } else {
       TitleScene.seenIntro = true;
-      lucienSays(this, 'title-intro');
+      this.greet(streak, dailyDone);
     }
+  }
+
+  private static nagged = false;
+
+  /** Lucien's intro the first time; after that, a word about the streak if it's at risk. */
+  private greet(streak: number, dailyDone: boolean): void {
+    if (lucienSays(this, 'title-intro')) return;
+    if (TitleScene.nagged || dailyDone || streak <= 0) return;
+    TitleScene.nagged = true;
+    const line =
+      streak >= 7
+        ? `${streak} nights running. The night shift would notice if you skipped one.`
+        : streak >= 3
+          ? `${streak} nights in a row. Don't break the chain tonight.`
+          : `${streak === 1 ? 'One night' : 'Two nights'} on the books. Tonight's file is waiting on the phone.`;
+    this.time.delayedCall(600, () => this.scene.isActive() && LucienBubble.say(this, line, 4200));
   }
 }
