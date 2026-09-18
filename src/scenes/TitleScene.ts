@@ -434,7 +434,13 @@ export class TitleScene extends Phaser.Scene {
       this,
       GAME_WIDTH / 2,
       GAME_HEIGHT - 12,
-      'hover the coffee  ·  click the lamp  ·  pet the cat',
+      [
+        'hover the coffee  ·  click the lamp  ·  pet the cat',
+        'click the window  ·  click the moon  ·  turn the radio dial',
+        'try typing a word  ·  swat the fly  ·  wish on a falling star',
+        'poke the detective  ·  open the safe  ·  read the wall',
+        'click the clock  ·  ink your cursor  ·  M mutes, F fills the screen',
+      ][Phaser.Math.Between(0, 4)],
       { size: 8, color: 'woodLight' },
     )
       .setOrigin(0.5, 0)
