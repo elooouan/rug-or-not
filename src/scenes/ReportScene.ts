@@ -6,12 +6,13 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH, REPORT } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
+import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
 import { gameState } from '@/systems/gameState';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
-import { lucienSays } from '@/ui/DialogueBox';
+import { LUCIEN_TEX, lucienSays } from '@/ui/DialogueBox';
 import { toast } from '@/ui/Toast';
 import { StickyNote } from '@/ui/StickyNote';
 import { LucienBubble } from '@/ui/LucienBubble';
@@ -128,7 +129,9 @@ export class ReportScene extends Phaser.Scene {
       ),
     );
     buttons.push(
-      new PixelButton(this, x + pad + 160, by, 'Share', () => this.share(), { width: 54 }),
+      new PixelButton(this, x + pad + 160, by, 'Share', () => this.shareMenu(x + pad + 160, by), {
+        width: 54,
+      }),
     );
     buttons.push(
       new PixelButton(
@@ -310,6 +313,88 @@ export class ReportScene extends Phaser.Scene {
         ),
       );
     return L;
+  }
+
+  private sharePopover?: Phaser.GameObjects.Container;
+
+  /** Two ways to share: the text for the clipboard, or a picture of the report. */
+  private shareMenu(bx: number, by: number): void {
+    if (this.sharePopover) {
+      this.sharePopover.destroy();
+      this.sharePopover = undefined;
+      return;
+    }
+    audio.play('ui');
+    const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
+    const close = () => {
+      c.destroy();
+      if (this.sharePopover === c) this.sharePopover = undefined;
+    };
+    const outside = this.add.zone(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0);
+    outside.setInteractive({ useHandCursor: false });
+    outside.on('pointerdown', close);
+    this.children.remove(outside);
+    c.add(outside);
+    const w = 96;
+    const h = 52;
+    const px = bx - 20;
+    const py = by - h - 6;
+    c.add(this.add.rectangle(px + 3, py + 4, w, h, HEX.bg, 0.5).setOrigin(0));
+    c.add(this.add.rectangle(px - 2, py - 2, w + 4, h + 4, HEX.woodDark).setOrigin(0));
+    c.add(this.add.rectangle(px, py, w, h, HEX.paper).setOrigin(0));
+    const mk = (label: string, y: number, fn: () => void) => {
+      const b = new PixelButton(
+        this,
+        px + 6,
+        y,
+        label,
+        () => {
+          close();
+          fn();
+        },
+        { width: w - 12, variant: 'ink' },
+      );
+      this.children.remove(b);
+      c.add(b);
+    };
+    mk('Copy text', py + 5, () => this.share());
+    mk('Save card', py + 27, () => this.saveCard());
+    this.sharePopover = c;
+  }
+
+  /** A 1280x720 PNG of the result, for posting. */
+  private saveCard(): void {
+    const { caseData: c, verdict, breakdown: b } = this.payload;
+    const flags = c.documents.flatMap((d) => d.clues).filter(isFlagClue).length;
+    const isDaily = gameState.mode === 'daily';
+    const mascotTex = this.textures.exists(LUCIEN_TEX)
+      ? (this.textures.get(LUCIEN_TEX).getSourceImage() as HTMLImageElement)
+      : null;
+    const canvas = renderShareCard({
+      ticker: c.ticker,
+      title: c.title,
+      verdict,
+      correct: b.verdictCorrect,
+      grade: b.grade,
+      score: b.total,
+      detail:
+        c.verdict === 'rug'
+          ? `Red flags found ${b.flagsFound.length}/${flags}  ·  false accusations ${b.falseAccusations.length + b.strayPins}`
+          : `Yellow herrings pinned ${b.falseAccusations.length}`,
+      mode: isDaily
+        ? `Daily ${localDateKey()}`
+        : `Case ${gameState.currentIndex + 1} of ${gameState.cases.length}`,
+      detective: saveStore.get().detectiveName,
+      url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
+      mascot: mascotTex,
+    });
+    const ok = downloadCanvas(canvas, `rug-or-not-${isDaily ? localDateKey() : c.id}.png`);
+    audio.play(ok ? 'stamp' : 'wrong');
+    toast(
+      this,
+      ok ? 'CARD SAVED' : 'NO LUCK',
+      ok ? 'a picture of this report' : 'this browser blocks downloads',
+    );
   }
 
   /** Wordle-style result text for the clipboard (falls back to a note you can read). */

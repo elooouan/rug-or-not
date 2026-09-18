@@ -8,6 +8,8 @@
   the safe combination in morse; Lucien explains dots and dashes if you sit with it.
 - Rogues gallery: a third notebook chapter with a WANTED poster for every rug you've called
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
+- Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
+  for posting, next to the clipboard text.
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid
   is now a live photo of your own desk, taken as you open it. Scrolling moves the wall, not
