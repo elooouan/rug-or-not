@@ -17,6 +17,7 @@
   names the flag on every hit; the help page covers the weekly, drills and custom files.
 - Seasonal dressing: a pumpkin by the mug in the last week of October, fairy lights in the
   window from December 10th. PixelForge carries the young-token herring.
+- M mutes from any screen (the volume setting is kept for when it comes back).
 - Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.
 - Once a mint is configured, the board page can show holders only.
 - Board handles pass a light word filter (client and worker); the weekly file sits at

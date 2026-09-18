@@ -628,7 +628,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.line('Click a suspicious line to pin it. Click again to unpin.');
     ctx.line('Stamp RUG (R) or LEGIT (L). Herring pins cost points.');
     ctx.line('Tab / arrows cycle clue spots, Enter pins, 1-6 switch tabs, wheel scrolls.');
-    ctx.line('Esc pauses. F toggles fullscreen.');
+    ctx.line('Esc pauses. F toggles fullscreen. M mutes.');
     ctx.line(
       'Red Flag Rush: sixty seconds, one page at a time. Click the red flag to clear the page; herrings and blank paper cost seconds.',
     );

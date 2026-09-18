@@ -132,7 +132,20 @@ export class AudioManager {
 
   setVolume(v: number): void {
     this.volume = Math.max(0, Math.min(1, v));
-    if (this.master) this.master.gain.value = this.volume;
+    if (this.master) this.master.gain.value = this.muted ? 0 : this.volume;
+  }
+
+  private muted = false;
+
+  /** A quick mute (M) that keeps the volume setting for when it comes back. */
+  toggleMute(): boolean {
+    this.muted = !this.muted;
+    if (this.master) this.master.gain.value = this.muted ? 0 : this.volume;
+    return this.muted;
+  }
+
+  get isMuted(): boolean {
+    return this.muted;
   }
 
   setRain(on: boolean, heavy = false): void {

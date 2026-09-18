@@ -130,7 +130,7 @@ the coin page once a mint is set; it's read-only and cached for a minute.
 - **Stamp** RUG or LEGIT by clicking a stamp or dragging it onto the paper.
 - Keyboard: `Tab`/arrows cycle clue spots, `Enter` pins, `R`/`L` stamp, `1`–`6` switch
   documents, `PageUp`/`PageDown` or the wheel scroll long documents, `Esc` pauses, `F` toggles
-  fullscreen.
+  fullscreen, `M` mutes.
 - Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
 

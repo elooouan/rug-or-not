@@ -97,6 +97,7 @@ export class TitleScene extends Phaser.Scene {
       }
       if (e.key.length !== 1) return;
       typed = (typed + e.key.toLowerCase()).slice(-8);
+      this.registry.set('typedAt', Date.now());
       const stampAt = (verdict: 'rug' | 'legit') => {
         const m = new StampMark(this, verdict, verdict === 'rug' ? 'stampRed' : 'stampGreen');
         m.setPosition(
