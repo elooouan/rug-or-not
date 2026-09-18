@@ -7,7 +7,7 @@
   "difficulty": 2,
   "verdict": "legit",
   "timeLimitSec": 240,
-  "debrief": "PixelForge looks scrappy but honest. Ownership was renounced with no back door, the big 'ecosystem' slice is locked behind a four-year schedule, the pool is the top holder because that's where liquidity lives, and the roadmap is refreshingly dull. A moderator asking people to chill is not a cover-up.",
+  "debrief": "PixelForge looks scrappy but honest. Ownership was renounced with no back door, the big 'ecosystem' slice is locked behind a four-year schedule, the pool is the top holder because that's where liquidity lives, and the roadmap is refreshingly dull. A moderator asking people to chill is not a cover-up. Nineteen days old is young, not guilty; everything was new once.",
   "documents": [
     {
       "type": "contract",
@@ -231,6 +231,12 @@
             "from": "Vesting contract",
             "to": "Bounty multisig",
             "amount": "468,750"
+          },
+          {
+            "when": "19d ago",
+            "from": "Deployer",
+            "to": "Liquidity pool",
+            "amount": "pool created"
           }
         ]
       },
@@ -255,6 +261,17 @@
             "kind": "row",
             "row": 1,
             "table": "holders"
+          }
+        },
+        {
+          "id": "px-young",
+          "label": "Only 19 days old",
+          "herring": true,
+          "herringId": "young-token",
+          "anchor": {
+            "kind": "row",
+            "row": 1,
+            "table": "transfers"
           }
         }
       ]
