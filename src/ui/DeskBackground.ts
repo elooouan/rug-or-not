@@ -814,6 +814,7 @@ export class DeskBackground {
       audio.play('click');
       apply(next);
       floatText(scene, x + 22, y - 2, STATION_LABEL[next]);
+      scene.events.emit('radio:tune', next);
       if (this.motion) {
         radio.setScale(1.06, 0.94);
         scene.tweens.add({

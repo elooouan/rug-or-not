@@ -345,8 +345,45 @@ export class TitleScene extends Phaser.Scene {
     // The dialogue box draws its own Lucien in the same spot; don't show two.
     this.events.off('dialogue:open');
     this.events.off('dialogue:close');
+    this.events.off('radio:tune');
     this.events.on('dialogue:open', () => idle.setVisible(false));
     this.events.on('dialogue:close', () => idle.setVisible(true));
+    // He has opinions about the radio.
+    const radioLines: Record<string, string> = {
+      jazz: "Late jazz. Now we're working.",
+      static: 'Leave it there a minute. Listen.',
+      off: 'Silence. Also fine.',
+      lofi: 'Back to the usual. Good.',
+    };
+    this.events.on('radio:tune', (station: string) => {
+      if (!idle.visible) return;
+      LucienBubble.say(this, radioLines[station] ?? '...', 2600);
+    });
+    // Idle business: every so often he glances at the window or bounces on his heels.
+    const fidget = () => {
+      this.time.delayedCall(Phaser.Math.Between(12000, 28000), () => {
+        if (!this.scene.isActive()) return;
+        if (idle.visible && !reduced) {
+          if (Math.random() < 0.5) {
+            idle.setFlipX(true);
+            this.time.delayedCall(1800, () => idle.setFlipX(false));
+          } else {
+            // The bob tween owns y, so wobble instead of hopping.
+            this.tweens.add({
+              targets: idle,
+              angle: { from: -4, to: 4 },
+              duration: 140,
+              yoyo: true,
+              repeat: 2,
+              ease: 'Sine.easeInOut',
+              onComplete: () => idle.setAngle(0),
+            });
+          }
+        }
+        fidget();
+      });
+    };
+    fidget();
     addText(
       this,
       GAME_WIDTH / 2,
