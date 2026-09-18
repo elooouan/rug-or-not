@@ -2,7 +2,7 @@
  * Marketing shots: PNG screenshots and short GIF clips of the game, driven through a
  * headless Chromium at 1280x720 (twice the 640x360 world, so every pixel is crisp and
  * the frame is Twitter's 16:9). Output lands in assets/marketing/ named
- * `<tag>-<nn>-<what>.png` / `.gif`.
+ * `<tag>-<what>.png` / `<tag>-clip-<what>.gif`.
  *
  *   npm run dev            (in another terminal; the script drives the dev server)
  *   node scripts/promo.mjs [only]      e.g. `node scripts/promo.mjs lens` or `clips`
@@ -187,10 +187,8 @@ const buttonAt = (page, sceneKey, label) =>
     [sceneKey, label],
   );
 
-let shotNo = 0;
 async function shot(page, name) {
-  shotNo++;
-  const file = `${OUT}/${TAG}-${String(shotNo).padStart(2, '0')}-${name}.png`;
+  const file = `${OUT}/${TAG}-${name}.png`;
   await page.screenshot({ path: file });
   console.log('shot', file);
 }
@@ -446,6 +444,20 @@ const SHOTS = {
       await sleep(1500);
       await shot(page, `weather-${weather}`);
     }
+  },
+  async themes(page) {
+    for (const theme of ['sepia', 'midnight', 'newsprint', 'speakeasy']) {
+      await boot(page, { ...VETERAN, settings: { ...VETERAN.settings, theme } });
+      await skipTalk(page);
+      await sleep(1200);
+      await shot(page, `theme-${theme}`);
+    }
+    await boot(page, { ...VETERAN, settings: { ...VETERAN.settings, theme: 'midnight' } });
+    await openCase(page, 'moonpup');
+    const spots = await clueSpots(page);
+    await move(page, spots[0].x, spots[0].y);
+    await sleep(700);
+    await shot(page, 'theme-midnight-reading');
   },
   async settings(page) {
     await boot(page, VETERAN);
