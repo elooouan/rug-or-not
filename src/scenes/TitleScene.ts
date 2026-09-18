@@ -414,6 +414,8 @@ export class TitleScene extends Phaser.Scene {
   /** Lucien's intro the first time; after that, what's new, or a word about a streak at risk. */
   private greet(streak: number, dailyDone: boolean): void {
     if (lucienSays(this, 'title-intro')) return;
+    // Back from the first case: a quick tour of what else is on the desk.
+    if (saveStore.get().stats.runs >= 1 && lucienSays(this, 'desk-tour')) return;
     // Returning players get a one-line tour of the update; new saves just note the version.
     const seen = saveStore.get().lastSeenVersion;
     if (seen !== GAME_VERSION) {

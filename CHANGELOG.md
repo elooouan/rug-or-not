@@ -42,6 +42,8 @@
   NetScope pages, the report and the ledger all scroll by dragging.
 - Returning players get a one-line "new tonight" from Lucien after an update (the save
   remembers the last version it was opened with).
+- Back on the title after the first case, Lucien gives a once-only tour of the desk (phone,
+  radio, cat, polaroid, safe).
 - On the title, Lucien points at a drill for the flag that keeps getting past you (missed
   more than pinned, never drilled) when there is no streak to nag about.
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,

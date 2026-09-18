@@ -39,7 +39,8 @@ export type ScriptId =
   | 'story-3'
   | 'story-4'
   | 'secret-unlocked'
-  | 'secret-solved';
+  | 'secret-solved'
+  | 'desk-tour';
 
 /** Campaign story beats: shown on the report after the case at this index (0-based) is closed. */
 export const STORY_BEATS: Record<number, ScriptId> = {
@@ -241,6 +242,15 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
       text: 'Every ordinary file on this desk, stamped right. Which is when this one showed up. No name on it.',
     },
     { text: 'Case files, bottom drawer. Take your coffee. Read it twice.' },
+  ],
+  'desk-tour': [
+    { text: 'One file down. Since you are back at the desk: everything on it does something.' },
+    {
+      text: 'The phone is NetScope, the browser: explorer, the coin, the board, the news. The radio picks the station. The lamp is a lamp, mostly.',
+    },
+    {
+      text: 'The cat is Biscuit. The polaroid on the corkboard is how this office got built. The safe under the desk is locked. For now.',
+    },
   ],
   'secret-solved': [
     {
