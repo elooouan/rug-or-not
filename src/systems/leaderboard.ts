@@ -1,5 +1,6 @@
 import type { Grade } from '@/config/gameConfig';
 import { TOKEN } from '@/config/token';
+import { timeoutSignal } from './wallet';
 
 export interface ScoreEntry {
   name: string;
@@ -109,7 +110,7 @@ export class RemoteLeaderboard implements LeaderboardProvider {
   async list(limit = 10, mode: BoardMode = 'case', caseId?: string): Promise<ScoreEntry[]> {
     try {
       const q = `?limit=${limit}&mode=${mode}${caseId ? `&caseId=${encodeURIComponent(caseId)}` : ''}`;
-      const res = await fetch(`${this.url}${q}`);
+      const res = await fetch(`${this.url}${q}`, { signal: timeoutSignal(8_000) });
       if (!res.ok) throw new Error(String(res.status));
       const entries = sanitizeEntries(await res.json());
       // Older servers ignore the filter; apply it here too.
@@ -130,6 +131,7 @@ export class RemoteLeaderboard implements LeaderboardProvider {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(entry),
+        signal: timeoutSignal(8_000),
       });
     } catch {
       /* offline: the local copy keeps it */

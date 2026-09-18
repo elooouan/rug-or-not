@@ -1,4 +1,5 @@
 import { TOKEN } from '@/config/token';
+import { timeoutSignal } from './wallet';
 
 /**
  * Read-only price lookup for the coin page. Understands a plain `{ price }`,
@@ -33,7 +34,7 @@ export async function fetchPrice(): Promise<number | null> {
   if (!TOKEN.priceUrl) return null;
   if (cached && Date.now() - cached.at < 60_000) return cached.price;
   try {
-    const res = await fetch(TOKEN.priceUrl);
+    const res = await fetch(TOKEN.priceUrl, { signal: timeoutSignal(8_000) });
     if (!res.ok) throw new Error(String(res.status));
     const price = pickPrice(await res.json(), TOKEN.mint);
     cached = { at: Date.now(), price };

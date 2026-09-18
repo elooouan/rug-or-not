@@ -64,11 +64,19 @@ export function walletName(): string {
 /** Where to get a wallet when none is installed. */
 export const PHANTOM_URL = 'https://phantom.app/download';
 
+/** A fetch that gives up, so a dead RPC can't leave the page "refreshing" forever. */
+export function timeoutSignal(ms: number): AbortSignal | undefined {
+  return typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+    ? AbortSignal.timeout(ms)
+    : undefined;
+}
+
 async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   const res = await fetch(TOKEN.rpcUrl, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+    signal: timeoutSignal(10_000),
   });
   if (!res.ok) throw new Error(`rpc ${res.status}`);
   const json = (await res.json()) as { result?: T; error?: { message: string } };
