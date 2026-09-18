@@ -7,7 +7,7 @@
   "difficulty": 3,
   "verdict": "rug",
   "timeLimitSec": 240,
-  "debrief": "The goose had a function called layEgg() that minted as many tokens as the owner wanted, whenever it wanted. Daily 'eggs' were guaranteed returns with feathers on. The farm's 28% was liquid on day one and the chat was a barn full of identical honks.",
+  "debrief": "The goose had a function called layEgg() that minted as many tokens as the owner wanted, whenever it wanted. Daily 'eggs' were guaranteed returns with feathers on. The farm's 28% was liquid on day one and the chat was a barn full of identical honks. The chart's volume was two wallets passing the same 6.4 million eggs back and forth every six minutes.",
   "documents": [
     {
       "type": "contract",
@@ -229,7 +229,32 @@
             "pct": 42
           }
         ],
-        "transfers": []
+        "transfers": [
+          {
+            "when": "4m ago",
+            "from": "0x7a1...c03",
+            "to": "0x2e9...b4f",
+            "amount": "6,400,000"
+          },
+          {
+            "when": "9m ago",
+            "from": "0x2e9...b4f",
+            "to": "0x7a1...c03",
+            "amount": "6,400,000"
+          },
+          {
+            "when": "15m ago",
+            "from": "0x7a1...c03",
+            "to": "0x2e9...b4f",
+            "amount": "6,400,000"
+          },
+          {
+            "when": "21m ago",
+            "from": "0x2e9...b4f",
+            "to": "0x7a1...c03",
+            "amount": "6,400,000"
+          }
+        ]
       },
       "clues": [
         {
@@ -241,6 +266,18 @@
             "kind": "row",
             "row": 0,
             "table": "holders"
+          }
+        },
+        {
+          "id": "gg-wash",
+          "label": "Same 2 wallets trading",
+          "flagId": "wash-trading",
+          "finePrint": true,
+          "text": "both wallets funded by 'the farm' the night before launch",
+          "anchor": {
+            "kind": "row",
+            "row": 0,
+            "table": "transfers"
           }
         }
       ]
