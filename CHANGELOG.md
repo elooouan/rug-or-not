@@ -21,6 +21,7 @@
   counts down to tomorrow's case; notebook flag pages remember how often you missed them.
 - A fly visits the lamp now and then (swat it); shooting stars on clear nights (catch one);
   more typed words on the title screen.
+- The badges page shows progress on counter badges (1/5, 3/14...).
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid
   is now a live photo of your own desk, taken as you open it. Scrolling moves the wall, not

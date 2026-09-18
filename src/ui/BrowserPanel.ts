@@ -10,13 +10,14 @@ import { gameState } from '@/systems/gameState';
 import type { CaseData } from '@/data/schema';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
-import { FLAGS } from '@/data/flags';
+import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
 import { currentStreak, localDateKey, playedStrip } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
-import { awardBadge, noteSeen } from '@/systems/badges';
+import { awardBadge, badgeProgress, noteSeen } from '@/systems/badges';
 import { BADGES } from '@/data/badges';
+import { WEATHERS } from '@/systems/settings';
 import { UNLOCKABLES } from '@/data/unlockables';
 import { lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
@@ -648,13 +649,23 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
 
   badges(ctx) {
     const earned = new Set(saveStore.get().badges);
+    const totals = {
+      cases: gameState.cases.length,
+      rugs: gameState.cases.filter((c) => c.verdict === 'rug').length,
+      pages: ALL_PAGES.length,
+      flags: FLAG_IDS.length,
+      weathers: WEATHERS.length,
+    };
     ctx.heading(`Badges  ${[...earned].length}/${BADGES.length}`, 'ink');
     for (const b of BADGES) {
       const has = earned.has(b.id);
       const name = has || !b.secret ? b.name : '? ? ?';
       const desc = has || !b.secret ? b.description : 'secret';
-      ctx.line(`${has ? '[x]' : '[ ]'} ${name.padEnd(24)} ${desc}`, {
-        color: has ? 'shadow' : 'paperShadow',
+      // Counter badges show how far along you are, once you know what they are.
+      const p = !has && (!b.secret || earned.has(b.id)) ? badgeProgress(b.id, totals) : null;
+      const progress = p && p.n > 0 ? `  (${p.n}/${p.of})` : '';
+      ctx.line(`${has ? '[x]' : '[ ]'} ${name.padEnd(24)} ${desc}${progress}`, {
+        color: has ? 'shadow' : p && p.n > 0 ? 'woodMid' : 'paperShadow',
       });
     }
     ctx.gap();
