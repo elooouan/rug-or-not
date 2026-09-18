@@ -269,6 +269,14 @@ function plan(rng: Rng, opts: GenOptions): Plan {
   return { verdict, difficulty, flags, fineChance, herrings };
 }
 
+/** Numbers several documents quote; they must agree unless a flag says otherwise. */
+interface Facts {
+  /** Total supply in millions. */
+  supplyM: number;
+  /** Liquidity lock length in years (the tokenomics sheet quotes it). */
+  lockYears: number;
+}
+
 /** Loosely typed while building; the schema validates the result (see tests). */
 interface ClueDraft {
   id: string;
@@ -316,6 +324,7 @@ function take<T>(rng: Rng, pool: readonly T[], n: number): T[] {
 function contractDoc(
   rng: Rng,
   nm: Names,
+  facts: Facts,
   flags: ContractFlag[],
   herrings: ContractHerring[],
   fine: (id: string) => boolean,
@@ -374,7 +383,7 @@ function contractDoc(
     );
     push(`contract ${cname} is ERC20Upgradeable${ownable ? ', OwnableUpgradeable' : ''} {`);
   } else push(`contract ${cname} is ERC20${ownable ? ', Ownable' : ''} {`);
-  const supplyLine = push(`  uint256 public constant MAX_SUPPLY = ${rng.int(10, 900)}_000_000e18;`);
+  const supplyLine = push(`  uint256 public constant MAX_SUPPLY = ${facts.supplyM}_000_000e18;`);
   if (herrings.includes('immutable-supply-note'))
     clues.push(
       herringClue('g-supply', 'Hard cap, minted once', 'immutable-supply-note', {
@@ -440,7 +449,10 @@ function contractDoc(
   }
   if (fakeRenounce) {
     push('  address public operator;');
+    if (!flags.includes('mint-unlimited')) push('  uint256 public buy; uint256 public sell;');
   }
+  if (flags.includes('sell-tax-adjustable') || herrings.includes('small-fixed-tax'))
+    push('  address public treasury;');
   push('');
   if (proxy) {
     push('  function initialize() public initializer {');
@@ -536,6 +548,7 @@ function contractDoc(
 function tokenomicsDoc(
   rng: Rng,
   nm: Names,
+  facts: Facts,
   wants: { unvested: boolean; copied: boolean; marketing: boolean; roadmap: boolean },
   fine: (id: string) => boolean,
 ): CaseDocument {
@@ -545,7 +558,7 @@ function tokenomicsDoc(
   const mkt = rng.int(3, 8);
   const rest = 100 - team - liq - mkt;
   const allocations = [
-    { label: 'Liquidity', pct: liq, vesting: `locked ${rng.int(1, 3)}y` },
+    { label: 'Liquidity', pct: liq, vesting: `locked ${facts.lockYears}y` },
     {
       label: rng.pick(['Community', 'Ecosystem', 'Treasury', 'Rewards', 'Stall fund']),
       pct: rest,
@@ -611,12 +624,51 @@ function tokenomicsDoc(
     type: 'tokenomics',
     title: 'Tokenomics',
     content: {
-      totalSupply: `${rng.int(10, 900)},000,000 ${nm.ticker.slice(1)}`,
+      totalSupply: `${facts.supplyM},000,000 ${nm.ticker.slice(1)}`,
       allocations,
       notes,
     },
     clues: clues as unknown as Clue[],
   };
+}
+
+/** A bio that fits the job title. */
+function bioFor(rng: Rng, role: string): string {
+  const years = rng.int(6, 15);
+  const field = rng.pick(['logistics', 'payments', 'retail software', 'events', 'hospitality']);
+  const byRole: Record<string, string[]> = {
+    CEO: [
+      `${years} years in ${field}. Speaks at the regional meetup.`,
+      'Serial founder. Previously exited two startups, one of them on purpose.',
+      'Organises the street market. Knows every stall by name.',
+    ],
+    CTO: [
+      'Public repo, public commits, public arguments about them.',
+      'Wrote the vesting contracts. Answers in the chat at 2am.',
+      `${years} years shipping ${field} systems that had to work on Mondays.`,
+    ],
+    'Head of Ops': [
+      'Ran a bakery. Now runs the schedule. Same clipboard.',
+      `${years} years in ${field} operations. Owns the checklist.`,
+    ],
+    'Contract dev': [
+      'Wrote the vesting contracts. Answers in the chat at 2am.',
+      'Former auditor. Left to build the thing being audited.',
+    ],
+    'Community lead': [
+      'Moderates the chat, pins the questions, deletes nothing.',
+      'Hosts the Thursday call. Has never said "wagmi".',
+    ],
+    Treasurer: [
+      'Runs the books. Publishes monthly minutes.',
+      'Ran a bakery. Now runs the treasury. Same spreadsheet.',
+    ],
+    Partnerships: [
+      `${years} years in ${field}. Knows which partners actually sign.`,
+      'Every "partnership" on the site has a countersigned PDF behind it.',
+    ],
+  };
+  return rng.pick(byRole[role] ?? byRole.CEO);
 }
 
 function teamDoc(
@@ -637,21 +689,13 @@ function teamDoc(
     ['CEO', 'CTO', 'Head of Ops', 'Contract dev', 'Community lead', 'Treasurer', 'Partnerships'],
     3,
   );
+  const surnames = take(rng, LAST, 4);
   for (let i = 0; i < (wants.meme || wants.duo ? 2 : 3); i++) {
-    const name = `${rng.pick(FIRST)} ${rng.pick(LAST)}`;
+    const name = `${rng.pick(FIRST)} ${surnames[i]}`;
     members.push({
       name,
       role: roles[i],
-      bio: rng.pick([
-        `${rng.int(6, 15)} years in ${rng.pick(['logistics', 'payments', 'retail software', 'events', 'hospitality', 'municipal IT'])}. Speaks at the regional meetup.`,
-        'Public repo, public commits, public arguments about them.',
-        'Serial founder. Previously exited two startups.',
-        'Runs the books. Publishes monthly minutes.',
-        'Former auditor. Left to build the thing being audited.',
-        'Organises the street market. Knows every stall by name.',
-        'Wrote the vesting contracts. Answers in the chat at 2am.',
-        'Ran a bakery. Now runs the treasury. Same spreadsheet.',
-      ]),
+      bio: bioFor(rng, roles[i]),
       portraitSeed: `${name.toLowerCase().replace(/\s/g, '-')}-${rng.int(1, 99)}`,
       style: 'normal',
     });
@@ -847,6 +891,7 @@ function chatDoc(
 function liquidityDoc(
   rng: Rng,
   nm: Names,
+  facts: Facts,
   wants: {
     unlocked: boolean;
     whales: boolean;
@@ -859,7 +904,7 @@ function liquidityDoc(
 ): CaseDocument {
   const clues: ClueDraft[] = [];
   const days = rng.int(2, 9);
-  const years = rng.int(1, 4);
+  const years = facts.lockYears;
   const lock = wants.unlocked
     ? rng.chance(0.5)
       ? { locked: false, pct: 0 }
@@ -1148,11 +1193,13 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     return fineFor.get(id) as boolean;
   };
 
+  const facts: Facts = { supplyM: rng.int(10, 900), lockYears: rng.int(1, 4) };
   const docs: CaseDocument[] = [];
   docs.push(
     contractDoc(
       rng,
       nm,
+      facts,
       CONTRACT_FLAGS.filter((f) => flags.has(f)),
       CONTRACT_HERRINGS.filter((h) => herrings.has(h)),
       fine,
@@ -1162,6 +1209,7 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     tokenomicsDoc(
       rng,
       nm,
+      facts,
       {
         unvested: flags.has('team-allocation-unvested'),
         copied: flags.has('copied-whitepaper'),
@@ -1214,6 +1262,7 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     liquidityDoc(
       rng,
       nm,
+      facts,
       {
         unlocked: flags.has('liquidity-unlocked'),
         whales: flags.has('whale-concentration'),
