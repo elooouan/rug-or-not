@@ -432,8 +432,10 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   /** A one-time quip per case, shown in Lucien's corner bubble. */
-  private mutter(key: string, text: string): void {
+  /** `rookie` lines are onboarding: they stop after the first few closed files. */
+  private mutter(key: string, text: string, rookie = false): void {
     if (this.said.has(key) || this.dialogue?.isActive || this.paused) return;
+    if (rookie && saveStore.get().stats.runs >= 3) return;
     this.said.add(key);
     LucienBubble.say(this, text);
   }
@@ -442,14 +444,14 @@ export class InvestigationScene extends Phaser.Scene {
     if (pinned) {
       this.suspicions.push({ id: clue.id, label: clue.label });
       // Neutral remarks keyed to counts only; nothing here says whether a pin is right.
-      if (this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.');
+      if (this.suspicions.length === 1) this.mutter('first-pin', 'Noted. Keep going.', true);
       if (this.suspicions.length === 4)
-        this.mutter('pins-4', 'Four. Could you explain each one to a judge?');
+        this.mutter('pins-4', 'Four. Could you explain each one to a judge?', true);
       if (this.suspicions.length >= 7)
         this.mutter('many-pins', 'Pinning everything is not a strategy. Some of that is fine.');
     } else {
       this.suspicions = this.suspicions.filter((s) => s.id !== clue.id);
-      this.mutter('unpin', 'Second thoughts. Fine. Doubt is part of the job.');
+      this.mutter('unpin', 'Second thoughts. Fine. Doubt is part of the job.', true);
     }
     this.refreshNotebook();
   }

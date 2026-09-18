@@ -193,12 +193,16 @@ export class ReportScene extends Phaser.Scene {
       this.time.delayedCall(900, () => {
         toast(this, 'PROMOTED', `You are now ${this.payload.rankUp}`);
         audio.play('caseClosed');
+        // A promotion is rarer than an S grade; it gets the same confetti.
+        if (!saveStore.get().settings.reducedMotion) confetti(this, 2600);
       });
     }
     // Toasts queue themselves; only the first needs a beat after the stamp.
     this.time.delayedCall(this.payload.rankUp ? 1400 : 1200, () => {
       if (this.payload.caughtName) toast(this, 'WANTED POSTER', this.payload.caughtName);
-      this.payload.newUnlockNames.forEach((name) => toast(this, 'UNLOCKED', name));
+      this.payload.newUnlockNames.forEach((name) =>
+        toast(this, 'UNLOCKED', `${name} · in Settings`),
+      );
       this.payload.newBadges.forEach((id) =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),
       );
