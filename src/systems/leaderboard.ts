@@ -13,6 +13,8 @@ export interface ScoreEntry {
   hard?: boolean;
   /** Which board the run belongs on; missing means a case run. */
   mode?: BoardMode;
+  /** Held the coin when the run was posted. */
+  holder?: boolean;
 }
 
 export type BoardMode = 'case' | 'rush';
@@ -50,6 +52,7 @@ export function sanitizeEntries(raw: unknown): ScoreEntry[] {
       ...e,
       name: e.name.slice(0, 12),
       mode: e.mode === 'rush' ? ('rush' as const) : undefined,
+      holder: e.holder === true ? true : undefined,
     }));
 }
 

@@ -21,6 +21,8 @@
   counts down to tomorrow's case; notebook flag pages remember how often you missed them.
 - A fly visits the lamp now and then (swat it); shooting stars on clear nights (catch one);
   more typed words on the title screen.
+- Holder perks beyond cosmetics: northern lights over the city on clear nights, a `$` mark on
+  the board, and a word from Lucien. Perks use the last balance the coin page saw.
 - The badges page shows progress on counter badges (1/5, 3/14...).
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid

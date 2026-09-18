@@ -1,4 +1,5 @@
 import { TOKEN } from '@/config/token';
+import { saveStore } from './save';
 
 /**
  * Phantom wallet integration, read-only. Connecting shares the public key;
@@ -136,3 +137,12 @@ export class WalletService {
 }
 
 export const wallet = new WalletService();
+
+/**
+ * Holder perks (aurora, the mark on the board) use the last balance the coin
+ * page saw, so they survive reloads without a live wallet connection.
+ */
+export function holderPerks(): boolean {
+  if (wallet.isHolder) return true;
+  return (saveStore.get().wallet.token ?? 0) >= TOKEN.holderMin;
+}

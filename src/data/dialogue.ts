@@ -32,7 +32,8 @@ export type ScriptId =
   | 'wall'
   | 'first-rush'
   | 'radio'
-  | 'rogues';
+  | 'rogues'
+  | 'holder';
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -157,6 +158,11 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   rogues: [
     {
       text: "Every face in this chapter walked off with somebody's savings. Fictional savings. Still: remember them.",
+    },
+  ],
+  holder: [
+    {
+      text: "You're holding. That makes you family. Family still reads the contract. Look out the window on a clear night.",
     },
   ],
   'first-rush': [

@@ -21,7 +21,7 @@ import { LUCIEN_FACE_TEX } from '@/ui/DialogueBox';
 import { SCORING } from '@/config/gameConfig';
 import { FONT } from '@/config/layout';
 import { leaderboard } from '@/systems/leaderboard';
-import { wallet } from '@/systems/wallet';
+import { holderPerks, wallet } from '@/systems/wallet';
 import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
 import { FLAG_IDS } from '@/data/flags';
 import { DeskClock } from '@/ui/DeskClock';
@@ -528,6 +528,7 @@ export class InvestigationScene extends Phaser.Scene {
       date: new Date().toISOString(),
       wallet: wallet.state.address ?? undefined,
       hard: saveStore.get().settings.hardMode || undefined,
+      holder: holderPerks() || undefined,
     });
 
     saveStore.update((d) => {

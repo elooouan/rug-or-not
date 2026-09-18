@@ -461,15 +461,21 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       );
       const holder = wallet.isHolder;
       ctx.line(
-        `Holder perks:  ${holder ? 'unlocked (see Settings > Magnifier rim)' : `need ${TOKEN.holderMin.toLocaleString()}+ ${TOKEN.symbol}`}`,
+        `Holder perks:  ${holder ? 'unlocked' : `need ${TOKEN.holderMin.toLocaleString()}+ ${TOKEN.symbol}`}`,
         { color: holder ? 'lampGreen' : 'woodMid' },
+      );
+      ctx.small(
+        'Perks: the aurora over the city on clear nights, a $ after your name on the board, the cosmetics below.',
       );
       // Remember the snapshot so the unlock survives reloads.
       saveStore.update(
         (d) =>
           (d.wallet = { address: s.address, token: s.token, checkedAt: new Date().toISOString() }),
       );
-      if (holder) awardBadge(ctx.scene, 'shareholder');
+      if (holder) {
+        awardBadge(ctx.scene, 'shareholder');
+        lucienSays(ctx.scene, 'holder');
+      }
       ctx.gap(4);
       ctx.line('Holder tiers:', { color: 'woodMid' });
       for (const u of UNLOCKABLES.filter((x) => x.source.type === 'holder')) {
@@ -569,7 +575,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         return;
       }
       entries.forEach((e, i) => {
-        const line = `${String(i + 1).padStart(2, ' ')}. ${e.name.padEnd(12)} ${String(e.score).padStart(4)}${e.hard ? '*' : ' '} ${e.grade}  ${e.caseId.padEnd(10)} ${e.date.slice(0, 10)}`;
+        const line = `${String(i + 1).padStart(2, ' ')}. ${(e.name + (e.holder ? '$' : '')).padEnd(13)} ${String(e.score).padStart(4)}${e.hard ? '*' : ' '} ${e.grade}  ${e.caseId.padEnd(10)} ${e.date.slice(0, 10)}`;
         ctx.content.add(
           makeText(ctx.scene, 0, y, line, {
             font: 'body',
@@ -600,7 +606,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         return;
       }
       entries.forEach((e, i) => {
-        const line = `${String(i + 1).padStart(2, ' ')}. ${e.name.padEnd(12)} ${String(e.score).padStart(4)}  ${e.grade}  ${e.date.slice(0, 10)}`;
+        const line = `${String(i + 1).padStart(2, ' ')}. ${(e.name + (e.holder ? '$' : '')).padEnd(13)} ${String(e.score).padStart(4)}  ${e.grade}  ${e.date.slice(0, 10)}`;
         ctx.content.add(
           makeText(ctx.scene, 0, rushY + i * BROWSER.lineH, line, {
             font: 'body',

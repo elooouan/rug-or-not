@@ -15,6 +15,7 @@ import { Vault, VAULT_COMBO } from './Vault';
 import { lucienSays } from './DialogueBox';
 import { localDateKey } from '@/systems/dailyCase';
 import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
+import { holderPerks } from '@/systems/wallet';
 import { WEATHERS } from '@/systems/settings';
 import { addText } from './text';
 
@@ -92,6 +93,7 @@ export class DeskBackground {
   private steam?: Phaser.GameObjects.Sprite;
   private rain?: Phaser.GameObjects.Particles.ParticleEmitter;
   private snow?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private aurora!: Phaser.GameObjects.Graphics;
   private stars0!: Phaser.GameObjects.Image;
   private stars1!: Phaser.GameObjects.Image;
   private fogA!: Phaser.GameObjects.Image;
@@ -323,6 +325,8 @@ export class DeskBackground {
       .setAlpha(0.25)
       .setMask(mask)
       .setVisible(false);
+    // Northern lights for coin holders, on clear nights only.
+    this.aurora = scene.add.graphics().setDepth(DEPTH.windowRain).setMask(mask).setVisible(false);
     this.flash = scene.add
       .image(x, y, TEX.windowFlash)
       .setOrigin(0)
@@ -449,6 +453,14 @@ export class DeskBackground {
             this.lights1.setAlpha(a);
             this.lights0.setAlpha(1 - a * 0.5);
             if (this.weather === 'clear') this.stars1.setVisible(!this.stars1.visible);
+          },
+        }),
+        scene.time.addEvent({
+          delay: 70,
+          loop: true,
+          callback: () => {
+            if (!this.aurora.visible) return;
+            this.drawAurora(scene.time.now / 1000);
           },
         }),
         scene.time.addEvent({
@@ -583,11 +595,40 @@ export class DeskBackground {
     const clear = w === 'clear';
     this.stars0.setVisible(clear);
     this.stars1.setVisible(clear && this.stars1.visible);
+    this.aurora.setVisible(clear && this.motion && holderPerks());
+    if (this.aurora.visible) this.drawAurora(this.scene.time.now / 1000);
     this.fogA.setVisible(w === 'fog');
     this.fogB.setVisible(w === 'fog');
     this.lights0.setAlpha(w === 'fog' ? 0.35 : 1);
     this.lights1.setAlpha(w === 'fog' ? 0 : this.lights1.alpha);
     this.scheduleLightning();
+  }
+
+  /** Three slow ribbons of light behind the skyline. */
+  private drawAurora(t: number): void {
+    const g = this.aurora;
+    g.clear();
+    const { x, y, w } = DESK.window;
+    const bands = [
+      { color: HEX.lampGreen, base: y + 9, amp: 4, thick: 7, k: 0.035, speed: 0.5, alpha: 0.38 },
+      { color: HEX.ink, base: y + 15, amp: 5, thick: 6, k: 0.05, speed: -0.4, alpha: 0.3 },
+      { color: HEX.stampGreen, base: y + 6, amp: 3, thick: 4, k: 0.028, speed: 0.7, alpha: 0.3 },
+    ];
+    const step = 4;
+    for (const b of bands) {
+      g.fillStyle(b.color, b.alpha);
+      g.beginPath();
+      g.moveTo(x, b.base + Math.sin(t * b.speed) * b.amp);
+      for (let px = 0; px <= w; px += step)
+        g.lineTo(x + px, b.base + Math.sin(px * b.k + t * b.speed) * b.amp);
+      for (let px = w; px >= 0; px -= step)
+        g.lineTo(
+          x + px,
+          b.base + b.thick + Math.sin(px * b.k * 1.3 + t * b.speed * 0.8 + 1) * b.amp,
+        );
+      g.closePath();
+      g.fillPath();
+    }
   }
 
   private petCat(): void {

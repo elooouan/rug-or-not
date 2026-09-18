@@ -59,8 +59,10 @@ The phone on the desk opens an in-game browser:
 - **RugScan** - an explorer page for the current case (flavour only, never a verdict).
 - **The coin** - connect a Phantom wallet (read-only: public address, SOL and token balance
   via public RPC). Holder tiers unlock cosmetics: `VITE_TOKEN_HOLDER_MIN`+ tokens → gilded
-  magnifier rim, 5× → mahogany desk, 10× → coin-gold lamp shade, plus the Shareholder badge.
-  The game never requests signatures or transactions; nothing about scoring changes.
+  magnifier rim, 5× → mahogany desk, 10× → coin-gold lamp shade, plus the Shareholder badge,
+  an aurora over the city on clear nights and a `$` after your name on the board. The last
+  balance seen is remembered, so the perks survive reloads. The game never requests signatures
+  or transactions; nothing about scoring changes.
 - **Board** - Hall of Detectives. Local by default; set `VITE_LEADERBOARD_URL` to a JSON
   endpoint (`GET ?limit=N` returns entries, `POST` accepts one) for a shared board. Pick your
   arcade-style handle there.

@@ -21,7 +21,7 @@ import {
   type RushState,
 } from '@/systems/rush';
 import { saveStore } from '@/systems/save';
-import { wallet } from '@/systems/wallet';
+import { holderPerks, wallet } from '@/systems/wallet';
 import { DeskBackground, floatText } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
 import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
@@ -337,6 +337,7 @@ export class RushScene extends Phaser.Scene {
       date: new Date().toISOString(),
       wallet: wallet.state.address ?? undefined,
       mode: 'rush',
+      holder: holderPerks() || undefined,
     });
     awardBadge(this, 'rush-hour');
     if (s.score >= 2000) awardBadge(this, 'speed-reader');
