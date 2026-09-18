@@ -122,4 +122,11 @@ export const HISTORY: HistoryFrame[] = [
     title: 'Rush hour',
     caption: 'Sixty seconds, one page at a time. Five in a row and the multiplier is climbing.',
   },
+  {
+    file: '16-v05-rogues',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'Rogues gallery',
+    caption: 'A WANTED poster for every rug called correctly. Grandma Edith is not who she says.',
+  },
 ];
