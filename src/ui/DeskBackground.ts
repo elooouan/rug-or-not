@@ -466,7 +466,50 @@ export class DeskBackground {
       );
       this.scheduleLightning();
       this.scheduleSiren();
+      this.scheduleShootingStar();
     }
+  }
+
+  /** On clear nights a star falls across the window now and then. Click it to make a wish. */
+  private scheduleShootingStar(): void {
+    const t = this.scene.time.delayedCall(Phaser.Math.Between(20000, 55000), () => {
+      if (this.weather === 'clear' && this.lampOn) this.shootingStar();
+      this.scheduleShootingStar();
+    });
+    this.timers.push(t);
+  }
+
+  private shootingStar(): void {
+    const scene = this.scene;
+    const { x, y, w } = DESK.window;
+    const sx = x + Phaser.Math.Between(40, w - 120);
+    const sy = y + Phaser.Math.Between(6, 18);
+    const star = scene.add.container(sx, sy).setDepth(DEPTH.windowRain + 1);
+    // A bright head with a fading tail behind it.
+    star.add(scene.add.rectangle(-8, 0, 8, 1, HEX.paper, 0.35).setOrigin(1, 0.5));
+    star.add(scene.add.rectangle(-3, 0, 3, 1, HEX.paper, 0.7).setOrigin(1, 0.5));
+    star.add(scene.add.rectangle(0, 0, 2, 2, HEX.paper).setOrigin(0.5));
+    star.setAngle(18);
+    const zone = scene.add.zone(0, 0, 18, 12).setOrigin(0.5);
+    zone.setInteractive({ useHandCursor: false });
+    star.add(zone);
+    let wished = false;
+    zone.on('pointerdown', () => {
+      if (wished) return;
+      wished = true;
+      audio.play('unlock');
+      floatText(scene, star.x, star.y - 6, 'wish granted (probably)', 'amber');
+      awardBadge(scene, 'stargazer');
+    });
+    scene.tweens.add({
+      targets: star,
+      x: sx + 70,
+      y: sy + 22,
+      alpha: { from: 1, to: 0 },
+      duration: 1100,
+      ease: 'Quad.easeOut',
+      onComplete: () => star.destroy(),
+    });
   }
 
   /** Every few minutes a patrol car passes somewhere below. Noir. */

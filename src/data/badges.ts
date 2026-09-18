@@ -75,6 +75,7 @@ export const BADGES: Badge[] = [
   { id: 'hot-streak', name: 'Hot Streak', description: 'Ten red flags in a row in Rush.' },
   { id: 'speed-reader', name: 'Speed Reader', description: 'Score 2000 in a single Rush.' },
   { id: 'swatter', name: 'Swatter', description: 'Swat the fly.', secret: true },
+  { id: 'stargazer', name: 'Stargazer', description: 'Catch a falling star.', secret: true },
   {
     id: 'night-radio',
     name: 'Night Radio',

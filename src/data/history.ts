@@ -129,4 +129,12 @@ export const HISTORY: HistoryFrame[] = [
     title: 'Rogues gallery',
     caption: 'A WANTED poster for every rug called correctly. Grandma Edith is not who she says.',
   },
+  {
+    file: '17-v05-radio',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'Late jazz',
+    caption:
+      'A radio under the lamp: lo-fi, late jazz, static, off. The static is not just static. A fly, too, some nights.',
+  },
 ];
