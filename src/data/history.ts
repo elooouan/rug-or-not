@@ -137,4 +137,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'A radio under the lamp: lo-fi, late jazz, static, off. The static is not just static. A fly, too, some nights.',
   },
+  {
+    file: '18-v05-noname',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'No name',
+    caption:
+      'Fifteen folders in a drawer built for twelve. The last one has no name until the others are closed.',
+  },
 ];
