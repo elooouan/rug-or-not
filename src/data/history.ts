@@ -153,4 +153,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Cold cases: the printer makes them up on the spot. $CRBAD, Crystal Badger, never existed until this photo.',
   },
+  {
+    file: '20-v05-drill',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'Drill',
+    caption:
+      'Five pages that all hide the same flag, printed on demand from the notebook. Practice, with a clock.',
+  },
 ];
