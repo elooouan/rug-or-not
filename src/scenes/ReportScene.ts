@@ -153,7 +153,8 @@ export class ReportScene extends Phaser.Scene {
         x + w - pad - 176,
         by,
         'Notebook',
-        () => this.scene.start('NotebookScene'),
+        // As an overlay, so Esc brings the report back instead of the title.
+        () => this.openNotebook('flags'),
         { width: 80 },
       ),
     );
@@ -426,7 +427,7 @@ export class ReportScene extends Phaser.Scene {
 
   /** A quick verdict on your verdict, every time. */
   /** Flag and herring lines are links into the notebook (overlay, comes back here). */
-  private openNotebook(chapter: 'flags' | 'herrings', id: string): void {
+  private openNotebook(chapter: 'flags' | 'herrings', id?: string): void {
     audio.play('paper');
     this.scene.launch('NotebookScene', { overlay: true, returnTo: ReportScene.KEY, chapter, id });
     this.scene.pause();
