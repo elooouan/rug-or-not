@@ -6,7 +6,7 @@ import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
 import { gameState } from '@/systems/gameState';
-import { rankForScore } from '@/systems/ranks';
+import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -20,6 +20,7 @@ import { LucienBubble } from '@/ui/LucienBubble';
 import { DIALOGUE } from '@/config/layout';
 import { LUCIEN_QUIPS } from '@/data/dialogue';
 import { PixelButton } from '@/ui/PixelButton';
+import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
@@ -63,7 +64,7 @@ export class TitleScene extends Phaser.Scene {
       konamiAt = k === konami[konamiAt] ? konamiAt + 1 : k === konami[0] ? 1 : 0;
       if (konamiAt === konami.length) {
         konamiAt = 0;
-        this.confetti();
+        confetti(this);
         awardBadge(this, 'cheater');
         lucienSaysNow(this, 'konami');
         return;
@@ -115,25 +116,6 @@ export class TitleScene extends Phaser.Scene {
         typed = '';
       }
     });
-  }
-
-  private confetti(): void {
-    audio.play('unlock');
-    const emitter = this.add.particles(GAME_WIDTH / 2, -4, TEX.pixel, {
-      x: { min: -GAME_WIDTH / 2, max: GAME_WIDTH / 2 },
-      speedY: { min: 40, max: 90 },
-      speedX: { min: -20, max: 20 },
-      lifespan: 4000,
-      quantity: 2,
-      frequency: 30,
-      scale: { min: 0.8, max: 1.6 },
-      rotate: { start: 0, end: 360 },
-      tint: [HEX.amber, HEX.stampRed, HEX.stampGreen, HEX.paper, HEX.ink],
-      gravityY: 20,
-    });
-    emitter.setDepth(DEPTH.toast);
-    this.time.delayedCall(3000, () => emitter.stop());
-    this.time.delayedCall(7500, () => emitter.destroy());
   }
 
   create(): void {
@@ -261,10 +243,11 @@ export class TitleScene extends Phaser.Scene {
     checkAggregateBadges(this);
     const badges = badgeCount();
     const rank = rankForScore(save.totalScore);
+    const next = nextRankInfo(save.totalScore);
     t(
       GAME_WIDTH / 2,
       cy + cardH - 26,
-      `${rank}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges`,
+      `${rank}  ·  ${save.totalScore} pts${next ? ` (${next.remaining} to ${next.rank})` : ''}  ·  ${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges`,
       {
         size: 12,
         color: 'woodMid',

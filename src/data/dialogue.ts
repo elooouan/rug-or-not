@@ -33,7 +33,19 @@ export type ScriptId =
   | 'first-rush'
   | 'radio'
   | 'rogues'
-  | 'holder';
+  | 'holder'
+  | 'story-1'
+  | 'story-2'
+  | 'story-3'
+  | 'story-4';
+
+/** Campaign story beats: shown on the report after the case at this index (0-based) is closed. */
+export const STORY_BEATS: Record<number, ScriptId> = {
+  1: 'story-1',
+  4: 'story-2',
+  9: 'story-3',
+  12: 'story-4',
+};
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -171,6 +183,36 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
       text: 'Every page hides at least one red flag. Find it, click it, next page. Each hit buys you three seconds.',
     },
     { text: 'Herrings cost you five. Blank paper costs two. Streaks multiply. Go.' },
+  ],
+  'story-1': [
+    {
+      text: "Two files down, and you didn't rug the honest one. Most rookies stamp everything red on night one.",
+    },
+    { text: 'The city has a lot of tokens and one of us. Keep the notebook close.' },
+  ],
+  'story-2': [
+    {
+      text: "Grandma's 'family'. I've seen those faces before, under different names, on a different coin.",
+    },
+    {
+      text: "Somebody is running a template: same stock photos, same countdown, same 'anti-bot' blacklist. Watch for the same handwriting.",
+    },
+  ],
+  'story-3': [
+    {
+      text: "TideWorks' compliance list. Vaultline's proxy. Grandma's family. Different masks, same hands.",
+    },
+    {
+      text: "There's a name that keeps coming up in the chats, always deleted a minute later: the Tailor. Keep reading. Every file gets us closer.",
+    },
+  ],
+  'story-4': [
+    {
+      text: 'Thirteen files. By now you can smell a template from the tokenomics page alone. The Tailor knows we can.',
+    },
+    {
+      text: 'One file left on the desk tonight. Read it twice. Nothing about it is what it looks like.',
+    },
   ],
   'all-cases': [
     {

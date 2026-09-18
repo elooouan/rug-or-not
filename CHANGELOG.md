@@ -23,6 +23,9 @@
   more typed words on the title screen.
 - Holder perks beyond cosmetics: northern lights over the city on clear nights, a `$` mark on
   the board, and a word from Lucien. Perks use the last balance the coin page saw.
+- Campaign story beats: Lucien connects the files after cases 2, 5, 10 and 13 (someone is
+  running a template; the chats keep deleting a name). Confetti on an S grade; the title
+  counts points to the next rank; Lucien fidgets and reviews the radio.
 - The badges page shows progress on counter badges (1/5, 3/14...).
 - Toasts queue instead of stacking on top of each other.
 - The wall gets photos of the safe, the rush and the rogues gallery, and its last polaroid

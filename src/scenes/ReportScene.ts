@@ -13,6 +13,8 @@ import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { LUCIEN_TEX, lucienSays } from '@/ui/DialogueBox';
+import { STORY_BEATS } from '@/data/dialogue';
+import { confetti } from '@/ui/confetti';
 import { toast } from '@/ui/Toast';
 import { StickyNote } from '@/ui/StickyNote';
 import { LucienBubble } from '@/ui/LucienBubble';
@@ -465,17 +467,26 @@ export class ReportScene extends Phaser.Scene {
   private lucienDebrief(): void {
     const b = this.payload.breakdown;
     const allDone = Object.keys(saveStore.get().caseResults).length >= gameState.cases.length;
+    // Campaign story beats land after certain files, once, when the verdict was right.
+    const beat =
+      gameState.mode === 'campaign' && b.verdictCorrect
+        ? STORY_BEATS[gameState.currentIndex]
+        : undefined;
     const finale = () => {
       const box = allDone ? lucienSays(this, 'all-cases') : null;
       if (!box) this.lucienComment();
     };
+    const story = () => {
+      const box = beat ? lucienSays(this, beat, { onDone: finale }) : null;
+      if (!box) finale();
+    };
     const follow = () => {
       const box = !b.verdictCorrect
-        ? lucienSays(this, 'first-wrong', { onDone: finale })
+        ? lucienSays(this, 'first-wrong', { onDone: story })
         : this.payload.caseData.verdict === 'legit'
-          ? lucienSays(this, 'first-legit', { onDone: finale })
+          ? lucienSays(this, 'first-legit', { onDone: story })
           : null;
-      if (!box) finale();
+      if (!box) story();
     };
     if (!lucienSays(this, 'first-report', { onDone: follow })) follow();
   }
@@ -497,6 +508,8 @@ export class ReportScene extends Phaser.Scene {
     );
     mark.add([box, t, small]);
     this.gradeMark = mark;
+    // A perfect night deserves paper in the air.
+    if (g === 'S') confetti(this, 2200);
     const reduced = saveStore.get().settings.reducedMotion;
     if (!reduced) {
       mark.setScale(1.6).setAlpha(0);
