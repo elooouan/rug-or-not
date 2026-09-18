@@ -16,6 +16,8 @@ export interface ButtonOpts {
 }
 
 /** A chunky pixel button with hover/focus states and optional hotkey. */
+const COARSE_POINTER = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+
 export class PixelButton extends Phaser.GameObjects.Container {
   private face: Phaser.GameObjects.Rectangle;
   private bottom: Phaser.GameObjects.Rectangle;
@@ -58,8 +60,15 @@ export class PixelButton extends Phaser.GameObjects.Container {
       .setVisible(false);
     this.add([frame, this.face, this.bottom, this.label, this.focusRing]);
     this.setSize(this.bw, this.bh);
+    // Fingers get a little slack around the drawn button (title rows are 5px apart).
+    const pad = COARSE_POINTER ? 2 : 0;
     this.setInteractive(
-      new Phaser.Geom.Rectangle(this.bw / 2, this.bh / 2, this.bw, this.bh),
+      new Phaser.Geom.Rectangle(
+        this.bw / 2 - pad * 1.5,
+        this.bh / 2 - pad / 2,
+        this.bw + pad * 3,
+        this.bh + pad,
+      ),
       Phaser.Geom.Rectangle.Contains,
     );
     this.on('pointerover', () => this.setHover(true));
