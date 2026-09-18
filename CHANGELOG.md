@@ -22,7 +22,12 @@
 - The case clock waits while Lucien is talking, so the tutorial no longer eats the timer.
   With the lamp off the desk actually goes dark.
 - Suspicions in the desk notebook are links: click one to jump back to that clue. Buttons
-  press down a pixel; screens fade up from the dark; dust drifts through the lamplight.
+  press down a pixel; tabs and the drawer's special folders lift under the pointer; screens
+  fade up from the dark; dust drifts through the lamplight.
+- The window has more life: the moon shows the real calendar phase, a lit night train
+  crosses the horizon now and then (Biscuit watches it), a plane blinks across clear skies.
+  The desk clock keeps real time on the title. New typed words on the title: biscuit, train,
+  plane, tailor, safe; the footer hint rotates.
 - M mutes from any screen (the volume setting is kept for when it comes back).
 - Editor: "Save & play". Generated chats sometimes have a deleted question the lens can read.
 - Once a mint is configured, the board page can show holders only.
