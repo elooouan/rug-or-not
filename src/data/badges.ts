@@ -76,6 +76,12 @@ export const BADGES: Badge[] = [
     description: 'Find the photo on the corkboard.',
     secret: true,
   },
+  {
+    id: 'safecracker',
+    name: 'Safecracker',
+    description: 'Open the safe under the desk.',
+    secret: true,
+  },
 ];
 
 export const BADGE_BY_ID: Record<string, Badge> = Object.fromEntries(BADGES.map((b) => [b.id, b]));

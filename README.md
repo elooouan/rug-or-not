@@ -47,7 +47,9 @@ Hover the coffee to take a sip. Click the lamp (it has feelings after ten clicks
 (cycles the weather: rain, thunderstorm, snow, clear night, fog), the moon, the corkboard
 (real detective tips), the folder stack, the ink pad (inks your cursor), the clock, and
 Biscuit the cat on the sill. The title card has a few typed-word and Konami surprises, and the
-version number hides the credits. Twenty badges track all of it (NetScope > Badges).
+version number hides the credits. There is also a floor safe with a three-digit combination
+(the notebook counts the answer) holding the developer's ledger. Badges track all of it
+(NetScope > Badges).
 
 ## NetScope (the phone)
 

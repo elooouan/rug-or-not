@@ -11,6 +11,7 @@ import { TIPS } from '@/data/tips';
 import { StickyNote } from './StickyNote';
 import { CursorScene } from '@/scenes/CursorScene';
 import { BrowserPanel } from './BrowserPanel';
+import { Vault } from './Vault';
 import { lucienSays } from './DialogueBox';
 import { localDateKey } from '@/systems/dailyCase';
 import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
@@ -148,6 +149,7 @@ export class DeskBackground {
       this.buildFolderStack();
       this.buildMug();
       this.buildPhone();
+      this.buildSafe();
     }
     if (opts.stamps !== false) this.buildInkPad();
 
@@ -573,6 +575,14 @@ export class DeskBackground {
       scene.tweens.killTweensOf(glow);
       BrowserPanel.toggle(scene);
     });
+  }
+
+  private buildSafe(): void {
+    const { x, y } = DESK.safe;
+    const safe = this.scene.add.image(x, y, TEX.safe).setOrigin(0).setDepth(DEPTH.deskProps);
+    safe.setInteractive({ useHandCursor: false });
+    safe.on('pointerover', () => audio.play('hover'));
+    safe.on('pointerdown', () => new Vault(this.scene));
   }
 
   private buildInkPad(): void {
