@@ -291,6 +291,10 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         });
       } else {
         ctx.line('No Solana wallet in this browser.', { color: 'woodMid' });
+        if (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches)
+          ctx.line("On a phone, open this page inside the Phantom app's own browser.", {
+            color: 'woodMid',
+          });
         ctx.button(
           'Get Phantom (opens a new tab)',
           () => window.open(PHANTOM_URL, '_blank', 'noopener'),
