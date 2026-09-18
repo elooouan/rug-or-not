@@ -10,7 +10,8 @@ export function startColdCase(scene: Phaser.Scene, seed: string): void {
   gameState.mode = 'cold';
   gameState.coldSeed = seed;
   // The weekly is for everyone, so it sits in the middle of the range (3 or 4).
-  const weekly = seed.startsWith('week-') ? { difficulty: 3 + (seed.length % 2) } : {};
+  const wk = /^week-\d{4}-w(\d{2})$/.exec(seed);
+  const weekly = wk ? { difficulty: 3 + (Number(wk[1]) % 2) } : {};
   gameState.currentCase = generateCase(seed, m ? { difficulty: Number(m[1]) } : weekly);
   gameState.currentIndex = -1;
   scene.scene.start('InvestigationScene');
