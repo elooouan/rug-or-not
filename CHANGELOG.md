@@ -7,6 +7,8 @@
   many flags and how much fine print). Endless play with its own board and badges, seeds
   shareable as `#cold=<seed>`.
 - Rush decks mix in four generated pages a day, so the pages change daily.
+- `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board
+  top 200, sanitising, rate limit, CORS), with tests against a fake KV.
 - Dev builds keep the game loop stepping in a hidden tab (a worker drives it), so automated
   checks and long-running tests don't freeze.
 

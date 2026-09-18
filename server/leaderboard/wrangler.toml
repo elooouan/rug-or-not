@@ -1,0 +1,13 @@
+name = "rug-or-not-board"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Create the namespace once:  npx wrangler kv namespace create BOARD
+# then paste the id it prints here.
+[[kv_namespaces]]
+binding = "BOARD"
+id = "REPLACE_WITH_YOUR_KV_ID"
+
+[vars]
+# Lock the board to the game's origin once it is deployed, e.g. "https://elooouan.github.io".
+ALLOWED_ORIGIN = "*"

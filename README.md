@@ -64,8 +64,10 @@ The phone on the desk opens an in-game browser:
   balance seen is remembered, so the perks survive reloads. The game never requests signatures
   or transactions; nothing about scoring changes.
 - **Board** - Hall of Detectives. Local by default; set `VITE_LEADERBOARD_URL` to a JSON
-  endpoint (`GET ?limit=N` returns entries, `POST` accepts one) for a shared board. Pick your
-  arcade-style handle there.
+  endpoint (`GET ?limit=N&mode=case|rush|cold` returns entries, `POST` accepts one) for a
+  shared board. A ready-made Cloudflare Worker lives in
+  [`server/leaderboard`](server/leaderboard/README.md) (one KV namespace, free tier, three
+  commands to deploy). Pick your arcade-style handle on the page.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
 Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
