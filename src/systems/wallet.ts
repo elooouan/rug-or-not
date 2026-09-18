@@ -145,7 +145,8 @@ export class WalletService {
   }
 
   private async link(p: SolanaProvider, onlyIfTrusted: boolean): Promise<void> {
-    this.set({ busy: true, error: null });
+    // A provider that injected after the load check is still a provider.
+    this.set({ available: true, busy: true, error: null });
     try {
       const res = await p.connect(onlyIfTrusted ? { onlyIfTrusted: true } : undefined);
       const address = res.publicKey.toString();
