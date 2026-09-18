@@ -119,3 +119,26 @@ test('the editor validates a generated case', async ({ page }) => {
   await page.click('#validate');
   await expect(page.locator('#status')).toHaveClass(/ok/);
 });
+
+test('the wall, the notebook and settings open and come back to the title', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  type Starter = {
+    scene: {
+      start(k: string, d?: unknown): void;
+      launch(k: string, d?: unknown): void;
+      pause(): void;
+    };
+  };
+  for (const key of ['HistoryScene', 'NotebookScene', 'SettingsScene']) {
+    await page.evaluate((k) => {
+      const title = window.__game.scene.getScene('TitleScene') as Starter;
+      title.scene.start(k);
+    }, key);
+    await waitForScene(page, key);
+    await skipTalk(page);
+    await page.keyboard.press('Escape');
+    await waitForScene(page, 'TitleScene');
+  }
+  expect(errors).toEqual([]);
+});
