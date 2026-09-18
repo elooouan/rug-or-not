@@ -946,7 +946,7 @@ function liquidityDoc(
     clues.push(
       flagClue(
         'g-wash',
-        'Same two wallets trading',
+        'Same 2 wallets trading',
         'wash-trading',
         { kind: 'row', row: 0, table: 'transfers' },
         fine('wash-trading')
