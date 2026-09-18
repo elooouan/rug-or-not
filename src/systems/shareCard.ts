@@ -27,7 +27,10 @@ const H = 720;
  * the lamp with the verdict stamped across it. Pure canvas 2D so it works
  * without Phaser and can be unit-tested with a fake context.
  */
-export function renderShareCard(data: ShareCardData, canvas?: HTMLCanvasElement): HTMLCanvasElement {
+export function renderShareCard(
+  data: ShareCardData,
+  canvas?: HTMLCanvasElement,
+): HTMLCanvasElement {
   const c = canvas ?? document.createElement('canvas');
   c.width = W;
   c.height = H;
