@@ -145,4 +145,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Fifteen folders in a drawer built for twelve. The last one has no name until the others are closed.',
   },
+  {
+    file: '19-v05-cold',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'The pile',
+    caption:
+      'Cold cases: the printer makes them up on the spot. $CRBAD, Crystal Badger, never existed until this photo.',
+  },
 ];
