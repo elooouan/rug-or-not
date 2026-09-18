@@ -20,8 +20,9 @@ import { floatText } from '@/ui/DeskBackground';
 import { awardBadge, badgeCount, checkAggregateBadges } from '@/systems/badges';
 import { LUCIEN_TEX } from '@/ui/DialogueBox';
 import { LucienBubble } from '@/ui/LucienBubble';
+import { toast } from '@/ui/Toast';
 import { DIALOGUE } from '@/config/layout';
-import { LUCIEN_QUIPS } from '@/data/dialogue';
+import { LUCIEN_QUIPS, WHATS_NEW } from '@/data/dialogue';
 import { PixelButton } from '@/ui/PixelButton';
 import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
@@ -409,9 +410,23 @@ export class TitleScene extends Phaser.Scene {
 
   private static nagged = false;
 
-  /** Lucien's intro the first time; after that, a word about the streak if it's at risk. */
+  /** Lucien's intro the first time; after that, what's new, or a word about a streak at risk. */
   private greet(streak: number, dailyDone: boolean): void {
     if (lucienSays(this, 'title-intro')) return;
+    // Returning players get a one-line tour of the update; new saves just note the version.
+    const seen = saveStore.get().lastSeenVersion;
+    if (seen !== GAME_VERSION) {
+      saveStore.update((d) => (d.lastSeenVersion = GAME_VERSION));
+      const note = WHATS_NEW[GAME_VERSION];
+      if (seen && note) {
+        this.time.delayedCall(600, () => {
+          if (!this.scene.isActive()) return;
+          toast(this, 'NEW TONIGHT', GAME_VERSION);
+          LucienBubble.say(this, note, 6500);
+        });
+        return;
+      }
+    }
     if (TitleScene.nagged || dailyDone || streak <= 0) return;
     TitleScene.nagged = true;
     const line =

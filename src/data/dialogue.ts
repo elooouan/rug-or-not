@@ -60,6 +60,12 @@ export const DOC_TIPS: Record<string, string> = {
   audit: 'An audit names a file. Make sure it is this file, and that it found something.',
 };
 
+/** What changed, in Lucien's words, for players coming back after an update. */
+export const WHATS_NEW: Record<string, string> = {
+  'v0.6':
+    'New on the desk: the pile (cold cases that never run out), drills in the notebook, a weekly file. The safe has the details.',
+};
+
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
   'The coffee is not for sharing.',

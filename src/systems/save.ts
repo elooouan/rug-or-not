@@ -38,6 +38,8 @@ export interface SaveData {
   seenHints: string[];
   /** Arcade-style handle shown on the leaderboard. */
   detectiveName: string;
+  /** Last GAME_VERSION this save was opened with (drives the "new tonight" note). */
+  lastSeenVersion: string;
   /** Earned badge ids (see src/data/badges.ts). */
   badges: string[];
   /** Counters for the sillier badges. */
@@ -92,6 +94,7 @@ export function defaultSave(): SaveData {
     seenUnlocks: [],
     seenHints: [],
     detectiveName: 'ANON',
+    lastSeenVersion: '',
     badges: [],
     stats: {
       sips: 0,
@@ -158,6 +161,7 @@ export function sanitizeSave(raw: unknown): SaveData {
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
     d.detectiveName = r.detectiveName.slice(0, 12);
+  if (typeof r.lastSeenVersion === 'string') d.lastSeenVersion = r.lastSeenVersion.slice(0, 16);
   if (Array.isArray(r.badges))
     d.badges = r.badges.filter((x): x is string => typeof x === 'string');
   if (r.stats && typeof r.stats === 'object') {

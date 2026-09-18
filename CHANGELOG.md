@@ -37,6 +37,8 @@
 - Touch: the lens floats above your finger while you hold the paper; no arrow cursor under a
   finger; the "more" / "up" hints at the foot of a document are tap targets; the wall,
   NetScope pages, the report and the ledger all scroll by dragging.
+- Returning players get a one-line "new tonight" from Lucien after an update (the save
+  remembers the last version it was opened with).
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
