@@ -233,7 +233,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
       text: 'Thirteen files. By now you can smell a template from the tokenomics page alone. The Tailor knows we can.',
     },
     {
-      text: 'One file left on the desk tonight. Read it twice. Nothing about it is what it looks like.',
+      text: 'Two files left on the desk tonight. Read them twice. Nothing about them is what it looks like.',
     },
   ],
   'secret-unlocked': [
