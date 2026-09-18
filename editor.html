@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rug or Not? · case editor</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      @font-face {
+        font-family: 'Pixelify Sans';
+        src: url('./fonts/PixelifySans.ttf') format('truetype');
+        font-weight: 400 700;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'VT323';
+        src: url('./fonts/VT323-Regular.ttf') format('truetype');
+        font-display: swap;
+      }
+      :root {
+        --bg: #1b1a1f;
+        --wood: #4a3a2f;
+        --wood-mid: #6b5140;
+        --paper: #d8c9a8;
+        --paper-shadow: #b8a88a;
+        --ink: #5b6f8a;
+        --red: #9a3b3b;
+        --green: #4f7a5a;
+        --amber: #e0b566;
+        --shadow: #2b2530;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--wood);
+        color: var(--shadow);
+        font-family: 'VT323', monospace;
+        font-size: 18px;
+      }
+      header {
+        background: var(--bg);
+        color: var(--paper);
+        padding: 10px 16px;
+        font-family: 'Pixelify Sans', sans-serif;
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      header h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      header small {
+        color: var(--paper-shadow);
+        font-family: 'VT323', monospace;
+        font-size: 16px;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px;
+        min-height: calc(100vh - 60px);
+        box-sizing: border-box;
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+      .pane {
+        background: var(--paper);
+        border: 3px solid var(--bg);
+        box-shadow: 4px 5px 0 rgba(27, 26, 31, 0.6);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .pane h2 {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 14px;
+        margin: 0 0 8px;
+        color: var(--wood);
+        letter-spacing: 1px;
+      }
+      textarea {
+        flex: 1;
+        min-height: 60vh;
+        width: 100%;
+        box-sizing: border-box;
+        background: #f0e6cc;
+        color: var(--shadow);
+        border: 2px solid var(--paper-shadow);
+        font-family: 'VT323', monospace;
+        font-size: 17px;
+        line-height: 1.2;
+        padding: 8px;
+        resize: vertical;
+        white-space: pre;
+        tab-size: 2;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 6px 0;
+        align-items: center;
+      }
+      button,
+      select,
+      label.file {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 12px;
+        background: var(--shadow);
+        color: var(--paper);
+        border: 2px solid var(--bg);
+        padding: 6px 10px;
+        cursor: pointer;
+        box-shadow: 2px 2px 0 var(--bg);
+      }
+      button.paper,
+      select {
+        background: var(--paper);
+        color: var(--shadow);
+      }
+      button:active {
+        transform: translate(1px, 1px);
+        box-shadow: 1px 1px 0 var(--bg);
+      }
+      input[type='file'] {
+        display: none;
+      }
+      #status {
+        padding: 8px;
+        border: 2px solid var(--paper-shadow);
+        background: #f0e6cc;
+        min-height: 60px;
+        white-space: pre-wrap;
+      }
+      #status.ok {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      #status.bad {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      details {
+        margin-top: 8px;
+        border-top: 1px dashed var(--paper-shadow);
+        padding-top: 6px;
+      }
+      summary {
+        cursor: pointer;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 12px;
+        color: var(--wood);
+      }
+      code {
+        background: rgba(27, 26, 31, 0.08);
+        padding: 0 3px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 16px;
+      }
+      td,
+      th {
+        text-align: left;
+        vertical-align: top;
+        padding: 2px 6px 2px 0;
+        border-bottom: 1px dotted var(--paper-shadow);
+      }
+      th {
+        color: var(--wood);
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 11px;
+      }
+      .muted {
+        color: var(--wood-mid);
+      }
+      #saved {
+        margin-top: 8px;
+      }
+      #saved li {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 2px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>RUG OR NOT? · case editor</h1>
+      <small
+        >Write a case, validate it against the game's schema, save it to this browser's game as a
+        custom file, or download the JSON to add it to <code>src/data/cases/</code>.</small
+      >
+      <a href="./" style="margin-left: auto; color: var(--amber)">back to the desk</a>
+    </header>
+    <main>
+      <section class="pane">
+        <h2>CASE JSON</h2>
+        <div class="row">
+          <button id="new-rug">New rug</button>
+          <button id="new-legit">New legit</button>
+          <button id="gen" class="paper">Generate one (cold case)</button>
+          <select id="doc-type" class="paper">
+            <option value="contract">contract</option>
+            <option value="tokenomics">tokenomics</option>
+            <option value="team">team</option>
+            <option value="chat">chat</option>
+            <option value="liquidity">liquidity</option>
+            <option value="audit">audit</option>
+          </select>
+          <button id="add-doc" class="paper">+ document</button>
+          <button id="format" class="paper">Format</button>
+        </div>
+        <textarea id="json" spellcheck="false"></textarea>
+      </section>
+      <section class="pane">
+        <h2>CHECK &amp; SAVE</h2>
+        <div class="row">
+          <button id="validate">Validate</button>
+          <button id="save">Save to this browser's game</button>
+          <button id="download" class="paper">Download JSON</button>
+          <label class="file paper">Load JSON<input id="load" type="file" accept=".json" /></label>
+        </div>
+        <div id="status">Paste or write a case, then Validate.</div>
+        <div id="saved-wrap">
+          <h2 style="margin-top: 10px">CUSTOM FILES IN THIS BROWSER</h2>
+          <ul id="saved" class="muted"></ul>
+        </div>
+        <details open>
+          <summary>Red flags (flagId) and yellow herrings (herringId)</summary>
+          <table id="ids"></table>
+        </details>
+        <details>
+          <summary>Anchors, by document type</summary>
+          <table>
+            <tr>
+              <th>contract</th>
+              <td>
+                <code>{ "kind": "line", "line": N }</code> (0-based line) or the header row
+                <code>{ "kind": "row", "row": 0, "table": "header" }</code>
+              </td>
+            </tr>
+            <tr>
+              <th>tokenomics</th>
+              <td>
+                <code>{ "kind": "row", "row": N }</code> (allocation) or
+                <code>{ "kind": "row", "row": N, "table": "notes" }</code>
+              </td>
+            </tr>
+            <tr>
+              <th>team</th>
+              <td>
+                <code>{ "kind": "row", "row": N, "table": "photo" | "bio" }</code> or
+                <code>{ "kind": "row", "row": 0, "table": "note" }</code>
+              </td>
+            </tr>
+            <tr>
+              <th>chat</th>
+              <td><code>{ "kind": "message", "index": N }</code></td>
+            </tr>
+            <tr>
+              <th>liquidity</th>
+              <td>
+                <code>{ "kind": "row", "row": 0, "table": "lock" }</code>,
+                <code>{ "kind": "row", "row": N, "table": "holders" }</code> or
+                <code>{ "kind": "row", "row": N, "table": "transfers" }</code>
+              </td>
+            </tr>
+            <tr>
+              <th>audit</th>
+              <td>
+                <code>{ "kind": "row", "row": 0-3, "table": "field" }</code> (auditor, contract,
+                date, score) or <code>{ "kind": "row", "row": N, "table": "findings" }</code>
+              </td>
+            </tr>
+          </table>
+          <p class="muted">
+            Clue labels are 22 characters at most. Fine-print clues need
+            <code>"finePrint": true</code> and a <code>"text"</code>. Legit cases must not contain
+            red-flag clues; rug cases need at least one. Contract lines longer than ~52 characters
+            get cut off on the paper.
+          </p>
+        </details>
+      </section>
+    </main>
+    <script type="module" src="/src/editor/main.ts"></script>
+  </body>
+</html>

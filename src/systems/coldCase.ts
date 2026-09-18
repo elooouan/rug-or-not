@@ -1,4 +1,5 @@
 import type Phaser from 'phaser';
+import type { CaseData } from '@/data/schema';
 import { generateCase } from './caseGen';
 import { gameState } from './gameState';
 import { saveStore } from './save';
@@ -17,4 +18,13 @@ export function startColdCase(scene: Phaser.Scene, seed: string): void {
 export function solvedRegular(): number {
   const results = saveStore.get().caseResults;
   return gameState.cases.filter((c) => !c.secret && results[c.id]?.solved).length;
+}
+
+/** A file from the editor: played like a cold case (own tally, no campaign effects). */
+export function startCustomCase(scene: Phaser.Scene, c: CaseData): void {
+  gameState.mode = 'cold';
+  gameState.coldSeed = null;
+  gameState.currentCase = c;
+  gameState.currentIndex = -1;
+  scene.scene.start('InvestigationScene');
 }

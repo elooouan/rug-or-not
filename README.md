@@ -206,6 +206,16 @@ and run `__debug.snapshot('13-v05-something')`. The dev server writes the file s
 `public/img/history/`; add an entry to `HISTORY` with a version, date, title and caption.
 (Without the snapshot server, `__debug.snapshot` downloads the JPEG instead.)
 
+## The case editor
+
+`editor.html` (served next to the game, `npm run dev` → http://localhost:5173/editor.html) is a
+JSON editor with the game's own schema: templates for every document type, a red-flag /
+herring id reference, anchor cheat sheet, live validation, and two exits: **Download JSON**
+(drop the file into `src/data/cases/`) or **Save to this browser's game**, which stores it in
+localStorage so it appears in NetScope > RugScan under "Your files" and plays like a cold
+case (`#custom=<id>` opens it directly). "Generate one" fills the editor with a cold case
+to tweak.
+
 ## Adding Lucien lines, tips, news, badges
 
 - Dialogue scripts: `src/data/dialogue.ts` (`LUCIEN`, keyed by `ScriptId`; lines with

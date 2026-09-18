@@ -32,7 +32,9 @@ export class FolderCard extends Phaser.GameObjects.Container {
         gameState.mode === 'daily'
           ? 'DAILY CASE'
           : gameState.mode === 'cold'
-            ? `COLD CASE  ${gameState.coldSeed ?? ''}`
+            ? gameState.coldSeed
+              ? `COLD CASE  ${gameState.coldSeed}`
+              : 'YOUR FILE'
             : `CASE #${String(gameState.currentIndex + 1).padStart(2, '0')}`,
         {
           size: FONT.size.tiny,

@@ -35,6 +35,9 @@
 - Share uses the phone's share sheet where there is one; the clipboard elsewhere; a note
   with the text if neither works.
 - Deleted chat messages leave a ghost of their text that only the lens can read.
+- A case editor (`editor.html`): write a file against the game's schema with templates and
+  live validation, download it for `src/data/cases/`, or save it into this browser's game
+  (NetScope > RugScan > Your files, `#custom=<id>`).
 - Offline: a network-first service worker (production builds) keeps a desk you've opened
   once playable without a connection. Phaser ships in its own chunk.
 - `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board

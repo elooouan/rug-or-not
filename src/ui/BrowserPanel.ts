@@ -9,6 +9,8 @@ import { LATE_NEWS, NEWS } from '@/data/news';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
+import { readCustomCases } from '@/systems/customCases';
+import { startCustomCase } from '@/systems/coldCase';
 import type { CaseData } from '@/data/schema';
 import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
@@ -383,6 +385,33 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         ctx.content.add(label);
         ctx.y += b.bh + 4;
       });
+      const custom = readCustomCases();
+      if (custom.length) {
+        ctx.gap(4);
+        ctx.line('Your files (written in the editor):', { color: 'woodMid' });
+        for (const cs of custom) {
+          const b = ctx.button(
+            `${cs.ticker}  d${cs.difficulty}`,
+            () => {
+              if (active) {
+                audio.play('wrong');
+                return;
+              }
+              ctx.panel.close();
+              startCustomCase(ctx.scene, cs);
+            },
+            { variant: 'paper', sameLine: true },
+          );
+          ctx.content.add(
+            makeText(ctx.scene, b.bw + 8, ctx.y + 4, cs.title, {
+              font: 'body',
+              size: FONT.size.body,
+              color: 'shadow',
+            }),
+          );
+          ctx.y += b.bh + 4;
+        }
+      }
       ctx.gap();
       ctx.small(
         active
@@ -833,6 +862,14 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button('Source on GitHub (opens a new tab)', () => {
       window.open('https://github.com/elooouan/rug-or-not', '_blank', 'noopener');
     });
+    ctx.button(
+      'Case editor (opens a new tab)',
+      () => {
+        window.open('./editor.html', '_blank', 'noopener');
+      },
+      { variant: 'paper' },
+    );
+    ctx.small('Write your own file in the editor; it shows up under RugScan > Your files.');
     ctx.small('Wallet features are read-only. The game never asks you to sign or send anything.');
   },
 
