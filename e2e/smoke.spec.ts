@@ -9,7 +9,19 @@ declare global {
         getScene(k: string): unknown;
       };
     };
-    __debug: { startCase(id: string): void };
+    __debug: {
+      startCase(id: string): void;
+      wallet: {
+        connect(): Promise<void>;
+        disconnect(): Promise<void>;
+        state: {
+          connected: boolean;
+          address: string | null;
+          sol: number | null;
+          error: string | null;
+        };
+      };
+    };
   }
 }
 
@@ -172,5 +184,74 @@ test('a generated daily opens on a generated day and records the streak', async 
   );
   expect(daily.lastPlayed).toBe('2026-09-19');
   expect(daily.streak).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('a wallet connects read-only and the title chip shows the address', async ({ page }) => {
+  // A stand-in for Phantom's injected provider. Anything that would sign or send records
+  // itself; the game must never call those.
+  await page.addInitScript(() => {
+    const calls: string[] = [];
+    const key = { toString: () => 'F4keWa11etAddre55xxxxxxxxxxxxxxxxxxxxxxxxxxx' };
+    const w = window as unknown as { phantom: unknown; __walletCalls: string[] };
+    w.__walletCalls = calls;
+    w.phantom = {
+      solana: {
+        isPhantom: true,
+        publicKey: null,
+        connect: async () => ({ publicKey: key }),
+        disconnect: async () => undefined,
+        on: () => undefined,
+        signTransaction: async () => calls.push('signTransaction'),
+        signAllTransactions: async () => calls.push('signAllTransactions'),
+        signAndSendTransaction: async () => calls.push('signAndSendTransaction'),
+        signMessage: async () => calls.push('signMessage'),
+        request: async () => calls.push('request'),
+      },
+    };
+  });
+  // Public RPC answered locally: 2.5 SOL, mainnet genesis, no token accounts.
+  await page.route('https://api.mainnet-beta.solana.com/**', async (route) => {
+    const { method } = route.request().postDataJSON() as { method: string };
+    const result =
+      method === 'getBalance'
+        ? { value: 2_500_000_000 }
+        : method === 'getGenesisHash'
+          ? '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d'
+          : { value: [] };
+    await route.fulfill({ json: { jsonrpc: '2.0', id: 1, result } });
+  });
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => window.__debug.wallet.connect());
+  await page.waitForFunction(() => window.__debug.wallet.state.sol !== null, null, {
+    timeout: SLOW,
+  });
+  const state = await page.evaluate(() => window.__debug.wallet.state);
+  expect(state).toMatchObject({ connected: true, sol: 2.5, error: null });
+  expect(state.address).toBe('F4keWa11etAddre55xxxxxxxxxxxxxxxxxxxxxxxxxxx');
+  // The chip on the title follows the wallet.
+  const chip = await page.evaluate(() => {
+    const title = window.__game.scene.getScene('TitleScene') as {
+      children: { list: { type: string; list?: { type: string; text?: string }[] }[] };
+    };
+    return title.children.list
+      .flatMap((o) => (o.type === 'Container' ? (o.list ?? []) : [o]))
+      .map((o) => (o as { text?: string }).text ?? '')
+      .find((t) => t.includes('F4ke...'));
+  });
+  expect(chip).toBe('$LUCIEN · F4ke...xxxx');
+  const saved = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).wallet,
+  );
+  expect(saved).toMatchObject({
+    linked: true,
+    address: 'F4keWa11etAddre55xxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  });
+  await page.evaluate(() => window.__debug.wallet.disconnect());
+  expect(await page.evaluate(() => window.__debug.wallet.state.connected)).toBe(false);
+  expect(
+    await page.evaluate(() => (window as unknown as { __walletCalls: string[] }).__walletCalls),
+  ).toEqual([]);
   expect(errors).toEqual([]);
 });
