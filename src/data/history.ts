@@ -185,4 +185,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Phantom on the coin page, read-only: an address, two balances, a tier. The staged 1,200 in the photo is a dev switch; the mint is still blank.',
   },
+  {
+    file: '24-v08-handbook',
+    version: 'v0.8',
+    date: '2026-09-19',
+    title: 'The handbook',
+    caption:
+      "Eighteen pages in the notebook on how the office works. The greyed ones are about things that haven't turned up on this desk yet: it opens up a piece at a time now.",
+  },
 ];
