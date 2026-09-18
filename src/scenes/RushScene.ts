@@ -231,6 +231,8 @@ export class RushScene extends Phaser.Scene {
     this.hud.mult.setColor(m >= RUSH.maxMultiplier ? '#c9503f' : m > 1 ? '#e0b566' : '#6b5140');
     this.hud.streak.setText(`streak  ${s.streak}`);
     this.hud.pages.setText(`pages   ${s.rounds}`);
+    if (this.drill)
+      this.hud.best.setText(`pages   ${Math.max(0, this.drillPagesLeft - s.rounds)} to go`);
   }
 
   // ---- flow ----------------------------------------------------------------
