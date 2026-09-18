@@ -144,7 +144,12 @@ export class InvestigationScene extends Phaser.Scene {
     this.said = new Set();
     this.hintsUsed = 0;
     audio.setTension(false);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => audio.setTension(false));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      audio.setTension(false);
+      // Hands the pointer back to the cursor overlay; otherwise a lens left active on the
+      // paper follows the mouse into the report.
+      this.magnifier.destroy();
+    });
     // Scene emitters survive restarts; drop last run's handlers before adding ours.
     this.events.off('browser:open');
     this.events.off('browser:close');
@@ -769,6 +774,8 @@ export class InvestigationScene extends Phaser.Scene {
       if (!this.clock.isRunning && left === 0 && this.lastTickSecond === 0)
         this.mutter('timeup', "Time's up. No bonus, no penalty. Stamp it.");
     }
-    this.magnifier.update();
+    // The lens only lives while the paper is in play: not under the pause dim, the phone,
+    // or the stamp animation (suspend() would be undone a frame later otherwise).
+    if (this.phase === 'investigating' && !this.paused && !this.browsing) this.magnifier.update();
   }
 }

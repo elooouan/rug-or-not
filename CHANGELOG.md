@@ -3,8 +3,10 @@
 ## v0.7 — night shift (unreleased)
 
 - Fixed: the pointer could vanish after a fullscreen toggle or a resize under the mouse
-  (the cursor overlay now trusts any move over the canvas); the pointer ring has a dark
-  halo so it reads on the wall as well as on paper.
+  (the cursor overlay now trusts any move over the canvas); the lens could re-activate under
+  the pause dim or the phone and follow the mouse into the report (it now only runs while
+  the paper is in play and lets go when the scene ends); the pointer ring has a dark halo
+  so it reads on the wall as well as on paper.
 - Fixed: Lucien could end up squashed or stretched after fast clicks through a dialogue
   (every squish now returns to his resting size); on the title his corner bubble sat a
   second head on top of him; the "glance at the window" mirror-flip is now a heel bounce.
