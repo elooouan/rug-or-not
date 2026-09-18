@@ -142,3 +142,35 @@ test('the wall, the notebook and settings open and come back to the title', asyn
   }
   expect(errors).toEqual([]);
 });
+
+test('a generated daily opens on a generated day and records the streak', async ({ page }) => {
+  // 2026-09-19 is an odd day number, so the daily is a generated file that day.
+  await page.clock.setFixedTime(new Date('2026-09-19T21:00:00'));
+  const errors = await boot(page, '#daily');
+  await waitForScene(page, 'InvestigationScene');
+  const id = await page.evaluate(
+    () =>
+      (window.__game.scene.getScene('InvestigationScene') as { caseData: { id: string } }).caseData
+        .id,
+  );
+  expect(id).toBe('cold-day-2026-09-19');
+  await skipTalk(page);
+  await waitForPhase(page, 'intake');
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as {
+      caseData: { verdict: string };
+      stamps: { trigger(fn: (v: string) => void): void }[];
+      onStamp(v: string): void;
+    };
+    inv.stamps[inv.caseData.verdict === 'rug' ? 0 : 1].trigger((v) => inv.onStamp(v));
+  });
+  await waitForScene(page, 'ReportScene');
+  const daily = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).daily,
+  );
+  expect(daily.lastPlayed).toBe('2026-09-19');
+  expect(daily.streak).toBe(1);
+  expect(errors).toEqual([]);
+});
