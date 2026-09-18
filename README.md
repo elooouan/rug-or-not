@@ -26,6 +26,7 @@ Other scripts:
 | `npm run preview`        | Serve the production build locally                   |
 | `npm test`               | Vitest: scoring, rush, generator, save, cases, board |
 | `npm run validate-cases` | Validate every case file and print a summary         |
+| `npm run e2e`            | Playwright smoke tests against the dev server        |
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
 
@@ -37,7 +38,7 @@ from a sub-folder). A GitHub Pages workflow is included in
 `.github/workflows/deploy.yml`: enable Pages (Settings → Pages → Source: _GitHub Actions_)
 and run the workflow from the Actions tab, or change its trigger to `push` to deploy on
 every commit. CI (`.github/workflows/ci.yml`) runs lint, typecheck, case validation, tests
-and a build on every push.
+a build and Playwright smoke tests (boot, a full case, deep links, the editor) on every push.
 
 ## Meet Detective Lucien
 

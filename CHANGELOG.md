@@ -59,6 +59,8 @@
   once playable without a connection. Phaser ships in its own chunk.
 - `server/leaderboard`: a reference Cloudflare Worker for the shared board (KV, per-board
   top 200, sanitising, rate limit, CORS), with tests against a fake KV.
+- Playwright smoke tests (`npm run e2e`): boot, a full case to the report, rush and cold deep
+  links, the editor; CI runs them after the unit tests.
 - Dev builds keep the game loop stepping in a hidden tab (a worker drives it), so automated
   checks and long-running tests don't freeze.
 - Wall photos: the rogues gallery, the radio, the nameless folder, a cold case, a drill.
