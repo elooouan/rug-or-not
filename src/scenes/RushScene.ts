@@ -8,6 +8,8 @@ import { audio } from '@/systems/audio';
 import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
 import { playableCases } from '@/systems/secretCase';
+import { generateCase } from '@/systems/caseGen';
+import { localDateKey } from '@/systems/dailyCase';
 import { leaderboard } from '@/systems/leaderboard';
 import {
   applyFlag,
@@ -76,7 +78,7 @@ export class RushScene extends Phaser.Scene {
     this.lastTickSecond = -1;
     this.doc = undefined;
     this.page = undefined;
-    this.deck = shuffle(rushPages(playableCases(saveStore.get(), gameState.cases)));
+    this.deck = shuffle(rushPages(this.rushCases()));
 
     new DeskBackground(this, { props: true, stamps: false });
     addText(this, DESK.caseHeader.x, DESK.caseHeader.y, 'RED FLAG RUSH  ·  one page at a time', {
@@ -125,6 +127,15 @@ export class RushScene extends Phaser.Scene {
   }
 
   // ---- HUD -----------------------------------------------------------------
+
+  /** The handcrafted files plus a few generated ones, so the pages change day to day. */
+  private rushCases() {
+    const day = localDateKey();
+    const generated = Array.from({ length: 4 }, (_, i) =>
+      generateCase(`rush-${day}-${i}`, { verdict: 'rug', difficulty: 1 + (i % 3) }),
+    );
+    return [...playableCases(saveStore.get(), gameState.cases), ...generated];
+  }
 
   private buildHud(): void {
     const { x, y, w, h, padding } = NOTEBOOK;
@@ -213,8 +224,7 @@ export class RushScene extends Phaser.Scene {
   }
 
   private dealPage(): void {
-    if (this.deck.length === 0)
-      this.deck = shuffle(rushPages(playableCases(saveStore.get(), gameState.cases)));
+    if (this.deck.length === 0) this.deck = shuffle(rushPages(this.rushCases()));
     // Never deal the same page twice in a row when there's a choice.
     let next = this.deck.pop() as RushPage;
     if (this.page && next.doc === this.page.doc && this.deck.length > 0) {

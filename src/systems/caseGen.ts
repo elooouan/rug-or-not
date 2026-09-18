@@ -372,18 +372,10 @@ function contractDoc(
       ),
     );
   }
-  if (flags.includes('honeypot')) {
+  const honeypot = flags.includes('honeypot');
+  if (honeypot) {
+    push('  address public pool;');
     push('  mapping(address => bool) public canSell;');
-    const l = push('  // sells to the pool only from approved wallets');
-    clues.push(
-      flagClue(
-        'g-honeypot',
-        'Only approved can sell',
-        'honeypot',
-        { kind: 'line', line: l },
-        fine('honeypot') ? "require(to != pool || canSell[from], 'not yet');" : undefined,
-      ),
-    );
   }
   if (fakeRenounce) {
     push('  address public operator;');
@@ -437,6 +429,36 @@ function contractDoc(
     push(
       '  function setFees(uint256 b, uint256 s) external { require(msg.sender == operator); buy = b; sell = s; }',
     );
+  }
+  // The transfer hook: where fees, freezes and the honeypot actually bite.
+  const taxed = flags.includes('sell-tax-adjustable') || herrings.includes('small-fixed-tax');
+  if (taxed || honeypot || flags.includes('blacklist')) {
+    push('');
+    push('  function _update(address from, address to, uint256 v)');
+    push('    internal override {');
+    if (flags.includes('blacklist')) push("    require(!flagged[from], 'compliance hold');");
+    if (honeypot) {
+      const l = push("    if (to == pool) require(canSell[from], 'not yet');");
+      clues.push(
+        flagClue(
+          'g-honeypot',
+          'Only approved can sell',
+          'honeypot',
+          { kind: 'line', line: l },
+          fine('honeypot')
+            ? '// canSell is set by the deployer. nobody else is on the list.'
+            : undefined,
+        ),
+      );
+    }
+    if (taxed) {
+      push(
+        `    uint256 fee = v * ${flags.includes('sell-tax-adjustable') ? 'sellTaxBps' : 'TAX_BPS'} / 10_000;`,
+      );
+      push('    super._update(from, treasury, fee);');
+      push('    super._update(from, to, v - fee);');
+    } else push('    super._update(from, to, v);');
+    push('  }');
   }
   push('}');
   return {
@@ -711,15 +733,22 @@ function chatDoc(
       ),
     );
   }
-  say(
-    handles[2],
-    rng.pick([
+  // Real chatter around whatever was planted.
+  const filler = take(
+    rng,
+    [
       'gm',
       'anyone else here from the newsletter?',
       'chart looks fine to me',
       'what time is the call?',
-    ]),
+      'can someone explain vesting like I am five',
+      'bought the dip. there was no dip. bought anyway.',
+      'mods can we get a pinned faq',
+      'reading the contract now, brb',
+    ],
+    rng.int(2, 3),
   );
+  filler.forEach((line, i) => say(handles[2 + (i % 3)], line));
   return {
     type: 'chat',
     title: `${rng.pick(['Telegram', 'Discord'])}: ${nm.name}`,
