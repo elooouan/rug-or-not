@@ -29,7 +29,13 @@ export interface SaveData {
   unlockedHerrings: string[];
   /** How many campaign folders are open (daily plays don't count). */
   campaignUnlocked: number;
-  daily: { lastPlayed: string | null; streak: number; bestStreak: number; played: string[] };
+  daily: {
+    lastPlayed: string | null;
+    streak: number;
+    bestStreak: number;
+    played: string[];
+    freezes: number;
+  };
   settings: Settings;
   cosmetics: CosmeticSelection;
   /** Unlockable ids the player has been shown a "new unlock" toast for. */
@@ -88,7 +94,7 @@ export function defaultSave(): SaveData {
     unlockedFlags: [],
     unlockedHerrings: [],
     campaignUnlocked: 1,
-    daily: { lastPlayed: null, streak: 0, bestStreak: 0, played: [] },
+    daily: { lastPlayed: null, streak: 0, bestStreak: 0, played: [], freezes: 0 },
     settings: { ...DEFAULT_SETTINGS },
     cosmetics: { ...DEFAULT_COSMETICS },
     seenUnlocks: [],
@@ -219,6 +225,8 @@ export function sanitizeSave(raw: unknown): SaveData {
       played: Array.isArray(dd.played)
         ? dd.played.filter((x): x is string => typeof x === 'string').slice(-60)
         : [],
+      freezes:
+        typeof dd.freezes === 'number' ? Math.max(0, Math.min(2, Math.floor(dd.freezes))) : 0,
     };
   }
   d.settings = sanitizeSettings(r.settings);

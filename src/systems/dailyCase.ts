@@ -68,9 +68,13 @@ export interface DailyState {
   bestStreak: number;
   /** Dates played, most recent last, capped for the calendar strip. */
   played?: string[];
+  /** Streak freezes in hand: one missed night forgiven each. Earned every seventh night. */
+  freezes?: number;
 }
 
 export const DAILY_HISTORY_MAX = 60;
+export const FREEZE_EVERY = 7;
+export const MAX_FREEZES = 2;
 
 function addDays(dateKey: string, days: number): string {
   const [y, m, d] = dateKey.split('-').map(Number);
@@ -78,13 +82,31 @@ function addDays(dateKey: string, days: number): string {
   return localDateKey(dt);
 }
 
+/** Did the streak survive from `lastPlayed` to `today`, and did it cost a freeze? */
+function bridge(state: DailyState, today: string): { continues: boolean; usedFreeze: boolean } {
+  if (state.lastPlayed === null) return { continues: false, usedFreeze: false };
+  if (addDays(state.lastPlayed, 1) === today) return { continues: true, usedFreeze: false };
+  // Exactly one night missed and a freeze in hand: the chain holds.
+  if (addDays(state.lastPlayed, 2) === today && (state.freezes ?? 0) > 0)
+    return { continues: true, usedFreeze: true };
+  return { continues: false, usedFreeze: false };
+}
+
 /** Apply a completed daily case for `today` to the streak state. Pure. */
 export function recordDailyPlay(state: DailyState, today: string): DailyState {
   if (state.lastPlayed === today) return { ...state, played: state.played ?? [] };
-  const continues = state.lastPlayed !== null && addDays(state.lastPlayed, 1) === today;
+  const { continues, usedFreeze } = bridge(state, today);
   const streak = continues ? state.streak + 1 : 1;
+  let freezes = (state.freezes ?? 0) - (usedFreeze ? 1 : 0);
+  if (streak > 0 && streak % FREEZE_EVERY === 0) freezes = Math.min(MAX_FREEZES, freezes + 1);
   const played = [...(state.played ?? []), today].slice(-DAILY_HISTORY_MAX);
-  return { lastPlayed: today, streak, bestStreak: Math.max(state.bestStreak, streak), played };
+  return {
+    lastPlayed: today,
+    streak,
+    bestStreak: Math.max(state.bestStreak, streak),
+    played,
+    freezes,
+  };
 }
 
 /** For the last `days` days ending today: true where the daily was played. */
@@ -93,9 +115,9 @@ export function playedStrip(state: DailyState, today: string, days = 14): boolea
   return Array.from({ length: days }, (_, i) => set.has(addDays(today, i - (days - 1))));
 }
 
-/** The streak the player currently "holds" (0 if it lapsed). */
+/** The streak the player currently "holds" (0 if it lapsed; a freeze can still bridge one night). */
 export function currentStreak(state: DailyState, today: string): number {
   if (state.lastPlayed === null) return 0;
-  if (state.lastPlayed === today || addDays(state.lastPlayed, 1) === today) return state.streak;
+  if (state.lastPlayed === today || bridge(state, today).continues) return state.streak;
   return 0;
 }

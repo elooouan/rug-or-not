@@ -642,7 +642,7 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const today = localDateKey();
     const strip = playedStrip(save.daily, today, 14);
     ctx.line(
-      `Daily streak: ${currentStreak(save.daily, today)}  ·  best ${save.daily.bestStreak}`,
+      `Daily streak: ${currentStreak(save.daily, today)}  ·  best ${save.daily.bestStreak}${save.daily.freezes > 0 ? `  ·  ${save.daily.freezes} freeze${save.daily.freezes > 1 ? 's' : ''} in hand` : ''}`,
       { color: 'woodMid' },
     );
     strip.forEach((on, i) => {

@@ -50,6 +50,7 @@ describe('streaks', () => {
       streak: 1,
       bestStreak: 1,
       played: ['2026-03-01'],
+      freezes: 0,
     });
     s = recordDailyPlay(s, '2026-03-02');
     expect(s.streak).toBe(2);
@@ -112,5 +113,52 @@ describe('generated dailies', () => {
     expect(JSON.stringify(g1)).toBe(JSON.stringify(g2));
     const c = dailyCaseFor(craftDay, pool, ['a', 'b']);
     expect(['a', 'b']).toContain(c?.id);
+  });
+});
+
+describe('streak freezes', () => {
+  it('earns a freeze every seventh night and spends it on one missed night', async () => {
+    const { recordDailyPlay, currentStreak } = await import('@/systems/dailyCase');
+    let st = {
+      lastPlayed: null as string | null,
+      streak: 0,
+      bestStreak: 0,
+      played: [] as string[],
+      freezes: 0,
+    };
+    const days = [
+      '2026-09-01',
+      '2026-09-02',
+      '2026-09-03',
+      '2026-09-04',
+      '2026-09-05',
+      '2026-09-06',
+      '2026-09-07',
+    ];
+    for (const d of days) st = { ...st, ...recordDailyPlay(st, d) } as typeof st;
+    expect(st.streak).toBe(7);
+    expect(st.freezes).toBe(1);
+    // Skip the 8th, play the 9th: the freeze bridges it.
+    expect(currentStreak(st, '2026-09-09')).toBe(7);
+    st = { ...st, ...recordDailyPlay(st, '2026-09-09') } as typeof st;
+    expect(st.streak).toBe(8);
+    expect(st.freezes).toBe(0);
+    // No freeze left: skipping two nights breaks the chain.
+    expect(currentStreak(st, '2026-09-11')).toBe(0);
+    expect(recordDailyPlay(st, '2026-09-11').streak).toBe(1);
+  });
+
+  it('caps freezes at two', async () => {
+    const { recordDailyPlay } = await import('@/systems/dailyCase');
+    let st = {
+      lastPlayed: null as string | null,
+      streak: 0,
+      bestStreak: 0,
+      played: [] as string[],
+      freezes: 2,
+    };
+    for (let i = 1; i <= 7; i++)
+      st = { ...st, ...recordDailyPlay(st, `2026-10-${String(i).padStart(2, '0')}`) } as typeof st;
+    expect(st.freezes).toBe(2);
   });
 });

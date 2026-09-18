@@ -7,6 +7,9 @@
   many flags and how much fine print). Endless play with its own board and badges, seeds
   shareable as `#cold=<seed>`; "the pile" folder in the drawer prints one. Difficulty grows
   with the number of campaign files you've solved (a `d<n>-` prefix in the seed pins it).
+- Streak freezes: every seventh daily in a row earns one (two at most); a freeze quietly
+  bridges a single missed night. The report says when one is earned or spent; the board
+  shows what's in hand.
 - Every other day the daily is a generated file seeded by the date (still the same for
   everyone); generated dailies count for the streak and the cold-case tally, never for the
   campaign or the rank.

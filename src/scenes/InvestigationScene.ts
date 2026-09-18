@@ -51,6 +51,8 @@ export interface ReportPayload {
   newUnlockNames: string[];
   bestImproved: boolean;
   newBadges: string[];
+  /** Anything else worth a toast on the report: [title, line]. */
+  notes: [string, string][];
   /** Set when this run crossed a rank threshold. */
   rankUp: string | null;
   /** The rogue who just got a WANTED poster (first correct RUG verdict on this case). */
@@ -501,6 +503,8 @@ export class InvestigationScene extends Phaser.Scene {
 
     const before = saveStore.get();
     const rankBefore = rankForScore(before.totalScore);
+    // The store mutates in place: keep the primitives we compare against later.
+    const dailyBefore = { lastPlayed: before.daily.lastPlayed, freezes: before.daily.freezes };
     const prevFlags = new Set(before.unlockedFlags);
     const caseFlagIds = c.documents.flatMap((d) =>
       d.clues.filter(isFlagClue).map((cl) => cl.flagId),
@@ -527,7 +531,7 @@ export class InvestigationScene extends Phaser.Scene {
             d.unlockedHerrings.push(clue.herringId);
       if (gameState.mode === 'daily') {
         const next = recordDailyPlay(d.daily, localDateKey());
-        d.daily = { ...next, played: next.played ?? [] };
+        d.daily = { ...next, played: next.played ?? [], freezes: next.freezes ?? 0 };
       }
       if (generated) {
         d.stats.coldRuns++;
@@ -569,6 +573,15 @@ export class InvestigationScene extends Phaser.Scene {
       if (gameState.mode !== 'daily')
         d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
     });
+
+    const notes: [string, string][] = [];
+    const afterDaily = saveStore.get().daily;
+    if (gameState.mode === 'daily' && dailyBefore.lastPlayed !== localDateKey()) {
+      if (afterDaily.freezes > dailyBefore.freezes)
+        notes.push(['STREAK FREEZE', 'one missed night forgiven, when it happens']);
+      else if (afterDaily.freezes < dailyBefore.freezes)
+        notes.push(['FREEZE USED', 'the chain held through a missed night']);
+    }
 
     // Every run goes on the board (local by default; see src/systems/leaderboard.ts).
     void leaderboard.submit({
@@ -648,6 +661,7 @@ export class InvestigationScene extends Phaser.Scene {
           : null,
       caughtName,
       elapsedSec: relaxed || !this.clock ? null : c.timeLimitSec - this.clock.timeLeft,
+      notes,
     };
     this.scene.start('ReportScene', payload);
   }

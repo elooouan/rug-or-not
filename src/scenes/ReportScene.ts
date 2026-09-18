@@ -182,6 +182,7 @@ export class ReportScene extends Phaser.Scene {
       this.payload.newBadges.forEach((id) =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),
       );
+      this.payload.notes.forEach(([title, line]) => toast(this, title, line));
     });
   }
 
