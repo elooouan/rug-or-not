@@ -70,6 +70,9 @@ export const BADGES: Badge[] = [
     description: 'Connect a wallet that holds the coin.',
     secret: true,
   },
+  { id: 'rush-hour', name: 'Rush Hour', description: 'Finish a Red Flag Rush.' },
+  { id: 'hot-streak', name: 'Hot Streak', description: 'Ten red flags in a row in Rush.' },
+  { id: 'speed-reader', name: 'Speed Reader', description: 'Score 2000 in a single Rush.' },
   {
     id: 'historian',
     name: 'Historian',

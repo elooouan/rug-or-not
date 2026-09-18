@@ -10,6 +10,7 @@ import { ReportScene } from '@/scenes/ReportScene';
 import { NotebookScene } from '@/scenes/NotebookScene';
 import { SettingsScene } from '@/scenes/SettingsScene';
 import { HistoryScene } from '@/scenes/HistoryScene';
+import { RushScene } from '@/scenes/RushScene';
 import { audio } from '@/systems/audio';
 import { overlayDepth } from '@/ui/escGuard';
 import { caseById, gameState } from '@/systems/gameState';
@@ -43,6 +44,7 @@ const game = new Phaser.Game({
     NotebookScene,
     SettingsScene,
     HistoryScene,
+    RushScene,
   ],
 });
 

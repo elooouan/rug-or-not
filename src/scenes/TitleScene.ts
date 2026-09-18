@@ -120,7 +120,7 @@ export class TitleScene extends Phaser.Scene {
 
     // Title card: a sheet of paper under the lamp.
     const cardW = 300;
-    const cardH = 232;
+    const cardH = 255;
     const cx = Math.round((GAME_WIDTH - cardW) / 2);
     const cy = 58;
     const card = this.add.container(0, 0).setDepth(DEPTH.documents);
@@ -227,6 +227,7 @@ export class TitleScene extends Phaser.Scene {
         },
       ),
       mk('Case files', () => this.scene.start('CaseSelectScene')),
+      mk('Red Flag Rush', () => this.scene.start('RushScene')),
       mk('Notebook', () => this.scene.start('NotebookScene')),
       mk('Settings', () => this.scene.start('SettingsScene')),
     ];
@@ -267,7 +268,7 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
-    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.4', {
+    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.5', {
       size: 8,
       color: 'woodLight',
     }).setDepth(DEPTH.hud);

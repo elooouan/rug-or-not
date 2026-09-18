@@ -112,6 +112,14 @@ export const HISTORY: HistoryFrame[] = [
     version: 'v0.4',
     date: '2026-09-18',
     title: 'The safe',
-    caption: 'A floor safe with a three-dial lock. The combination is in the notebook. Inside: the ledger.',
+    caption:
+      'A floor safe with a three-dial lock. The combination is in the notebook. Inside: the ledger.',
+  },
+  {
+    file: '15-v05-rush',
+    version: 'v0.5',
+    date: '2026-09-18',
+    title: 'Rush hour',
+    caption: 'Sixty seconds, one page at a time. Five in a row and the multiplier is climbing.',
   },
 ];

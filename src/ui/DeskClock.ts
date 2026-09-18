@@ -44,6 +44,13 @@ export class DeskClock extends Phaser.GameObjects.Container {
     this.running = !p && this.total > 0;
   }
 
+  /** Buy or lose seconds mid-run (Rush). Never below zero; the dial stretches if we go over. */
+  addTime(sec: number): void {
+    this.left = Math.max(0, this.left + sec);
+    this.total = Math.max(this.total, this.left);
+    this.refresh();
+  }
+
   get timeLeft(): number {
     return Math.max(0, Math.ceil(this.left));
   }

@@ -29,7 +29,8 @@ export type ScriptId =
   | 'leaderboard'
   | 'konami'
   | 'all-cases'
-  | 'wall';
+  | 'wall'
+  | 'first-rush';
 
 /** Things Lucien says when you poke him on the title screen. */
 export const LUCIEN_QUIPS: string[] = [
@@ -142,6 +143,13 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: 'Every case leaves a photo on the wall. This one is ours: how the office came together, night by night.',
     },
+  ],
+  'first-rush': [
+    { text: 'Different game tonight. One page at a time, sixty seconds on the clock.' },
+    {
+      text: 'Every page hides at least one red flag. Find it, click it, next page. Each hit buys you three seconds.',
+    },
+    { text: 'Herrings cost you five. Blank paper costs two. Streaks multiply. Go.' },
   ],
   'all-cases': [
     {

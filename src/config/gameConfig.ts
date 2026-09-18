@@ -33,6 +33,28 @@ export const RANKS = [
 
 export type Rank = (typeof RANKS)[number]['rank'];
 
+/** Red Flag Rush: one page at a time against the clock. */
+export const RUSH = {
+  timeSec: 60,
+  flagPoints: 100,
+  /** Each consecutive hit adds this to the multiplier... */
+  streakStep: 0.25,
+  /** ...up to here. */
+  maxMultiplier: 3,
+  /** Seconds bought by a hit / lost to a herring / lost to blank paper. */
+  flagTimeBonus: 3,
+  herringPenaltySec: 5,
+  strayPenaltySec: 2,
+  /** Score thresholds for the grade on the results card and the board. */
+  grades: [
+    { grade: 'S', min: 3000 },
+    { grade: 'A', min: 2000 },
+    { grade: 'B', min: 1200 },
+    { grade: 'C', min: 600 },
+    { grade: 'D', min: 0 },
+  ],
+} as const;
+
 export const SAVE_KEY = 'rug-or-not:save:v1';
 export const SAVE_VERSION = 1;
 

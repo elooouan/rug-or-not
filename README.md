@@ -72,6 +72,10 @@ Configure the coin through env vars (see `.env.example`); nothing is hard-coded.
 - **Campaign**: twelve cases in order (seven rugs, five legit, difficulty 1→5); each verdict unlocks the next folder.
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Daily plays don't unlock campaign folders.
+- **Red Flag Rush**: sixty seconds, one evidence page at a time. Every page hides at least
+  one red flag; click it to clear the page (+3 s), herrings cost 5 s, blank paper 2 s, streaks
+  multiply up to ×3. Fine print is shown inline (no lens). Best score, longest streak and a
+  separate top-five live on the Hall of Detectives page.
 - **Detective's honour** (hard mode): no nudges from Lucien, no examined counter, no hover
   highlights; every run scores ×1.25 and is starred on the board.
 - **Relaxed**: turn off timers in Settings. Reduced motion, lamp flicker, rain and a

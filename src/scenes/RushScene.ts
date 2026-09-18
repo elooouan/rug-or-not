@@ -1,0 +1,466 @@
+import Phaser from 'phaser';
+import { DEPTH } from '@/config/depth';
+import { RUSH } from '@/config/gameConfig';
+import { DESK, FONT, GAME_HEIGHT, GAME_WIDTH, NOTEBOOK, PAPER } from '@/config/layout';
+import { HEX } from '@/config/palette';
+import { isFlagClue, type Clue } from '@/data/schema';
+import { audio } from '@/systems/audio';
+import { awardBadge } from '@/systems/badges';
+import { gameState } from '@/systems/gameState';
+import { leaderboard } from '@/systems/leaderboard';
+import {
+  applyFlag,
+  applyHerring,
+  applyStray,
+  freshRush,
+  rushGrade,
+  rushMultiplier,
+  rushPages,
+  shuffle,
+  type RushPage,
+  type RushState,
+} from '@/systems/rush';
+import { saveStore } from '@/systems/save';
+import { wallet } from '@/systems/wallet';
+import { DeskBackground, floatText } from '@/ui/DeskBackground';
+import { DeskClock } from '@/ui/DeskClock';
+import { lucienSays, type DialogueBox } from '@/ui/DialogueBox';
+import type { DocumentView } from '@/ui/DocumentView';
+import { createDocumentView } from '@/ui/documents';
+import { escTaken } from '@/ui/escGuard';
+import { LucienBubble } from '@/ui/LucienBubble';
+import { PixelButton } from '@/ui/PixelButton';
+import { rect } from '@/ui/shapes';
+import { addText, makeText } from '@/ui/text';
+import { setupScene } from './sceneUtil';
+
+type Phase = 'intro' | 'countdown' | 'playing' | 'over';
+
+/**
+ * Red Flag Rush: sixty seconds, one evidence page at a time. Click the red
+ * flag to clear the page; herrings and blank paper cost seconds.
+ */
+export class RushScene extends Phaser.Scene {
+  static readonly KEY = 'RushScene';
+  private phase: Phase = 'intro';
+  private state: RushState = freshRush();
+  private deck: RushPage[] = [];
+  private page?: RushPage;
+  private doc?: DocumentView;
+  private clock!: DeskClock;
+  private dialogue: DialogueBox | null = null;
+  private locked = false;
+  private strayCount = 0;
+  private lastTickSecond = -1;
+  private hud!: {
+    score: Phaser.GameObjects.Text;
+    mult: Phaser.GameObjects.Text;
+    streak: Phaser.GameObjects.Text;
+    pages: Phaser.GameObjects.Text;
+    best: Phaser.GameObjects.Text;
+  };
+
+  constructor() {
+    super(RushScene.KEY);
+  }
+
+  create(): void {
+    setupScene(this);
+    this.phase = 'intro';
+    this.state = freshRush();
+    this.locked = false;
+    this.strayCount = 0;
+    this.lastTickSecond = -1;
+    this.doc = undefined;
+    this.page = undefined;
+    this.deck = shuffle(rushPages(gameState.cases));
+
+    new DeskBackground(this, { props: true, stamps: false });
+    addText(this, DESK.caseHeader.x, DESK.caseHeader.y, 'RED FLAG RUSH  ·  one page at a time', {
+      size: 10,
+      color: 'paperShadow',
+    })
+      .setOrigin(1, 0)
+      .setDepth(DEPTH.hud);
+
+    this.buildHud();
+    this.clock = new DeskClock(this);
+    this.clock.setDepth(DEPTH.deskProps);
+    this.clock.start(RUSH.timeSec);
+    this.clock.pause(true);
+
+    addText(
+      this,
+      GAME_WIDTH - 96,
+      GAME_HEIGHT - 12,
+      'click the red flag  ·  herring: -5s  ·  blank paper: -2s  ·  Tab/Enter works too',
+      { size: 10, color: 'paperShadow' },
+    )
+      .setOrigin(1, 0)
+      .setDepth(DEPTH.hud);
+    const quit = new PixelButton(this, 0, GAME_HEIGHT - 22, 'Quit [Esc]', () => this.quit(), {
+      variant: 'ink',
+    });
+    quit.setDepth(DEPTH.hud).setX(GAME_WIDTH - quit.bw - 6);
+
+    this.bindKeys();
+    audio.setTension(false);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => audio.setTension(false));
+
+    // Lucien explains the rules once, then a short countdown.
+    this.dialogue = lucienSays(this, 'first-rush', {
+      onDone: () => {
+        this.dialogue = null;
+        this.countdown();
+      },
+    });
+    if (!this.dialogue) this.countdown();
+  }
+
+  // ---- HUD -----------------------------------------------------------------
+
+  private buildHud(): void {
+    const { x, y, w, h, padding } = NOTEBOOK;
+    const c = this.add.container(x, y).setDepth(DEPTH.notebook);
+    c.add(rect(this, 3, 4, w, h, HEX.bg, 0.5));
+    c.add(rect(this, -4, -3, w + 8, h + 6, HEX.woodDark));
+    c.add(rect(this, 0, 0, w, h, HEX.paper));
+    for (let rx = 10; rx < w - 6; rx += 12) c.add(rect(this, rx, -6, 3, 8, HEX.paperShadow));
+    c.add(rect(this, padding + 8, 4, 1, h - 8, HEX.stampRed, 0.35));
+    c.add(
+      makeText(this, padding, padding - 2, 'RUSH', { size: FONT.size.small, color: 'woodDark' }),
+    );
+    const score = makeText(this, w / 2, padding + 14, '0', {
+      size: FONT.size.title,
+      color: 'shadow',
+    }).setOrigin(0.5, 0);
+    const mult = makeText(this, w / 2, padding + 52, 'x1.0', {
+      size: FONT.size.bodyLarge,
+      color: 'woodMid',
+    }).setOrigin(0.5, 0);
+    const mk = (row: number, text: string) =>
+      makeText(this, padding + 12, padding + 84 + row * 14, text, {
+        font: 'body',
+        size: FONT.size.body,
+        color: 'shadow',
+      });
+    const streak = mk(0, 'streak  0');
+    const pages = mk(1, 'pages   0');
+    const best = mk(2, `best    ${saveStore.get().stats.rushBest}`);
+    c.add([score, mult, streak, pages, best]);
+    c.add(
+      makeText(this, padding, h - padding - 6, 'hits buy 3s', {
+        size: FONT.size.tiny,
+        color: 'woodMid',
+      }),
+    );
+    this.hud = { score, mult, streak, pages, best };
+  }
+
+  private refreshHud(): void {
+    const s = this.state;
+    this.hud.score.setText(String(s.score));
+    const m = rushMultiplier(s.streak);
+    this.hud.mult.setText(`x${m.toFixed(2).replace(/0$/, '')}`);
+    this.hud.mult.setColor(m >= RUSH.maxMultiplier ? '#c9503f' : m > 1 ? '#e0b566' : '#6b5140');
+    this.hud.streak.setText(`streak  ${s.streak}`);
+    this.hud.pages.setText(`pages   ${s.rounds}`);
+  }
+
+  // ---- flow ----------------------------------------------------------------
+
+  private countdown(): void {
+    if (this.phase !== 'intro') return;
+    this.phase = 'countdown';
+    const steps = ['3', '2', '1', 'GO'];
+    const reduced = saveStore.get().settings.reducedMotion;
+    steps.forEach((label, i) => {
+      this.time.delayedCall(i * 450, () => {
+        if (this.phase !== 'countdown') return;
+        audio.play(label === 'GO' ? 'correct' : 'tick');
+        const t = addText(this, PAPER.x + PAPER.w / 2, PAPER.y + PAPER.h / 2, label, {
+          size: FONT.size.title,
+          color: label === 'GO' ? 'amber' : 'paper',
+        })
+          .setOrigin(0.5)
+          .setDepth(DEPTH.toast);
+        if (reduced) this.time.delayedCall(400, () => t.destroy());
+        else
+          this.tweens.add({
+            targets: t,
+            scale: 1.6,
+            alpha: 0,
+            duration: 420,
+            ease: 'Quad.easeOut',
+            onComplete: () => t.destroy(),
+          });
+        if (label === 'GO') this.start();
+      });
+    });
+  }
+
+  private start(): void {
+    this.phase = 'playing';
+    this.clock.pause(false);
+    this.dealPage();
+  }
+
+  private dealPage(): void {
+    if (this.deck.length === 0) this.deck = shuffle(rushPages(gameState.cases));
+    // Never deal the same page twice in a row when there's a choice.
+    let next = this.deck.pop() as RushPage;
+    if (this.page && next.doc === this.page.doc && this.deck.length > 0) {
+      const swap = this.deck.pop() as RushPage;
+      this.deck.push(next);
+      next = swap;
+    }
+    this.page = next;
+    const ctx = {
+      // Fine print inline: there's no time for the lens tonight.
+      noMagnifier: true,
+      registerFinePrint: () => {},
+      onPinToggle: (clue: Clue, pinned: boolean) => this.onPin(clue, pinned),
+      onStrayChange: (count: number) => this.onStray(count),
+      onHoverSpot: () => {},
+    };
+    const doc = createDocumentView(this, next.doc, ctx).setDepth(DEPTH.documents);
+    // Make sure a red flag is on the page without scrolling.
+    let guard = 0;
+    while (!doc.visibleSpots().some((s) => isFlagClue(s.clue)) && doc.scroll(1) && guard++ < 20);
+    this.doc = doc;
+    this.strayCount = 0;
+    this.locked = false;
+    audio.play('paper');
+    if (!saveStore.get().settings.reducedMotion) {
+      doc.setX(PAPER.x + 40).setAlpha(0);
+      this.tweens.add({ targets: doc, x: PAPER.x, alpha: 1, duration: 150, ease: 'Quad.easeOut' });
+    }
+  }
+
+  private onPin(clue: Clue, pinned: boolean): void {
+    if (this.phase !== 'playing' || this.locked || !pinned || !this.doc) return;
+    if (isFlagClue(clue)) {
+      this.locked = true;
+      const next = applyFlag(this.state);
+      this.state = next;
+      this.clock.addTime(next.timeDelta);
+      this.refreshHud();
+      audio.play('correct');
+      const m = rushMultiplier(next.streak - 1);
+      floatText(
+        this,
+        PAPER.x + PAPER.w / 2,
+        PAPER.y + 40,
+        `+${next.gained}${m > 1 ? `  (x${m.toFixed(2).replace(/0$/, '')})` : ''}  +${RUSH.flagTimeBonus}s`,
+        'amber',
+      );
+      if (next.streak === 5)
+        LucienBubble.say(this, 'Five in a row. Keep that pencil moving.', 2200);
+      if (next.streak === 10) {
+        awardBadge(this, 'hot-streak');
+        LucienBubble.say(this, 'Ten. You could do this in your sleep.', 2200);
+      }
+      const old = this.doc;
+      this.doc = undefined;
+      const done = () => {
+        old.destroy();
+        if (this.phase === 'playing') this.dealPage();
+      };
+      if (saveStore.get().settings.reducedMotion) this.time.delayedCall(120, done);
+      else
+        this.tweens.add({
+          targets: old,
+          x: PAPER.x - 60,
+          alpha: 0,
+          duration: 180,
+          delay: 140,
+          ease: 'Quad.easeIn',
+          onComplete: done,
+        });
+      return;
+    }
+    // A yellow herring: the pin stays in as a reminder, the clock pays for it.
+    this.state = applyHerring(this.state);
+    this.penalty(this.state.timeDelta, 'herring');
+  }
+
+  private onStray(count: number): void {
+    if (this.phase !== 'playing' || this.locked) return;
+    if (count <= this.strayCount) {
+      this.strayCount = count;
+      return;
+    }
+    this.strayCount = count;
+    this.state = applyStray(this.state);
+    this.penalty(this.state.timeDelta, 'blank paper');
+  }
+
+  private penalty(sec: number, why: string): void {
+    this.clock.addTime(sec);
+    this.refreshHud();
+    audio.play('wrong');
+    floatText(this, PAPER.x + PAPER.w / 2, PAPER.y + 40, `${sec}s  ${why}`, 'stampRed');
+    if (!saveStore.get().settings.reducedMotion) this.cameras.main.shake(90, 0.003);
+    if (this.clock.timeLeft === 0) this.end();
+  }
+
+  private end(): void {
+    if (this.phase === 'over') return;
+    this.phase = 'over';
+    this.locked = true;
+    audio.setTension(false);
+    LucienBubble.dismiss();
+    this.doc?.destroy();
+    this.doc = undefined;
+    const s = this.state;
+    const grade = rushGrade(s.score);
+    let improved = false;
+    saveStore.update((d) => {
+      d.stats.rushRuns++;
+      if (s.score > d.stats.rushBest) {
+        d.stats.rushBest = s.score;
+        improved = s.score > 0;
+      }
+      d.stats.rushBestStreak = Math.max(d.stats.rushBestStreak, s.bestStreak);
+    });
+    void leaderboard.submit({
+      name: saveStore.get().detectiveName,
+      score: s.score,
+      caseId: 'rush',
+      grade,
+      date: new Date().toISOString(),
+      wallet: wallet.state.address ?? undefined,
+      mode: 'rush',
+    });
+    awardBadge(this, 'rush-hour');
+    if (s.score >= 2000) awardBadge(this, 'speed-reader');
+    this.hud.best.setText(`best    ${saveStore.get().stats.rushBest}`);
+    audio.play('stamp');
+    this.showResults(grade, improved);
+  }
+
+  private showResults(grade: string, improved: boolean): void {
+    const s = this.state;
+    const w = 240;
+    const h = 170;
+    const x = PAPER.x + (PAPER.w - w) / 2;
+    const y = PAPER.y + (PAPER.h - h) / 2 - 10;
+    const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
+    c.add(rect(this, x + 4, y + 5, w, h, HEX.bg, 0.6));
+    c.add(rect(this, x, y, w, h, HEX.paper));
+    c.add(rect(this, x + 3, y + 3, w - 6, h - 6).setStrokeStyle(1, HEX.paperShadow));
+    c.add(
+      makeText(this, x + w / 2, y + 10, "TIME'S UP", {
+        size: FONT.size.heading,
+        color: 'shadow',
+      }).setOrigin(0.5, 0),
+    );
+    c.add(
+      makeText(this, x + w / 2, y + 36, String(s.score), {
+        size: FONT.size.title,
+        color: 'ink',
+      }).setOrigin(0.5, 0),
+    );
+    const rows = [
+      `pages cleared   ${s.rounds}`,
+      `best streak     ${s.bestStreak}  ·  peak x${rushMultiplier(s.bestStreak).toFixed(2).replace(/0$/, '')}`,
+      improved ? 'personal best!' : `personal best   ${saveStore.get().stats.rushBest}`,
+    ];
+    rows.forEach((r, i) =>
+      c.add(
+        makeText(this, x + 16, y + 78 + i * 13, r, {
+          font: 'body',
+          size: FONT.size.body,
+          color: improved && i === 2 ? 'stampRed' : 'shadow',
+        }),
+      ),
+    );
+    // Grade stamp in the corner.
+    const mark = this.add.container(x + w - 34, y + 46).setAngle(-12);
+    mark.add(rect(this, 0, 0, 30, 30).setStrokeStyle(2, HEX.stampRed).setOrigin(0.5));
+    mark.add(
+      makeText(this, 0, 0, grade, { size: FONT.size.heading, color: 'stampRed' }).setOrigin(0.5),
+    );
+    this.children.remove(mark);
+    c.add(mark);
+    const again = new PixelButton(
+      this,
+      x + 16,
+      y + h - 32,
+      'Again [Enter]',
+      () => this.scene.restart(),
+      {
+        width: 100,
+        hotkey: 'ENTER',
+      },
+    );
+    const menu = new PixelButton(
+      this,
+      x + w - 16 - 100,
+      y + h - 32,
+      'Menu [Esc]',
+      () => this.quit(),
+      {
+        width: 100,
+        variant: 'ink',
+      },
+    );
+    this.children.remove(again);
+    this.children.remove(menu);
+    c.add([again, menu]);
+    if (!saveStore.get().settings.reducedMotion) {
+      c.setScale(0.9).setAlpha(0);
+      this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 200, ease: 'Back.easeOut' });
+    }
+    const line =
+      s.score === 0
+        ? "Nothing on the board. The flags don't find themselves."
+        : grade === 'S'
+          ? 'That was a rush. Coffee is on me.'
+          : s.bestStreak >= 5
+            ? 'Good eye. The streak is where the points live.'
+            : 'Not bad. Faster next time, and skip the herrings.';
+    this.time.delayedCall(
+      500,
+      () => this.phase === 'over' && LucienBubble.say(this, line, 4000, 14),
+    );
+  }
+
+  private quit(): void {
+    this.scene.start('TitleScene');
+  }
+
+  private bindKeys(): void {
+    const kb = this.input.keyboard;
+    if (!kb) return;
+    kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
+    const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
+    const inPlay = () => this.phase === 'playing' && !this.locked && !!this.doc;
+    on('ESC', () => !this.dialogue?.isActive && !escTaken() && this.quit());
+    on('TAB', (e?: KeyboardEvent) => inPlay() && this.doc?.focusMove(e?.shiftKey ? -1 : 1));
+    on('DOWN', () => inPlay() && this.doc?.focusMove(1));
+    on('RIGHT', () => inPlay() && this.doc?.focusMove(1));
+    on('UP', () => inPlay() && this.doc?.focusMove(-1));
+    on('LEFT', () => inPlay() && this.doc?.focusMove(-1));
+    on('ENTER', () => inPlay() && this.doc?.activateFocused());
+    on('SPACE', () => inPlay() && this.doc?.activateFocused());
+    on('PAGE_DOWN', () => inPlay() && this.doc?.scroll(1));
+    on('PAGE_UP', () => inPlay() && this.doc?.scroll(-1));
+    this.input.on('wheel', (p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
+      if (!inPlay()) return;
+      if (this.doc?.containsPoint(p.worldX, p.worldY)) this.doc.scroll(dy > 0 ? 1 : -1);
+    });
+  }
+
+  override update(_t: number, delta: number): void {
+    if (this.phase !== 'playing') return;
+    this.clock.tick(delta);
+    const left = this.clock.timeLeft;
+    if (left <= 10 && left !== this.lastTickSecond) {
+      this.lastTickSecond = left;
+      audio.play('tick');
+      audio.setTension(true);
+    }
+    if (!this.clock.isRunning && left === 0) this.end();
+  }
+}

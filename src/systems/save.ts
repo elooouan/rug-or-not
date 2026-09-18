@@ -49,6 +49,10 @@ export interface SaveData {
     correct: number;
     /** How often each red flag was missed, for the personal record page. */
     flagMisses: Record<string, number>;
+    /** Red Flag Rush. */
+    rushRuns: number;
+    rushBest: number;
+    rushBestStreak: number;
   };
   /** Last known wallet snapshot (public address + token balance) for holder perks. */
   wallet: { address: string | null; token: number | null; checkedAt: string | null };
@@ -87,6 +91,9 @@ export function defaultSave(): SaveData {
       runs: 0,
       correct: 0,
       flagMisses: {},
+      rushRuns: 0,
+      rushBest: 0,
+      rushBestStreak: 0,
     },
     wallet: { address: null, token: null, checkedAt: null },
   };
@@ -151,6 +158,9 @@ export function sanitizeSave(raw: unknown): SaveData {
           (e): e is [string, number] => typeof e[1] === 'number',
         ),
       ),
+      rushRuns: num(st.rushRuns),
+      rushBest: num(st.rushBest),
+      rushBestStreak: num(st.rushBestStreak),
     };
   }
   if (r.wallet && typeof r.wallet === 'object') {

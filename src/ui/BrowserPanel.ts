@@ -580,6 +580,36 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       });
     });
     ctx.y += BROWSER.lineH * 11;
+    ctx.rule();
+    ctx.line(
+      `Red Flag Rush: best ${st.rushBest}  ·  longest streak ${st.rushBestStreak}  ·  ${st.rushRuns} runs`,
+      { color: 'woodMid' },
+    );
+    const rushY = ctx.y;
+    void leaderboard.list(5, 'rush').then((entries: ScoreEntry[]) => {
+      if (!ctx.content.active) return;
+      if (entries.length === 0) {
+        ctx.content.add(
+          makeText(ctx.scene, 0, rushY, 'No rush runs yet. Sixty seconds, one page at a time.', {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'paperShadow',
+          }),
+        );
+        return;
+      }
+      entries.forEach((e, i) => {
+        const line = `${String(i + 1).padStart(2, ' ')}. ${e.name.padEnd(12)} ${String(e.score).padStart(4)}  ${e.grade}  ${e.date.slice(0, 10)}`;
+        ctx.content.add(
+          makeText(ctx.scene, 0, rushY + i * BROWSER.lineH, line, {
+            font: 'body',
+            size: FONT.size.body,
+            color: i === 0 ? 'amber' : 'shadow',
+          }),
+        );
+      });
+    });
+    ctx.y += BROWSER.lineH * 5;
     lucienSays(ctx.scene, 'leaderboard');
   },
 
@@ -638,6 +668,9 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.line('Stamp RUG (R) or LEGIT (L). Herring pins cost points.');
     ctx.line('Tab / arrows cycle clue spots, Enter pins, 1-6 switch tabs, wheel scrolls.');
     ctx.line('Esc pauses. F toggles fullscreen.');
+    ctx.line(
+      'Red Flag Rush: sixty seconds, one page at a time. Click the red flag to clear the page; herrings and blank paper cost seconds.',
+    );
     ctx.gap();
     ctx.line(
       'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock.',

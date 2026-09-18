@@ -314,6 +314,11 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     return this.rows.flatMap((r) => r.spots);
   }
 
+  /** Spots in rows currently on the page (not scrolled away). */
+  visibleSpots(): ClueSpot[] {
+    return this.rows.filter((r) => r.container.visible).flatMap((r) => r.spots);
+  }
+
   pinnedIds(): string[] {
     return this.allSpots()
       .filter((s) => s.pinned)
