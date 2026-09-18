@@ -881,6 +881,23 @@ function chatDoc(
     rng.int(2, 3),
   );
   filler.forEach((line, i) => say(handles[2 + (i % 3)], line));
+  // Mods in a hurry delete questions. The lens can still read the ghost of the text.
+  if ((wants.urgency || wants.bots) && rng.chance(0.4)) {
+    const i = say(
+      handles[5],
+      rng.pick([
+        'why does the countdown keep resetting?',
+        'three accounts just posted the same sentence',
+        'can we see the lock tx before it closes?',
+      ]),
+    );
+    msgs[i].deleted = true;
+    say(
+      admin,
+      rng.pick(['keep it positive please', 'no fud in main chat', 'dms are open']),
+      'admin',
+    );
+  }
   return {
     type: 'chat',
     title: `${rng.pick(['Telegram', 'Discord'])}: ${nm.name}`,
