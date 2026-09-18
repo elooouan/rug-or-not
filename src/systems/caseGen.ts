@@ -28,6 +28,16 @@ const ADJ = [
   'Copper',
   'Pixel',
   'Marble',
+  'Saffron',
+  'Granite',
+  'Willow',
+  'Tidal',
+  'Ivory',
+  'Cobalt',
+  'Juniper',
+  'Static',
+  'Paper',
+  'Midnight',
 ];
 const NOUN = [
   'Otter',
@@ -50,6 +60,16 @@ const NOUN = [
   'Cactus',
   'Prism',
   'Harvest',
+  'Kiosk',
+  'Trolley',
+  'Parcel',
+  'Ferry',
+  'Bakery',
+  'Vinyl',
+  'Sprocket',
+  'Tandem',
+  'Postcard',
+  'Umbrella',
 ];
 const PROMISES = [
   'real yield from real receipts',
@@ -60,6 +80,12 @@ const PROMISES = [
   'the coin with a roadmap and a spreadsheet',
   'cross-chain, cross-town, cross-your-heart',
   'rewards for showing up',
+  'the loyalty card, but on-chain',
+  'payroll for the night shift',
+  'a treasury run by people who show their work',
+  'micro-tips for street musicians',
+  'receipts you can actually read',
+  'the token behind the corner shop',
 ];
 const TRAITS = [
   'Audited.',
@@ -70,6 +96,10 @@ const TRAITS = [
   'Fair launch.',
   'Fixed supply.',
   'Community first.',
+  'No VC.',
+  'Real partners.',
+  'Boring on purpose.',
+  'Ships weekly.',
 ];
 const FIRST = [
   'Mara',
@@ -129,12 +159,20 @@ const JOKES = [
   'I only hold this so I can say I am invested in {noun}s',
   'my dog just sneezed on my keyboard, that is a buy signal',
   'put my whole lunch budget in. living on crackers now',
+  'my portfolio is 90% {noun} and 10% regret, which is up from last week',
+  'told my landlord about {noun}. he raised the rent anyway',
+  'the chart looks like my heart rate reading the contract',
+  'bought some for my cat. she is a long-term holder now',
 ];
 const QUESTIONS = [
   'who can change the fee and what is the cap?',
   'is the lock held by the team wallet or a contract?',
   'renounced is a word. what does the operator do?',
   'why did three wallets get the same amount in the same block?',
+  'where is the audit for the contract that actually holds funds?',
+  'what happens to the treasury if the team disappears?',
+  'can someone link the tx where the lock was created?',
+  'is the marketing wallet a multisig or one person?',
 ];
 const AUDITORS_REAL = ['Kestrel Security', 'Ashgrove Audits', 'Lantern & Vale'];
 const AUDITORS_FAKE = ['ChainSure Labs', 'SafuScan', 'BlockCert 24/7'];
@@ -488,7 +526,11 @@ function tokenomicsDoc(
   const rest = 100 - team - liq - mkt;
   const allocations = [
     { label: 'Liquidity', pct: liq, vesting: `locked ${rng.int(1, 3)}y` },
-    { label: 'Community', pct: rest, vesting: 'by vote' },
+    {
+      label: rng.pick(['Community', 'Ecosystem', 'Treasury', 'Rewards', 'Stall fund']),
+      pct: rest,
+      vesting: 'by vote',
+    },
     { label: 'Team', pct: team, vesting: wants.unvested ? 'none' : `${rng.int(6, 12)}m cliff+2y` },
     {
       label: 'Marketing',
@@ -570,17 +612,25 @@ function teamDoc(
     portraitSeed: string;
     style: 'normal' | 'stock' | 'ai' | 'anon';
   }[] = [];
-  const roles = take(rng, ['CEO', 'CTO', 'Head of Ops', 'Contract dev', 'Community lead'], 3);
+  const roles = take(
+    rng,
+    ['CEO', 'CTO', 'Head of Ops', 'Contract dev', 'Community lead', 'Treasurer', 'Partnerships'],
+    3,
+  );
   for (let i = 0; i < (wants.meme ? 2 : 3); i++) {
     const name = `${rng.pick(FIRST)} ${rng.pick(LAST)}`;
     members.push({
       name,
       role: roles[i],
       bio: rng.pick([
-        `${rng.int(6, 15)} years in ${rng.pick(['logistics', 'payments', 'retail software', 'events'])}. Speaks at the regional meetup.`,
+        `${rng.int(6, 15)} years in ${rng.pick(['logistics', 'payments', 'retail software', 'events', 'hospitality', 'municipal IT'])}. Speaks at the regional meetup.`,
         'Public repo, public commits, public arguments about them.',
         'Serial founder. Previously exited two startups.',
         'Runs the books. Publishes monthly minutes.',
+        'Former auditor. Left to build the thing being audited.',
+        'Organises the street market. Knows every stall by name.',
+        'Wrote the vesting contracts. Answers in the chat at 2am.',
+        'Ran a bakery. Now runs the treasury. Same spreadsheet.',
       ]),
       portraitSeed: `${name.toLowerCase().replace(/\s/g, '-')}-${rng.int(1, 99)}`,
       style: 'normal',
@@ -846,7 +896,7 @@ function liquidityDoc(
     type: 'liquidity',
     title: 'Liquidity & Holders',
     content: {
-      pool: `${nm.ticker.slice(1)} / USDC`,
+      pool: `${nm.ticker.slice(1)} / ${rng.pick(['USDC', 'SOL', 'USDT'])}`,
       liquidityUsd: `$${rng.int(40, 900)},000`,
       lock,
       holders: holders.slice(0, 8),
@@ -1095,7 +1145,16 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
       ? `${nm.name} was a cold one: ${flagList.map((f) => FLAG_BLURB[f]).join('; ')}. ${herrings.size > 0 ? 'The rest of the paperwork was real, which is what the paperwork was for.' : 'Nothing about it was real.'}`
       : `${nm.name} was fine. ${[...herrings].length} things looked scary and none of them were: fixed numbers, public locks, a team you could find, a chat that argued. Scary is not the same as guilty.`;
   const title = rng
-    .pick(['The {n} File', 'Nothing But {n}', '{n} Hours', 'The {n} Receipt', 'A {n} Problem'])
+    .pick([
+      'The {n} File',
+      'Nothing But {n}',
+      '{n} Hours',
+      'The {n} Receipt',
+      'A {n} Problem',
+      'Late {n}',
+      'The {n} Ledger',
+      '{n} After Dark',
+    ])
     .replace('{n}', nm.name.split(' ')[1]);
   return {
     id: `cold-${seed.toLowerCase().replace(/[^a-z0-9-]/g, '-')}`,
