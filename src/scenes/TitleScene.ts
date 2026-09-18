@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { GAME_VERSION } from '@/config/gameConfig';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { pickDailyCaseId, localDateKey, currentStreak } from '@/systems/dailyCase';
@@ -281,7 +282,7 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
-    const version = addText(this, 6, GAME_HEIGHT - 12, 'v0.5', {
+    const version = addText(this, 6, GAME_HEIGHT - 12, GAME_VERSION, {
       size: 8,
       color: 'woodLight',
     }).setDepth(DEPTH.hud);

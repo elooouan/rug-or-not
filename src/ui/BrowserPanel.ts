@@ -4,6 +4,7 @@ import { DEPTH } from '@/config/depth';
 import { BROWSER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { shortAddress, TOKEN } from '@/config/token';
+import { GAME_VERSION } from '@/config/gameConfig';
 import { NEWS } from '@/data/news';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
@@ -30,8 +31,18 @@ import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 
-type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | '404';
-const ALL_PAGES: PageId[] = ['home', 'rugscan', 'coin', 'board', 'news', 'help', 'badges', '404'];
+type PageId = 'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | 'about' | '404';
+const ALL_PAGES: PageId[] = [
+  'home',
+  'rugscan',
+  'coin',
+  'board',
+  'news',
+  'help',
+  'badges',
+  'about',
+  '404',
+];
 
 const URLS: Record<PageId, string> = {
   home: 'netscope://home',
@@ -40,6 +51,7 @@ const URLS: Record<PageId, string> = {
   board: 'board.example/detectives',
   news: 'news.example/latest',
   help: 'netscope://help',
+  about: 'netscope://about',
   badges: 'board.example/badges',
   '404': 'nowhere.example/lost',
 };
@@ -306,7 +318,8 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button(`${TOKEN.symbol} - the coin`, () => ctx.panel.go('coin'));
     ctx.button('Leaderboard', () => ctx.panel.go('board'));
     ctx.button('The news', () => ctx.panel.go('news'));
-    ctx.button('Help', () => ctx.panel.go('help'));
+    ctx.button('Help', () => ctx.panel.go('help'), { sameLine: true });
+    ctx.button('About', () => ctx.panel.go('about'), { x: 60 });
     ctx.button(
       'The wall (how this game was built)',
       () => {
@@ -780,6 +793,34 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     );
     ctx.gap();
     ctx.small(`NetScope v2.0  ·  ${gameState.cases.length} cases loaded`);
+  },
+
+  about(ctx) {
+    ctx.heading(`Rug or Not?  ${GAME_VERSION}`, 'ink');
+    ctx.line(
+      'A pixel-noir detective game about reading before buying. Every case, token, person and',
+    );
+    ctx.line('project in it is fictional. Nothing here is financial advice.');
+    ctx.gap();
+    ctx.line('Made with Phaser 3 and a lot of coffee. Fonts: Pixelify Sans and VT323 (SIL OFL).', {
+      color: 'woodMid',
+    });
+    ctx.line('Mascot: Detective Lucien. Biscuit the cat: unpaid, unbothered.', {
+      color: 'woodMid',
+    });
+    ctx.line('Music, sound effects and every texture are generated in code; no samples.', {
+      color: 'woodMid',
+    });
+    ctx.gap();
+    ctx.line('The wall behind the corkboard polaroid is the making-of. The safe under the desk', {
+      color: 'woodMid',
+    });
+    ctx.line('holds the full changelog, if you can open it.', { color: 'woodMid' });
+    ctx.gap();
+    ctx.button('Source on GitHub (opens a new tab)', () => {
+      window.open('https://github.com/elooouan/rug-or-not', '_blank', 'noopener');
+    });
+    ctx.small('Wallet features are read-only. The game never asks you to sign or send anything.');
   },
 
   '404'(ctx) {

@@ -29,6 +29,8 @@
   renders); they now ramp from their own level.
 - Rogues gallery: a third notebook chapter with a WANTED poster for every rug you've called
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
+- NetScope has an About page (version, credits, licences, source link); the version string
+  lives in one place (`GAME_VERSION`).
 - The board page can save a Detective ID card (PNG): rank, record, arcade bests, badges, Lucien.
 - Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
   for posting, next to the clipboard text.
