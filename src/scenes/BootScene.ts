@@ -12,6 +12,7 @@ import { loadCases, reportCaseErrors } from '@/systems/caseLoader';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
+import { syncDiscovery } from '@/systems/discovery';
 import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
@@ -46,6 +47,7 @@ export class BootScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     installToasts();
+    syncDiscovery();
     // A wallet linked on a previous visit reconnects silently (no popup); optional either way.
     void wallet.reconnect();
     const s = saveStore.get().settings;

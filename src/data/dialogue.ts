@@ -256,6 +256,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: 'The cat is Biscuit. The polaroid on the corkboard is how this office got built. The safe under the desk is locked. For now.',
     },
+    {
+      text: 'The drawer holds the case files: a closed one can be reopened for a better grade. And if anything on this desk ever puzzles you, the notebook has a handbook.',
+    },
   ],
   'secret-solved': [
     {

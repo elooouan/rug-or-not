@@ -16,6 +16,7 @@ import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
+import { unlocked } from '@/systems/discovery';
 import { difficultyPips, rect } from '@/ui/shapes';
 
 /** A filing-cabinet drawer of case folders. Locked ones wear a padlock. */
@@ -47,7 +48,9 @@ export class CaseSelectScene extends Phaser.Scene {
       this,
       GAME_WIDTH / 2,
       GAME_HEIGHT - 26,
-      `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed  ·  P: the pile  W: weekly`,
+      `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed${
+        unlocked('cold') ? '  ·  P: the pile' : ''
+      }${unlocked('weekly') ? '  W: weekly' : ''}`,
       {
         size: FONT.size.small,
         color: 'paperShadow',
@@ -71,8 +74,11 @@ export class CaseSelectScene extends Phaser.Scene {
     });
     // The pile: a blank folder at the end of the drawer that prints a cold case, and
     // beside it this week's cold case, the same file for everyone.
-    if (cases.length < DRAWER.cols * DRAWER.rows) this.makePile(slot(cases.length));
-    if (cases.length + 1 < DRAWER.cols * DRAWER.rows) this.makeWeekly(slot(cases.length + 1));
+    // Both turn up with progress (see systems/discovery).
+    if (unlocked('cold') && cases.length < DRAWER.cols * DRAWER.rows)
+      this.makePile(slot(cases.length));
+    if (unlocked('weekly') && cases.length + 1 < DRAWER.cols * DRAWER.rows)
+      this.makeWeekly(slot(cases.length + 1));
 
     const back = new PixelButton(
       this,
@@ -94,10 +100,12 @@ export class CaseSelectScene extends Phaser.Scene {
     kb?.on('keydown-ENTER', () => this.open(this.focus));
     // The two folders at the end of the drawer, for keyboard players.
     kb?.on('keydown-P', () => {
+      if (!unlocked('cold')) return;
       audio.play('paper');
       startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
     });
     kb?.on('keydown-W', () => {
+      if (!unlocked('weekly')) return;
       audio.play('paper');
       startColdCase(this, `week-${weekKey()}`);
     });

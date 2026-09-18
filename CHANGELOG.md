@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.8 — the handbook (unreleased)
+
+- The desk opens up a piece at a time: a fresh save sees the folder, the daily, the notebook
+  and settings. The drawer turns up after the first closed file (Lucien's tour covers it),
+  Red Flag Rush after the second, cold cases after the third, the weekly after the fourth,
+  each with a word from Lucien and a toast the first time. Saves that already had it all
+  keep it all; shared links skip the gate.
+- A handbook: the notebook's fourth chapter, eighteen short pages on how the office works
+  (lens, pins, tabs, stamping, scoring, hints, notebook, daily, drawer, cold cases, weekly,
+  rush, the phone, the coin, badges, sharing, desk toys). "How to play" on the title opens
+  it; pages about things not yet on the desk say when they turn up.
+- Phantom's mark on the wallet buttons; buttons can carry an icon. The title chip says
+  which wallet it will connect.
+
 ## v0.7 — night shift
 
 - Wallet: a "Connect wallet" chip on the title (it opens the coin page on the phone), silent

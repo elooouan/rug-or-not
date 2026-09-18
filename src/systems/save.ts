@@ -43,6 +43,8 @@ export interface SaveData {
   seenUnlocks: string[];
   /** Lucien dialogue scripts already shown. */
   seenHints: string[];
+  /** Desk features (see src/systems/discovery.ts) the player has been told about. */
+  discovered: string[];
   /** Arcade-style handle shown on the leaderboard. */
   detectiveName: string;
   /** Last GAME_VERSION this save was opened with (drives the "new tonight" note). */
@@ -105,6 +107,7 @@ export function defaultSave(): SaveData {
     cosmetics: { ...DEFAULT_COSMETICS },
     seenUnlocks: [],
     seenHints: [],
+    discovered: [],
     detectiveName: 'ANON',
     lastSeenVersion: '',
     badges: [],
@@ -221,6 +224,8 @@ export function sanitizeSave(raw: unknown): SaveData {
   }
   if (Array.isArray(r.seenHints))
     d.seenHints = r.seenHints.filter((x): x is string => typeof x === 'string');
+  if (Array.isArray(r.discovered))
+    d.discovered = r.discovered.filter((x): x is string => typeof x === 'string');
   if (Array.isArray(r.seenUnlocks))
     d.seenUnlocks = r.seenUnlocks.filter((x): x is string => typeof x === 'string');
   if (r.daily && typeof r.daily === 'object') {

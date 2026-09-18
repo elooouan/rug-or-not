@@ -24,6 +24,9 @@ import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { setupScene } from './sceneUtil';
+import { HANDBOOK } from '@/data/handbook';
+import { closedFiles, FEATURES, unlocked } from '@/systems/discovery';
+import { PALETTE } from '@/config/palette';
 
 const BOOK = { x: 70, y: 30, w: 500, h: 300, gutter: 8, pad: 14, lineH: 14, rowH: 15 } as const;
 const SEV_COLOR: Record<Severity, PaletteKey> = {
@@ -34,8 +37,8 @@ const SEV_COLOR: Record<Severity, PaletteKey> = {
 const SEV_MARK: Record<Severity, string> = { minor: '!', major: '!!', critical: '!!!' };
 const HERRING_IDS = Object.keys(HERRINGS) as HerringId[];
 
-type Chapter = 'flags' | 'herrings' | 'rogues';
-const CHAPTERS: Chapter[] = ['flags', 'herrings', 'rogues'];
+type Chapter = 'flags' | 'herrings' | 'rogues' | 'handbook';
+const CHAPTERS: Chapter[] = ['flags', 'herrings', 'rogues', 'handbook'];
 
 /**
  * The Detective's Notebook: three chapters. Red flags (unlocked as you meet
@@ -60,6 +63,12 @@ export class NotebookScene extends Phaser.Scene {
   }
 
   private openAt: { chapter: Chapter; id: string } | null = null;
+  /** Where the next line on the right-hand page goes. */
+  private detailY = 0;
+
+  private detailGap(px: number): void {
+    this.detailY += px;
+  }
 
   init(
     data: { overlay?: boolean; returnTo?: string; chapter?: Chapter; id?: string } | undefined,
@@ -82,11 +91,13 @@ export class NotebookScene extends Phaser.Scene {
 
   private get ids(): string[] {
     if (this.chapter === 'rogues') return this.rugs.map((c) => c.id);
+    if (this.chapter === 'handbook') return HANDBOOK.map((t) => t.id);
     return this.chapter === 'flags' ? FLAG_IDS : HERRING_IDS;
   }
 
   private known(id: string): boolean {
     const save = saveStore.get();
+    if (this.chapter === 'handbook') return true;
     if (this.chapter === 'rogues') return save.caseResults[id]?.solved === true;
     return this.chapter === 'flags'
       ? save.unlockedFlags.includes(id)
@@ -129,15 +140,16 @@ export class NotebookScene extends Phaser.Scene {
     // Chapter tabs on the cover edge.
     const tab = (label: string, ch: Chapter, tx: number) => {
       const b = new PixelButton(this, tx, y + h + 8, label, () => this.setChapter(ch), {
-        width: 118,
+        width: 108,
       });
       b.setDepth(DEPTH.hud);
       return b;
     };
     this.tabButtons = [
       tab('Red flags', 'flags', x),
-      tab('Yellow herrings', 'herrings', x + 124),
-      tab('Rogues', 'rogues', x + 248),
+      tab('Yellow herrings', 'herrings', x + 114),
+      tab('Rogues', 'rogues', x + 228),
+      tab('Handbook', 'handbook', x + 342),
     ];
 
     this.listPage = this.add.container(x + BOOK.pad, y + BOOK.pad).setDepth(DEPTH.pins);
@@ -185,10 +197,16 @@ export class NotebookScene extends Phaser.Scene {
     const pageW = BOOK.w / 2 - BOOK.gutter;
     const verb = ch === 'flags' ? 'learned' : ch === 'herrings' ? 'met' : 'caught';
     this.listPage.add(
-      makeText(this, pageW - BOOK.pad * 2, 2, `${learned}/${this.ids.length} ${verb}`, {
-        size: FONT.size.tiny,
-        color: 'paperShadow',
-      }).setOrigin(1, 0),
+      makeText(
+        this,
+        pageW - BOOK.pad * 2,
+        2,
+        ch === 'handbook' ? 'how the office works' : `${learned}/${this.ids.length} ${verb}`,
+        {
+          size: FONT.size.tiny,
+          color: 'paperShadow',
+        },
+      ).setOrigin(1, 0),
     );
     if (ch === 'rogues' && learned === this.ids.length && this.ids.length > 0)
       awardBadge(this, 'most-wanted');
@@ -200,7 +218,9 @@ export class NotebookScene extends Phaser.Scene {
           ? FLAGS[id as FlagId].title
           : ch === 'herrings'
             ? HERRINGS[id as HerringId].title
-            : this.rogueTitle(id);
+            : ch === 'handbook'
+              ? (HANDBOOK[i]?.title ?? id)
+              : this.rogueTitle(id);
       const t = makeText(this, 14, 16 + i * BOOK.rowH, known ? title : '? ? ? ? ?', {
         size: FONT.size.body,
         font: 'body',
@@ -232,6 +252,17 @@ export class NotebookScene extends Phaser.Scene {
             color: 'stampRed',
           }),
         );
+      } else if (ch === 'handbook') {
+        const topic = HANDBOOK[i];
+        // Pages about things that haven't turned up on the desk yet are dimmed, not hidden.
+        const soon = topic?.feature && !unlocked(topic.feature);
+        if (soon) t.setColor(PALETTE.paperShadow);
+        this.listPage.add(
+          makeText(this, 0, 18 + i * BOOK.rowH, String(i + 1), {
+            size: FONT.size.tiny,
+            color: soon ? 'paperShadow' : 'woodMid',
+          }),
+        );
       } else {
         this.listPage.add(
           makeText(this, 0, 18 + i * BOOK.rowH, known ? 'ok' : '', {
@@ -257,11 +288,11 @@ export class NotebookScene extends Phaser.Scene {
     const pageW = BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2;
     const cw = charWidth(this, 'body', 12);
     const maxChars = Math.floor(pageW / cw);
-    let y = 0;
+    this.detailY = 0;
     const add = (text: string, opts: Parameters<typeof makeText>[4]) => {
-      const t = makeText(this, 0, y, text, opts);
+      const t = makeText(this, 0, this.detailY, text, opts);
       this.detail.add(t);
-      y += BOOK.lineH;
+      this.detailY += BOOK.lineH;
       return t;
     };
     if (this.chapter === 'rogues') {
@@ -269,9 +300,14 @@ export class NotebookScene extends Phaser.Scene {
       audio.play('tick');
       return;
     }
+    if (this.chapter === 'handbook') {
+      this.handbookPage(id, add, maxChars);
+      audio.play('tick');
+      return;
+    }
     if (!known) {
       add('UNKNOWN PATTERN', { size: FONT.size.body, color: 'paperShadow' });
-      y += 4;
+      this.detailY += 4;
       const msg =
         this.chapter === 'flags'
           ? 'You have not met this red flag yet. Close more cases to fill in this page.'
@@ -289,18 +325,18 @@ export class NotebookScene extends Phaser.Scene {
         size: FONT.size.tiny,
         color: SEV_COLOR[flag.severity],
       });
-      y += 6;
+      this.detailY += 6;
       add('What it is', { size: FONT.size.tiny, color: 'paperShadow' });
       wrapMono(flag.explanation, maxChars).forEach((l) =>
         add(l, { font: 'body', color: 'shadow' }),
       );
-      y += 6;
+      this.detailY += 6;
       add('How to spot it', { size: FONT.size.tiny, color: 'paperShadow' });
       wrapMono(flag.howToSpot, maxChars).forEach((l) => add(l, { font: 'body', color: 'ink' }));
       const misses = saveStore.get().stats.flagMisses[id] ?? 0;
       const hits = saveStore.get().stats.flagHits[id] ?? 0;
       if (misses + hits > 0) {
-        y += 6;
+        this.detailY += 6;
         add(
           `Your record: pinned ${hits}, missed ${misses}${misses > hits ? '. Look harder.' : '.'}`,
           { font: 'body', color: misses > hits ? 'stampRed' : 'stampGreen' },
@@ -311,12 +347,12 @@ export class NotebookScene extends Phaser.Scene {
       // Not from a live investigation (it would abandon the case underneath); from the
       // report it's fine, the case is closed.
       if (!this.overlay || this.returnTo === 'ReportScene') {
-        y += 8;
+        this.detailY += 8;
         const drilled = saveStore.get().stats.drilled.includes(id);
         const b = new PixelButton(
           this,
           0,
-          y,
+          this.detailY,
           drilled ? 'Drill again' : 'Drill this flag',
           () => {
             if (this.overlay) this.scene.stop(this.returnTo);
@@ -328,12 +364,12 @@ export class NotebookScene extends Phaser.Scene {
         this.detail.add(b);
         if (drilled)
           this.detail.add(
-            makeText(this, b.bw + 8, y + 4, 'drilled', {
+            makeText(this, b.bw + 8, this.detailY + 4, 'drilled', {
               size: FONT.size.tiny,
               color: 'stampGreen',
             }),
           );
-        y += b.bh + 4;
+        this.detailY += b.bh + 4;
       }
     } else {
       const h = HERRINGS[id as HerringId];
@@ -341,11 +377,41 @@ export class NotebookScene extends Phaser.Scene {
         add(l, { size: FONT.size.body, color: 'woodDark' }),
       );
       add('yellow herring: looks scary, is fine', { size: FONT.size.tiny, color: 'stampGreen' });
-      y += 6;
+      this.detailY += 6;
       add('Why it is fine', { size: FONT.size.tiny, color: 'paperShadow' });
       wrapMono(h.reassurance, maxChars).forEach((l) => add(l, { font: 'body', color: 'shadow' }));
     }
     audio.play('tick');
+  }
+
+  /** One subject of the handbook on the right-hand page. */
+  private handbookPage(
+    id: string,
+    add: (text: string, opts: Parameters<typeof makeText>[4]) => Phaser.GameObjects.Text,
+    maxChars: number,
+  ): void {
+    const topic = HANDBOOK.find((t) => t.id === id);
+    if (!topic) return;
+    wrapMono(topic.title.toUpperCase(), 26).forEach((l) =>
+      add(l, { size: FONT.size.body, color: 'woodDark' }),
+    );
+    const gate = topic.feature ? FEATURES.find((f) => f.id === topic.feature) : undefined;
+    if (gate && !unlocked(gate.id)) {
+      const left = gate.after - closedFiles();
+      add(`turns up after ${left} more closed ${left === 1 ? 'file' : 'files'}`, {
+        size: FONT.size.tiny,
+        color: 'amber',
+      });
+    }
+    for (const part of topic.body) {
+      if (typeof part === 'string') {
+        wrapMono(part, maxChars).forEach((l) => add(l, { font: 'body', color: 'shadow' }));
+        this.detailGap(4);
+      } else {
+        this.detailGap(2);
+        add(part.h, { size: FONT.size.tiny, color: 'paperShadow' });
+      }
+    }
   }
 
   private rogueTitle(caseId: string): string {

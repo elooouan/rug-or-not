@@ -32,6 +32,7 @@ import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
+import { markDiscovered, pendingDiscovery, unlocked, type Feature } from '@/systems/discovery';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 
@@ -175,7 +176,10 @@ export class TitleScene extends Phaser.Scene {
 
     // Title card: a sheet of paper under the lamp.
     const cardW = 300;
-    const cardH = 262;
+    // The sheet grows with the menu: a fresh desk has four rows, a full one seven.
+    const menuRows =
+      4 + (['drawer', 'rush', 'cold'] as Feature[]).filter((f) => unlocked(f)).length;
+    const cardH = 130 + menuRows * 22;
     const cx = Math.round((GAME_WIDTH - cardW) / 2);
     const cy = 56;
     const card = this.add.container(0, 0).setDepth(DEPTH.documents);
@@ -244,16 +248,20 @@ export class TitleScene extends Phaser.Scene {
     const nextIndex = Math.min(save.campaignUnlocked - 1, playable.length - 1);
     const allDone = playable.every((c) => save.caseResults[c.id]);
     const bx = GAME_WIDTH / 2 - 75;
-    let by = cy + 90;
+    let by = cy + 86;
     const mk = (label: string, fn: () => void, half: 'left' | 'right' | null = null) => {
       const b = new PixelButton(this, half === 'right' ? bx + 77 : bx, by, label, fn, {
         width: half ? 73 : 150,
       });
       this.children.remove(b);
       card.add(b);
-      if (half !== 'left') by += 23;
+      if (half !== 'left') by += 22;
       return b;
     };
+    // The desk opens up a piece at a time (see systems/discovery); rows for features that
+    // haven't shown up yet simply aren't there.
+    const only = (f: Feature, row: () => PixelButton): PixelButton | null =>
+      unlocked(f) ? row() : null;
     const play = () => {
       gameState.mode = 'campaign';
       gameState.currentIndex = nextIndex;
@@ -278,12 +286,17 @@ export class TitleScene extends Phaser.Scene {
           startDaily(this, daily);
         },
       ),
-      mk('Case files', () => this.scene.start('CaseSelectScene')),
-      mk('Red Flag Rush', () => this.scene.start('RushScene')),
-      mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())))),
+      only('drawer', () => mk('Case files', () => this.scene.start('CaseSelectScene'))),
+      only('rush', () => mk('Red Flag Rush', () => this.scene.start('RushScene'))),
+      only('cold', () =>
+        mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())))),
+      ),
+      mk('How to play', () =>
+        this.scene.start('NotebookScene', { chapter: 'handbook', id: 'desk' }),
+      ),
       mk('Notebook', () => this.scene.start('NotebookScene'), 'left'),
       mk('Settings', () => this.scene.start('SettingsScene'), 'right'),
-    ];
+    ].filter((b): b is PixelButton => b !== null);
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'));
     this.input.on('pointermove', () => group.clearFocus());
 
@@ -507,7 +520,10 @@ export class TitleScene extends Phaser.Scene {
   private greet(streak: number, dailyDone: boolean): void {
     if (lucienSays(this, 'title-intro')) return;
     // Back from the first case: a quick tour of what else is on the desk.
-    if (saveStore.get().stats.runs >= 1 && lucienSays(this, 'desk-tour')) return;
+    if (saveStore.get().stats.runs >= 1 && lucienSays(this, 'desk-tour')) {
+      markDiscovered('drawer');
+      return;
+    }
     // Returning players get a one-line tour of the update; new saves just note the version.
     const seen = saveStore.get().lastSeenVersion;
     if (seen !== GAME_VERSION) {
@@ -521,6 +537,17 @@ export class TitleScene extends Phaser.Scene {
         });
         return;
       }
+    }
+    // Something new on the desk since last time: say so, one thing per visit.
+    const fresh = pendingDiscovery();
+    if (fresh) {
+      markDiscovered(fresh.id);
+      this.time.delayedCall(500, () => {
+        if (!this.scene.isActive()) return;
+        toast(this, 'NEW ON THE DESK', fresh.title);
+        LucienBubble.say(this, fresh.blurb, 6500);
+      });
+      return;
     }
     if (TitleScene.nagged) return;
     TitleScene.nagged = true;
