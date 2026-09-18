@@ -165,6 +165,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     this.content.setY(
       BROWSER.y + BROWSER.titleH + BROWSER.toolbarH + BROWSER.padding - this.scrollY,
     );
+    this.moreHint?.setVisible(this.scrollY < max - 1);
   }
 
   go(page: PageId, pushHistory = true): void {
@@ -195,6 +196,33 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     const ctx = new PageCtx(this.scene, this.content, BROWSER.w - BROWSER.padding * 2, this);
     PAGES[this.page](ctx);
     this.contentHeight = ctx.y;
+    this.updateMoreHint();
+  }
+
+  /** A tap target at the foot of the window when the page runs past it. */
+  private moreHint?: Phaser.GameObjects.Text;
+
+  private updateMoreHint(): void {
+    const { x, y, w, h } = BROWSER;
+    if (!this.moreHint) {
+      this.moreHint = makeText(this.scene, x + w - 10, y + h - 4, 'v  more', {
+        size: 8,
+        color: 'woodMid',
+      }).setOrigin(1, 1);
+      this.moreHint.setInteractive(
+        new Phaser.Geom.Rectangle(-8, -8, this.moreHint.width + 16, this.moreHint.height + 16),
+        Phaser.Geom.Rectangle.Contains,
+      );
+      this.moreHint.on(
+        'pointerdown',
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+          ev.stopPropagation();
+          this.scrollBy(52);
+        },
+      );
+      this.add(this.moreHint);
+    }
+    this.moreHint.setVisible(this.scrollY < this.contentHeight - this.viewH - 1);
   }
 
   private overlayHeld = true;
