@@ -300,7 +300,9 @@ export class NotebookScene extends Phaser.Scene {
       }
       // Drill: five generated pages that all hide this flag. Not from an overlay,
       // where it would abandon the case underneath.
-      if (!this.overlay) {
+      // Not from a live investigation (it would abandon the case underneath); from the
+      // report it's fine, the case is closed.
+      if (!this.overlay || this.returnTo === 'ReportScene') {
         y += 8;
         const drilled = saveStore.get().stats.drilled.includes(id);
         const b = new PixelButton(
@@ -308,7 +310,10 @@ export class NotebookScene extends Phaser.Scene {
           0,
           y,
           drilled ? 'Drill again' : 'Drill this flag',
-          () => this.scene.start('RushScene', { drill: id }),
+          () => {
+            if (this.overlay) this.scene.stop(this.returnTo);
+            this.scene.start('RushScene', { drill: id });
+          },
           { variant: 'ink' },
         );
         this.children.remove(b);
