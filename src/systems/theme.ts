@@ -15,7 +15,6 @@ export function syncTheme(scene: Phaser.Scene): boolean {
   if (currentTheme() === wanted) return false;
   applyTheme(wanted);
   repaintTextures(scene);
-  applyCosmetics(scene, saveStore.get().cosmetics);
-  (scene.scene.get('CursorScene') as { retexture?: () => void } | null)?.retexture?.();
+  applyCosmetics(scene, saveStore.get().cosmetics); // also re-points the cursor overlay
   return true;
 }

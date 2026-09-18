@@ -96,6 +96,12 @@ every squish returns to rest), make interactions respond immediately, check UI e
 - Dynamic `import('/src/...')` from the console can give a different module instance than
   the game's; read state from scene objects instead.
 - CI runners render through software GL: e2e waits must be condition-based (see `e2e/`).
+- `node scripts/fuzz.mjs [seconds] [seed]` (dev server up) is a monkey test: random clicks,
+  keys, wheel and drags across the game; it prints page errors with the scene, and heap
+  jumps. A crash is deterministic per seed: `FUZZ_TRACE=<n>` prints actions from n on,
+  `FUZZ_WATCH=<n>` pauses the page with the debugger during action n and prints the stack.
+- `node scripts/promo.mjs` (dev server up) regenerates the marketing stills and GIF clips in
+  `assets/marketing/`; add an entry there when a feature deserves a tweet.
 - Wall photos: `SNAP_ROOT=$PWD npx vite --config scripts/snapshot.config.ts --port 5180`, then
   `__debug.snapshot('NN-vXX-name')` and a frame in `src/data/history.ts`.
 

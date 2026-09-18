@@ -18,6 +18,10 @@
   which wallet it will connect.
 - Fixed: closing the pause menu or the phone with a click over the paper dropped a stray
   pin (and cost 15 points) on the release; a release now only counts where the press began.
+- Fixed: changing a cosmetic (rim, ink, wood, lamp) in Settings left the pointer overlay
+  holding textures that no longer existed, which threw on every frame afterwards and could
+  lock the whole tab up on the next screen change. Found by a new monkey test
+  (`scripts/fuzz.mjs`) that clicks and types at random and reports what breaks.
 
 ## v0.7 — night shift
 

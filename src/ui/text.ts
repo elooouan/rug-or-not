@@ -87,6 +87,12 @@ export function lineHeightOf(scene: Phaser.Scene, font: 'ui' | 'body', size: num
 
 /** Greedy word wrap using a monospace char width. Returns lines. */
 export function wrapMono(text: string, maxChars: number): string[] {
+  // A width that works out to nothing (a measurement gone wrong, a box too narrow) must
+  // not become an endless loop of empty lines; one character per line is the floor.
+  if (!(maxChars >= 1)) {
+    if (import.meta.env.DEV) console.warn('wrapMono: maxChars', maxChars, 'for', text.slice(0, 40));
+    maxChars = Number.isNaN(maxChars) ? Infinity : 1;
+  }
   const out: string[] = [];
   for (const para of text.split('\n')) {
     const words = para.split(' ');

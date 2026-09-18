@@ -27,4 +27,8 @@ export function applyCosmetics(scene: Phaser.Scene, sel: CosmeticSelection): voi
   makeLamp(scene, lamp.shade);
   makeMagnifier(scene, rim);
   makeStamps(scene, ink.rug, ink.legit);
+  // The cursor overlay outlives every other scene and holds the lens and pointer images;
+  // left pointing at the dropped textures it would throw on every frame from here on.
+  if (scene.scene.isActive('CursorScene'))
+    (scene.scene.get('CursorScene') as { retexture?: () => void }).retexture?.();
 }

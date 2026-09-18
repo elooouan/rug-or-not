@@ -1,4 +1,4 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import { GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '@/config/layout';
 import { CursorScene } from './CursorScene';
 import { saveStore } from '@/systems/save';
@@ -9,7 +9,16 @@ import { saveStore } from '@/systems/save';
  */
 export function setupScene(scene: Phaser.Scene): void {
   scene.cameras.main.setZoom(RENDER_SCALE).centerOn(GAME_WIDTH / 2, GAME_HEIGHT / 2);
-  if (scene.scene.isActive(CursorScene.KEY)) scene.scene.bringToTop(CursorScene.KEY);
+  if (scene.scene.isActive(CursorScene.KEY)) {
+    // While the scene manager is mid-step, bringToTop only queues itself; queued from
+    // inside the queue it re-queues forever (the manager's flag stays up after a frame
+    // that threw). Wait for the step to end instead.
+    if (scene.scene.manager.isProcessing)
+      scene.events.once(Phaser.Scenes.Events.POST_UPDATE, () =>
+        scene.scene.bringToTop(CursorScene.KEY),
+      );
+    else scene.scene.bringToTop(CursorScene.KEY);
+  }
   // A short fade up from the dark so screens don't hard-cut. Overlays launched on top of a
   // paused scene skip it (they slide in over the desk).
   if (!saveStore.get().settings.reducedMotion && !scene.scene.isPaused(otherScene(scene)))
