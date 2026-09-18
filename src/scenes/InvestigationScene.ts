@@ -410,6 +410,16 @@ export class InvestigationScene extends Phaser.Scene {
       });
     if (changed && animate) {
       audio.play('paper');
+      // Rookies get told what the marks mean, once the lesson isn't running. A document
+      // tip has the floor first; this one waits for a later switch.
+      this.time.delayedCall(900, () => {
+        if (LucienBubble.isShowing) return;
+        this.mutter(
+          'tab-dots',
+          "A red dot on a tab is a page you haven't opened yet. The examined counter is the clue spots you've looked at.",
+          true,
+        );
+      });
       const doc = this.docs[i];
       if (!saveStore.get().settings.reducedMotion) {
         // A quick page flip: the sheet lands from slightly above.

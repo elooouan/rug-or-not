@@ -15,6 +15,11 @@ import { charWidth, makeText, wrapMono } from './text';
 export class LucienBubble extends Phaser.GameObjects.Container {
   private static current: LucienBubble | null = null;
 
+  /** Is he saying something right now? (Lower-priority lines wait for the next chance.) */
+  static get isShowing(): boolean {
+    return LucienBubble.current !== null && LucienBubble.current.active;
+  }
+
   static dismiss(): void {
     LucienBubble.current?.destroy();
     LucienBubble.current = null;
