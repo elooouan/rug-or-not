@@ -37,6 +37,19 @@ function hoursToMidnight(): number {
   return Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 3_600_000));
 }
 
+/** Extra title quips for the hour of the night (or day) the player is actually in. */
+function timeQuips(hour: number): string[] {
+  if (hour >= 1 && hour < 5)
+    return [
+      `${hour} in the morning. The tokens don't sleep either.`,
+      'Nobody launches anything honest at this hour. Nobody reads anything either.',
+    ];
+  if (hour >= 5 && hour < 9) return ['Early. The rugs from last night are still warm.'];
+  if (hour >= 12 && hour < 14) return ['Lunch is a concept. The coffee is real.'];
+  if (hour >= 22 || hour === 0) return ['Late. Good. The night shift sees the good ones.'];
+  return [];
+}
+
 export class TitleScene extends Phaser.Scene {
   static readonly KEY = 'TitleScene';
   private static seenIntro = false;
@@ -306,10 +319,12 @@ export class TitleScene extends Phaser.Scene {
     const idle = this.add.image(m.x, m.y, LUCIEN_TEX).setOrigin(0, 1).setDepth(DEPTH.hud);
     idle.setDisplaySize(Math.round(idle.width * (m.height / idle.height)), m.height);
     idle.setInteractive({ useHandCursor: false });
-    let quip = Phaser.Math.Between(0, LUCIEN_QUIPS.length - 1);
+    // The clock on the wall is real: a few quips know what time it is.
+    const quips = [...LUCIEN_QUIPS, ...timeQuips(new Date().getHours())];
+    let quip = Phaser.Math.Between(0, quips.length - 1);
     idle.on('pointerdown', () => {
-      quip = (quip + 1) % LUCIEN_QUIPS.length;
-      LucienBubble.say(this, LUCIEN_QUIPS[quip], 3600);
+      quip = (quip + 1) % quips.length;
+      LucienBubble.say(this, quips[quip], 3600);
       if (!reduced) {
         idle.setScale(idle.scaleX * 1.06, idle.scaleY * 0.94);
         this.tweens.add({
