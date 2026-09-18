@@ -25,6 +25,7 @@
   renders); they now ramp from their own level.
 - Rogues gallery: a third notebook chapter with a WANTED poster for every rug you've called
   correctly (mugshot, charges, reward, CAUGHT stamp); the report announces new posters.
+- The board page can save a Detective ID card (PNG): rank, record, arcade bests, badges, Lucien.
 - Share now offers "Save card": a 1280x720 PNG of the report (stamp, grade, score, Lucien)
   for posting, next to the clipboard text.
 - Two new cases: $NAPKIN (a renounce with an operator behind it, an audit for the wrong file)

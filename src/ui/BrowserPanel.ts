@@ -16,14 +16,16 @@ import { makeRng } from '@/systems/rng';
 import { currentStreak, localDateKey, playedStrip } from '@/systems/dailyCase';
 import { saveStore } from '@/systems/save';
 import { wallet } from '@/systems/wallet';
-import { awardBadge, badgeProgress, noteSeen } from '@/systems/badges';
-import { BADGES } from '@/data/badges';
+import { awardBadge, badgeCount, badgeProgress, noteSeen } from '@/systems/badges';
+import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
 import { UNLOCKABLES } from '@/data/unlockables';
-import { lucienSays } from './DialogueBox';
+import { LUCIEN_TEX, lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { attachScroll } from './dragScroll';
+import { downloadCanvas, renderIdCard } from '@/systems/shareCard';
+import { toast } from './Toast';
 import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
@@ -521,7 +523,46 @@ const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button(
       'Change name',
       () => ctx.panel.scene && new NamePicker(ctx.scene, () => ctx.panel.render()),
-      { variant: 'paper' },
+      { variant: 'paper', sameLine: true },
+    );
+    ctx.button(
+      'Save ID card',
+      () => {
+        const badges = badgeCount();
+        const mascot = ctx.scene.textures.exists(LUCIEN_TEX)
+          ? (ctx.scene.textures.get(LUCIEN_TEX).getSourceImage() as HTMLImageElement)
+          : null;
+        const st = save.stats;
+        const canvas = renderIdCard({
+          detective: save.detectiveName,
+          rank: rankForScore(save.totalScore),
+          score: save.totalScore,
+          casesSolved: Object.values(save.caseResults).filter((r) => r.solved).length,
+          casesTotal: gameState.cases.length,
+          badges: badges.earned,
+          badgesTotal: badges.total,
+          streak: currentStreak(save.daily, localDateKey()),
+          rushBest: st.rushBest,
+          coldBest: st.coldBest,
+          badgeNames: save.badges
+            .map((id) => BADGE_BY_ID[id]?.name)
+            .filter((n): n is string => !!n)
+            .slice(0, 4),
+          url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
+          mascot,
+        });
+        const ok = downloadCanvas(
+          canvas,
+          `rug-or-not-detective-${save.detectiveName.toLowerCase()}.png`,
+        );
+        audio.play(ok ? 'stamp' : 'wrong');
+        toast(
+          ctx.scene,
+          ok ? 'CARD SAVED' : 'NO LUCK',
+          ok ? 'your detective ID' : 'this browser blocks downloads',
+        );
+      },
+      { x: 110, variant: 'paper' },
     );
     // Daily strip: the last two weeks, filled squares are days played.
     const today = localDateKey();

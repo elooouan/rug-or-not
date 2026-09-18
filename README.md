@@ -67,7 +67,8 @@ The phone on the desk opens an in-game browser:
   endpoint (`GET ?limit=N&mode=case|rush|cold` returns entries, `POST` accepts one) for a
   shared board. A ready-made Cloudflare Worker lives in
   [`server/leaderboard`](server/leaderboard/README.md) (one KV namespace, free tier, three
-  commands to deploy). Pick your arcade-style handle on the page.
+  commands to deploy). Pick your arcade-style handle on the page, and save a Detective ID card
+  (a PNG with your rank, record and badges) from there.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
 Configure the coin through env vars (see `.env.example`); nothing is hard-coded.

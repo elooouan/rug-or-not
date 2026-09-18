@@ -149,6 +149,114 @@ export function renderShareCard(
   return c;
 }
 
+export interface IdCardData {
+  detective: string;
+  rank: string;
+  score: number;
+  casesSolved: number;
+  casesTotal: number;
+  badges: number;
+  badgesTotal: number;
+  streak: number;
+  rushBest: number;
+  coldBest: number;
+  /** Badge names to print, already trimmed to a handful. */
+  badgeNames: string[];
+  url: string;
+  mascot?: HTMLImageElement | HTMLCanvasElement | null;
+}
+
+/** A detective ID card: rank, record, a few badges, Lucien. 1280x720 like the report card. */
+export function renderIdCard(data: IdCardData, canvas?: HTMLCanvasElement): HTMLCanvasElement {
+  const c = canvas ?? document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext('2d');
+  if (!ctx) return c;
+  const ui = (px: number, weight = 700) => `${weight} ${px}px '${FONT.ui}'`;
+  const body = (px: number) => `${px}px '${FONT.body}'`;
+  ctx.fillStyle = PALETTE.woodDark;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = PALETTE.woodMid;
+  for (let y = 0; y < H; y += 46) ctx.fillRect(0, y + ((y * 7) % 11), W, 3);
+  // The card itself: a laminated badge with a photo window.
+  const px = 190;
+  const py = 120;
+  const pw = W - 380;
+  const ph = H - 240;
+  ctx.fillStyle = 'rgba(27, 26, 31, 0.55)';
+  ctx.fillRect(px + 12, py + 14, pw, ph);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fillRect(px, py, pw, ph);
+  ctx.strokeStyle = PALETTE.stampRed;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(px + 12, py + 12, pw - 24, ph - 24);
+  ctx.fillStyle = PALETTE.stampRed;
+  ctx.fillRect(px + 12, py + 12, pw - 24, 54);
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = PALETTE.paper;
+  ctx.font = ui(30);
+  ctx.fillText('RUG OR NOT?  ·  DETECTIVE ID', px + 34, py + 24);
+  ctx.textAlign = 'right';
+  ctx.font = body(24);
+  ctx.fillText(`${data.url}   #RugOrNot`, px + pw - 34, py + 30);
+  ctx.textAlign = 'left';
+  // Photo window.
+  ctx.fillStyle = PALETTE.woodDark;
+  ctx.fillRect(px + 40, py + 96, 220, 300);
+  if (data.mascot) {
+    const img = data.mascot;
+    const scale = Math.min(200 / img.width, 280 / img.height);
+    ctx.imageSmoothingEnabled = false;
+    const dw = Math.round(img.width * scale);
+    const dh = Math.round(img.height * scale);
+    ctx.drawImage(img, px + 40 + (220 - dw) / 2, py + 96 + (300 - dh) / 2, dw, dh);
+  }
+  // Fields.
+  const fx = px + 300;
+  let fy = py + 96;
+  const field = (label: string, value: string, big = false) => {
+    ctx.fillStyle = PALETTE.woodMid;
+    ctx.font = ui(18);
+    ctx.fillText(label.toUpperCase(), fx, fy);
+    ctx.fillStyle = PALETTE.shadow;
+    ctx.font = big ? ui(44) : body(34);
+    ctx.fillText(value, fx, fy + 22);
+    fy += big ? 88 : 68;
+  };
+  field('Detective', data.detective, true);
+  field('Rank', `${data.rank}  ·  ${data.score} pts`);
+  field(
+    'Record',
+    `${data.casesSolved}/${data.casesTotal} files  ·  ${data.badges}/${data.badgesTotal} badges  ·  streak ${data.streak}`,
+  );
+  field('Arcade', `rush ${data.rushBest}  ·  cold ${data.coldBest}`);
+  if (data.badgeNames.length) {
+    ctx.fillStyle = PALETTE.woodMid;
+    ctx.font = ui(18);
+    ctx.fillText('BADGES', px + 40, py + 412);
+    ctx.fillStyle = PALETTE.ink;
+    ctx.font = body(26);
+    ctx.fillText(data.badgeNames.join('  ·  ').slice(0, 90), px + 40, py + 436);
+  }
+  // An "ON DUTY" stamp across the corner.
+  ctx.save();
+  ctx.translate(px + pw - 150, py + 130);
+  ctx.rotate(0.2);
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = PALETTE.stampGreen;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(-90, -28, 180, 56);
+  ctx.fillStyle = PALETTE.stampGreen;
+  ctx.font = ui(34);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('ON DUTY', 0, 2);
+  ctx.restore();
+  return c;
+}
+
 /** Trigger a PNG download of the card. Returns false when the browser can't. */
 export function downloadCanvas(canvas: HTMLCanvasElement, filename: string): boolean {
   try {
