@@ -111,6 +111,8 @@ export class DeskBackground {
   private flickerOn = true;
   private motion = true;
   private lampOn = true;
+  /** Biscuit is following something outside (the train); idle frames wait. */
+  private catWatching = false;
   private dark!: Phaser.GameObjects.Rectangle;
   private dust?: Phaser.GameObjects.Particles.ParticleEmitter;
   private lampClicks = 0;
@@ -440,12 +442,14 @@ export class DeskBackground {
           delay: 700,
           loop: true,
           callback: () =>
+            !this.catWatching &&
             this.cat.setTexture(`${TEX.cat}-${this.cat.texture.key.endsWith('-1') ? 0 : 1}`),
         }),
         scene.time.addEvent({
           delay: Phaser.Math.Between(2500, 5000),
           loop: true,
           callback: () => {
+            if (this.catWatching) return;
             this.cat.setTexture(`${TEX.cat}-2`);
             scene.time.delayedCall(
               140,
@@ -544,16 +548,28 @@ export class DeskBackground {
     const mask = scene.make.graphics({ x: 0, y: 0 }, false);
     mask.fillRect(x + 4, y + 4, w - 8, h - 10);
     g.setMask(new Phaser.Display.Masks.GeometryMask(scene, mask));
+    const duration = Phaser.Math.Between(7000, 11000);
     scene.tweens.add({
       targets: g,
       x: endX,
-      duration: Phaser.Math.Between(7000, 11000),
+      duration,
       ease: 'Linear',
       onComplete: () => {
         g.destroy();
         mask.destroy();
       },
     });
+    // Biscuit watches it go by.
+    if (this.cat?.active && !this.catWatching) {
+      this.catWatching = true;
+      this.cat.setTexture(`${TEX.cat}-3`);
+      this.timers.push(
+        scene.time.delayedCall(duration, () => {
+          this.catWatching = false;
+          if (this.cat.active) this.cat.setTexture(`${TEX.cat}-0`);
+        }),
+      );
+    }
   }
 
   /** A plane's blinking light crosses the top of the sky, rarely. */

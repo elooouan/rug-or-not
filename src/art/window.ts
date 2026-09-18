@@ -196,6 +196,7 @@ export function makeWindow(scene: Phaser.Scene): void {
 
 const CAT_MAP = { b: 'woodDark', d: 'shadow', e: 'amber', p: 'stampRed' } as const;
 // Frame 0: eyes open, tail down. Frame 1: eyes open, tail up. Frame 2: blink.
+// Frame 3: watching something go by (eyes to the side, ears up).
 const CAT_FRAMES = [
   [
     '.b.b..........',
@@ -225,6 +226,18 @@ const CAT_FRAMES = [
     '.b.b..........',
     'bbbbb.........',
     'bdbdb.........',
+    'bbbbb.........',
+    '.bbbbbbbb.....',
+    '.bbbbbbbbb....',
+    '.bbbbbbbbbb...',
+    '.bbbbbbbbbb.b.',
+    '.bbbbbbbbbbbb.',
+    '..bb..bb.bbb..',
+  ],
+  [
+    'b.b.b.........',
+    'bbbbb.........',
+    'bbebe.........',
     'bbbbb.........',
     '.bbbbbbbb.....',
     '.bbbbbbbbb....',
