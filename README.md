@@ -22,7 +22,7 @@ Other scripts:
 | ------------------------ | ---------------------------------------------------- |
 | `npm run build`          | Typecheck + production build into `dist/`            |
 | `npm run preview`        | Serve the production build locally                   |
-| `npm test`               | Vitest: scoring, daily seeding, save, unlocks, cases |
+| `npm test`               | Vitest: scoring, rush, generator, save, cases, board |
 | `npm run validate-cases` | Validate every case file and print a summary         |
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
@@ -138,12 +138,16 @@ src/
   config/           palette.ts (the only colours), layout.ts (all layout numbers), gameConfig.ts
   art/              Procedural placeholder textures (swap for sprite sheets later)
   data/             flags.ts (red flag + herring library), schema.ts (zod), cases/*.json, unlockables.ts
-  systems/          Pure logic: scoring, ranks, dailyCase, save, settings, unlocks, badges, hints,
-                    leaderboard, wallet (Phantom, read-only), weather, audio (synth SFX + lo-fi loop), caseLoader
+  systems/          Pure logic: scoring, rush, caseGen (cold cases), secretCase, ranks, dailyCase, save,
+                    settings, unlocks, badges, hints, leaderboard, wallet (Phantom, read-only), weather,
+                    audio (synth SFX, lo-fi + jazz loops, radio static), shareCard, caseLoader
   ui/               Reusable Phaser components: DocumentView + documents/, Magnifier, Stamp, NotebookPanel,
-                    DialogueBox (Lucien), BrowserPanel (NetScope), DeskBackground, StickyNote, Toast…
-  scenes/           Boot, Cursor (overlay), Title, CaseSelect, Investigation, Report, Notebook, Settings
-scripts/            validate-cases.ts
+                    DialogueBox (Lucien), BrowserPanel (NetScope), DeskBackground (window, cat, radio, safe…),
+                    Vault, StickyNote, Toast, dragScroll…
+  scenes/           Boot, Cursor (overlay), Title, CaseSelect, Investigation, Report, Notebook, Settings,
+                    Rush (also drills), History (the wall)
+scripts/            validate-cases.ts, snapshot.config.ts + photograph.sh (wall photos)
+server/leaderboard  Reference Cloudflare Worker for a shared board
 tests/              vitest
 public/fonts/       Pixelify Sans + VT323 (both SIL OFL, licences included)
 ```
