@@ -16,6 +16,7 @@ export const PALETTE = {
   ink: '#5b6f8a', // ink blue (text highlights, links)
   stampRed: '#9a3b3b', // muted stamp red (RUG)
   stampGreen: '#4f7a5a', // muted stamp green (LEGIT)
+  phantom: '#ab9ff2', // Phantom's lavender: the wallet mark only, nowhere else
 } as const;
 
 export type PaletteKey = keyof typeof PALETTE;

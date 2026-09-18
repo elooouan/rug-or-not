@@ -43,6 +43,7 @@ export const TEX = {
   iconUnlock: 'icon-unlock',
   iconPadlock: 'icon-padlock',
   iconPie: 'icon-pie',
+  iconPhantom: 'icon-phantom',
   pixel: 'px-white',
   phone: 'desk-phone',
   phoneGlow: 'desk-phone-glow',

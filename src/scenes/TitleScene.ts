@@ -31,7 +31,7 @@ import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
 import { setupScene } from './sceneUtil';
 import { toggleFullscreen } from '@/main';
-import { wallet } from '@/systems/wallet';
+import { wallet, walletName } from '@/systems/wallet';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 
@@ -329,7 +329,7 @@ export class TitleScene extends Phaser.Scene {
     const walletLabel = () => {
       const w = wallet.state;
       if (w.connected && w.address) return `${TOKEN.symbol} · ${shortAddress(w.address)}`;
-      return w.busy ? 'Wallet...' : 'Connect wallet';
+      return w.busy ? 'Wallet...' : `Connect ${walletName()}`;
     };
     const walletBtn = new PixelButton(
       this,
@@ -337,8 +337,13 @@ export class TitleScene extends Phaser.Scene {
       GAME_HEIGHT - 48,
       walletLabel(),
       () => BrowserPanel.toggle(this, 'coin'),
-      { variant: 'paper', width: 128 },
+      {
+        variant: 'paper',
+        width: 128,
+        icon: walletName() === 'Phantom' ? TEX.iconPhantom : undefined,
+      },
     );
+    walletBtn.setX(GAME_WIDTH - walletBtn.bw - 6);
     walletBtn.setDepth(DEPTH.hud);
     const unsubWallet = wallet.onChange(
       () => walletBtn.active && walletBtn.setLabel(walletLabel()),

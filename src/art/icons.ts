@@ -3,6 +3,29 @@ import { TEX } from './keys';
 import { drawPixels, makeGraphicsTexture } from './pixelUtil';
 
 export function makeIcons(scene: Phaser.Scene): void {
+  // Phantom's ghost on its lavender tile, redrawn at desk resolution for the wallet buttons.
+  makeGraphicsTexture(scene, TEX.iconPhantom, 14, 14, (g) =>
+    drawPixels(
+      g,
+      [
+        '.llllllllllll.',
+        'llllllllllllll',
+        'llllwwwwwwllll',
+        'lllwwwwwwwwlll',
+        'llwwwwwwwwwwll',
+        'llwwwkwwwkwwll',
+        'llwwwkwwwkwwll',
+        'llwwwwwwwwwwll',
+        'llwwwwwwwwwwll',
+        'llwwwwwwwwwwll',
+        'lllwwlwwwwlwll',
+        'llllllllllllll',
+        'llllllllllllll',
+        '.llllllllllll.',
+      ],
+      { l: 'phantom', w: 'paper', k: 'shadow' },
+    ),
+  );
   makeGraphicsTexture(scene, TEX.iconCheck, 9, 9, (g) =>
     drawPixels(
       g,

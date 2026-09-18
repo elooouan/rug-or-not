@@ -284,21 +284,25 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       ctx.gap(4);
       if (s.available) {
         ctx.line(`${walletName()} detected.`, { color: 'lampGreen' });
-        ctx.button(s.busy ? 'Waiting for the wallet...' : `Connect ${walletName()}`, () => {
-          if (s.busy) return;
-          lucienSays(ctx.scene, 'wallet');
-          void wallet.connect();
-        });
+        ctx.button(
+          s.busy ? 'Waiting for the wallet...' : `Connect ${walletName()}`,
+          () => {
+            if (s.busy) return;
+            lucienSays(ctx.scene, 'wallet');
+            void wallet.connect();
+          },
+          { icon: walletName() === 'Phantom' ? TEX.iconPhantom : undefined },
+        );
       } else {
         ctx.line('No Solana wallet in this browser.', { color: 'woodMid' });
         if (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches)
           ctx.line("On a phone, open this page inside the Phantom app's own browser.", {
             color: 'woodMid',
           });
-        ctx.button(
-          'Get Phantom (opens a new tab)',
+        const get = ctx.button(
+          'Get Phantom (new tab)',
           () => window.open(PHANTOM_URL, '_blank', 'noopener'),
-          { variant: 'paper', sameLine: true },
+          { variant: 'paper', sameLine: true, icon: TEX.iconPhantom },
         );
         ctx.button(
           'Check again',
@@ -306,7 +310,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             void wallet.connect();
             ctx.panel.render();
           },
-          { x: 190, variant: 'paper' },
+          { x: get.bw + 8, variant: 'paper' },
         );
       }
     } else {

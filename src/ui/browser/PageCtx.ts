@@ -63,10 +63,11 @@ export class PageCtx {
   button(
     label: string,
     onClick: () => void,
-    opts: { x?: number; variant?: 'paper' | 'ink'; sameLine?: boolean } = {},
+    opts: { x?: number; variant?: 'paper' | 'ink'; sameLine?: boolean; icon?: string } = {},
   ): PixelButton {
     const b = new PixelButton(this.scene, opts.x ?? 0, this.y, label, onClick, {
       variant: opts.variant ?? 'ink',
+      icon: opts.icon,
     });
     this.scene.children.remove(b);
     this.content.add(b);
