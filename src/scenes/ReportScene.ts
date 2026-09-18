@@ -16,6 +16,7 @@ import { LUCIEN_TEX, lucienSays } from '@/ui/DialogueBox';
 import { STORY_BEATS } from '@/data/dialogue';
 import { playableCases, secretUnlocked } from '@/systems/secretCase';
 import { confetti } from '@/ui/confetti';
+import { attachScroll } from '@/ui/dragScroll';
 import { toast } from '@/ui/Toast';
 import { StickyNote } from '@/ui/StickyNote';
 import { LucienBubble } from '@/ui/LucienBubble';
@@ -83,9 +84,7 @@ export class ReportScene extends Phaser.Scene {
     this.input.on('pointerdown', () => this.typewriter?.skip());
     this.input.keyboard?.on('keydown-SPACE', () => this.typewriter?.skip());
     this.input.keyboard?.on('keydown-ENTER', () => this.typewriter?.skip());
-    this.input.on('wheel', (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) =>
-      this.scrollBy(dy > 0 ? 26 : -26),
-    );
+    attachScroll(this, { step: 26, onScroll: (d) => this.scrollBy(d) });
     this.input.keyboard?.on('keydown-PAGE_DOWN', () => this.scrollBy(60));
     this.input.keyboard?.on('keydown-PAGE_UP', () => this.scrollBy(-60));
 

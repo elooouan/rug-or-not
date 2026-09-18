@@ -23,6 +23,7 @@ import { UNLOCKABLES } from '@/data/unlockables';
 import { lucienSays } from './DialogueBox';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
+import { attachScroll } from './dragScroll';
 import { StickyNote } from './StickyNote';
 import { charWidth, makeText, wrapMono, type TextOpts } from './text';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
@@ -115,6 +116,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   private viewH: number;
   private unsubscribeWallet?: () => void;
   private escBinding?: { key: Phaser.Input.Keyboard.Key; fn: () => void };
+  private detachScroll?: () => void;
   private static openPanel: BrowserPanel | null = null;
   /** What the RugScan page shows: the current case, the token index, or a chosen token. */
   rugscanView: 'auto' | 'index' | CaseData = 'auto';
@@ -209,7 +211,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     scene.events.emit('browser:open');
     audio.play('click');
 
-    scene.input.on('wheel', this.onWheel, this);
+    this.detachScroll = attachScroll(scene, { step: 26, onScroll: (d) => this.scrollBy(d) });
     const kb = scene.input.keyboard;
     if (kb) {
       const key = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
@@ -230,9 +232,9 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     this.go(page, false);
   }
 
-  private onWheel(_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number): void {
+  private scrollBy(delta: number): void {
     const max = Math.max(0, this.contentHeight - this.viewH);
-    this.scrollY = Phaser.Math.Clamp(this.scrollY + (dy > 0 ? 26 : -26), 0, max);
+    this.scrollY = Phaser.Math.Clamp(this.scrollY + delta, 0, max);
     this.content.setY(
       BROWSER.y + BROWSER.titleH + BROWSER.toolbarH + BROWSER.padding - this.scrollY,
     );
@@ -279,7 +281,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   close(): void {
     if (!this.scene) return;
     const scene = this.scene;
-    scene.input.off('wheel', this.onWheel, this);
+    this.detachScroll?.();
     this.escBinding?.key.off('down', this.escBinding.fn);
     this.unsubscribeWallet?.();
     if (BrowserPanel.openPanel === this) BrowserPanel.openPanel = null;

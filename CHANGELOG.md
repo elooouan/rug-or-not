@@ -29,7 +29,8 @@
 - Deleted chat messages leave a ghost of their text that only the lens can read.
 - Touch: the lens floats above your finger while you hold the paper, so the finger never
   covers what you're reading; no arrow cursor under a finger; the "more" / "up" hints at the
-  foot of a document are tap targets that scroll it; the wall scrolls by dragging.
+  foot of a document are tap targets that scroll it; the wall, NetScope pages, the report and
+  the ledger all scroll by dragging.
 - Campaign story beats: Lucien connects the files after cases 2, 5, 10 and 13 (someone is
   running a template; the chats keep deleting a name). Confetti on an S grade; the title
   counts points to the next rank; Lucien fidgets and reviews the radio.

@@ -12,6 +12,7 @@ import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 import { LucienBubble } from './LucienBubble';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
+import { attachScroll } from './dragScroll';
 import { charWidth, makeText, wrapMono } from './text';
 
 /** The combination is the number of red flags in the notebook, zero-padded. */
@@ -218,12 +219,14 @@ export class Vault extends Phaser.GameObjects.Container {
     const viewH = h - pad * 2 - 16;
     const maxScroll = Math.max(0, cy - viewH);
     let scroll = 0;
-    const onWheel = (_p: Phaser.Input.Pointer, _o: unknown, _dx: number, dy: number) => {
-      scroll = Phaser.Math.Clamp(scroll + (dy > 0 ? 24 : -24), 0, maxScroll);
-      content.setY(y + pad + 18 - scroll);
-    };
-    scene.input.on('wheel', onWheel);
-    this.once(Phaser.GameObjects.Events.DESTROY, () => scene.input.off('wheel', onWheel));
+    const detach = attachScroll(scene, {
+      step: 24,
+      onScroll: (d) => {
+        scroll = Phaser.Math.Clamp(scroll + d, 0, maxScroll);
+        content.setY(y + pad + 18 - scroll);
+      },
+    });
+    this.once(Phaser.GameObjects.Events.DESTROY, detach);
     audio.play('paper');
   }
 
