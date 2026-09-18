@@ -23,6 +23,7 @@ import { LucienBubble } from '@/ui/LucienBubble';
 import { toast } from '@/ui/Toast';
 import { DIALOGUE } from '@/config/layout';
 import { LUCIEN_QUIPS, WHATS_NEW } from '@/data/dialogue';
+import { FLAGS, isFlagId } from '@/data/flags';
 import { PixelButton } from '@/ui/PixelButton';
 import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
@@ -427,14 +428,29 @@ export class TitleScene extends Phaser.Scene {
         return;
       }
     }
-    if (TitleScene.nagged || dailyDone || streak <= 0) return;
+    if (TitleScene.nagged) return;
     TitleScene.nagged = true;
-    const line =
-      streak >= 7
-        ? `${streak} nights running. The night shift would notice if you skipped one.`
-        : streak >= 3
-          ? `${streak} nights in a row. Don't break the chain tonight.`
-          : `${streak === 1 ? 'One night' : 'Two nights'} on the books. Tonight's file is waiting on the phone.`;
-    this.time.delayedCall(600, () => this.scene.isActive() && LucienBubble.say(this, line, 4200));
+    const line = this.streakLine(streak, dailyDone) ?? this.drillLine();
+    if (line)
+      this.time.delayedCall(600, () => this.scene.isActive() && LucienBubble.say(this, line, 4800));
+  }
+
+  private streakLine(streak: number, dailyDone: boolean): string | null {
+    if (dailyDone || streak <= 0) return null;
+    return streak >= 7
+      ? `${streak} nights running. The night shift would notice if you skipped one.`
+      : streak >= 3
+        ? `${streak} nights in a row. Don't break the chain tonight.`
+        : `${streak === 1 ? 'One night' : 'Two nights'} on the books. Tonight's file is waiting on the phone.`;
+  }
+
+  /** The flag you miss most, if it has been missed more than found and never drilled. */
+  private drillLine(): string | null {
+    const st = saveStore.get().stats;
+    const worst = Object.entries(st.flagMisses)
+      .filter(([id, n]) => n >= 2 && n > (st.flagHits[id] ?? 0) && !st.drilled.includes(id))
+      .sort((a, b) => b[1] - a[1])[0];
+    if (!worst || !isFlagId(worst[0])) return null;
+    return `"${FLAGS[worst[0]].title}" keeps getting past you. There's a drill for it in the notebook.`;
   }
 }

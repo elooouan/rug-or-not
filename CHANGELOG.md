@@ -42,6 +42,8 @@
   NetScope pages, the report and the ledger all scroll by dragging.
 - Returning players get a one-line "new tonight" from Lucien after an update (the save
   remembers the last version it was opened with).
+- On the title, Lucien points at a drill for the flag that keeps getting past you (missed
+  more than pinned, never drilled) when there is no streak to nag about.
 - Lucien gives a one-off reading tip the first time each kind of document lands on the desk,
   reminds you about a daily streak at risk, fidgets on the title and reviews the radio.
   Settings: "Lucien's remarks" switches the corner bubbles off without touching the hints.
