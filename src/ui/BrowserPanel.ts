@@ -140,7 +140,16 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
       key.on('down', fn);
       this.escBinding = { key, fn };
     }
-    this.unsubscribeWallet = wallet.onChange(() => this.page === 'coin' && this.render());
+    // The coin page follows the wallet; a fresh connection or a refusal gets a sound too.
+    let wasConnected = wallet.state.connected;
+    let lastError = wallet.state.error;
+    this.unsubscribeWallet = wallet.onChange((st) => {
+      if (st.connected && !wasConnected) audio.play('unlock');
+      else if (st.error && st.error !== lastError) audio.play('wrong');
+      wasConnected = st.connected;
+      lastError = st.error;
+      if (this.page === 'coin') this.render();
+    });
 
     if (!saveStore.get().settings.reducedMotion) {
       this.setScale(0.96).setAlpha(0);

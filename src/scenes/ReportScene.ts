@@ -383,9 +383,7 @@ export class ReportScene extends Phaser.Scene {
       mode: isDaily
         ? `Daily ${localDateKey()}`
         : gameState.mode === 'cold'
-          ? gameState.coldSeed?.startsWith('week-')
-            ? `This week's file ${gameState.coldSeed.slice(5)}`
-            : `Cold case ${gameState.coldSeed ?? ''}`
+          ? ReportScene.coldLabel(gameState.coldSeed, '').trim()
           : `Case ${gameState.currentIndex + 1} of ${gameState.cases.length}`,
       detective: saveStore.get().detectiveName,
       url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
@@ -401,6 +399,13 @@ export class ReportScene extends Phaser.Scene {
   }
 
   /** Wordle-style result text for the clipboard (falls back to a note you can read). */
+  /** How a cold seed reads to people: the weekly, the holders' file, or a plain cold case. */
+  private static coldLabel(seed: string | null, ticker: string): string {
+    if (seed?.startsWith('week-')) return `Weekly ${seed.slice(5)} ${ticker}`;
+    if (seed?.startsWith('holders-')) return `Holders' file ${seed.slice(8)} ${ticker}`;
+    return `Cold case ${ticker}`;
+  }
+
   /** The result as text, for the clipboard, the share sheet and the X intent. */
   private shareLines(): string[] {
     const { caseData: c, verdict, breakdown: b } = this.payload;
@@ -408,7 +413,7 @@ export class ReportScene extends Phaser.Scene {
     const isDaily = gameState.mode === 'daily';
     const save = saveStore.get();
     return [
-      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? (gameState.coldSeed?.startsWith('week-') ? `Weekly ${gameState.coldSeed.slice(5)} ${c.ticker}` : `Cold case ${c.ticker}`) : `Case: ${c.ticker}`} "${c.title}"`,
+      `Rug or Not? ${isDaily ? `Daily ${localDateKey()}` : gameState.mode === 'cold' ? ReportScene.coldLabel(gameState.coldSeed, c.ticker) : `Case: ${c.ticker}`} "${c.title}"`,
       `Verdict: ${verdict.toUpperCase()} ${b.verdictCorrect ? '(correct)' : '(wrong)'}  Grade ${b.grade}  ${b.total} pts${this.payload.elapsedSec === null ? '' : `  in ${Math.floor(this.payload.elapsedSec / 60)}:${String(this.payload.elapsedSec % 60).padStart(2, '0')}`}`,
       c.verdict === 'rug'
         ? `Red flags found: ${b.flagsFound.length}/${flags}  False accusations: ${b.falseAccusations.length + b.strayPins}`

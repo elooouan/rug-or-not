@@ -337,15 +337,17 @@ export class CaseSelectScene extends Phaser.Scene {
       const tip = this.add.container(0, 0).setDepth(DEPTH.toast);
       tip.add(rect(this, tx + 2, ty + 3, w, 34, HEX.bg, 0.5));
       tip.add(rect(this, tx, ty, w, 34, HEX.paper));
-      [`The week's cold case (${wk}). Same file`, 'for everyone; compare on the board.'].forEach(
-        (l, i) =>
-          tip.add(
-            makeText(this, tx + 6, ty + 5 + i * 12, l, {
-              font: 'body',
-              size: FONT.size.body,
-              color: 'shadow',
-            }),
-          ),
+      [
+        `The week's cold case (${wk}). Same file`,
+        'for everyone. Holders get a second one.',
+      ].forEach((l, i) =>
+        tip.add(
+          makeText(this, tx + 6, ty + 5 + i * 12, l, {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'shadow',
+          }),
+        ),
       );
       this.tip = tip;
     });
