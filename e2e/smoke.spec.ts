@@ -347,3 +347,38 @@ test('a theme change repaints the office without breaking the next screens', asy
   await page.waitForTimeout(800);
   expect(errors).toEqual([]);
 });
+
+test('a herring hunt deals pages that carry the herring and scores a hit on it', async ({
+  page,
+}) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => {
+    const title = window.__game.scene.getScene('TitleScene') as {
+      scene: { start(k: string, d?: unknown): void };
+    };
+    title.scene.start('RushScene', { hunt: 'community-jokes' });
+  });
+  await waitForScene(page, 'RushScene');
+  await page.waitForFunction(
+    () => (window.__game.scene.getScene('RushScene') as { phase: string }).phase === 'playing',
+    null,
+    { timeout: SLOW },
+  );
+  const result = await page.evaluate(() => {
+    type Spot = { clue: { id: string; herringId?: string; flagId?: string } };
+    const r = window.__game.scene.getScene('RushScene') as {
+      hunt: string;
+      state: { score: number; rounds: number };
+      doc: { allSpots(): Spot[]; focusClue(id: string): boolean; activateFocused(): void };
+    };
+    const spots = r.doc.allSpots();
+    const target = spots.find((s) => s.clue.herringId === 'community-jokes');
+    if (!target) return { hunt: r.hunt, target: false, score: -1, rounds: -1 };
+    r.doc.focusClue(target.clue.id);
+    r.doc.activateFocused();
+    return { hunt: r.hunt, target: true, score: r.state.score, rounds: r.state.rounds };
+  });
+  expect(result).toEqual({ hunt: 'community-jokes', target: true, score: 100, rounds: 1 });
+  expect(errors).toEqual([]);
+});
