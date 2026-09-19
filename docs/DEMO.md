@@ -1,7 +1,10 @@
 # Five-minute tour
 
 A script for showing the game to someone (a stream, a community call, a friend). Everything
-below works on a fresh save; times are rough.
+below works on a fresh save; times are rough. Note that a fresh desk only shows Play, the
+daily, How to play, Notebook and Settings: the drawer, the rush, the pile and the weekly
+turn up after one, two, three and four closed files. For a demo, import a played-in save
+code (Settings → Office → Import) or close a couple of files first.
 
 ## 0:00 — The desk
 
@@ -29,7 +32,9 @@ below works on a fresh save; times are rough.
 8. **Red Flag Rush**: sixty seconds, one page at a time, click the red flag.
 9. **Cold case** on the title, or "the pile" in Case files: a generated file that never
    existed before. The WEEKLY folder is the same generated file for everyone this week.
-10. Notebook → any red flag → **Drill this flag**: five pages that all hide it.
+10. Notebook → any red flag → **Drill this flag**: five pages that all hide it. Any yellow
+    herring → **Hunt this herring**: five pages where you click the thing that only looks bad.
+    The notebook's last chapter is the handbook ("How to play" on the title).
 
 ## 4:00 — The story
 
@@ -45,5 +50,6 @@ below works on a fresh save; times are rough.
 
 - `#daily` today's file · `#rush` · `#cold=<seed>` a specific cold case · `#custom=<id>` a file
   from the editor · `/editor.html` the editor.
-- Settings: relaxed mode (no timers), no-magnifier mode, reduced motion, Detective's honour
-  (hard mode, ×1.25), weather, radio, export/import a save code.
+- Settings, Game page: relaxed mode (no timers), no-magnifier mode, reduced motion, pointer
+  size, Detective's honour (hard mode, ×1.25), radio. Office page: office colours (five
+  palettes, repainted on the spot), weather, film grain, cosmetics, export/import a save code.
