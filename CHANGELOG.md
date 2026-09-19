@@ -88,8 +88,9 @@
 - The title's Fullscreen button stays hidden where the browser can't do fullscreen (iPhone
   Safari); the wallet chip takes its corner.
 - On a touch screen the desk's hints say tap and hold instead of click, hover and type
-  (the title's footer, the desk's key line, the rush's), and Lucien's lessons do too: the
-  first file's tour talks about sliding a finger, tapping a clue and dragging a stamp.
+  (the title's footer, the desk's key line, the rush's), buttons drop their key hints
+  ("Back" rather than "Back [Esc]"), and Lucien's lessons do too: the first file's tour
+  talks about sliding a finger, tapping a clue and dragging a stamp.
 - Fixed (touch): a finger dragging to scroll the report, a phone page or a notebook page
   fired whatever button or link it started on. Buttons and report lines now fire when a
   finger lifts where it landed; a mouse still fires on the press.
