@@ -15,6 +15,8 @@ import { saveStore } from './save';
 export const CLIPS = {
   /** Closing any file. */
   file: 3,
+  /** A campaign file closed for the fourth time and beyond: enough to count, not to farm. */
+  wornFile: 1,
   /** The first time a campaign file is closed right. */
   firstSolve: 2,
   /** An S grade. */
@@ -61,10 +63,13 @@ export function clipsForFile(opts: {
   correct: boolean;
   firstSolve: boolean;
   mode: 'campaign' | 'daily' | 'cold';
+  /** Times this file was closed before tonight (campaign only). */
+  completions?: number;
 }): { total: number; reasons: string[] } {
   const reasons: string[] = [];
-  let total = CLIPS.file;
-  reasons.push(`${CLIPS.file} for the file`);
+  const worn = opts.mode === 'campaign' && (opts.completions ?? 0) >= 3;
+  let total = worn ? CLIPS.wornFile : CLIPS.file;
+  reasons.push(worn ? `${CLIPS.wornFile} for a well-worn file` : `${CLIPS.file} for the file`);
   if (opts.correct && opts.firstSolve) {
     total += CLIPS.firstSolve;
     reasons.push(`${CLIPS.firstSolve} first solve`);

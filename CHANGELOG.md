@@ -3,7 +3,8 @@
 ## v0.9 — the market
 
 - Paper clips: the desk's own currency. Closing any file pays 3 (+2 for a first solve, +2
-  for an S, +1 cold, +2 daily), a rush pays 1 per thousand points, and the report says so.
+  for an S, +1 cold, +2 daily; a campaign file replayed more than three times pays 1), a
+  rush pays 1 per thousand points, and the report says so.
   Holding the coin adds an allowance that follows the balance the wallet reports (25 clips
   per 1,000 coins, capped at 1,000) — read-only, nothing is ever spent from the wallet.
 - The market, a new NetScope page (also under Settings > Office > Desk & wardrobe): 33

@@ -169,7 +169,7 @@ export const HANDBOOK: HandbookTopic[] = [
     id: 'market',
     title: 'The market and clips',
     body: [
-      `Closing a file pays a few paper clips (${CLIPS.file}, plus ${CLIPS.firstSolve} for a first solve, ${CLIPS.sGrade} for an S, ${CLIPS.daily} for the daily); a rush pays ${CLIPS.rushPerThousand} per thousand points. Clips are spent at the Market on the phone: Lucien's coat and hat, the mug, the radio, the cat's fur, an ornament for the corner, curtains.`,
+      `Closing a file pays a few paper clips (${CLIPS.file}, plus ${CLIPS.firstSolve} for a first solve, ${CLIPS.sGrade} for an S, ${CLIPS.daily} for the daily); a rush pays ${CLIPS.rushPerThousand} per thousand points; a campaign file replayed more than three times pays ${CLIPS.wornFile}. Clips are spent at the Market on the phone: Lucien's coat and hat, the mug, the radio, the cat's fur, an ornament for the corner, curtains.`,
       { h: 'The coin' },
       `Holding ${TOKEN.symbol} adds an allowance that follows the balance the wallet reports (${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin} coins, up to ${CLIPS.holderCap}). Read-only: nothing is ever spent from the wallet, and a few items ask for a holder tier as well.`,
       'Nothing bought changes a score, a timer or a file. It is a desk; dress it.',

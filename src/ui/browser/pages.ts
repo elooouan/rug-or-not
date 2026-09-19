@@ -989,7 +989,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     }
     ctx.gap();
     ctx.small(
-      `Files pay ${CLIPS.file} clips (+${CLIPS.firstSolve} for a first solve, +${CLIPS.sGrade} for an S, +${CLIPS.daily} for the daily); a rush pays ${CLIPS.rushPerThousand} per 1,000 points.`,
+      `Files pay ${CLIPS.file} clips (+${CLIPS.firstSolve} for a first solve, +${CLIPS.sGrade} for an S, +${CLIPS.daily} for the daily; ${CLIPS.wornFile} after three replays); a rush pays ${CLIPS.rushPerThousand} per 1,000 points.`,
     );
   },
 

@@ -63,6 +63,20 @@ describe('clips', () => {
     expect(
       clipsForFile({ grade: 'C', correct: true, firstSolve: false, mode: 'daily' }).total,
     ).toBe(CLIPS.file + CLIPS.daily);
+    // The fourth replay of a campaign file pays a token amount; cold files never wear out.
+    expect(
+      clipsForFile({
+        grade: 'A',
+        correct: true,
+        firstSolve: false,
+        mode: 'campaign',
+        completions: 3,
+      }).total,
+    ).toBe(CLIPS.wornFile);
+    expect(
+      clipsForFile({ grade: 'A', correct: true, firstSolve: false, mode: 'cold', completions: 9 })
+        .total,
+    ).toBe(CLIPS.file + CLIPS.cold);
     expect(clipsForRush(0)).toBe(0);
     expect(clipsForRush(999)).toBe(0);
     expect(clipsForRush(3450)).toBe(3 * CLIPS.rushPerThousand);
