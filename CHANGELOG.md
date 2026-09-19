@@ -22,8 +22,8 @@
   reach the desk's easter eggs or the M/F hotkeys.
 - The board page opens with the desk's own log: the last six files, newest first, whatever
   the board is set to.
-- Two new badges: Herring Hunter (every hunt done) and Decorator (all five office colours
-  tried); the badges page counts progress for both.
+- Three new badges: Herring Hunter (every hunt done), Decorator (all five office colours
+  tried) and Hindsight (five second looks); the badges page counts progress for each.
 - Herring hunts: every yellow herring page in the notebook can print five pages that each
   carry that herring, and the job is to click the thing that only looks bad. Red flags on
   those pages cost seconds, like herrings do in the rush. Hunting them all earns Herring

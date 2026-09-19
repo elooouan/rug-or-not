@@ -108,6 +108,8 @@ export function badgeProgress(
       return clamp(st.hunted.length, Object.keys(HERRINGS).length);
     case 'decorator':
       return clamp(st.themesSeen.length, THEME_IDS.length);
+    case 'hindsight':
+      return clamp(st.secondLooks, 5);
     default:
       return null;
   }

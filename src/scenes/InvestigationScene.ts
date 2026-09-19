@@ -219,6 +219,7 @@ export class InvestigationScene extends Phaser.Scene {
     // Open on the first page that has something to show.
     const first = marks.findIndex((n) => n > 0);
     if (first > 0) this.showDocument(first, false);
+    if (bumpStat('secondLooks') >= 5) awardBadge(this, 'hindsight');
     this.time.delayedCall(500, () =>
       LucienBubble.tell(
         this,

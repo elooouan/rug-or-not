@@ -81,6 +81,8 @@ export interface SaveData {
     hunted: string[];
     /** Week keys whose weekly cold case has been closed. */
     weeklyDone: string[];
+    /** Second looks taken from a report (the Hindsight badge). */
+    secondLooks: number;
   };
   /** Last known wallet snapshot (public address + token balance) for holder perks; `linked` asks for a silent reconnect on boot. */
   wallet: {
@@ -151,6 +153,7 @@ export function defaultSave(): SaveData {
       coldBest: 0,
       drilled: [],
       hunted: [],
+      secondLooks: 0,
       weeklyDone: [],
     },
     wallet: { address: null, token: null, checkedAt: null, linked: false },
@@ -234,6 +237,7 @@ export function sanitizeSave(raw: unknown): SaveData {
       drilled: strs(st.drilled),
       hunted: strs(st.hunted),
       weeklyDone: strs(st.weeklyDone),
+      secondLooks: num(st.secondLooks),
     };
   }
   if (r.wallet && typeof r.wallet === 'object') {
