@@ -20,7 +20,7 @@ import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { DeskBackground } from '@/ui/DeskBackground';
-import { lucienSays } from '@/ui/DialogueBox';
+import { LUCIEN_FACE_TEX, lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
@@ -38,6 +38,28 @@ const SEV_MARK: Record<Severity, string> = { minor: '!', major: '!!', critical: 
 const HERRING_IDS = Object.keys(HERRINGS) as HerringId[];
 
 type Chapter = 'flags' | 'herrings' | 'rogues' | 'handbook';
+
+/** Which desk texture illustrates each handbook page. */
+const HANDBOOK_ICONS: Record<string, string> = {
+  desk: TEX.lamp,
+  lens: TEX.cursor,
+  pins: TEX.pin,
+  tabs: TEX.tabActive,
+  stamp: TEX.stampRug,
+  score: TEX.stampLegit,
+  hints: LUCIEN_FACE_TEX,
+  notebook: TEX.paperclip,
+  daily: TEX.clock,
+  drawer: TEX.folder,
+  cold: TEX.folderStack,
+  weekly: TEX.folder,
+  rush: TEX.clock,
+  phone: TEX.phone,
+  coin: TEX.iconPhantom,
+  badges: TEX.iconCheck,
+  share: TEX.paperclip,
+  toys: TEX.mug,
+};
 const CHAPTERS: Chapter[] = ['flags', 'herrings', 'rogues', 'handbook'];
 
 /**
@@ -428,6 +450,16 @@ export class NotebookScene extends Phaser.Scene {
   ): void {
     const topic = HANDBOOK.find((t) => t.id === id);
     if (!topic) return;
+    // A prop from the desk in the bottom corner of the page, drawn from the same textures.
+    const iconKey = HANDBOOK_ICONS[id];
+    if (iconKey && this.textures.exists(iconKey)) {
+      const pageW = BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2;
+      const pageH = BOOK.h - BOOK.pad * 2;
+      const img = this.add.image(pageW, pageH - 6, iconKey).setOrigin(1, 1);
+      const scale = Math.min(40 / img.width, 40 / img.height, 3);
+      img.setScale(scale).setAlpha(0.85);
+      this.detail.add(img);
+    }
     wrapMono(topic.title.toUpperCase(), 26).forEach((l) =>
       add(l, { size: FONT.size.body, color: 'woodDark' }),
     );
