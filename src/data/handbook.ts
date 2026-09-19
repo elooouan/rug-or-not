@@ -113,6 +113,7 @@ export const HANDBOOK: HandbookTopic[] = [
     feature: 'drawer',
     body: [
       'The drawer holds every campaign file. Closed ones can be reopened for a better grade; the best grade is what counts. New files unlock as you close the ones before.',
+      'The grade sticker on a closed folder opens the report of your last run on it, second look included.',
       'A folder with no name turns up at the end once everything else is closed. Nobody knows who filed it.',
     ],
   },

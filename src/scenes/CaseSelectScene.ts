@@ -11,6 +11,8 @@ import { secretUnlocked } from '@/systems/secretCase';
 import { weekKey } from '@/systems/dailyCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
+import { scoreCase } from '@/systems/scoring';
+import type { ReportPayload } from './InvestigationScene';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
@@ -157,6 +159,22 @@ export class CaseSelectScene extends Phaser.Scene {
         color: 'stampGreen',
       }).setOrigin(0.5);
       cont.add([box, t]);
+      // The sticker opens the last report on this file (with its second look).
+      if (saveStore.get().caseResults[c.id]?.lastRun) {
+        box.setInteractive(
+          new Phaser.Geom.Rectangle(-2, -2, 18, 18),
+          Phaser.Geom.Rectangle.Contains,
+        );
+        box.on('pointerover', () => box.setFillStyle(HEX.stampGreen, 0.25));
+        box.on('pointerout', () => box.setFillStyle(HEX.stampGreen, 0));
+        box.on(
+          'pointerdown',
+          (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+            ev.stopPropagation();
+            this.openLastReport(i);
+          },
+        );
+      }
     }
     const focusRing = rect(this, -3, -3, DRAWER.folderW + 6, DRAWER.folderH + 6)
       .setStrokeStyle(1, HEX.amber)
@@ -201,6 +219,7 @@ export class CaseSelectScene extends Phaser.Scene {
               : 'not played yet',
             maxChars,
           ),
+          ...(best?.lastRun ? ['the grade sticker opens the last report'] : []),
         ]
       : wrapMono(
           c.secret
@@ -394,5 +413,38 @@ export class CaseSelectScene extends Phaser.Scene {
     gameState.currentCase = gameState.cases[i];
     audio.play('paper');
     goTo(this, 'InvestigationScene');
+  }
+
+  /** The report of the last run on this file, scored again from the pins it kept. */
+  private openLastReport(i: number): void {
+    const c = gameState.cases[i];
+    const last = saveStore.get().caseResults[c.id]?.lastRun;
+    if (!c || !last) return;
+    gameState.mode = 'campaign';
+    gameState.currentIndex = i;
+    gameState.currentCase = c;
+    const breakdown = scoreCase({
+      caseData: c,
+      verdict: last.verdict,
+      pins: { clueIds: last.clueIds, strayPins: last.strayPins, hintsUsed: last.hintsUsed },
+      timeLeftSec: last.timeLeftSec,
+      hardMode: last.hard,
+    });
+    const payload: ReportPayload = {
+      caseData: c,
+      verdict: last.verdict,
+      breakdown,
+      newFlagIds: [],
+      newUnlockNames: [],
+      bestImproved: false,
+      newBadges: [],
+      notes: [],
+      rankUp: null,
+      caughtName: null,
+      elapsedSec: last.timeLeftSec === null ? null : c.timeLimitSec - last.timeLeftSec,
+      revisit: true,
+    };
+    audio.play('paper');
+    goTo(this, 'ReportScene', payload);
   }
 }

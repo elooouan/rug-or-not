@@ -39,6 +39,40 @@ describe('sanitizeSave', () => {
     expect(s.settings.volume).toBe(1);
     expect(s.settings.relaxed).toBe(true);
   });
+  it('keeps a well-formed last run and drops a broken one', () => {
+    const base = { bestScore: 100, bestGrade: 'B', completions: 1, lastVerdictCorrect: true };
+    const d = sanitizeSave({
+      version: 1,
+      caseResults: {
+        ok: {
+          ...base,
+          lastRun: {
+            verdict: 'rug',
+            clueIds: ['a', 3, 'b'],
+            strayPins: 1.7,
+            hintsUsed: -2,
+            timeLeftSec: 42,
+            hard: 'yes',
+          },
+        },
+        relaxed: { ...base, lastRun: { verdict: 'legit', clueIds: [], timeLeftSec: null } },
+        bad: { ...base, lastRun: { verdict: 'maybe', clueIds: [] } },
+        none: base,
+      },
+    });
+    expect(d.caseResults.ok.lastRun).toEqual({
+      verdict: 'rug',
+      clueIds: ['a', 'b'],
+      strayPins: 1,
+      hintsUsed: 0,
+      timeLeftSec: 42,
+      hard: false,
+    });
+    expect(d.caseResults.relaxed.lastRun?.timeLeftSec).toBeNull();
+    expect(d.caseResults.bad.lastRun).toBeUndefined();
+    expect(d.caseResults.none.lastRun).toBeUndefined();
+  });
+
   it('clamps campaign progress', () => {
     expect(sanitizeSave({ campaignUnlocked: 0 }).campaignUnlocked).toBe(1);
     expect(sanitizeSave({ campaignUnlocked: 4.7 }).campaignUnlocked).toBe(4);

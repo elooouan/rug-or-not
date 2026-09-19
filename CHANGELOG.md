@@ -28,6 +28,9 @@
   carry that herring, and the job is to click the thing that only looks bad. Red flags on
   those pages cost seconds, like herrings do in the rush. Hunting them all earns Herring
   Hunter. The generator can be asked for a herring the way drills ask for a flag.
+- The drawer keeps the last run of every file: the grade sticker on a closed folder opens
+  that run's report again, second look included. (The fastest-call record also survives a
+  slower replay now; it used to be dropped.)
 - The second look: when a report has a missed flag or a false accusation, a line on it
   opens the file again read-only, with the run's pins where they were and every missed
   flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the

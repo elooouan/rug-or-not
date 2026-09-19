@@ -723,6 +723,17 @@ export class InvestigationScene extends Phaser.Scene {
         completions: (prev?.completions ?? 0) + 1,
         lastVerdictCorrect: breakdown.verdictCorrect,
         solved: (prev?.solved ?? false) || breakdown.verdictCorrect,
+        // The fastest call so far stays on the record even when this run was slower.
+        ...(prev?.bestTimeSec !== undefined ? { bestTimeSec: prev.bestTimeSec } : {}),
+        // Enough to print this run's report again from the drawer.
+        lastRun: {
+          verdict,
+          clueIds: pins.clueIds,
+          strayPins: pins.strayPins,
+          hintsUsed: pins.hintsUsed,
+          timeLeftSec: relaxed || !this.clock ? null : this.clock.timeLeft,
+          hard: saveStore.get().settings.hardMode,
+        },
       };
       // Fastest correct call, timed runs only.
       if (breakdown.verdictCorrect && !relaxed && this.clock) {

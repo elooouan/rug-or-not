@@ -2,6 +2,17 @@ import { SAVE_KEY, SAVE_VERSION, type Grade } from '@/config/gameConfig';
 import { DEFAULT_SETTINGS, sanitizeSettings, type Settings } from './settings';
 import { isNameAllowed } from './names';
 
+/** What the last run of a file did, enough to print its report (and second look) again. */
+export interface LastRun {
+  verdict: 'rug' | 'legit';
+  clueIds: string[];
+  strayPins: number;
+  hintsUsed: number;
+  /** Seconds left at the stamp, or null when the file ran without a clock. */
+  timeLeftSec: number | null;
+  hard: boolean;
+}
+
 export interface CaseResult {
   bestScore: number;
   bestGrade: Grade;
@@ -11,6 +22,7 @@ export interface CaseResult {
   solved?: boolean;
   /** Fastest correct verdict in seconds (timed runs only). */
   bestTimeSec?: number;
+  lastRun?: LastRun;
 }
 
 export interface CosmeticSelection {
@@ -163,6 +175,27 @@ export function defaultSave(): SaveData {
 const GRADES_OK = new Set(['S', 'A', 'B', 'C', 'D']);
 
 /** Merge unknown JSON onto defaults, dropping anything malformed. Pure. */
+/** A stored last run, or undefined when the shape is off. */
+function lastRunOf(v: unknown): LastRun | undefined {
+  if (!v || typeof v !== 'object') return undefined;
+  const r = v as Record<string, unknown>;
+  if (r.verdict !== 'rug' && r.verdict !== 'legit') return undefined;
+  if (!Array.isArray(r.clueIds)) return undefined;
+  const count = (x: unknown) =>
+    typeof x === 'number' && Number.isFinite(x) ? Math.max(0, Math.floor(x)) : 0;
+  return {
+    verdict: r.verdict,
+    clueIds: r.clueIds.filter((x): x is string => typeof x === 'string'),
+    strayPins: count(r.strayPins),
+    hintsUsed: count(r.hintsUsed),
+    timeLeftSec:
+      typeof r.timeLeftSec === 'number' && Number.isFinite(r.timeLeftSec)
+        ? count(r.timeLeftSec)
+        : null,
+    hard: r.hard === true,
+  };
+}
+
 export function sanitizeSave(raw: unknown): SaveData {
   const d = defaultSave();
   if (!raw || typeof raw !== 'object') return d;
@@ -188,6 +221,7 @@ export function sanitizeSave(raw: unknown): SaveData {
         ...(typeof cr.bestTimeSec === 'number' && Number.isFinite(cr.bestTimeSec)
           ? { bestTimeSec: Math.max(0, Math.floor(cr.bestTimeSec)) }
           : {}),
+        ...(lastRunOf(cr.lastRun) ? { lastRun: lastRunOf(cr.lastRun) } : {}),
       };
     }
   }
