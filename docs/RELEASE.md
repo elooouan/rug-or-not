@@ -8,7 +8,7 @@ so it is done by hand, not by a script.
 1. `npm run lint`, `npm test`, `npm run build` (type-checks first), `npm run e2e`.
 2. With the dev server up: `node scripts/sweep.mjs` (every file plays clean),
    `SWEEP_LOOK=1 node scripts/sweep.mjs 0` (the second look on every file), and a couple of
-   `node scripts/fuzz.mjs 150 <seed>` runs with fresh seeds.
+   `node scripts/fuzz.mjs 150 <seed>` runs with fresh seeds, one of them `FUZZ_TOUCH=1`.
 3. `GAME_VERSION` in `src/config/gameConfig.ts` and the `WHATS_NEW` line in
    `src/data/dialogue.ts` name the version; the `CHANGELOG.md` section for it is complete.
 4. Marketing: `node scripts/promo.mjs` regenerated `assets/marketing/`, the README table
