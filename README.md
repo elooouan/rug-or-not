@@ -9,6 +9,8 @@ A pixel-art noir detective game about spotting crypto scams, with Detective Luci
 evidence on your desk: a contract snippet, tokenomics, a team page, a community chat log,
 a liquidity report and sometimes an audit certificate. Read it through the magnifying
 glass, pin the suspicious bits, stamp a verdict (**RUG** or **LEGIT**), and read the report.
+It plays in a desktop browser or on a phone held sideways (the lens floats above your
+finger; add the page to the home screen for a full-screen desk).
 
 > All cases, tokens, people and projects are fictional. This is a game, not financial advice.
 
