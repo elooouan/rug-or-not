@@ -149,11 +149,13 @@ export class SettingsScene extends Phaser.Scene {
         if (audio.isMuted) audio.toggleMute();
         set((st) => (st.volume = Phaser.Math.Clamp(Math.round(st.volume * 10 + d) / 10, 0, 1)));
       },
+      hint: () => 'everything: clicks, stamps, the radio. M is a quick mute anywhere.',
     });
     this.rows.push({
       label: 'Relaxed mode (no timers)',
       value: () => onOff(s().relaxed),
       change: () => set((st) => (st.relaxed = !st.relaxed)),
+      hint: () => 'no clock on files (and no time bonus); the rush keeps its sixty seconds',
     });
     this.rows.push({
       label: 'Reduced motion',
@@ -166,6 +168,7 @@ export class SettingsScene extends Phaser.Scene {
       tab: 'office',
       value: () => onOff(s().lampFlicker),
       change: () => set((st) => (st.lampFlicker = !st.lampFlicker)),
+      hint: () => 'the lamp wavers now and then (off with reduced motion)',
     });
     this.rows.push({
       label: "Detective's honour",
@@ -198,6 +201,7 @@ export class SettingsScene extends Phaser.Scene {
       label: 'Music (the radio)',
       value: () => onOff(s().music),
       change: () => set((st) => (st.music = !st.music)),
+      hint: () => 'the desk radio: lo-fi, static, or off. Its dial does the same.',
     });
     this.rows.push({
       label: 'Music volume',
@@ -215,6 +219,7 @@ export class SettingsScene extends Phaser.Scene {
         set((st) => (st.bigPointer = !st.bigPointer));
         (this.scene.get('CursorScene') as { refreshPointer?: () => void }).refreshPointer?.();
       },
+      hint: () => 'half again as big, for large or far-away screens',
     });
     this.rows.push({
       label: 'Office colours',
