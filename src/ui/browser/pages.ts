@@ -826,10 +826,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       `${earnedClips()} earned from files${holder ? `  ·  ${holder} holder allowance` : ''}${spent ? `  ·  ${spent} spent` : ''}`,
       { color: 'woodMid' },
     );
-    if (!holder)
+    if (!holder) {
       ctx.small(
-        `Holding ${TOKEN.symbol} adds an allowance${TOKEN.mint ? '' : ' once it launches'}: ${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin.toLocaleString()} coins, up to ${CLIPS.holderCap.toLocaleString()}. Read-only; nothing is spent from the wallet.`,
+        `Holding ${TOKEN.symbol} adds an allowance${TOKEN.mint ? '' : ' once it launches'}: ${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin.toLocaleString()} coins, up to ${CLIPS.holderCap.toLocaleString()}.`,
       );
+      ctx.small('Read-only: nothing is ever spent from the wallet.');
+    }
     ctx.gap(4);
 
     // Your desk as it stands: the props at their real size, Lucien to scale. Hovering a
