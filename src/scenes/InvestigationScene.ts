@@ -92,6 +92,8 @@ export class InvestigationScene extends Phaser.Scene {
   private hintsUsed = 0;
   private askLabel?: Phaser.GameObjects.Text;
   private askFace?: Phaser.GameObjects.Image;
+  private menuBtn?: PixelButton;
+  private menuDimmed = false;
   /** Tab the last nudge was about; a second ask on it points at the line. */
   private nudgedDoc = -1;
   private idleMs = 0;
@@ -114,6 +116,8 @@ export class InvestigationScene extends Phaser.Scene {
     this.paused = false;
     this.docs = [];
     this.askFace = undefined;
+    this.menuBtn = undefined;
+    this.menuDimmed = false;
     this.stamps = [];
     this.suspicions = [];
     this.current = 0;
@@ -454,6 +458,7 @@ export class InvestigationScene extends Phaser.Scene {
       },
     );
     menu.setDepth(DEPTH.hud).setX(GAME_WIDTH - menu.bw - 6);
+    this.menuBtn = menu;
     this.hint = addText(
       this,
       GAME_WIDTH - menu.bw - 16,
@@ -975,6 +980,12 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   override update(_t: number, delta: number): void {
+    // The menu waits for Lucien to finish (its button says so by dimming).
+    const talking = !!this.dialogue?.isActive && !this.review;
+    if (this.menuBtn && talking !== this.menuDimmed) {
+      this.menuDimmed = talking;
+      this.menuBtn.setDisabled(talking);
+    }
     // The clock waits while Lucien is talking: a first-timer shouldn't lose the tutorial's
     // minute to the timer.
     if (this.phase === 'investigating' && !this.paused && this.clock && !this.dialogue?.isActive) {
