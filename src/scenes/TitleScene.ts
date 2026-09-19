@@ -451,7 +451,8 @@ export class TitleScene extends Phaser.Scene {
     let quip = Phaser.Math.Between(0, quips.length - 1);
     idle.on('pointerdown', () => {
       quip = (quip + 1) % quips.length;
-      LucienBubble.say(this, quips[quip], 3600);
+      // A poke is a question: answered even with the ambient quips off.
+      LucienBubble.tell(this, quips[quip], 3600);
       if (!reduced) squish(this, idle);
     });
     if (!reduced)

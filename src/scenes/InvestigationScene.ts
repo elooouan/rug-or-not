@@ -596,12 +596,13 @@ export class InvestigationScene extends Phaser.Scene {
     // Not while he's already talking (the dialogue box covers the face anyway).
     if (this.phase !== 'investigating' || this.paused || this.browsing || this.dialogue?.isActive)
       return;
+    // Asked for, so answered even with the desk quips switched off.
     if (saveStore.get().settings.hardMode) {
-      LucienBubble.say(this, "Detective's honour. You're on your own tonight.");
+      LucienBubble.tell(this, "Detective's honour. You're on your own tonight.");
       return;
     }
     if (this.hintsUsed >= SCORING.maxHints) {
-      LucienBubble.say(this, "Three nudges is my limit. Detective's honour.");
+      LucienBubble.tell(this, "Three nudges is my limit. Detective's honour.");
       return;
     }
     const unexaminedIn = (i: number) =>
@@ -630,7 +631,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.hintsUsed++;
     audio.play('wrong');
     this.askLabel?.setText(`ask (${SCORING.hintCost})  used ${this.hintsUsed}/${SCORING.maxHints}`);
-    LucienBubble.say(this, text, 4500);
+    LucienBubble.tell(this, text, 4500);
   }
 
   /** A one-time quip per case, shown in Lucien's corner bubble. */

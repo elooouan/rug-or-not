@@ -25,6 +25,8 @@
   keyboard. On a file it opens the pause menu (or leaves straight away while the folder is
   still closed); on a second look it goes back to the report; in the rush it asks once,
   like Esc; elsewhere it is Back.
+- Asking Lucien (the corner face, or a poke on the title) answers even with the desk
+  quips switched off in Settings: a nudge used to cost its points and show nothing.
 - Lucien's corner face stays one face: his bubbles now speak beside the clickable head on
   the desk instead of drawing a second one over it, so a press on the head always lands
   (and he nods to every press, even mid-lesson when he can't answer).
