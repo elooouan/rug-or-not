@@ -164,7 +164,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       { variant: 'paper' },
     );
     ctx.gap();
-    ctx.small('tip: click the lost page link if you enjoy 404s');
+    ctx.small(`tip: ${touchScreen() ? 'tap' : 'click'} the lost page link if you enjoy 404s`);
     ctx.button('nowhere.example', () => ctx.panel.go('404'), { variant: 'paper' });
   },
 
@@ -1120,7 +1120,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       "Missed something? The report offers a second look: the file again, read-only, misses in amber. The grade sticker in the drawer reopens a file's last report.",
     );
     ctx.line(
-      'Red Flag Rush: sixty seconds, one page at a time. Click the red flag to clear the page; herrings and blank paper cost seconds.',
+      `Red Flag Rush: sixty seconds, one page at a time. ${touchScreen() ? 'Tap' : 'Click'} the red flag to clear the page; herrings and blank paper cost seconds.`,
     );
     ctx.line(
       'Cold cases: files the printer makes up on the spot, endless. Same rules, their own board; the seed in the share link brings the same file back.',
@@ -1139,7 +1139,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     );
     ctx.gap();
     ctx.line(
-      'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio (four stations), the safe.',
+      touchScreen()
+        ? 'Desk: tap the coffee, the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio (four stations), the safe.'
+        : 'Desk: hover the coffee, click the lamp, the window, the moon, the cat, the corkboard, the folders, the ink pad, the clock, the radio (four stations), the safe.',
       { color: 'woodMid' },
     );
     ctx.gap();
