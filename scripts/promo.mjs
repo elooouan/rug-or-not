@@ -702,6 +702,26 @@ const CLIPS = {
     await sleep(2200);
     await stopRecording(page, 'office-colours');
   },
+  async 'trading-switch'(page) {
+    // A printed file whose contract carries the newest red flag, read through the lens.
+    await boot(page, VETERAN, '#cold=d2-switch18');
+    await sleep(1500);
+    await skipTalk(page);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      () => window.__game.scene.getScene('InvestigationScene').phase === 'investigating',
+      null,
+      { timeout: SLOW },
+    );
+    await sleep(600);
+    await skipTalk(page);
+    const spots = await clueSpots(page);
+    const s = spots.find((x) => x.flag) ?? spots[0];
+    // The lens on the right end of the line: the fine print shows, the function name too.
+    await move(page, s.x + 105, s.y + 8, 20);
+    await sleep(800);
+    await shot(page, 'red-flag-trading-switch');
+  },
   async weather(page) {
     await boot(page, VETERAN);
     await skipTalk(page);
