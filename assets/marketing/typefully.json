@@ -1,5 +1,5 @@
 {
-  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts and the extra October ones are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }.",
+  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts and the extra October ones are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }. Clips: queue.json names the committed GIFs, but every draft carries the 1280x720 MP4 twin (media ids below, files regenerated locally with `PROMO_GIF=0 node scripts/promo.mjs clips`).",
   "social_set_id": 332931,
   "drafts": {
     "intro-thread": 10832778,
@@ -78,7 +78,18 @@
     "v0.9-badges.png": "0b5573e1-7c80-480a-a185-b055a765f730",
     "v0.8-herring-hunt.png": "8f6316ff-995a-4586-8977-da86d3f498b4",
     "v0.8-theme-speakeasy.png": "534234b4-36a4-4b41-b583-50b6e5580798",
-    "v0.9-clip-curtains.gif": "84abb861-5d32-47b8-b74e-27a9dcab8693"
+    "v0.9-clip-curtains.gif": "84abb861-5d32-47b8-b74e-27a9dcab8693",
+    "v0.9-clip-solve-a-case.mp4": "d3a27dd2-026d-4407-9645-0467aac2f072",
+    "v0.9-clip-second-look.mp4": "28a06b63-5180-4b93-a55a-33b214760944",
+    "v0.9-clip-red-flag-rush.mp4": "5f09f9d1-c3a9-401a-ae4d-5ebf058c5281",
+    "v0.9-clip-desk-toys.mp4": "c118e84f-f49e-4db8-822f-0cf82ae131da",
+    "v0.9-clip-market-shopping.mp4": "1faf7753-b613-4a07-bc93-a84c59852e38",
+    "v0.9-clip-weather.mp4": "e2e1752a-96e3-479f-9228-b82c82d9bf49",
+    "v0.9-clip-herring-hunt.mp4": "e5f30c16-6917-4dfe-8235-b21cdde68fe6",
+    "v0.9-clip-office-colours.mp4": "0893ab24-17e0-4de9-af2f-cda8c925f3b5",
+    "v0.9-clip-handbook.mp4": "d59c9945-ff12-4ccf-afc4-92fa6115ec4d",
+    "v0.9-clip-title-intro.mp4": "79bad4a9-ea22-46fa-8ed1-ffc1ffc03dab",
+    "v0.9-clip-curtains.mp4": "02a73b2e-4cf7-4f19-ada7-32b0ba4be114"
   },
   "pending_media": {},
   "status": {
