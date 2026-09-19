@@ -295,7 +295,10 @@ export class ReportScene extends Phaser.Scene {
 
     if (this.secondLookOffered())
       L.push({
-        text: '> SECOND LOOK [S]  ·  open the file again with every mark on the paper',
+        text:
+          b.flagsMissed.length + b.falseAccusations.length > 0
+            ? '> SECOND LOOK [S]  ·  open the file again with every mark on the paper'
+            : '> SECOND LOOK [S]  ·  open the file again and ask about anything that looked bad',
         color: 'ink',
         gap: 4,
         onClick: () => this.secondLook(),
