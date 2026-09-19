@@ -419,6 +419,14 @@ media: v0.9-market-page.png
 
 media: v0.9-hall-of-detectives.png
 
+## Mon, 05 Oct, 09:00  ·  `curtains`
+
+(159)
+
+> Velvet curtains, 45 clips at the market. Click the cloth and they draw across the rain; click again and the city comes back. Biscuit keeps the sill either way.
+
+media: v0.9-clip-curtains.gif
+
 # Drafts (unscheduled)
 
 ## when you say so  ·  `coin-launch-thread`

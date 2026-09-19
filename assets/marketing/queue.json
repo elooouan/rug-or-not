@@ -460,6 +460,17 @@
           "alt": "The Hall of Detectives with the weekly file scores."
         }
       ]
+    },
+    {
+      "id": "curtains",
+      "when": "2026-10-05T09:00",
+      "tweets": [
+        {
+          "text": "Velvet curtains, 45 clips at the market. Click the cloth and they draw across the rain; click again and the city comes back. Biscuit keeps the sill either way.",
+          "media": "v0.9-clip-curtains.gif",
+          "alt": "Red velvet curtains drawn across the office window, then opened again on the rainy city."
+        }
+      ]
     }
   ],
   "drafts": [

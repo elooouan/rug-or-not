@@ -1,5 +1,5 @@
 {
-  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }.",
+  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts and the extra October ones are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }.",
   "social_set_id": 332931,
   "drafts": {
     "intro-thread": 10832778,
@@ -41,7 +41,8 @@
     "saturday-2": 10833251,
     "quiz-4-answer": 10833252,
     "coin-launch-thread": 10832833,
-    "coin-teaser": 10832834
+    "coin-teaser": 10832834,
+    "curtains": 10834033
   },
   "media": {
     "v0.8-clip-solve-a-case.gif": "3e04243c-f60e-4a7d-86d0-9c68ea68ba13",
@@ -76,7 +77,8 @@
     "v0.8-share-card.png": "2558c238-787c-419e-85e8-93a37b9d21e0",
     "v0.9-badges.png": "0b5573e1-7c80-480a-a185-b055a765f730",
     "v0.8-herring-hunt.png": "8f6316ff-995a-4586-8977-da86d3f498b4",
-    "v0.8-theme-speakeasy.png": "534234b4-36a4-4b41-b583-50b6e5580798"
+    "v0.8-theme-speakeasy.png": "534234b4-36a4-4b41-b583-50b6e5580798",
+    "v0.9-clip-curtains.gif": "84abb861-5d32-47b8-b74e-27a9dcab8693"
   },
   "pending_media": {},
   "status": {
@@ -120,8 +122,12 @@
       "quiz-3",
       "quiz-3-answer",
       "try-on",
-      "rush-results"
+      "rush-results",
+      "curtains"
     ],
-    "unscheduled": ["coin-launch-thread", "coin-teaser"]
+    "unscheduled": [
+      "coin-launch-thread",
+      "coin-teaser"
+    ]
   }
 }

@@ -28,6 +28,7 @@ promotion playbook is [`docs/PROMO.md`](../../docs/PROMO.md).
 | market-page                                           | The market on the phone: coats for Lucien, a strip of your desk, prices in paper clips.      |
 | dressed-desk                                          | The title desk dressed: oxblood trench, black fedora, velvet curtains, red mug, globe, Soot. |
 | clip-market-shopping                                  | Buying a coat, a hat and an ornament; Lucien and the desk change as each one lands.          |
+| clip-curtains                                         | Velvet curtains drawn across the rain and opened again; Biscuit keeps the sill.              |
 | hall-of-detectives                                    | The board with the detectives list: one row per desk, by career score or by clips.           |
 | netscope-phone / coin-page-phantom-connected / badges | The phone's pages as of v0.9 (Market in the toolbar, the allowance on the coin page).        |
 

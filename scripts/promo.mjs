@@ -7,7 +7,7 @@
  *   npm run dev            (in another terminal; the script drives the dev server)
  *   node scripts/promo.mjs [only]      e.g. `node scripts/promo.mjs lens` or `clips`
  *
- *   PROMO_BASE=http://localhost:5173  PROMO_OUT=assets/marketing  PROMO_TAG=v0.8
+ *   PROMO_BASE=http://localhost:5173  PROMO_OUT=assets/marketing  PROMO_TAG=v0.9
  *
  * GIFs are encoded in the page with gifenc (dev dependency); there is no ffmpeg here.
  * Twitter turns GIFs into video on upload. For proper MP4s, run the clips through
@@ -19,7 +19,7 @@ import { resolve } from 'node:path';
 
 const BASE = process.env.PROMO_BASE ?? 'http://localhost:5173';
 const OUT = resolve(process.env.PROMO_OUT ?? 'assets/marketing');
-const TAG = process.env.PROMO_TAG ?? 'v0.8';
+const TAG = process.env.PROMO_TAG ?? 'v0.9';
 const only = process.argv[2] ?? '';
 const W = 1280;
 const H = 720;
@@ -639,6 +639,26 @@ const SHOTS = {
 };
 
 const CLIPS = {
+  async curtains(page) {
+    // Velvet curtains from the market: drawn across the rain, then opened again.
+    await boot(page, { ...DRESSED, settings: { ...DRESSED.settings, weather: 'rain' } });
+    await skipTalk(page);
+    await record(page);
+    await move(page, 330, 140, 10);
+    await sleep(900);
+    await move(page, 131, 26, 18);
+    await sleep(300);
+    await click(page, 131, 26);
+    await sleep(1600);
+    await move(page, 330, 140, 14);
+    await sleep(900);
+    await move(page, 320, 24, 14);
+    await click(page, 320, 24);
+    await sleep(1400);
+    await move(page, 330, 140, 12);
+    await sleep(800);
+    await stopRecording(page, 'curtains');
+  },
   async 'market-shopping'(page) {
     await boot(page, SHOPPER);
     await skipTalk(page);
