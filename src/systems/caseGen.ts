@@ -1106,11 +1106,16 @@ function liquidityDoc(
     );
   if (wants.lockedLong)
     clues.push(
-      herringClue('g-lockedlong', `Locked ${years} years`, 'liquidity-locked-long', {
-        kind: 'row',
-        row: 0,
-        table: 'lock',
-      }),
+      herringClue(
+        'g-lockedlong',
+        `Locked ${years} year${years === 1 ? '' : 's'}`,
+        'liquidity-locked-long',
+        {
+          kind: 'row',
+          row: 0,
+          table: 'lock',
+        },
+      ),
     );
   const poolPct = rng.int(24, 40);
   const holders: { label: string; pct: number; tag?: string }[] = [
