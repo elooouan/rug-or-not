@@ -31,6 +31,12 @@ export interface DialogueOpts {
 /** The box each scene is showing, so a new one replaces it instead of stacking. */
 const OPEN = new WeakMap<Phaser.Scene, DialogueBox>();
 
+/** Lucien is mid-lesson on this scene: a bubble now would be a second head talking. */
+export function dialogueOpen(scene: Phaser.Scene): boolean {
+  const box = OPEN.get(scene);
+  return !!box && box.isActive;
+}
+
 export class DialogueBox extends Phaser.GameObjects.Container {
   private lines: DialogueLine[];
   private index = -1;

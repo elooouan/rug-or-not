@@ -4,7 +4,7 @@ import { FONT, GAME_HEIGHT } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
-import { LUCIEN_FACE_TEX, LUCIEN_TEX } from './DialogueBox';
+import { dialogueOpen, LUCIEN_FACE_TEX, LUCIEN_TEX } from './DialogueBox';
 import { rect } from './shapes';
 import { charWidth, makeText, wrapMono } from './text';
 
@@ -25,10 +25,13 @@ export class LucienBubble extends Phaser.GameObjects.Container {
     LucienBubble.current = null;
   }
 
-  /** `lift` raises the bubble above things at the bottom of the screen (e.g. report buttons). */
+  /**
+   * `lift` raises the bubble above things at the bottom of the screen (e.g. report
+   * buttons). Ambient: nothing with the quips off, nothing over a lesson he is giving.
+   */
   static say(scene: Phaser.Scene, text: string, ms = 3200, lift = 0): void {
     LucienBubble.current?.destroy();
-    if (!saveStore.get().settings.quips) return;
+    if (!saveStore.get().settings.quips || dialogueOpen(scene)) return;
     LucienBubble.current = new LucienBubble(scene, text, ms, lift);
   }
 
