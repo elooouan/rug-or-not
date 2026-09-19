@@ -816,9 +816,11 @@ export class InvestigationScene extends Phaser.Scene {
       firstSolve: caughtName !== null || (!generated && breakdown.verdictCorrect && !prevSolved),
       mode: generated ? 'cold' : gameState.mode === 'daily' ? 'daily' : 'campaign',
     });
+    const firstClips = before.clips.earned === 0;
     earnClips(clips.total);
 
     const notes: [string, string][] = [];
+    if (firstClips) notes.push(['PAPER CLIPS', 'the market on the phone takes them']);
     const afterDaily = saveStore.get().daily;
     if (gameState.mode === 'daily' && dailyBefore.lastPlayed !== localDateKey()) {
       if (afterDaily.freezes > dailyBefore.freezes)

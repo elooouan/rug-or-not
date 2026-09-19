@@ -30,6 +30,7 @@ import { awardBadge, badgeCount, badgeProgress } from '@/systems/badges';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
 import { LUCIEN_TEX, lucienSays } from '../DialogueBox';
+import { LucienBubble } from '../LucienBubble';
 import { PixelButton } from '../PixelButton';
 import { markEscConsumed, popModal, popOverlay, pushModal, pushOverlay } from '../escGuard';
 import { rect } from '../shapes';
@@ -84,6 +85,17 @@ const boardRows = new Map<string, number>();
 
 /** Which column the detectives board is sorted by; remembered while the phone is open. */
 let deskSort: DeskSort = 'total';
+
+/** What Lucien says when something new lands on the desk. */
+const BOUGHT_QUIPS: Record<ShopSlot, string[]> = {
+  coat: ['New coat. The old one had opinions.', 'Same detective. Better silhouette.'],
+  hat: ['A hat is a commitment.', 'The hat does the thinking. I take the credit.'],
+  cat: ['Biscuit will pretend not to notice.', 'She approves. Silently. Judgingly.'],
+  ornament: ['Something to look at between files.', 'The corner needed a witness.'],
+  mug: ['Same coffee. Better mug.', 'The mug holds more. Allegedly.'],
+  curtains: ["Curtains. The city can't watch me work now.", 'Very cinema. Very late.'],
+  radio: ['Same static, better box.', 'The numbers station approves.'],
+};
 
 /** The market's open drawer; remembered across renders so buying doesn't jump the page. */
 let marketSlot: ShopSlot = 'coat';
@@ -899,6 +911,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             redress(scene);
             audio.play('stamp');
             toast(scene, 'Bought', `${item.name}. ${clipBalance()} clips left.`);
+            const quips = BOUGHT_QUIPS[item.style.slot];
+            LucienBubble.say(scene, quips[Phaser.Math.Between(0, quips.length - 1)]);
             if (boughtCount() >= 5) awardBadge(scene, 'collector');
             ctx.panel.render();
           },
