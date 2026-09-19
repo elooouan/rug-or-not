@@ -171,7 +171,10 @@ export class ReportScene extends Phaser.Scene {
         x + w - pad - 90,
         by,
         isDaily || isCold ? 'Title' : 'Case files',
-        () => goTo(this, isDaily || isCold ? 'TitleScene' : 'CaseSelectScene'),
+        () =>
+          isDaily || isCold
+            ? goTo(this, 'TitleScene')
+            : goTo(this, 'CaseSelectScene', { focus: gameState.currentIndex }),
         { width: 90 },
       ),
     );

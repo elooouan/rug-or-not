@@ -46,6 +46,13 @@ export class CaseSelectScene extends Phaser.Scene {
     super(CaseSelectScene.KEY);
   }
 
+  /** Which folder to land on (the report sends the file it came from). */
+  private wantFocus = -1;
+
+  init(data?: { focus?: number }): void {
+    this.wantFocus = typeof data?.focus === 'number' ? data.focus : -1;
+  }
+
   create(): void {
     setupScene(this);
     new DeskBackground(this, { props: false, stamps: false });
@@ -125,7 +132,10 @@ export class CaseSelectScene extends Phaser.Scene {
       audio.play('paper');
       startColdCase(this, `week-${weekKey()}`);
     });
-    this.focus = Math.max(0, this.unlocked.lastIndexOf(true));
+    this.focus =
+      this.wantFocus >= 0 && this.unlocked[this.wantFocus]
+        ? this.wantFocus
+        : Math.max(0, this.unlocked.lastIndexOf(true));
     this.refreshFocus();
     lucienSays(this, 'case-files');
   }
