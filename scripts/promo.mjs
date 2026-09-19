@@ -605,6 +605,20 @@ const CLIPS = {
     await sleep(2500);
     await stopRecording(page, 'herring-hunt');
   },
+  async 'title-intro'(page) {
+    // The first night: lamp on, the case file slides in, Lucien introduces himself.
+    await page.addInitScript(
+      (save) => {
+        localStorage.setItem('rug-or-not:save:v1', JSON.stringify(save));
+      },
+      { ...FRESH, settings: { ...FRESH.settings, hints: true } },
+    );
+    await page.goto(`${BASE}/?p=${Date.now()}`);
+    await page.waitForFunction(() => typeof window.__game !== 'undefined', null, { timeout: SLOW });
+    await record(page);
+    await sleep(9000);
+    await stopRecording(page, 'title-intro');
+  },
   async 'office-colours'(page) {
     await boot(page, VETERAN);
     await skipTalk(page);

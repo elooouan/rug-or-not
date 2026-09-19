@@ -45,6 +45,7 @@ Regenerate after a change with the dev server running:
 | theme-midnight-reading | Reading a contract in the Blue hour theme. |
 | settings | Settings. |
 | notebook-herring-hunt-button / herring-hunt | Herring hunts: the notebook page's button, and a hunt page (click what only looks bad). |
+| clip-title-intro | The first night: the lamp comes on and the case file slides in. |
 | clip-solve-a-case | Title to report in twenty seconds. |
 | clip-herring-hunt | Five pages of herring hunting. |
 | clip-office-colours | Cycling the office colours in Settings, Lucien commenting, then the desk in the last one. |
