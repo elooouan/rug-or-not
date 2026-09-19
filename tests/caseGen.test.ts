@@ -8,6 +8,24 @@ describe('cold case generator', () => {
     expect(generateCase('abc').ticker).not.toBe(generateCase('xyz').ticker);
   });
 
+  it('prints a valid file for every daily and weekly seed of the coming year', async () => {
+    const { dailySeed, dailyIsGenerated, localDateKey, weekKey } =
+      await import('@/systems/dailyCase');
+    const bad: string[] = [];
+    const start = new Date('2026-09-19T12:00:00Z');
+    for (let i = 0; i < 366; i++) {
+      const date = new Date(start.getTime() + i * 86400000);
+      const key = localDateKey(date);
+      const seeds = dailyIsGenerated(key) ? [dailySeed(key)] : [];
+      if (date.getDay() === 1) seeds.push(`week-${weekKey(date)}`, `holders-${weekKey(date)}`);
+      for (const seed of seeds) {
+        const res = validateCase(generateCase(seed));
+        if (!res.ok) bad.push(`${seed}: ${res.errors.join(' | ')}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
   it('produces valid cases for hundreds of seeds', () => {
     const bad: string[] = [];
     for (let i = 0; i < 400; i++) {
