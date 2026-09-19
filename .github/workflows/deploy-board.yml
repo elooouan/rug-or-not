@@ -1,0 +1,24 @@
+name: Deploy the board worker
+
+# Manual. Deploys server/leaderboard to Cloudflare Workers. Needs two repository secrets
+# (CLOUDFLARE_API_TOKEN with Workers Scripts + KV edit rights, CLOUDFLARE_ACCOUNT_ID) and
+# one variable, CF_KV_BOARD_ID: the namespace id printed by
+# `npx wrangler kv namespace create BOARD`. Optional variable BOARD_ALLOWED_ORIGIN locks
+# the board to the game's origin (e.g. https://elooouan.github.io). Afterwards set the
+# VITE_LEADERBOARD_URL variable to the worker's URL and run the Pages deploy again.
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Point wrangler.toml at the KV namespace
+        run: sed -i "s/REPLACE_WITH_YOUR_KV_ID/${{ vars.CF_KV_BOARD_ID }}/" server/leaderboard/wrangler.toml
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: server/leaderboard
+          command: deploy --var ALLOWED_ORIGIN:${{ vars.BOARD_ALLOWED_ORIGIN || '*' }}

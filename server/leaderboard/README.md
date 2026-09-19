@@ -10,6 +10,10 @@ npx wrangler kv namespace create BOARD      # paste the id into wrangler.toml
 npx wrangler deploy                          # prints https://rug-or-not-board.<you>.workers.dev
 ```
 
+Or from GitHub: the "Deploy the board worker" workflow (`.github/workflows/deploy-board.yml`)
+runs the same deploy with the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets
+and the `CF_KV_BOARD_ID` variable (the namespace id from the `kv namespace create` step).
+
 Then in the game's `.env`:
 
 ```

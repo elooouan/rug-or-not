@@ -25,7 +25,19 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Launch settings come from repository variables (Settings > Secrets and variables >
+      # Actions > Variables); anything left unset keeps the game's defaults.
       - run: npm run build
+        env:
+          VITE_TOKEN_NAME: ${{ vars.VITE_TOKEN_NAME }}
+          VITE_TOKEN_SYMBOL: ${{ vars.VITE_TOKEN_SYMBOL }}
+          VITE_TOKEN_MINT: ${{ vars.VITE_TOKEN_MINT }}
+          VITE_SOLANA_RPC: ${{ vars.VITE_SOLANA_RPC }}
+          VITE_SOLANA_CLUSTER: ${{ vars.VITE_SOLANA_CLUSTER }}
+          VITE_TOKEN_HOLDER_MIN: ${{ vars.VITE_TOKEN_HOLDER_MIN }}
+          VITE_TOKEN_BUY_URL: ${{ vars.VITE_TOKEN_BUY_URL }}
+          VITE_LEADERBOARD_URL: ${{ vars.VITE_LEADERBOARD_URL }}
+          VITE_TOKEN_PRICE_URL: ${{ vars.VITE_TOKEN_PRICE_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
