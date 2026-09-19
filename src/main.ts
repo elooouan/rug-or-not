@@ -15,6 +15,7 @@ import { audio } from '@/systems/audio';
 import { wallet } from '@/systems/wallet';
 import { toast } from '@/ui/Toast';
 import { modalOpen, overlayDepth, overlayOwners } from '@/ui/escGuard';
+import { touchScreen } from '@/ui/lensLift';
 import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
@@ -54,6 +55,26 @@ const game = new Phaser.Game({
 const unlockAudio = () => audio.unlock();
 window.addEventListener('pointerdown', unlockAudio);
 window.addEventListener('keydown', unlockAudio);
+
+// On a phone the hardware/gesture "back" would leave the site mid-file. Keep one history
+// entry in hand and turn a back press into Esc instead (the second press, on the title,
+// still leaves: Esc does nothing there and the spare entry is gone).
+if (touchScreen() && window.top === window) {
+  history.pushState({ desk: true }, '');
+  window.addEventListener('popstate', () => {
+    const busy = game.scene
+      .getScenes(true)
+      .some((s) => s.scene.key !== 'TitleScene' && s.scene.key !== 'CursorScene');
+    if (!busy) return;
+    history.pushState({ desk: true }, '');
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }),
+    );
+    window.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }),
+    );
+  });
+}
 
 // Fullscreen toggle (F) works from any scene; browsers require a user gesture.
 export function toggleFullscreen(): void {

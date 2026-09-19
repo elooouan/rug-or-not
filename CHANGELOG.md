@@ -82,6 +82,8 @@
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
   mark at the corner); the small section headings are darker and read at a glance.
+- On a phone, the system "back" (button or swipe) works as Esc while a file, the notebook or
+  any other screen is open instead of leaving the site; on the title it leaves as usual.
 - Added to a phone's home screen, the game opens without the browser around it (the
   manifest already asked for fullscreen; iPhones needed their own meta tags) and draws
   under the notch. The help page says so on touch screens.
