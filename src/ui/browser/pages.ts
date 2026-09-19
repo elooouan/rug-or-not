@@ -465,7 +465,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     );
     ctx.button(
       'Change name',
-      () => ctx.panel.scene && new NamePicker(ctx.scene, () => ctx.panel.render()),
+      () =>
+        ctx.panel.scene &&
+        new NamePicker(ctx.scene, () => {
+          void postDesk(); // the board row carries the name
+          ctx.panel.render();
+        }),
       { variant: 'paper', sameLine: true },
     );
     ctx.button(
