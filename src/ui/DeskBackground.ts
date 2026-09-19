@@ -967,11 +967,18 @@ export class DeskBackground {
     }
     audio.play('meow');
     if (this.pets === 1) lucienSays(this.scene, 'cat');
+    // A white cat in the snow, a black cat at midnight: she knows what she's doing.
+    const fur = worn('cat').id;
+    const hidden =
+      (fur === 'cat-snow' && this.weather === 'snow') ||
+      (fur === 'cat-soot' && (this.weather === 'clear' || this.weather === 'fog') && !this.lampOn);
     floatText(
       this.scene,
       this.cat.x + 14,
       this.cat.y - 22,
-      ['mrrp', 'prrr', 'mew', '...'][Phaser.Math.Between(0, 3)],
+      hidden
+        ? ['camouflage', 'what cat', 'you found me'][Phaser.Math.Between(0, 2)]
+        : ['mrrp', 'prrr', 'mew', '...'][Phaser.Math.Between(0, 3)],
     );
     const heart = this.scene.add
       .image(this.cat.x + 20, this.cat.y - 24, TEX.heart)
