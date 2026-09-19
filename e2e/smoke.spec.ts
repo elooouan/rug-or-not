@@ -117,6 +117,19 @@ test('a case can be opened, stamped and reported', async ({ page }) => {
     inv.stamps[0].trigger((v) => inv.onStamp(v));
   });
   await waitForScene(page, 'ReportScene');
+  // The file paid its clips and the desk went up on the (local) detectives board.
+  const after = await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string);
+    const desks = JSON.parse(localStorage.getItem('rug-or-not:desks:v1') ?? '[]');
+    return {
+      earned: save.clips.earned,
+      id: save.id,
+      desks: desks.map((d: { id: string }) => d.id),
+    };
+  });
+  expect(after.earned).toBeGreaterThanOrEqual(3);
+  expect(after.id).toMatch(/^[a-f0-9]{16}$/);
+  expect(after.desks).toEqual([after.id]);
   expect(errors).toEqual([]);
 });
 
