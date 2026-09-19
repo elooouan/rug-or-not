@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_SOLANA_CLUSTER?: string;
   readonly VITE_TOKEN_MOCK_BALANCE?: string;
   readonly VITE_GOATCOUNTER?: string;
+  readonly VITE_X_HANDLE?: string;
 }
 
 interface ImportMeta {

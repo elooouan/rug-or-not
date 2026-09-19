@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { TOKEN } from '@/config/token';
 import { GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { DEPTH } from '@/config/depth';
 import { HEX } from '@/config/palette';
@@ -55,7 +56,10 @@ export class SharePopover {
     };
     entries.push({
       label: 'Post on X',
-      run: intent((text, url) => `https://twitter.com/intent/tweet?text=${text}&url=${url}`),
+      run: intent(
+        (text, url) =>
+          `https://twitter.com/intent/tweet?text=${text}&url=${url}${TOKEN.xHandle ? `&via=${TOKEN.xHandle}` : ''}`,
+      ),
     });
     entries.push({
       label: 'Telegram',

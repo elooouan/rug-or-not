@@ -1100,9 +1100,17 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     });
     ctx.line('holds the full changelog, if you can open it.', { color: 'woodMid' });
     ctx.gap();
-    ctx.button('Source on GitHub (opens a new tab)', () => {
-      window.open('https://github.com/elooouan/rug-or-not', '_blank', 'noopener');
-    });
+    if (TOKEN.xHandle)
+      ctx.button(`@${TOKEN.xHandle} on X (opens a new tab)`, () => {
+        window.open(`https://x.com/${TOKEN.xHandle}`, '_blank', 'noopener');
+      });
+    ctx.button(
+      'Source on GitHub (opens a new tab)',
+      () => {
+        window.open('https://github.com/elooouan/rug-or-not', '_blank', 'noopener');
+      },
+      { variant: 'paper' },
+    );
     ctx.button(
       'Something broke? Report it (new tab)',
       () => window.open('https://github.com/elooouan/rug-or-not/issues', '_blank', 'noopener'),

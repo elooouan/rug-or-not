@@ -30,6 +30,8 @@ export const TOKEN = {
   leaderboardUrl: env(import.meta.env.VITE_LEADERBOARD_URL, '').replace(/\/$/, ''),
   /** Optional price feed for the coin page (see src/systems/price.ts). */
   priceUrl: env(import.meta.env.VITE_TOKEN_PRICE_URL, ''),
+  /** The game's X account, without the @: shares carry it and the About page links it. */
+  xHandle: env(import.meta.env.VITE_X_HANDLE, '0xRugOrNot').replace(/^@/, ''),
 } as const;
 
 export type Cluster = 'mainnet-beta' | 'devnet' | 'testnet';
