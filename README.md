@@ -274,15 +274,20 @@ to tweak.
 ## Adding Lucien lines, tips, news, badges
 
 - Dialogue scripts: `src/data/dialogue.ts` (`LUCIEN`, keyed by `ScriptId`; lines with
-  `waitFor` need a matching condition in the scene). Title quips: `LUCIEN_QUIPS`. Per-case
-  intro lines: the optional `intro` field in each case file.
+  `waitFor` need a matching condition in the scene; a `touch` variant replaces the line on
+  touch screens, so nothing there says click, hover or a key). Title quips:
+  `LUCIEN_QUIPS`. Per-case intro lines: the optional `intro` field in each case file.
 - Corkboard tips: `src/data/tips.ts`. Headlines: `src/data/news.ts`. Badges: `src/data/badges.ts`
   (award with `awardBadge(scene, id)`; counters live in `save.stats`).
 
 ## Adding a red flag or unlockable
 
 - Red flags: add an entry to `FLAGS` in `src/data/flags.ts` (title, explanation, how to
-  spot it, severity). It appears in the Detective's Notebook once a player meets it.
+  spot it, severity). It appears in the Detective's Notebook once a player meets it. For
+  the printer to use it, add it to a document builder in `src/systems/caseGen.ts` (its
+  `*Flag` union, `FLAG_POOL`, `FLAG_BLURB`, the lines it writes, and any herring it
+  contradicts in the assembly step); yellow herrings follow the same path with `HERRINGS`
+  and `HERRING_POOL`. The safe's combination is the number of red flags, on purpose.
 - Unlockables: add to `src/data/unlockables.ts`. The `source` field is a tagged union; new
   source kinds only need a resolver in `sourceResolvers` (`src/systems/unlocks.ts`).
   Unlockables are cosmetic only.
