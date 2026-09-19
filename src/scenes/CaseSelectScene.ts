@@ -20,6 +20,7 @@ import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
 import { unlocked } from '@/systems/discovery';
 import { difficultyPips, rect } from '@/ui/shapes';
+import { touchScreen } from '@/ui/lensLift';
 
 /** A filing-cabinet drawer of case folders. Locked ones wear a padlock. */
 export class CaseSelectScene extends Phaser.Scene {
@@ -162,8 +163,10 @@ export class CaseSelectScene extends Phaser.Scene {
       cont.add([box, t]);
       // The sticker opens the last report on this file (with its second look).
       if (saveStore.get().caseResults[c.id]?.lastRun) {
+        // A thumb needs more than the sticker itself.
+        const pad = touchScreen() ? 6 : 2;
         box.setInteractive(
-          new Phaser.Geom.Rectangle(-2, -2, 18, 18),
+          new Phaser.Geom.Rectangle(-pad, -pad, 14 + pad * 2, 14 + pad * 2),
           Phaser.Geom.Rectangle.Contains,
         );
         box.on('pointerover', () => box.setFillStyle(HEX.stampGreen, 0.25));
