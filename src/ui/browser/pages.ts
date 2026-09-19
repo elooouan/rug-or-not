@@ -512,7 +512,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const placeholder = makeText(ctx.scene, 0, ctx.y, 'loading...', {
       font: 'body',
       size: FONT.size.body,
-      color: 'paperShadow',
+      color: 'woodMid',
     });
     ctx.content.add(placeholder);
     const startY = ctx.y;
@@ -532,7 +532,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             {
               font: 'body',
               size: FONT.size.body,
-              color: 'paperShadow',
+              color: 'woodMid',
             },
           ),
         );
@@ -565,7 +565,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           makeText(ctx.scene, 0, rushY, 'No rush runs yet. Sixty seconds, one page at a time.', {
             font: 'body',
             size: FONT.size.body,
-            color: 'paperShadow',
+            color: 'woodMid',
           }),
         );
         return;
@@ -596,7 +596,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           makeText(ctx.scene, 0, coldY, 'No cold cases yet. The pile never ends.', {
             font: 'body',
             size: FONT.size.body,
-            color: 'paperShadow',
+            color: 'woodMid',
           }),
         );
         return;
@@ -631,7 +631,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             {
               font: 'body',
               size: FONT.size.body,
-              color: 'paperShadow',
+              color: 'woodMid',
             },
           ),
         );
@@ -872,7 +872,7 @@ export class NamePicker extends Phaser.GameObjects.Container {
     this.add(
       makeText(scene, x + w / 2, y + h - 30, 'type it, or use the arrows  ·  Enter saves', {
         size: FONT.size.tiny,
-        color: 'paperShadow',
+        color: 'woodMid',
       }).setOrigin(0.5, 0),
     );
     const confirm = () => {
