@@ -1,0 +1,504 @@
+{
+  "_readme": "Two weeks of tweets for Typefully. Times are Europe/Paris. `tweets` with more than one entry are a thread; `media` paths are relative to assets/marketing; `poll` makes an X poll (no media allowed on polls). QUEUE.md is rendered from this file (node scripts/queue.mjs).",
+  "play_url": "https://elooouan.github.io/rug-or-not/",
+  "items": [
+    {
+      "id": "intro-thread",
+      "when": "2026-09-21T09:00",
+      "pin": true,
+      "tweets": [
+        {
+          "text": "I made a detective game about rug pulls.\n\nA folder lands on your desk: contract, tokenomics, team page, chat log, liquidity report. You read it through a magnifying glass, pin the red flags, and stamp RUG or LEGIT.\n\nThe detective is Lucien. He has a cat.",
+          "media": "v0.8-clip-solve-a-case.gif",
+          "alt": "A case file opened on a wooden desk, clues pinned through a magnifying glass, then stamped RUG."
+        },
+        {
+          "text": "Fine print only shows through the lens. A sell tax that can change. An address that isn't the one it claims to be. A lock that expires next week.\n\nMove slowly. Anything that turns amber is worth a second look.",
+          "media": "v0.8-lens-fine-print.png",
+          "alt": "The magnifying glass over a contract, revealing small print about a sell tax."
+        },
+        {
+          "text": "The report shows every flag: the ones you caught and the ones you walked past. Miss one and it offers a second look at the same paper, your pins where you left them, the misses in amber.",
+          "media": "v0.8-clip-second-look.gif",
+          "alt": "The case report, then the file reopened with missed clues marked in amber."
+        },
+        {
+          "text": "18 red flags, 15 yellow herrings (things that look scary and are fine), 16 written cases, and a printer that makes up cold cases forever.\n\nRed Flag Rush: sixty seconds, one page at a time, click the flag.",
+          "media": "v0.8-clip-red-flag-rush.gif",
+          "alt": "Red Flag Rush: evidence pages flipping past with a timer, red flags being clicked."
+        },
+        {
+          "text": "Everything on the desk does something. Coffee, lamp, window (it has weather), the cat, a radio with a numbers station, a safe, and a phone that runs a fake browser with a market on it.",
+          "media": "v0.8-clip-desk-toys.gif",
+          "alt": "Clicking the lamp, the mug, the cat and the radio on the detective's desk."
+        },
+        {
+          "text": "Files pay paper clips. Clips buy Lucien a coat, the cat a new fur, the desk a globe. It's a desk; dress it.\n\nNothing bought changes a score. Nothing in the game costs money.",
+          "media": "v0.9-clip-market-shopping.gif",
+          "alt": "Buying a coat, a hat and an ornament at the in-game market; the detective changes as each lands."
+        },
+        {
+          "text": "It's free, it runs in a browser, phones work sideways. All cases are fictional. This is a game, not financial advice.\n\n{PLAY_URL}",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "flag-1",
+      "when": "2026-09-21T15:30",
+      "tweets": [
+        {
+          "text": "Red flag of the day: owner-only unlimited mint.\n\nOne address can print tokens whenever it likes. \"Fixed supply\" in the pitch, `mint(uint256)` with `onlyOwner` in the contract. The pitch is a JPEG; the contract is the contract.\n\nLucien: read the code before the chat.",
+          "media": "v0.8-red-flag-trading-switch.png",
+          "alt": "A printed contract on the desk with a suspicious owner-only function under the lens."
+        }
+      ]
+    },
+    {
+      "id": "desk-alive",
+      "when": "2026-09-21T21:00",
+      "tweets": [
+        {
+          "text": "The office at night. The window cycles through rain, storm, snow, fog and a clear night with a moon you can click. A train crosses the horizon now and then. Biscuit watches it.",
+          "media": "v0.8-clip-weather.gif",
+          "alt": "The office window changing from rain to snow to a clear night with a moon."
+        }
+      ]
+    },
+    {
+      "id": "devlog-coats",
+      "when": "2026-09-22T09:00",
+      "tweets": [
+        {
+          "text": "How the coats work: Lucien is one PNG. The market recolours only the pixels that are trench-coat cloth (a hue band, a saturation floor) and leaves skin and brass alone, hat above a line, coat below. Seven coats, six hats, no new art.",
+          "media": "v0.9-market-page.png",
+          "alt": "The in-game market page: Lucien's coats for sale, a strip showing him in the coat being hovered."
+        }
+      ]
+    },
+    {
+      "id": "quiz-1",
+      "when": "2026-09-22T15:30",
+      "poll": ["Rug", "Legit"],
+      "tweets": [
+        {
+          "text": "Rug or Not? #1\n\nFrom the contract:\n\nfunction setSellTax(uint256 t) public onlyOwner {\n  sellTax = t;\n}\n\nThe pitch says \"1% tax, fixed\".\n\nStamp it. Answer tomorrow morning.",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "rush-clip",
+      "when": "2026-09-22T21:00",
+      "tweets": [
+        {
+          "text": "Red Flag Rush. Sixty seconds, one evidence page at a time, click the red flag. Herrings cost five seconds, blank paper two, streaks multiply. Then the notebook remembers what you keep falling for.",
+          "media": "v0.8-red-flag-rush.png",
+          "alt": "A rush page with a timer, a streak counter and a red flag about to be clicked."
+        }
+      ]
+    },
+    {
+      "id": "quiz-1-answer",
+      "when": "2026-09-23T09:00",
+      "tweets": [
+        {
+          "text": "Yesterday's file: RUG.\n\nA tax the owner can set is a tax the owner can set to 99%. \"Fixed\" means a constant, or no setter at all. This one had a setter, no cap, no timelock.\n\nThe report in the game says the same thing, slower.",
+          "media": "v0.8-case-report.png",
+          "alt": "The case report: verdict RUG, correct, red flags listed with explanations."
+        }
+      ]
+    },
+    {
+      "id": "board",
+      "when": "2026-09-23T15:30",
+      "tweets": [
+        {
+          "text": "The Hall of Detectives. Your runs under a handle, a 14-day streak strip, the rush and cold-case boards, and now one row per desk: career score, rank, clips earned, files solved. Sort by score or by clips.\n\nArcade names only. No email, no login.",
+          "media": "v0.9-hall-of-detectives.png",
+          "alt": "The leaderboard page: detectives listed with scores, ranks, clips and files solved."
+        }
+      ]
+    },
+    {
+      "id": "rogues",
+      "when": "2026-09-23T21:00",
+      "tweets": [
+        {
+          "text": "Every rug you call correctly puts a face on the wall. Wanted posters with charges and a reward, generated per case.\n\nThe Tailor is still at large.",
+          "media": "v0.8-rogues-gallery.png",
+          "alt": "The notebook's rogues gallery: wanted posters of the rug pullers caught so far."
+        }
+      ]
+    },
+    {
+      "id": "flag-2",
+      "when": "2026-09-24T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: the honeypot.\n\nAnyone can buy. Only approved addresses can sell. The chart only goes up because nobody can take profit, until the owner does.\n\nWhere it hides: a transfer hook with a whitelist check, or a \"cooldown\" that never ends.",
+          "media": "v0.8-pins-and-suspicions.png",
+          "alt": "Clues pinned on a contract, the suspicions list filling in on the right."
+        }
+      ]
+    },
+    {
+      "id": "wallet-stance",
+      "when": "2026-09-24T15:30",
+      "tweets": [
+        {
+          "text": "The game connects to Phantom read-only. It learns your public address and reads two balances. It never asks you to sign anything, never sees a seed phrase, and plays exactly the same without a wallet.\n\nA game about rugs that asked for a signature would be a rug.",
+          "media": "v0.9-coin-page-phantom-connected.png",
+          "alt": "The in-game coin page with a wallet connected: address, balances, what holding opens."
+        }
+      ]
+    },
+    {
+      "id": "second-look",
+      "when": "2026-09-24T21:00",
+      "tweets": [
+        {
+          "text": "\"Missed: in Tokenomics\" used to be the whole lesson. Now the file comes back read-only with your pins where they were and every miss in amber. Click one and Lucien explains why it mattered. Nothing counts; it's for next time.",
+          "media": "v0.8-second-look.png",
+          "alt": "A closed case file reopened, missed clues marked in amber, Lucien explaining one."
+        }
+      ]
+    },
+    {
+      "id": "herring-hunt",
+      "when": "2026-09-25T09:00",
+      "tweets": [
+        {
+          "text": "Half of learning to spot rugs is learning what's fine. A small fixed tax. A team of two. A liquidity pool that's the top holder. An audit that lists minor findings.\n\nHerring hunts: five printed pages, click the thing that only looks bad.",
+          "media": "v0.8-clip-herring-hunt.gif",
+          "alt": "Herring hunt pages: scary-looking but harmless items being clicked."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2",
+      "when": "2026-09-25T15:30",
+      "poll": ["Rug", "Legit"],
+      "tweets": [
+        {
+          "text": "Rug or Not? #2\n\nFrom the liquidity report:\n\nPool: TOKEN / USDC\nLiquidity: $614,000\nLocked 100% via LockBox until Sep 2028\nTop holder: the liquidity pool (34%)\n\nStamp it. Answer tomorrow.",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "office-colours",
+      "when": "2026-09-25T21:00",
+      "tweets": [
+        {
+          "text": "Five office colours: Noir, Old file, Blue hour, Newsprint, Speakeasy. The whole desk is drawn from twelve named colours, so a theme is twelve new values and a repaint. Lucien has opinions about each.",
+          "media": "v0.8-clip-office-colours.gif",
+          "alt": "Cycling the office through five colour themes in the settings."
+        }
+      ]
+    },
+    {
+      "id": "saturday-1",
+      "when": "2026-09-26T12:00",
+      "tweets": [
+        {
+          "text": "The detective's desk, four ways. A pixel-noir game about spotting rug pulls, all in a browser.\n\n#screenshotsaturday #pixelart #indiedev",
+          "media": [
+            "v0.9-dressed-desk.png",
+            "v0.8-theme-midnight-reading.png",
+            "v0.8-weather-snow.png",
+            "v0.8-rogues-gallery.png"
+          ],
+          "alt": "Four stills: the dressed desk, reading a contract in blue hour, snow at the window, the rogues gallery."
+        }
+      ]
+    },
+    {
+      "id": "quiz-2-answer",
+      "when": "2026-09-26T20:00",
+      "tweets": [
+        {
+          "text": "Yesterday's file: LEGIT, on this page at least.\n\nLiquidity locked for two years with the pool as top holder is the boring, good kind of paperwork. You still read the contract. One page never clears a case.",
+          "media": "v0.8-cold-case-printed-file.png",
+          "alt": "A printed cold-case liquidity report with a long lock and holder bars."
+        }
+      ]
+    },
+    {
+      "id": "the-wall",
+      "when": "2026-09-27T12:00",
+      "tweets": [
+        {
+          "text": "Behind the corkboard is the making-of: a polaroid for every notable build since the first night, red string and all. 29 photos, 430-odd commits, ten days.\n\nClick one to look closer.",
+          "media": "v0.8-the-wall-making-of.png",
+          "alt": "A wall of polaroids joined by red string, each a screenshot of an earlier build."
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-1",
+      "when": "2026-09-27T20:00",
+      "tweets": [
+        {
+          "text": "Lucien, on being asked whether a coin will go up:\n\n\"Wen? When you have read the tokenomics.\"",
+          "media": "v0.8-title-first-night.png",
+          "alt": "The title screen on the first night, Lucien introducing himself."
+        }
+      ]
+    },
+    {
+      "id": "devlog-week",
+      "when": "2026-09-28T09:00",
+      "tweets": [
+        {
+          "text": "Shipped last week (v0.9): paper clips as currency, a market with 35 things, a try-on strip, a daily deal, a detectives board, deep links, a secret badge for an all-gold look, and a bug where asking Lucien for help cost points and said nothing if you'd muted his remarks. Fixed.",
+          "media": "v0.9-market-page.png",
+          "alt": "The market page with coats for sale and the collection count."
+        }
+      ]
+    },
+    {
+      "id": "flag-3",
+      "when": "2026-09-28T15:30",
+      "tweets": [
+        {
+          "text": "Red flag of the day: liquidity that isn't locked, or a lock that expires next week.\n\nThe lock is the promise that the pool won't be pulled. \"Locked\" with an expiry in nine days is a countdown, not a promise. Read the date, not the badge.",
+          "media": "v0.8-cold-case-printed-file.png",
+          "alt": "A liquidity report on the desk with the lock date under the lens."
+        }
+      ]
+    },
+    {
+      "id": "handbook",
+      "when": "2026-09-28T21:00",
+      "tweets": [
+        {
+          "text": "Too many features, someone said. Fair. So the desk opens up a piece at a time now, and the notebook grew a handbook: nineteen short pages on how the office works. \"How to play\" on the title opens it.",
+          "media": "v0.8-clip-handbook.gif",
+          "alt": "Flipping through the notebook's handbook chapter."
+        }
+      ]
+    },
+    {
+      "id": "drawer",
+      "when": "2026-09-29T09:00",
+      "tweets": [
+        {
+          "text": "The drawer: sixteen written files, a pile of printed ones that never runs out, a weekly file everyone gets the same seed for. Every closed folder keeps its last run; the sticker in the corner opens that report again.",
+          "media": "v0.8-case-files-drawer.png",
+          "alt": "The case files drawer: folders in rows, grade stickers, the cold-case pile and the weekly."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3",
+      "when": "2026-09-29T15:30",
+      "poll": ["Rug", "Legit"],
+      "tweets": [
+        {
+          "text": "Rug or Not? #3\n\nFrom the team page:\n\n\"Ownership renounced.\"\nRoles in the contract: OPERATOR (can pause transfers). Held by: 0x4b1...e2.\n\nStamp it. Answer tomorrow.",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "title-intro",
+      "when": "2026-09-29T21:00",
+      "tweets": [
+        {
+          "text": "The first night. The lamp clicks on, the case file slides in, and Lucien explains the job in four lines. After that he only speaks when something new turns up on the desk.",
+          "media": "v0.8-clip-title-intro.gif",
+          "alt": "The title screen intro: the lamp turning on and the case file sliding in."
+        }
+      ]
+    },
+    {
+      "id": "quiz-3-answer",
+      "when": "2026-09-30T09:00",
+      "tweets": [
+        {
+          "text": "Yesterday's file: RUG.\n\n\"Renounced\" is about one role. If another role can pause transfers, nothing was given up; the button changed hands. Look for every role, not the one in the tweet.",
+          "media": "v0.8-notebook-red-flags.png",
+          "alt": "The notebook's red flag chapter open on a page."
+        }
+      ]
+    },
+    {
+      "id": "try-on",
+      "when": "2026-09-30T15:30",
+      "tweets": [
+        {
+          "text": "Hover a coat and he wears it before you buy it. One item a day is a third off, the same one for everyone. Coin holders pay half. That's the whole economy: clips from closed files, dressing for the desk, nothing that touches a score.",
+          "media": "v0.9-dressed-desk.png",
+          "alt": "The title desk dressed: oxblood coat, black fedora, velvet curtains, red mug, a globe."
+        }
+      ]
+    },
+    {
+      "id": "rush-results",
+      "when": "2026-09-30T21:00",
+      "tweets": [
+        {
+          "text": "The results card after a rush tells you which herrings cost you seconds and why they were fine. Learning by getting fooled, on purpose, with a timer.",
+          "media": "v0.8-rush-results.png",
+          "alt": "Rush results card: score, streak, and the herrings that looked scary but were fine."
+        }
+      ]
+    },
+    {
+      "id": "flag-4",
+      "when": "2026-10-01T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: the trading switch.\n\nOne bool the owner flips and nobody else moves. No timelock, nothing that reopens it on its own. An emergency pause that expires by itself is fine. One that doesn't is a leash.",
+          "media": "v0.8-red-flag-trading-switch.png",
+          "alt": "A printed contract with a trading switch function under the magnifying glass."
+        }
+      ]
+    },
+    {
+      "id": "id-card",
+      "when": "2026-10-01T15:30",
+      "tweets": [
+        {
+          "text": "Every report has a Share button: a detective ID card with your rank, record and badges, and a link that opens the same file for someone else.\n\nPost yours and I'll put the best names on the wall.",
+          "media": "v0.8-share-card.png",
+          "alt": "A detective ID card: name, rank, files solved, badges, Lucien in the corner."
+        }
+      ]
+    },
+    {
+      "id": "badges",
+      "when": "2026-10-01T21:00",
+      "tweets": [
+        {
+          "text": "38 badges. Some for playing well, most for poking things: ten sips of coffee, every kind of weather, sitting with the radio static long enough to hear the numbers station, opening the safe. They change nothing about scoring. They're for bragging.",
+          "media": "v0.9-badges.png",
+          "alt": "The badges page in the in-game browser, some earned, some still hidden."
+        }
+      ]
+    },
+    {
+      "id": "cold-cases",
+      "when": "2026-10-02T09:00",
+      "tweets": [
+        {
+          "text": "The printer. Cold cases are generated on the spot from the same 18 flags and 15 herrings as the written ones, contradictions checked, so a fake renounce never sits next to a clean one. A seed in the share link brings the exact same file back.",
+          "media": "v0.8-cold-case-printed-file.png",
+          "alt": "A freshly printed cold case file on the desk."
+        }
+      ]
+    },
+    {
+      "id": "quiz-4",
+      "when": "2026-10-02T15:30",
+      "poll": ["Rug", "Legit"],
+      "tweets": [
+        {
+          "text": "Rug or Not? #4\n\nFrom the chat log:\n\n@degen_paul: \"when marketing wallet unlock?\"\n@team: \"2% marketing wallet, 12-month vesting, contract linked in the pinned message.\"\n@degen_paul: \"ok boring\"\n\nStamp the chat. Answer tomorrow.",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "notebook",
+      "when": "2026-10-02T21:00",
+      "tweets": [
+        {
+          "text": "The notebook fills in as you meet things: red flags, yellow herrings, the rogues, the handbook. Each flag page keeps your own record: how often you caught it, how often you walked past it.",
+          "media": "v0.8-notebook-red-flags.png",
+          "alt": "The detective's notebook open on the red flags chapter."
+        }
+      ]
+    },
+    {
+      "id": "saturday-2",
+      "when": "2026-10-03T12:00",
+      "tweets": [
+        {
+          "text": "Reading fine print, taking a second look, hunting herrings, and the same desk in Speakeasy.\n\n#screenshotsaturday #pixelart #indiedev",
+          "media": [
+            "v0.8-lens-fine-print.png",
+            "v0.8-second-look.png",
+            "v0.8-herring-hunt.png",
+            "v0.8-theme-speakeasy.png"
+          ],
+          "alt": "Four stills: the lens over fine print, the second look, a herring hunt page, the speakeasy theme."
+        }
+      ]
+    },
+    {
+      "id": "quiz-4-answer",
+      "when": "2026-10-03T20:00",
+      "tweets": [
+        {
+          "text": "Yesterday's chat: LEGIT.\n\nA small marketing wallet, vested, with the contract linked, answered plainly. Boring is the tell. Rugs answer questions with rockets.",
+          "media": "v0.8-herring-hunt.png",
+          "alt": "A herring hunt page listing harmless-looking items."
+        }
+      ]
+    },
+    {
+      "id": "coat-poll",
+      "when": "2026-10-04T12:00",
+      "poll": ["Navy trench", "Oxblood trench", "Forest trench", "Cream trench"],
+      "tweets": [
+        {
+          "text": "Lucien's coat for next week's screenshots. He'll wear whatever wins and complain about it.",
+          "media": null,
+          "alt": null
+        }
+      ]
+    },
+    {
+      "id": "board-sunday",
+      "when": "2026-10-04T20:00",
+      "tweets": [
+        {
+          "text": "Sunday board. The weekly file is the same seed for everyone, so the scores compare. Top three get their names on the wall next week. Arcade handles only; the game never asks who you are.",
+          "media": "v0.9-hall-of-detectives.png",
+          "alt": "The Hall of Detectives with the weekly file scores."
+        }
+      ]
+    }
+  ],
+  "drafts": [
+    {
+      "id": "coin-launch-thread",
+      "note": "Unscheduled. Fill in CA, lock link, supply, DexScreener link on launch day; pin it; nowhere else.",
+      "tweets": [
+        {
+          "text": "The precinct's coin is live.\n\nWhat holding does in the game: an allowance of paper clips at the market, a weekly holders' file, a gold hat, a bobblehead, a coat. What it does to scoring: nothing. What you need it for: nothing. It's a membership card for a desk.",
+          "media": "v0.9-dressed-desk.png",
+          "alt": "The detective's desk dressed with market items."
+        },
+        {
+          "text": "Contract: {CA}\nSupply: {SUPPLY}, fixed, no mint function.\nLiquidity: locked until {LOCK_DATE} ({LOCK_LINK}).\nTeam wallet: {TEAM_WALLET_NOTE}.\nChart: {DEXSCREENER_LINK}\n\nThis is the only place the address is posted. Anyone DMing you one is the case.",
+          "media": null,
+          "alt": null
+        },
+        {
+          "text": "The game reads your balance through Phantom, read-only. It never asks for a signature or a seed phrase. Connect on the coin page inside the game or don't; it plays the same.\n\n{PLAY_URL}\n\nAll cases are fictional. This is a game, not financial advice.",
+          "media": "v0.9-coin-page-phantom-connected.png",
+          "alt": "The in-game coin page with a wallet connected."
+        }
+      ]
+    },
+    {
+      "id": "coin-teaser",
+      "note": "Unscheduled. T-3 days before the coin: perks only, no date, no address.",
+      "tweets": [
+        {
+          "text": "What the coin will do in the game, and nothing else:\n\n- clips at the market, an allowance that follows the balance\n- a second weekly file, the holders' file\n- a gold fedora, a bobblehead, a coat for the board\n- the daily deal at half price\n\nScoring untouched. Nothing required.",
+          "media": "v0.9-market-page.png",
+          "alt": "The market page with tier-gated items."
+        }
+      ]
+    }
+  ]
+}

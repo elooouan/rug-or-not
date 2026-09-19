@@ -17,7 +17,9 @@ Regenerate after a change with the dev server running:
     node scripts/promo.mjs lens       # one entry by name
     PROMO_TAG=v0.9 node scripts/promo.mjs
 
-Tweet copy for each asset is in `TWEETS.md`.
+Tweet copy for each asset is in `TWEETS.md`. The scheduled queue (two weeks, Paris times,
+pushed to Typefully) is `queue.json`, rendered to `QUEUE.md` by `node scripts/queue.mjs`; the
+promotion playbook is [`docs/PROMO.md`](../../docs/PROMO.md).
 
 ## v0.9 set
 
