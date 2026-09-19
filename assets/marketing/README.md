@@ -17,6 +17,8 @@ Regenerate after a change with the dev server running:
     node scripts/promo.mjs lens       # one entry by name
     PROMO_TAG=v0.9 node scripts/promo.mjs
 
+Tweet copy for each asset is in `TWEETS.md`.
+
 ## v0.8 set
 
 | file                                                             | what to say                                                                                         |
