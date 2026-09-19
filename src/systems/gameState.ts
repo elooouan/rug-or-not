@@ -1,5 +1,6 @@
 import type { CaseData } from '@/data/schema';
 import type { ReportPayload } from '@/scenes/InvestigationScene';
+import { saveStore } from './save';
 
 export type PlayMode = 'campaign' | 'daily' | 'cold';
 
@@ -43,6 +44,18 @@ export function coldDifficultyFor(solvedRegular: number): number {
   const base = 1 + Math.floor(solvedRegular / 3);
   const wobble = Math.random() < 0.35 ? 1 : 0;
   return Math.max(1, Math.min(5, base + wobble));
+}
+
+/** How many ordinary campaign files have been stamped right (drives cold difficulty). */
+export function solvedRegular(): number {
+  const results = saveStore.get().caseResults;
+  return gameState.cases.filter((c) => !c.secret && results[c.id]?.solved).length;
+}
+
+/** Tonight's printer setting: pinned in Settings, or grown from the campaign. */
+export function coldDifficulty(): number {
+  const pinned = saveStore.get().settings.coldDifficulty;
+  return pinned > 0 ? pinned : coldDifficultyFor(solvedRegular());
 }
 
 export function caseById(id: string): CaseData | undefined {
