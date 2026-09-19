@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { DRAWER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, type PaletteKey } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { gameState, newColdSeed } from '@/systems/gameState';
@@ -178,10 +178,13 @@ export class CaseSelectScene extends Phaser.Scene {
       // played as the daily keeps its padlock there, so its grade sits bottom-right.
       const gx = 70;
       const gy = unlocked ? 7 : 47;
-      const box = rect(this, gx, gy, 14, 14).setStrokeStyle(1, HEX.stampGreen).setOrigin(0.5);
+      // Same ink as the report's grade mark: green for S and A, red for D, blue between.
+      const ink: PaletteKey =
+        grade === 'S' || grade === 'A' ? 'stampGreen' : grade === 'D' ? 'stampRed' : 'ink';
+      const box = rect(this, gx, gy, 14, 14).setStrokeStyle(1, HEX[ink]).setOrigin(0.5);
       const t = makeText(this, gx, gy, grade, {
         size: FONT.size.small,
-        color: 'stampGreen',
+        color: ink,
       }).setOrigin(0.5);
       cont.add([box, t]);
       // The sticker opens the last report on this file (with its second look).
@@ -192,8 +195,8 @@ export class CaseSelectScene extends Phaser.Scene {
           new Phaser.Geom.Rectangle(-pad, -pad, 14 + pad * 2, 14 + pad * 2),
           Phaser.Geom.Rectangle.Contains,
         );
-        box.on('pointerover', () => box.setFillStyle(HEX.stampGreen, 0.25));
-        box.on('pointerout', () => box.setFillStyle(HEX.stampGreen, 0));
+        box.on('pointerover', () => box.setFillStyle(HEX[ink], 0.25));
+        box.on('pointerout', () => box.setFillStyle(HEX[ink], 0));
         box.on(
           'pointerdown',
           (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
