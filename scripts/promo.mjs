@@ -69,12 +69,13 @@ const VETERAN = {
   unlockedHerrings: ['small-fixed-tax', 'doxxed-meme-name', 'community-jokes'],
   badges: ['first-case', 'clean-sweep', 'rush-hour', 'historian'],
   daily: { lastPlayed: null, streak: 3, bestStreak: 5, played: [], freezes: 1 },
-  settings: { hints: false, quips: true, music: false, weather: 'rain' },
+  // No film grain: it changes every pixel every frame, which makes the GIFs huge.
+  settings: { hints: false, quips: true, music: false, weather: 'rain', grain: false },
   discovered: ['drawer', 'rush', 'cold', 'weekly'],
   detectiveName: 'LUCIEN',
   stats: { runs: 9, correct: 8, rushRuns: 3, rushBest: 1450, rushBestStreak: 6, coldRuns: 2 },
 };
-const FRESH = { version: 1, settings: { music: false } };
+const FRESH = { version: 1, settings: { music: false, grain: false } };
 
 /** Phantom's injected provider, faked, plus an RPC that answers locally. */
 const FAKE_WALLET = `
@@ -603,6 +604,38 @@ const CLIPS = {
     }
     await sleep(2500);
     await stopRecording(page, 'herring-hunt');
+  },
+  async 'office-colours'(page) {
+    await boot(page, VETERAN);
+    await skipTalk(page);
+    await startScene(page, 'SettingsScene', { tab: 'office' });
+    await sleep(1500);
+    await skipTalk(page);
+    await record(page);
+    await sleep(600);
+    for (let i = 0; i < 4; i++) {
+      await page.evaluate(() => {
+        const st = window.__game.scene.getScene('SettingsScene');
+        st.select(0);
+      });
+      await page.keyboard.press('ArrowRight');
+      await sleep(1500);
+    }
+    await page.keyboard.press('Escape');
+    await sleep(2200);
+    await stopRecording(page, 'office-colours');
+  },
+  async weather(page) {
+    await boot(page, VETERAN);
+    await skipTalk(page);
+    await record(page, 10);
+    await move(page, 320, 26, 20);
+    for (let i = 0; i < 4; i++) {
+      await sleep(1400);
+      await click(page, 320, 26);
+    }
+    await sleep(1400);
+    await stopRecording(page, 'weather');
   },
   async 'desk-toys'(page) {
     await boot(page, VETERAN);

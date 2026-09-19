@@ -47,6 +47,8 @@ Regenerate after a change with the dev server running:
 | notebook-herring-hunt-button / herring-hunt | Herring hunts: the notebook page's button, and a hunt page (click what only looks bad). |
 | clip-solve-a-case | Title to report in twenty seconds. |
 | clip-herring-hunt | Five pages of herring hunting. |
+| clip-office-colours | Cycling the office colours in Settings, Lucien commenting, then the desk in the last one. |
+| clip-weather | Clicking the window through the five weathers. |
 | clip-red-flag-rush | Six pages of rush. |
 | clip-desk-toys | Coffee, lamp, cat, radio, a typed word. |
 | clip-handbook | Flipping through the handbook. |
