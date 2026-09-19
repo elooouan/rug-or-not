@@ -1,6 +1,6 @@
 {
   "name": "rug-or-not",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "description": "A pixel-art noir detective game about spotting crypto rug pulls. All cases are fictional.",
