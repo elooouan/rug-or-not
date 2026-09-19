@@ -28,7 +28,10 @@ code (Settings → Office → Import) or close a couple of files first.
 
 8. Tap the phone. **RugScan** is the explorer page for the current file. **Board** is the Hall
    of Detectives (pick a handle, save a Detective ID card). **$LUCIEN** is the coin page
-   (wallet is read-only, it never signs anything). **About → Case editor** opens the editor.
+   (wallet is read-only, it never signs anything). **Market** spends the paper clips the
+   file just paid: hover a coat to try it on Lucien, buy one, close the phone and he is
+   wearing it (the same for the cat's fur, the mug, an ornament, curtains). **About → Case
+   editor** opens the editor.
 
 ## 2:45 — Arcade and endless
 
