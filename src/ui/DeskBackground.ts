@@ -666,7 +666,10 @@ export class DeskBackground {
           callback: () => {
             if (this.catAsleep || !this.cat.active) return;
             const home = DESK.cat.x;
+            // The brass bell from the market gives her away on every stroll.
+            const bell = () => worn('collar').id === 'col-bell' && audio.play('tally');
             this.cat.setFlipX(true);
+            bell();
             scene.tweens.chain({
               targets: this.cat,
               tweens: [
@@ -676,7 +679,10 @@ export class DeskBackground {
                   x: home,
                   duration: 2200,
                   ease: 'Sine.easeInOut',
-                  onStart: () => this.cat.setFlipX(false),
+                  onStart: () => {
+                    this.cat.setFlipX(false);
+                    bell();
+                  },
                 },
               ],
             });
