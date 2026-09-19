@@ -59,6 +59,11 @@
       #game {
         width: 100%;
         height: 100%;
+        /* A long press on the desk is a lens, not a text selection or a callout. */
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
       }
       /* Phones in portrait can't fit the desk; ask for landscape. */
       #rotate {
