@@ -1082,4 +1082,80 @@ test.describe('touch', () => {
     expect(await paused()).toBe(true);
     expect(errors).toEqual([]);
   });
+
+  test('a tap on a market name tries it on, a second tap takes it off', async ({ page }) => {
+    const errors = await boot(page, '#market');
+    await skipTalk(page);
+    await page.waitForTimeout(1200);
+    await skipTalk(page);
+    // Strip image and the "Navy trench" row, both inside the panel.
+    const find = () =>
+      page.evaluate(() => {
+        const title = window.__game.scene.getScene('TitleScene') as unknown as {
+          children: { list: { constructor: { name: string }; list?: unknown[] }[] };
+        };
+        const panel = title.children.list.find((o) => o.constructor.name === 'BrowserPanel');
+        type Obj = {
+          type?: string;
+          text?: string;
+          texture?: { key: string };
+          list?: Obj[];
+          getWorldTransformMatrix(): { tx: number; ty: number };
+        };
+        const all: Obj[] = [];
+        const visit = (o: Obj) => {
+          o.list?.forEach(visit);
+          all.push(o);
+        };
+        if (panel) visit(panel as unknown as Obj);
+        const strip = all.find((o) => o.type === 'Image')?.texture?.key;
+        const name = all.find((o) => o.type === 'Text' && /^Navy trench/.test(o.text ?? ''));
+        const m = name?.getWorldTransformMatrix();
+        return { strip, x: (m?.tx ?? 0) + 12, y: (m?.ty ?? 0) + 4, found: !!name };
+      });
+    const tap = (wx: number, wy: number) =>
+      page.evaluate(
+        ([wx, wy]) => {
+          const canvas = window.__game.canvas;
+          const r = canvas.getBoundingClientRect();
+          const c = { x: r.left + (wx * r.width) / 640, y: r.top + (wy * r.height) / 360 };
+          const t = new Touch({
+            identifier: 1,
+            target: canvas,
+            clientX: c.x,
+            clientY: c.y,
+            pageX: c.x,
+            pageY: c.y,
+          });
+          const fire = (type: string, list: Touch[]) =>
+            canvas.dispatchEvent(
+              new TouchEvent(type, {
+                touches: list,
+                targetTouches: list,
+                changedTouches: [t],
+                bubbles: true,
+                cancelable: true,
+              }),
+            );
+          fire('touchstart', [t]);
+          return new Promise<void>((done) =>
+            setTimeout(() => {
+              fire('touchend', []);
+              done();
+            }, 40),
+          );
+        },
+        [wx, wy] as [number, number],
+      );
+    const before = await find();
+    expect(before.found).toBe(true);
+    expect(before.strip).toBe('lucien');
+    await tap(before.x, before.y);
+    await page.waitForTimeout(200);
+    expect((await find()).strip).toBe('preview-coat');
+    await tap(before.x, before.y);
+    await page.waitForTimeout(200);
+    expect((await find()).strip).toBe('lucien');
+    expect(errors).toEqual([]);
+  });
 });

@@ -970,10 +970,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
 
     const slotName = SHOP_SLOTS.find((s) => s.id === marketSlot)?.name ?? '';
     ctx.line(
-      `${slotName}  ·  wearing ${worn(marketSlot).name}${touchScreen() ? '' : '  ·  hover a row to try it on'}`,
+      `${slotName}  ·  wearing ${worn(marketSlot).name}  ·  ${touchScreen() ? 'tap' : 'hover'} a ${touchScreen() ? 'name' : 'row'} to try it on`,
       { color: 'woodMid' },
     );
     ctx.gap(2);
+    // Fingers can't hover: a tap on the name puts it on the strip, a second tap takes it off.
+    let trying: string | null = null;
     for (const item of itemsFor(marketSlot)) {
       const rowY = ctx.y;
       const inUse = worn(marketSlot).id === item.id;
@@ -1040,13 +1042,23 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         : item.price
           ? `${item.price} clips`
           : 'free';
-      ctx.content.add(
-        makeText(scene, 72, rowY + 2, `${item.name}  ·  ${price}`, {
-          font: 'body',
-          size: FONT.size.body,
-          color: onDeal ? 'stampRed' : has || !blocker ? 'shadow' : 'woodMid',
-        }),
-      );
+      const name = makeText(scene, 72, rowY + 2, `${item.name}  ·  ${price}`, {
+        font: 'body',
+        size: FONT.size.body,
+        color: onDeal ? 'stampRed' : has || !blocker ? 'shadow' : 'woodMid',
+      });
+      ctx.content.add(name);
+      if (touchScreen() && !inUse) {
+        name.setInteractive({ useHandCursor: false });
+        name.on('pointerup', (p: Phaser.Input.Pointer) => {
+          // A drag that started on the name was a scroll.
+          if (p.getDistance() > 8) return;
+          const next = trying === item.id ? null : item;
+          trying = next?.id ?? null;
+          tryOn(next, item.style.slot);
+          audio.play('paper');
+        });
+      }
       ctx.content.add(
         makeText(scene, 72, rowY + 13, item.blurb, { size: FONT.size.tiny, color: 'woodMid' }),
       );
