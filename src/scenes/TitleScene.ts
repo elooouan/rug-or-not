@@ -518,6 +518,7 @@ export class TitleScene extends Phaser.Scene {
             'tap the window  ·  tap the moon  ·  turn the radio dial',
             'swat the fly  ·  wish on a falling star  ·  read the wall',
             'poke the detective  ·  open the safe  ·  tap the clock',
+            'tap the phone  ·  the market dresses the desk  ·  files pay clips',
           ]
         : [
             'hover the coffee  ·  click the lamp  ·  pet the cat',
@@ -525,6 +526,7 @@ export class TitleScene extends Phaser.Scene {
             'try typing a word  ·  swat the fly  ·  wish on a falling star',
             'poke the detective  ·  open the safe  ·  read the wall',
             'click the clock  ·  ink your cursor  ·  M mutes, F fills the screen',
+            'click the phone  ·  the market dresses the desk  ·  files pay clips',
           ]
       ).sort(() => Math.random() - 0.5)[0],
       { size: 9, color: 'paperShadow' },
