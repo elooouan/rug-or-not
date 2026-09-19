@@ -523,18 +523,15 @@ export class RushScene extends Phaser.Scene {
     this.hud.best.setText(`best    ${saveStore.get().stats.rushBest}`);
     audio.play('stamp');
     const clips = clipsForRush(s.score);
-    if (clips > 0) {
-      earnClips(clips);
-      toast(this, 'CLIPS', `+${clips} for the market`);
-    }
-    this.showResults(grade, improved);
+    if (clips > 0) earnClips(clips);
+    this.showResults(grade, improved, false, clips);
   }
 
-  private showResults(grade: string, improved: boolean, drillDone = false): void {
+  private showResults(grade: string, improved: boolean, drillDone = false, clips = 0): void {
     const s = this.state;
     const lessons = (this.hunt ? this.flagsHit : this.herringsHit).slice(0, 2);
     const w = 270;
-    const h = 170 + (lessons.length ? 18 + lessons.length * 36 : 0);
+    const h = 170 + (clips > 0 ? 13 : 0) + (lessons.length ? 18 + lessons.length * 36 : 0);
     const x = PAPER.x + (PAPER.w - w) / 2;
     const y = PAPER.y + (PAPER.h - h) / 2 - 10;
     const c = this.add.container(0, 0).setDepth(DEPTH.overlay);
@@ -569,6 +566,7 @@ export class RushScene extends Phaser.Scene {
         : improved
           ? 'personal best!'
           : `personal best   ${saveStore.get().stats.rushBest}`,
+      ...(clips > 0 ? [`clips           +${clips} for the market`] : []),
     ];
     rows.forEach((r, i) =>
       c.add(
@@ -584,11 +582,12 @@ export class RushScene extends Phaser.Scene {
     if (lessons.length) {
       const cw = charWidth(this, 'body', FONT.size.body);
       const maxChars = Math.floor((w - 32) / cw);
+      const shift = clips > 0 ? 13 : 0; // the clips row above pushes the lessons down
       c.add(
         makeText(
           this,
           x + 16,
-          y + 120,
+          y + 120 + shift,
           this.hunt ? 'looked fine, was not:' : 'looked scary, was fine:',
           {
             size: FONT.size.tiny,
@@ -599,7 +598,7 @@ export class RushScene extends Phaser.Scene {
       lessons.forEach((id, i) => {
         const hr = this.hunt ? FLAGS[id as FlagId] : HERRINGS[id as keyof typeof HERRINGS];
         if (!hr) return;
-        const ly = y + 132 + i * 36;
+        const ly = y + 132 + shift + i * 36;
         c.add(
           makeText(this, x + 16, ly, hr.title, {
             font: 'body',
