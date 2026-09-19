@@ -111,13 +111,24 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     }
   }
 
-  /** An amber tag where the pin should have gone. */
-  setMissed(): void {
+  /** An amber tag where the pin should have gone; it lands with a small pop. */
+  setMissed(delay = 0): void {
     this.missed = true;
     if (!this.tag) {
       const { x, y } = this.rect;
       this.tag = mkRect(this.scene, x - 3, y - 4, 7, 7, HEX.amber).setStrokeStyle(1, HEX.shadow);
       this.add(this.tag);
+      if (!saveStore.get().settings.reducedMotion) {
+        this.tag.setScale(2.2).setAlpha(0);
+        this.scene.tweens.add({
+          targets: this.tag,
+          scale: 1,
+          alpha: 1,
+          delay,
+          duration: 260,
+          ease: 'Back.easeOut',
+        });
+      }
     }
     this.refresh();
   }

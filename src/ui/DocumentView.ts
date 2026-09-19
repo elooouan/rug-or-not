@@ -414,7 +414,7 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     for (const s of this.allSpots()) {
       if (pinned.has(s.clue.id)) s.setPinned(true, false);
       else if (isFlagClue(s.clue)) {
-        s.setMissed();
+        s.setMissed(400 + marks * 120);
         marks++;
       }
     }
