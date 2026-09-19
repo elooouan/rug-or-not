@@ -70,6 +70,7 @@ function lookQuips(): string[] {
   if (worn('hat').id !== 'hat-brown') out.push('The hat is new. The headaches are not.');
   if (worn('cat').id !== 'cat-biscuit')
     out.push('Biscuit changed her coat. She will not discuss it.');
+  if (worn('collar').id !== 'col-none') out.push("The collar was her idea. She'll deny it.");
   const orn = worn('ornament');
   if (orn.style.slot === 'ornament' && orn.style.kind !== 'none')
     out.push(`The ${orn.name.toLowerCase()} stays. It has seniority now.`);
