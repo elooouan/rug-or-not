@@ -471,6 +471,786 @@
           "alt": "Red velvet curtains drawn across the office window, then opened again on the rainy city."
         }
       ]
+    },
+    {
+      "id": "flag-5-selltax",
+      "when": "2026-10-05T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Red flag of the day: a sell tax the owner can change.\n\n3% today. There is a function that sets it. Nothing caps what it can be set to.\n\nA tax you can edit isn't a tax, it's a lever. Fixed and documented is fine. Adjustable is the tell.",
+          "media": "v0.8-notebook-red-flags.png",
+          "alt": "The notebook open on a red flag page."
+        }
+      ]
+    },
+    {
+      "id": "herring-pool-top-holder",
+      "when": "2026-10-05T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: the liquidity pool holding most of the supply.\n\nPeople see \"top holder: 78%\" and run. That 78% is the pool everyone is trading against.\n\nThe version worth worrying about is a fresh wallet at the top, funded an hour before launch."
+        }
+      ]
+    },
+    {
+      "id": "flag-10-unverified",
+      "when": "2026-10-06T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: the contract isn't verified.\n\nThe explorer shows bytecode and nothing else. The team says the source is \"coming\". Until it does, every promise on the website is about code nobody can read.\n\nNo source, no case. The folder stays shut.",
+          "media": "v0.8-lens-fine-print.png",
+          "alt": "The magnifying glass over a contract, revealing small print."
+        }
+      ]
+    },
+    {
+      "id": "quiz-5",
+      "when": "2026-10-06T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Rug or Not? #5\n\nFrom the tokenomics:\n\nTeam:       18%\nVesting:    none\nUnlock:     at launch\nMarketing:  9%, same terms\n\nEverything else sits in the pool.\n\nRug or not? Answer tomorrow."
+        }
+      ]
+    },
+    {
+      "id": "desk-right-side-teaser",
+      "when": "2026-10-06T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "The left of the desk has a lamp, a mug, a radio, a clock, a phone and a safe.\n\nThe right of the desk has a cat and two stamps.\n\nWorking on that.",
+          "media": "v0.8-clip-weather.gif",
+          "alt": "The office window cycling through its weather."
+        }
+      ]
+    },
+    {
+      "id": "devlog-sound",
+      "when": "2026-10-07T09:00",
+      "tweets": [
+        {
+          "text": "Every sound in the game is synthesised while it plays: the stamp, the paper, the rain, the till, both radio stations and the numbers station under the static. No audio files anywhere. One oscillator graph per sound, tuned by ear, in about seven hundred lines."
+        }
+      ]
+    },
+    {
+      "id": "quiz-5-answer",
+      "when": "2026-10-07T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Yesterday's tokenomics: RUG.\n\n27% held by the team and the marketing wallet, no vesting, no cliff. A quarter of the supply can hit the pool the minute the chart looks good.\n\nVesting is the whole difference between an allocation and an exit."
+        }
+      ]
+    },
+    {
+      "id": "flag-6-whales",
+      "when": "2026-10-07T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Red flag of the day: a few wallets holding most of the supply.\n\nOpen the holder list. Skip the pool. Read 2 through 10.\n\nIf six of them were funded within an hour of each other, that isn't six holders. That's one person with six hats.",
+          "media": "v0.8-clip-red-flag-rush.gif",
+          "alt": "Red Flag Rush: evidence pages flipping past with a timer."
+        }
+      ]
+    },
+    {
+      "id": "herring-liquidity-locked",
+      "when": "2026-10-08T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: nothing about the liquidity can move.\n\nLocked for two years, with a known locker, the pool address on the certificate. It is dull. Dull is the point. A lock you can check beats a promise you can't.",
+          "media": "v0.8-cold-case-printed-file.png",
+          "alt": "A printed cold case file on the desk."
+        }
+      ]
+    },
+    {
+      "id": "herring-real-audit",
+      "when": "2026-10-08T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: an audit that lists problems.\n\nFour medium findings with a fix logged against each one is an audit. A gold badge and zero findings is a receipt.\n\nNobody writes perfect code. Anyone claiming they did is selling the badge."
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-2",
+      "when": "2026-10-08T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Lucien, on a team that answered every question in the chat within a minute:\n\n\"A fast answer is a decision somebody made before you asked.\""
+        }
+      ]
+    },
+    {
+      "id": "cold-case-seed",
+      "when": "2026-10-09T09:00",
+      "tweets": [
+        {
+          "text": "Every cold case has a seed. The share link carries it, so the file a friend opens is the exact file you closed: same pages, same flags, same herrings. Two grades on the same paper, and then an argument.",
+          "media": "v0.8-cold-case-printed-file.png",
+          "alt": "A printed cold case file on the desk."
+        }
+      ]
+    },
+    {
+      "id": "flag-7-anon-team",
+      "when": "2026-10-09T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Red flag of the day: an anonymous team with a photo each.\n\nAnonymous isn't the problem. Half of crypto is anonymous and fine.\n\nThe problem is four headshots, four job titles, and no way to check that any of the four exist. Pick one. Be anonymous, or be checkable."
+        }
+      ]
+    },
+    {
+      "id": "devlog-desk-editor-1",
+      "when": "2026-10-09T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Coming to the desk: an editor.\n\nPick things up. Put them where you want them. Take the ones you never touch off entirely.\n\nClips buy the slots. None of it moves a score.\n\nIt's your office."
+        }
+      ]
+    },
+    {
+      "id": "saturday-3",
+      "when": "2026-10-10T17:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "The paperwork side of detective work: the notebook, the drawer, the badges, the ID card.\n\nAll of it drawn from twelve named colours.\n\n#pixelart #Solana",
+          "media": [
+            "v0.8-notebook-red-flags.png",
+            "v0.8-case-files-drawer.png",
+            "v0.9-badges.png",
+            "v0.8-share-card.png"
+          ],
+          "alt": "Four stills: the notebook, the drawer, the badges page, the ID card."
+        }
+      ]
+    },
+    {
+      "id": "herring-two-person-team",
+      "when": "2026-10-10T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a team of two.\n\nSmall teams ship. The headcount on the about page is not a safety rating, and a 40-person \"team\" of stock photos is worth less than two people you can actually find.\n\nCount what they shipped, not who they listed."
+        }
+      ]
+    },
+    {
+      "id": "board-sunday-2",
+      "when": "2026-10-11T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Sunday board. Everyone gets the same weekly file, same seed, so the scores actually compare.\n\nPost your grade with the time on it. S ranks with four minutes on the clock don't count and you know it.",
+          "media": "v0.8-share-card.png",
+          "alt": "A detective ID card with rank, record and badges."
+        }
+      ]
+    },
+    {
+      "id": "quiz-6",
+      "when": "2026-10-11T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Rug or Not? #6\n\nFrom the contract:\n\ncontract Token is ERC20, Pausable {\n  function pause() external onlyOwner {\n    _pause();\n  }\n}\n\nNo unpause timer. No timelock. Ownership \"renounced\" last week.\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "flag-11-copied-whitepaper",
+      "when": "2026-10-12T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: the copied whitepaper.\n\nA roadmap that mentions the wrong token name. Team bios identical, word for word, to another project's. It means there is no plan, only a template filled in to look busy.\n\nSearch one sentence of it. Takes ten seconds."
+        }
+      ]
+    },
+    {
+      "id": "quiz-6-answer",
+      "when": "2026-10-12T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Yesterday's contract: RUG.\n\n\"Renounced\" covers the owner role. Pausable keeps its own. If the pauser survived the renounce, transfers stop whenever that key says so, and nothing in the contract reopens them.\n\nRead which role was given up, not that one was."
+        }
+      ]
+    },
+    {
+      "id": "flag-8-fake-audit",
+      "when": "2026-10-12T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Red flag of the day: an audit you can't verify.\n\nCheck three things. Does the auditor exist outside this one PDF. Does the contract address in the report match the one you're buying. Is the report on the auditor's site, or only on the project's.\n\nMost fakes fail the second one.",
+          "media": "v0.8-lens-fine-print.png",
+          "alt": "The magnifying glass over a contract, revealing small print."
+        }
+      ]
+    },
+    {
+      "id": "devlog-fuzz",
+      "when": "2026-10-13T09:00",
+      "tweets": [
+        {
+          "text": "Testing a game with a cat and a safe in it: a script clicks, drags, types and scrolls at random for as long as you like, on a fixed seed, and prints every error with the screen it happened on. Same seed, same crash, every time. A finger mode does it with taps."
+        }
+      ]
+    },
+    {
+      "id": "herring-doxxed-meme-name",
+      "when": "2026-10-13T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a developer called something like gm_toaster who is completely doxxed underneath it.\n\nA real name, a real history and a stupid handle is a person having fun.\n\nA serious handle with nothing behind it is the one to check."
+        }
+      ]
+    },
+    {
+      "id": "devlog-desk-editor-2",
+      "when": "2026-10-13T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "The editor doesn't open, it takes over. The lamp dims, the paperwork slides off, the desk lifts into a grid and every object you own gets a handle.\n\nDrag it where you like. Put it back. Buy another shelf.\n\nThen the lamp comes up and it's your desk again.",
+          "media": "v0.8-clip-office-colours.gif",
+          "alt": "The desk repainting through its five office colours."
+        }
+      ]
+    },
+    {
+      "id": "the-safe",
+      "when": "2026-10-14T09:00",
+      "tweets": [
+        {
+          "text": "There is a floor safe under the desk. Three digits. Sit with the radio's static long enough and a numbers station taps them out in morse; the notebook counts them too. Inside is the developer's ledger.",
+          "media": "v0.8-title-the-desk.png",
+          "alt": "The detective's desk at night: lamp, mug, radio, safe, phone, the rainy window with the cat on the sill."
+        }
+      ]
+    },
+    {
+      "id": "flag-9-blacklist",
+      "when": "2026-10-14T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Red flag of the day: an owner-controlled blacklist.\n\nOne address decides which wallets can move. It's sold as anti-bot protection, and it is, right up until the day it isn't.\n\nAsk who can be added, who decides, and what stops them adding you.",
+          "media": "v0.8-notebook-red-flags.png",
+          "alt": "The notebook open on a red flag page."
+        }
+      ]
+    },
+    {
+      "id": "herring-small-fixed-tax",
+      "when": "2026-10-14T21:00",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a small tax.\n\n1% to a treasury, written down, hardcoded, with no function to raise it, is a funding model.\n\nThe number isn't what matters. Whether anyone can change the number is what matters."
+        }
+      ]
+    },
+    {
+      "id": "herring-young-token",
+      "when": "2026-10-15T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: the token is three weeks old.\n\nEverything was new once. Age is not a verdict. The lock, the code and the team are. Read those and let the calendar be."
+        }
+      ]
+    },
+    {
+      "id": "quiz-7",
+      "when": "2026-10-15T15:30",
+      "note": "drafted in the sibling session",
+      "tweets": [
+        {
+          "text": "Rug or Not? #7\n\nFrom the chat log:\n\n@newguy: \"why is the dev wallet moving?\"\n@mod: \"FUD. muted.\"\n@newguy2: \"same question tbh\"\n@mod: \"muted.\"\n@everyone_else: \"LFG 🚀🚀\"\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-3",
+      "when": "2026-10-15T21:00",
+      "tweets": [
+        {
+          "text": "Lucien, on a roadmap with \"CEX listing\" in Q2:\n\n\"Which one? They didn't say. Neither did the exchange.\""
+        }
+      ]
+    },
+    {
+      "id": "flag-12-bot-chat",
+      "when": "2026-10-16T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: a chat full of the same sentence.\n\n\"Bullish!\" from forty accounts made this week, seconds apart, and no question answered anywhere.\n\nReal communities argue. Bots agree."
+        }
+      ]
+    },
+    {
+      "id": "quiz-7-answer",
+      "when": "2026-10-16T15:30",
+      "tweets": [
+        {
+          "text": "Yesterday's chat: RUG.\n\nA dev wallet moving isn't the flag. The mute is. When the only answer to a question is \"FUD\", the answer is whatever they're not saying.\n\nFind the wallet on the explorer and read it yourself.",
+          "media": "v0.8-case-report.png",
+          "alt": "The case report with the flags caught and missed."
+        }
+      ]
+    },
+    {
+      "id": "desk-editor-launch",
+      "when": "2026-10-16T21:00",
+      "tweets": [
+        {
+          "text": "The desk editor is in. Pick anything up and put it where you like. Take off what you never touch. The desk remembers, and every screen follows.\n\nYour office now.\n\n{PLAY_URL}",
+          "media": "v0.8-title-the-desk.png",
+          "alt": "The detective's desk at night."
+        }
+      ]
+    },
+    {
+      "id": "saturday-4",
+      "when": "2026-10-17T12:00",
+      "tweets": [
+        {
+          "text": "The desk, the phone, the wall, and fog.\n\n#screenshotsaturday #pixelart #indiedev",
+          "media": [
+            "v0.8-title-the-desk.png",
+            "v0.8-netscope-phone.png",
+            "v0.8-the-wall-making-of.png",
+            "v0.8-weather-fog.png"
+          ],
+          "alt": "Four stills: the desk, the phone browser, the making-of wall, fog at the window."
+        }
+      ]
+    },
+    {
+      "id": "herring-renounced-cleanly",
+      "when": "2026-10-17T20:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: \"ownership renounced\" when it's actually true.\n\nNo owner, no operator, no pauser, no proxy admin. Nobody can change anything, including the bugs. Boring, and the real thing.\n\nCheck every role before you believe the word."
+        }
+      ]
+    },
+    {
+      "id": "board-sunday-3",
+      "when": "2026-10-18T12:00",
+      "tweets": [
+        {
+          "text": "Sunday board. One weekly file, the same seed on every desk, so the grades compare.\n\nPost yours. Lucien reads the replies.",
+          "media": "v0.9-hall-of-detectives.png",
+          "alt": "The Hall of Detectives page with the boards."
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-4",
+      "when": "2026-10-18T20:00",
+      "tweets": [
+        {
+          "text": "Lucien, on \"the audit is on our website\":\n\n\"And the exam results are on the student's website. Show me the auditor's.\""
+        }
+      ]
+    },
+    {
+      "id": "flag-13-urgency",
+      "when": "2026-10-19T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: the countdown.\n\n\"Presale closes in 2 hours.\" \"Last 50 spots.\" \"100x, guaranteed.\"\n\nA project that needs you to hurry needs you not to look. Nothing worth buying vanishes because you read for ten minutes."
+        }
+      ]
+    },
+    {
+      "id": "contract-thread",
+      "when": "2026-10-19T15:30",
+      "tweets": [
+        {
+          "text": "How to read a token contract in five minutes. No code background needed; you're looking for five words. A thread from the desk."
+        },
+        {
+          "text": "1. mint\n\nSearch the source for it. If a function can create tokens, only the owner can call it, and nothing caps the total, the supply is whatever the owner says it is. The tokenomics page is overruled.",
+          "media": "v0.8-lens-fine-print.png",
+          "alt": "The magnifying glass over a contract, revealing small print."
+        },
+        {
+          "text": "2. tax, fee\n\nFind the number, then find the setter. A fixed 1% is a funding model. A setSellTax with no maximum is a trapdoor. What matters is not the number but who can change it."
+        },
+        {
+          "text": "3. blacklist, pause\n\nEither means one key can stop your tokens moving. Sold as anti-bot. Ask what stops the key being used on you, and whether the pause lifts on its own."
+        },
+        {
+          "text": "4. owner, admin, proxy\n\n\"Renounced\" covers one role. Read them all: operator, pauser, proxy admin. A renounce with an upgradeable proxy behind it renounced nothing."
+        },
+        {
+          "text": "5. verified\n\nIf the explorer can't show you the source, none of the above is readable and none of the promises are checkable. That's where the case ends.\n\nPractice on fictional files, free: {PLAY_URL}",
+          "media": "v0.8-clip-solve-a-case.gif",
+          "alt": "A case file opened on a wooden desk, clues pinned through a magnifying glass, then stamped RUG."
+        }
+      ]
+    },
+    {
+      "id": "weather-window",
+      "when": "2026-10-19T21:00",
+      "tweets": [
+        {
+          "text": "Click the window: rain, storm, snow, fog, a clear night. On a clear night, wait. Something falls now and then, and there's a badge for catching it.",
+          "media": "v0.8-weather-clear.png",
+          "alt": "A clear night at the office window, stars and a moon over the city."
+        }
+      ]
+    },
+    {
+      "id": "herring-tough-questions",
+      "when": "2026-10-20T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: someone in the chat grilling the team and not getting banned.\n\nA community that argues is a community. Watch the admins, not the question: an honest answer is a green flag, a deleted question is a red one."
+        }
+      ]
+    },
+    {
+      "id": "quiz-8",
+      "when": "2026-10-20T15:30",
+      "tweets": [
+        {
+          "text": "Rug or Not? #8\n\nFrom the whitepaper:\n\n\"$NOVA will revolutionise DeFi with its community-first ethos. Q3: CEX listings. Q4: the NOVA metaverse.\"\n\nThe same paragraph, with a different ticker, is on two other sites.\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "typed-words",
+      "when": "2026-10-20T21:00",
+      "tweets": [
+        {
+          "text": "Things you can type on the title screen: rug, legit, cat, moon, wen, gm, biscuit, train, plane, curtains, safe, clips.\n\nThere are more. Lucien doesn't list them.",
+          "media": "v0.8-title-first-night.png",
+          "alt": "The title card on the desk, the first night."
+        }
+      ]
+    },
+    {
+      "id": "quiz-8-answer",
+      "when": "2026-10-21T09:00",
+      "tweets": [
+        {
+          "text": "Yesterday's whitepaper: RUG.\n\nA plan lifted from another project with the ticker swapped is not a plan. It's a template filled in to look busy. Roadmap items that name the wrong token are the giveaway. Read it slowly, once."
+        }
+      ]
+    },
+    {
+      "id": "flag-14-guaranteed",
+      "when": "2026-10-21T15:30",
+      "tweets": [
+        {
+          "text": "Red flag of the day: guaranteed returns.\n\n\"5% daily, forever.\" Nobody has that. The money paying today's 5% is tomorrow's deposits, and the last people in pay for everyone before them.\n\nA guarantee is a confession."
+        }
+      ]
+    },
+    {
+      "id": "handbook-2",
+      "when": "2026-10-21T21:00",
+      "tweets": [
+        {
+          "text": "Nineteen short pages on how the office works: the lens, the pins, the stamps, the rush, the market, the phone. It's in the notebook, and \"How to play\" on the title opens it. Read one page a night and you're a detective by November.",
+          "media": "v0.8-handbook-how-to-play.png",
+          "alt": "The handbook page in the notebook: how to play, in short paragraphs."
+        }
+      ]
+    },
+    {
+      "id": "herring-immutable-supply",
+      "when": "2026-10-22T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a contract with no mint function at all.\n\nSome people read \"can't mint\" as \"can't grow\". It means the supply on the tokenomics page is the supply, forever.\n\nThat's the good kind of can't."
+        }
+      ]
+    },
+    {
+      "id": "flag-15-proxy-admin",
+      "when": "2026-10-22T15:30",
+      "tweets": [
+        {
+          "text": "Red flag of the day: an upgradeable proxy with one admin key.\n\nThe contract you read today can be swapped for another tomorrow by whoever holds the key. Every audit, every \"renounced\", every promise: valid until the next upgrade."
+        }
+      ]
+    },
+    {
+      "id": "rush-notes",
+      "when": "2026-10-22T21:00",
+      "tweets": [
+        {
+          "text": "Rush notes: a herring costs five seconds, blank paper two, so guessing loses to reading. Streaks multiply. The training is in the notebook: every red flag has a drill, five printed pages that each hide that one flag, until you know its shape.",
+          "media": "v0.8-rush-results.png",
+          "alt": "The results card after a Red Flag Rush."
+        }
+      ]
+    },
+    {
+      "id": "herring-boring-roadmap",
+      "when": "2026-10-23T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a roadmap with nothing exciting on it.\n\n\"Q4: audit remediation, lock extended, docs.\" No metaverse, no CEX, no moon. Specific, small, checkable.\n\nThat's what work looks like written down."
+        }
+      ]
+    },
+    {
+      "id": "quiz-9",
+      "when": "2026-10-23T15:30",
+      "tweets": [
+        {
+          "text": "Rug or Not? #9\n\nFrom the explorer:\n\nProxy: yes\nImplementation: changed 3 times this month\nProxy admin: 0x9c...a1 (a plain wallet)\nOwnership: renounced\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "devlog-schema",
+      "when": "2026-10-23T21:00",
+      "tweets": [
+        {
+          "text": "Every written case is a JSON file checked against a schema before the build: every flag it names has to exist in the library, every clue has to land on a page. A misspelt flag id fails the build, not the player.",
+          "media": "v0.8-case-folder-intake.png",
+          "alt": "A case folder on the desk before it is opened: the intake card with the token's name and a difficulty."
+        }
+      ]
+    },
+    {
+      "id": "pumpkin",
+      "when": "2026-10-24T12:00",
+      "tweets": [
+        {
+          "text": "A pumpkin turned up on the desk this morning, next to the mug. It stays until the end of the month. Nobody ordered it."
+        }
+      ]
+    },
+    {
+      "id": "quiz-9-answer",
+      "when": "2026-10-24T20:00",
+      "tweets": [
+        {
+          "text": "Yesterday's explorer: RUG.\n\nRenouncing ownership of a proxy whose admin is one wallet renounced nothing. Three implementation swaps in a month means the contract you read isn't the one you'll hold.\n\nThe admin is the owner, whatever the label."
+        }
+      ]
+    },
+    {
+      "id": "board-sunday-4",
+      "when": "2026-10-25T12:00",
+      "tweets": [
+        {
+          "text": "Sunday board. Last call on this week's file: same seed on every desk, so the grades compare. Post yours; the Hall of Detectives keeps the rest.",
+          "media": "v0.9-hall-of-detectives.png",
+          "alt": "The Hall of Detectives page with the boards."
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-5",
+      "when": "2026-10-25T20:00",
+      "tweets": [
+        {
+          "text": "Lucien, on being told to \"do your own research\":\n\n\"I did. That's why we're having this conversation.\""
+        }
+      ]
+    },
+    {
+      "id": "flag-16-wash-trading",
+      "when": "2026-10-26T09:00",
+      "tweets": [
+        {
+          "text": "Red flag of the day: wash trading.\n\nVolume looks healthy. Open the trades: the same three wallets buying from each other every few minutes, round numbers, nobody else.\n\nVolume is a number anyone can make with two wallets and a script."
+        }
+      ]
+    },
+    {
+      "id": "herrings-thread",
+      "when": "2026-10-26T15:30",
+      "tweets": [
+        {
+          "text": "Five things that look like rugs and aren't. A thread from the desk, because half of learning to spot a rug is learning what's fine."
+        },
+        {
+          "text": "1. The liquidity pool is the top holder.\n\n\"Top wallet: 78%\" is the pool everyone trades against. Skip it. Read holders 2 to 10 instead."
+        },
+        {
+          "text": "2. A small, fixed tax.\n\n1% to a treasury, hardcoded, no setter. The number doesn't matter; whether anyone can change it does."
+        },
+        {
+          "text": "3. An audit with findings.\n\nFour mediums, each with a fix logged, is an audit. \"100/100, zero findings\" is a badge someone bought."
+        },
+        {
+          "text": "4. An emergency pause that expires on its own.\n\nA pause with a timer written into the contract is a fire exit. A pause with a key and no timer is a trap."
+        },
+        {
+          "text": "5. Admin powers behind a public timelock.\n\nEvery change queued in the open, 48 hours before it lands, on a contract you can watch. Power you can see coming is power you can leave ahead of.\n\nThe herring hunt drills all fifteen: {PLAY_URL}",
+          "media": "v0.8-clip-herring-hunt.gif",
+          "alt": "The herring hunt: five printed pages, click the thing that only looks bad."
+        }
+      ]
+    },
+    {
+      "id": "notebook-drills",
+      "when": "2026-10-26T21:00",
+      "tweets": [
+        {
+          "text": "Every red flag page in the notebook has a drill: five printed pages in a row that each hide that one flag. Eighteen drills, one per flag, and a badge for the lot. The rush gets easier for reasons you can name.",
+          "media": "v0.8-notebook-red-flags.png",
+          "alt": "The notebook open on a red flag page."
+        }
+      ]
+    },
+    {
+      "id": "herring-community-jokes",
+      "when": "2026-10-27T09:00",
+      "tweets": [
+        {
+          "text": "Looks bad, is fine: a chat that's mostly memes.\n\nPeople joking is people. The chat to worry about is the tidy one: identical praise, fresh accounts, no questions.\n\nNoise is fine. Choreography isn't."
+        }
+      ]
+    },
+    {
+      "id": "quiz-10",
+      "when": "2026-10-27T15:30",
+      "tweets": [
+        {
+          "text": "Rug or Not? #10\n\nFrom the chat log:\n\n@dev: \"emergency pause active for 24h while we patch the router. it lifts itself at block 19,404,220. tx in pinned.\"\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "office-colours-2",
+      "when": "2026-10-27T21:00",
+      "tweets": [
+        {
+          "text": "Five office colours: Noir, Old file, Blue hour, Newsprint, Speakeasy. The desk is drawn from twelve named colours, so a theme is twelve new values and a repaint. Pick yours in Settings > Office.",
+          "media": "v0.8-theme-newsprint.png",
+          "alt": "The desk in the Newsprint office colours: grey paper and black ink."
+        }
+      ]
+    },
+    {
+      "id": "quiz-10-answer",
+      "when": "2026-10-28T09:00",
+      "tweets": [
+        {
+          "text": "Yesterday's chat: LEGIT, on this page.\n\nA pause that lifts itself at a named block, with the transaction pinned, is one you can check and wait out. The one to run from has no timer and no transaction.\n\nYou still read the rest of the file."
+        }
+      ]
+    },
+    {
+      "id": "flag-17-team-unvested",
+      "when": "2026-10-28T15:30",
+      "tweets": [
+        {
+          "text": "Red flag of the day: a big team allocation with no vesting.\n\n20% to the team, unlocked at launch. Not a payday later; a payday now, the moment the chart looks good.\n\nVesting means they get paid over years, alongside you. Unlocked means they get paid first."
+        }
+      ]
+    },
+    {
+      "id": "reduced-motion",
+      "when": "2026-10-28T21:00",
+      "tweets": [
+        {
+          "text": "Reduced motion switches off the flicker, the grain, the dust in the lamplight and every bounce; the desk plays the same without them. Lucien's hints can be turned off too, or replayed from Settings when you want the lesson again.",
+          "media": "v0.8-settings.png",
+          "alt": "The settings page on the desk: sound, office colours, weather, motion."
+        }
+      ]
+    },
+    {
+      "id": "small-things",
+      "when": "2026-10-29T09:00",
+      "tweets": [
+        {
+          "text": "Small things on the desk: the ink pad inks your cursor for a few seconds, a fly finds the lamp now and then (swat it, there's a badge), and the folder stack has opinions about the $PUPCOIN file.",
+          "media": "v0.8-clip-desk-toys.gif",
+          "alt": "Coffee, lamp, cat, radio: the desk toys."
+        }
+      ]
+    },
+    {
+      "id": "quiz-11",
+      "when": "2026-10-29T15:30",
+      "tweets": [
+        {
+          "text": "Rug or Not? #11\n\nFrom the holder list:\n\n1. Pool     61%\n2. 0x3f…   4.1%   funded 14:02\n3. 0x8a…   4.0%   funded 14:02\n4. 0xc1…   4.0%   funded 14:03\n5. 0x77…   3.9%   funded 14:03\n\nRug or not?"
+        }
+      ]
+    },
+    {
+      "id": "phones",
+      "when": "2026-10-29T21:00",
+      "tweets": [
+        {
+          "text": "Phones work sideways. The desk is 640 by 360 and scales to whatever you hold it in. Under a finger the lens floats above the fingertip so it never hides the fine print, and buttons fire on release, so a scroll never stamps a file."
+        }
+      ]
+    },
+    {
+      "id": "quiz-11-answer",
+      "when": "2026-10-30T09:00",
+      "tweets": [
+        {
+          "text": "Yesterday's holders: RUG.\n\nFour wallets funded within a minute of each other, holding the same slice, is one person with four hats and 16% of the supply. The pool at 61% is fine; that's the trade.\n\nRead rows 2 to 10, and read the timestamps."
+        }
+      ]
+    },
+    {
+      "id": "october-recap",
+      "when": "2026-10-30T15:30",
+      "tweets": [
+        {
+          "text": "October on the desk: the market, curtains, the desk editor, a pumpkin nobody ordered.\n\nStill true: every case is fictional, nothing costs money, and none of it is financial advice.\n\n{PLAY_URL}",
+          "media": "v0.9-clip-market-shopping.gif",
+          "alt": "Shopping at the market on the phone: coats, hats, a globe."
+        }
+      ]
+    },
+    {
+      "id": "lucien-says-6",
+      "when": "2026-10-30T21:00",
+      "tweets": [
+        {
+          "text": "Lucien, on a chart that only goes up:\n\n\"A chart that only goes up is a room with no exit. Ask who has the key.\""
+        }
+      ]
+    },
+    {
+      "id": "saturday-5",
+      "when": "2026-10-31T12:00",
+      "tweets": [
+        {
+          "text": "The rogues gallery, for the season. Every rug you called right is a face on the wall, with charges and a reward.\n\n#screenshotsaturday #pixelart",
+          "media": "v0.8-rogues-gallery.png",
+          "alt": "The rogues gallery: wanted posters with charges and rewards."
+        }
+      ]
+    },
+    {
+      "id": "lucien-halloween",
+      "when": "2026-10-31T20:00",
+      "tweets": [
+        {
+          "text": "Lucien, on Halloween:\n\n\"Everyone in a mask, everyone asking for something sweet, and none of them will say where they live. An ordinary Tuesday, in this line of work.\""
+        }
+      ]
     }
   ],
   "drafts": [
