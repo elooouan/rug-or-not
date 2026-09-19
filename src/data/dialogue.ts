@@ -101,6 +101,16 @@ export const LUCIEN_QUIPS: string[] = [
   'I have never seen a timelock lie. I have seen a lot of screenshots do.',
   'The printer never sleeps. Neither, I suspect, does the Tailor.',
   'If the audit was easy to read, read it again. If it was hard to read, read it twice.',
+  'Paper clips. Because a detective should be paid in something that holds files together.',
+  "A liquidity lock with an expiry is a countdown. They just don't say what it's counting to.",
+  'Three wallets, one block, the same amount. Coincidences travel in ones.',
+  '"Community-driven" means the community is doing the driving. Ask who has the keys.',
+  'The safest contract I ever read did nothing. Beautiful. Useless. Safe.',
+  'I read the chat last. The chat is where the truth goes to be shouted over.',
+  "Biscuit doesn't trust anything that moves faster than a bird. Good instincts.",
+  'Every whitepaper has a section that was written at 4am. Find it.',
+  'The market has a hat with my name on it. The name is spelled wrong. I bought it anyway.',
+  'If the roadmap has a rocket on it, the road ends at the rocket.',
 ];
 
 export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
