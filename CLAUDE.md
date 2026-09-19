@@ -107,7 +107,9 @@ true })` (see the touch block in `e2e/smoke.spec.ts`). Fingers fire buttons on l
   jumps. A crash is deterministic per seed: `FUZZ_TRACE=<n>` prints actions from n on,
   `FUZZ_WATCH=<n>` pauses the page with the debugger during action n and prints the stack.
 - `node scripts/promo.mjs` (dev server up) regenerates the marketing stills and GIF clips in
-  `assets/marketing/`; add an entry there when a feature deserves a tweet.
+  `assets/marketing/`; add an entry there when a feature deserves a tweet. Regenerate only
+  what changed (`node scripts/promo.mjs <name>`): every GIF committed again is a few more
+  MB of history.
 - `node scripts/sweep.mjs [cold=24]` (dev server up) plays every campaign file and a batch of
   printed ones perfectly and reports page errors and anything that doesn't grade S: run it
   after touching documents, the generator, scoring or the report. `SWEEP_INLINE=1` plays
