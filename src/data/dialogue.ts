@@ -40,6 +40,7 @@ export type ScriptId =
   | 'story-2'
   | 'story-3'
   | 'story-4'
+  | 'story-5'
   | 'secret-unlocked'
   | 'secret-solved'
   | 'desk-tour';
@@ -48,6 +49,7 @@ export type ScriptId =
 export const STORY_BEATS: Record<number, ScriptId> = {
   1: 'story-1',
   4: 'story-2',
+  6: 'story-5',
   9: 'story-3',
   12: 'story-4',
 };
@@ -245,6 +247,14 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
     {
       text: "Somebody is running a template: same stock photos, same countdown, same 'anti-bot' blacklist. Watch for the same handwriting.",
+    },
+  ],
+  'story-5': [
+    {
+      text: "Seven files. Oracle's audit came from a firm registered the week before, by a wallet that also funded the presale.",
+    },
+    {
+      text: 'Whoever this is has stopped copying templates and started manufacturing the paperwork. Trust the code, not the certificate.',
     },
   ],
   'story-3': [
