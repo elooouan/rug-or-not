@@ -241,4 +241,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Oxblood trench, black fedora, velvet curtains, a red mug, a globe that turns, and Biscuit in a red bow she tolerates. Clear night. The moon is unrelated to any coin.',
   },
+  {
+    file: '31-v10-editor',
+    version: 'v0.10',
+    date: '2026-09-19',
+    title: 'The desk in pieces',
+    caption:
+      'Arrange desk: the lamp dims, the card slides off, a grid rises through the wood and every prop gets a handle. The radio is on its way across; the hatched patch is where the file goes.',
+  },
 ];
