@@ -7,8 +7,8 @@ import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
-import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
-import { solvedRegular, startColdCase } from '@/systems/coldCase';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { coldDifficulty, startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
 import { ButtonGroup } from '@/ui/ButtonGroup';
@@ -128,7 +128,7 @@ export class ReportScene extends Phaser.Scene {
           isCold ? 'Next cold one' : 'Next case',
           () => {
             if (isCold) {
-              startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
+              startColdCase(this, newColdSeed(coldDifficulty()));
               return;
             }
             gameState.currentIndex = nextIndex;

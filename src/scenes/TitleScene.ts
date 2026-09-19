@@ -6,8 +6,8 @@ import { GAME_VERSION } from '@/config/gameConfig';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { dailyCaseFor, localDateKey, currentStreak } from '@/systems/dailyCase';
-import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
-import { solvedRegular, startColdCase, startDaily } from '@/systems/coldCase';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { coldDifficulty, startColdCase, startDaily } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
@@ -295,9 +295,7 @@ export class TitleScene extends Phaser.Scene {
       ),
       only('drawer', () => mk('Case files', () => goTo(this, 'CaseSelectScene'))),
       only('rush', () => mk('Red Flag Rush', () => goTo(this, 'RushScene'))),
-      only('cold', () =>
-        mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())))),
-      ),
+      only('cold', () => mk('Cold case', () => startColdCase(this, newColdSeed(coldDifficulty())))),
       mk('How to play', () => goTo(this, 'NotebookScene', { chapter: 'handbook', id: 'desk' })),
       mk('Notebook', () => goTo(this, 'NotebookScene'), 'left'),
       mk('Settings', () => goTo(this, 'SettingsScene'), 'right'),

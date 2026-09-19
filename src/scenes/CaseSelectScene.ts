@@ -5,8 +5,8 @@ import { DRAWER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import type { CaseData } from '@/data/schema';
 import { audio } from '@/systems/audio';
-import { coldDifficultyFor, gameState, newColdSeed } from '@/systems/gameState';
-import { solvedRegular, startColdCase } from '@/systems/coldCase';
+import { gameState, newColdSeed } from '@/systems/gameState';
+import { coldDifficulty, solvedRegular, startColdCase } from '@/systems/coldCase';
 import { secretUnlocked } from '@/systems/secretCase';
 import { weekKey } from '@/systems/dailyCase';
 import { rankForScore } from '@/systems/ranks';
@@ -106,7 +106,7 @@ export class CaseSelectScene extends Phaser.Scene {
     kb?.on('keydown-P', () => {
       if (!unlocked('cold')) return;
       audio.play('paper');
-      startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
+      startColdCase(this, newColdSeed(coldDifficulty()));
     });
     kb?.on('keydown-W', () => {
       if (!unlocked('weekly')) return;
@@ -292,8 +292,11 @@ export class CaseSelectScene extends Phaser.Scene {
         color: 'woodDark',
       }).setOrigin(0.5, 0),
     );
-    // Where the printer is set tonight (it sometimes goes one harder).
-    const base = Math.max(1, Math.min(5, 1 + Math.floor(solvedRegular() / 3)));
+    // Where the printer is set tonight: pinned in Settings, or grown from the campaign
+    // (which sometimes goes one harder).
+    const pinned = saveStore.get().settings.coldDifficulty;
+    const base =
+      pinned > 0 ? pinned : Math.max(1, Math.min(5, 1 + Math.floor(solvedRegular() / 3)));
     cont.add(difficultyPips(this, 40 - 17, 44, base));
     cont.setSize(DRAWER.folderW, DRAWER.folderH);
     cont.setInteractive(
@@ -317,7 +320,9 @@ export class CaseSelectScene extends Phaser.Scene {
       tip.add(rect(this, tx, ty, w, 34, HEX.paper));
       [
         'Cold cases: files the printer makes up.',
-        `Endless. Difficulty ${base}${base < 5 ? ` or ${base + 1}` : ''}. Own board.`,
+        pinned > 0
+          ? `Endless. Difficulty ${base}, set in Settings. Own board.`
+          : `Endless. Difficulty ${base}${base < 5 ? ` or ${base + 1}` : ''}. Own board.`,
       ].forEach((l, i) =>
         tip.add(
           makeText(this, tx + 6, ty + 5 + i * 12, l, {
@@ -335,7 +340,7 @@ export class CaseSelectScene extends Phaser.Scene {
     });
     cont.on('pointerdown', () => {
       audio.play('paper');
-      startColdCase(this, newColdSeed(coldDifficultyFor(solvedRegular())));
+      startColdCase(this, newColdSeed(coldDifficulty()));
     });
   }
 

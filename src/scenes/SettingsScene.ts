@@ -158,6 +158,13 @@ export class SettingsScene extends Phaser.Scene {
       hint: () => 'no clock on files (and no time bonus); the rush keeps its sixty seconds',
     });
     this.rows.push({
+      label: 'Printer difficulty',
+      value: () => (s().coldDifficulty > 0 ? `${s().coldDifficulty} of 5` : 'auto'),
+      change: (d) => set((st) => (st.coldDifficulty = (st.coldDifficulty + d + 6) % 6)),
+      hint: () =>
+        'how hard the cold cases come off the printer; auto grows with the campaign files you close',
+    });
+    this.rows.push({
       label: 'Reduced motion',
       value: () => onOff(s().reducedMotion),
       change: () => set((st) => (st.reducedMotion = !st.reducedMotion)),

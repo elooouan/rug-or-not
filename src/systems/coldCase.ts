@@ -2,7 +2,7 @@ import { goTo } from '@/scenes/sceneUtil';
 import type Phaser from 'phaser';
 import type { CaseData } from '@/data/schema';
 import { generateCase } from './caseGen';
-import { gameState } from './gameState';
+import { coldDifficultyFor, gameState } from './gameState';
 import { saveStore } from './save';
 
 /** Generate the file for `seed` (a `d<1-5>-` prefix pins its difficulty) and put it on the desk. */
@@ -19,6 +19,12 @@ export function startColdCase(scene: Phaser.Scene, seed: string): void {
   gameState.currentCase = generateCase(seed, m ? { difficulty: Number(m[1]) } : weekly);
   gameState.currentIndex = -1;
   goTo(scene, 'InvestigationScene');
+}
+
+/** Tonight's printer setting: pinned in Settings, or grown from the campaign. */
+export function coldDifficulty(): number {
+  const pinned = saveStore.get().settings.coldDifficulty;
+  return pinned > 0 ? pinned : coldDifficultyFor(solvedRegular());
 }
 
 /** How many ordinary campaign files have been stamped right (drives cold difficulty). */

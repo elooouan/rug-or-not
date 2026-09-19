@@ -66,6 +66,8 @@
 - Small readability pass: the notebook's section headings, the phone's placeholder lines,
   the rush card's hints and the sticky notes use the darker ink instead of the faint one.
   Every settings row now has a line under it saying what it does.
+- Settings has a "Printer difficulty" row: auto (grows with the campaign, as before) or a
+  pinned 1 to 5 for every cold case the pile, the title button and "Next cold one" print.
 - The pile folder shows tonight's printer difficulty; the weekly folder counts the days
   until the next one. A story beat after the seventh file, between the template and the
   name.

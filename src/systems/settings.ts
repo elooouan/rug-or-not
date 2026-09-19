@@ -30,6 +30,8 @@ export interface Settings {
   bigPointer: boolean;
   /** A faint animated film grain over the office. */
   grain: boolean;
+  /** Printer setting for cold cases: 0 follows campaign progress, 1-5 pins the difficulty. */
+  coldDifficulty: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -47,6 +49,7 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'noir',
   bigPointer: false,
   grain: true,
+  coldDifficulty: 0,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -80,5 +83,9 @@ export function sanitizeSettings(raw: unknown): Settings {
       : DEFAULT_SETTINGS.theme,
     bigPointer: bool(r.bigPointer, DEFAULT_SETTINGS.bigPointer),
     grain: bool(r.grain, DEFAULT_SETTINGS.grain),
+    coldDifficulty:
+      typeof r.coldDifficulty === 'number' && Number.isFinite(r.coldDifficulty)
+        ? Math.min(5, Math.max(0, Math.floor(r.coldDifficulty)))
+        : DEFAULT_SETTINGS.coldDifficulty,
   };
 }

@@ -123,7 +123,7 @@ export const HANDBOOK: HandbookTopic[] = [
     feature: 'cold',
     body: [
       'The printer makes files up on the spot: a fresh coin, contract, team and chat every time, assembled from the same red flags and herrings as the campaign. They never run out.',
-      'Difficulty grows with the campaign files you have solved. Cold cases keep their own tally, board and badges; the seed in a share link brings the exact same file back for someone else.',
+      'Difficulty grows with the campaign files you have solved, or is pinned under Settings (Printer difficulty). Cold cases keep their own tally, board and badges; the seed in a share link brings the exact same file back for someone else.',
     ],
   },
   {
