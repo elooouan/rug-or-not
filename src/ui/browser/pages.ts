@@ -949,7 +949,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           `Buy ${priceOf(item)}`,
           () => {
             if (!buy(item.id)) {
-              toast(scene, 'Not yet', blocker ?? 'Something got in the way.');
+              audio.play('wrong');
+              toast(scene, 'Not yet', buyBlocker(item) ?? 'Something got in the way.');
               return;
             }
             redress(scene);
@@ -960,7 +961,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             if (boughtCount() >= 5) awardBadge(scene, 'collector');
             ctx.panel.render();
           },
-          { sameLine: true, width: 64, disabled: !!blocker },
+          // Short of clips: still pressable, so the press can say how many are missing.
+          { sameLine: true, width: 64, variant: blocker ? 'paper' : 'ink' },
         );
       }
       if (rowButton && !inUse && item.style.slot !== 'curtains') {
