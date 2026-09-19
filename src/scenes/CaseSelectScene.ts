@@ -51,8 +51,8 @@ export class CaseSelectScene extends Phaser.Scene {
       GAME_WIDTH / 2,
       GAME_HEIGHT - 26,
       `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed${
-        unlocked('cold') ? '  ·  P: the pile' : ''
-      }${unlocked('weekly') ? '  W: weekly' : ''}`,
+        Object.values(save.caseResults).some((r) => r.lastRun) ? '  ·  R: last report' : ''
+      }${unlocked('cold') ? '  ·  P: the pile' : ''}${unlocked('weekly') ? '  W: weekly' : ''}`,
       {
         size: FONT.size.small,
         color: 'paperShadow',
@@ -100,6 +100,7 @@ export class CaseSelectScene extends Phaser.Scene {
     kb?.on('keydown-UP', () => this.moveFocus(-DRAWER.cols));
     kb?.on('keydown-TAB', () => this.moveFocus(1));
     kb?.on('keydown-ENTER', () => this.open(this.focus));
+    kb?.on('keydown-R', () => this.openLastReport(this.focus));
     // The two folders at the end of the drawer, for keyboard players.
     kb?.on('keydown-P', () => {
       if (!unlocked('cold')) return;
