@@ -321,6 +321,16 @@ export class DeskBackground {
       floatText(scene, x + 14, y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
       if (this.motion && orn.active) squish(scene, orn, 1.1, 0.9, 180);
     });
+    // The bobblehead nods on its own now and then; it is what it is for.
+    const style = worn('ornament').style;
+    if (this.motion && style.slot === 'ornament' && style.kind === 'bobble') {
+      const nod = scene.time.addEvent({
+        delay: Phaser.Math.Between(6000, 9000),
+        loop: true,
+        callback: () => orn.active && squish(scene, orn, 1.04, 0.94, 300),
+      });
+      orn.once(Phaser.GameObjects.Events.DESTROY, () => nod.remove(false));
+    }
   }
 
   /** Curtains at both ends of the window, in the market's colour; nothing when bare. */
