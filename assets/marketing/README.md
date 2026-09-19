@@ -19,6 +19,14 @@ Regenerate after a change with the dev server running:
 
 Tweet copy for each asset is in `TWEETS.md`.
 
+## v0.9 set
+
+| file                 | what to say                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| market-page          | The market on the phone: coats for Lucien, a strip of your desk, prices in paper clips.      |
+| dressed-desk         | The title desk dressed: oxblood trench, black fedora, velvet curtains, red mug, globe, Soot. |
+| clip-market-shopping | Buying a coat, a hat and an ornament; Lucien and the desk change as each one lands.          |
+
 ## v0.8 set
 
 | file                                                             | what to say                                                                                         |

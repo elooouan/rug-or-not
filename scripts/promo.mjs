@@ -76,6 +76,30 @@ const VETERAN = {
   stats: { runs: 9, correct: 8, rushRuns: 3, rushBest: 1450, rushBestStreak: 6, coldRuns: 2 },
 };
 const FRESH = { version: 1, settings: { music: false, grain: false } };
+/** The veteran with a pocket of clips and a few things from the market already on the desk. */
+const SHOPPER = { ...VETERAN, clips: { earned: 320, spent: 0 } };
+const DRESSED = {
+  ...VETERAN,
+  clips: { earned: 900, spent: 405 },
+  owned: [
+    'coat-oxblood',
+    'hat-black',
+    'cat-soot',
+    'orn-globe',
+    'mug-red',
+    'cur-velvet',
+    'radio-cherry',
+  ],
+  look: {
+    coat: 'coat-oxblood',
+    hat: 'hat-black',
+    cat: 'cat-soot',
+    ornament: 'orn-globe',
+    mug: 'mug-red',
+    curtains: 'cur-velvet',
+    radio: 'radio-bakelite',
+  },
+};
 
 /** Phantom's injected provider, faked, plus an RPC that answers locally. */
 const FAKE_WALLET = `
@@ -172,6 +196,7 @@ const buttonAt = (page, sceneKey, label) =>
       let found = null;
       const walk = (list) =>
         list.forEach((o) => {
+          if (found) return;
           if (
             o.constructor.name === 'PixelButton' &&
             o.list?.some((c) => c.type === 'Text' && c.text.includes(label))
@@ -317,7 +342,36 @@ async function secondLook(page) {
   await sleep(1200);
 }
 
+/** The phone on the desk, then a NetScope bookmark. */
+async function openPhone(page, bookmark) {
+  await click(page, 129, 314);
+  await sleep(700);
+  await skipTalk(page);
+  if (bookmark) {
+    const b = await buttonAt(page, 'TitleScene', bookmark);
+    await click(page, b.x, b.y);
+    await sleep(500);
+    await skipTalk(page);
+  }
+}
+
 const SHOTS = {
+  async 'market-page'(page) {
+    await boot(page, SHOPPER);
+    await skipTalk(page);
+    await openPhone(page, 'Market');
+    const buy = await buttonAt(page, 'TitleScene', 'Buy 100');
+    await move(page, buy.x, buy.y, 16);
+    await sleep(600);
+    await shot(page, 'market-page');
+  },
+  async 'dressed-desk'(page) {
+    await boot(page, DRESSED);
+    await skipTalk(page);
+    await move(page, 330, 140);
+    await sleep(1500);
+    await shot(page, 'dressed-desk');
+  },
   async 'title-fresh'(page) {
     await boot(page, { ...FRESH, settings: { ...FRESH.settings, hints: true } });
     await sleep(2600);
@@ -562,6 +616,35 @@ const SHOTS = {
 };
 
 const CLIPS = {
+  async 'market-shopping'(page) {
+    await boot(page, SHOPPER);
+    await skipTalk(page);
+    await record(page);
+    await sleep(500);
+    await openPhone(page, 'Market');
+    await sleep(400);
+    // A coat and a hat: Lucien in the corner and in the strip change as each one lands.
+    const shop = async (tab, label) => {
+      const t = await buttonAt(page, 'TitleScene', tab);
+      await move(page, t.x, t.y, 14);
+      await click(page, t.x, t.y);
+      await sleep(500);
+      const b = await buttonAt(page, 'TitleScene', label);
+      await move(page, b.x, b.y, 16);
+      await sleep(300);
+      await click(page, b.x, b.y);
+      await sleep(1100);
+    };
+    await shop('Coat', 'Buy 100');
+    await shop('Hat', 'Buy 60');
+    await shop('Ornament', 'Buy 50');
+    await sleep(400);
+    await page.keyboard.press('Escape');
+    await sleep(500);
+    await move(page, 330, 140, 20);
+    await sleep(1800);
+    await stopRecording(page, 'market-shopping');
+  },
   async 'solve-a-case'(page) {
     // "Continue" lands on case 3 ($SAFEYLD, a rug): two flags to pin and a RUG stamp.
     await boot(page, { ...VETERAN, campaignUnlocked: 3 });

@@ -33,6 +33,18 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
 
 ## Feature tweets
 
+- **[v0.9-clip-market-shopping.gif]** The market is open. Closing a file pays a few paper
+  clips; clips buy Lucien a coat and a hat, the cat a new fur, the desk a globe or a
+  bobblehead. Holding $TICKER adds an allowance (read-only, nothing leaves the wallet).
+  Nothing bought moves a score. It's a desk. Dress it.
+
+- **[v0.9-dressed-desk.png]** Oxblood trench, black fedora, velvet curtains, a red mug and a
+  globe. Same detective, better wardrobe. 33 things at the market, all cosmetic.
+
+- **[v0.9-market-page.png]** Paper clips as currency because it's a desk. 3 per file, +2 for
+  a first solve, +2 for an S, 1 per thousand rush points. Coin holders get an allowance on
+  top. The Hall of Detectives now lists every desk by career score or by clips.
+
 - **[v0.8-title-the-desk.png]** Everything on the desk does something. Sip the coffee, pet
   the cat, click the lamp, turn the radio dial, open the safe. The window has weather. The
   phone runs a browser. Lucien has opinions.

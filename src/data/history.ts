@@ -225,4 +225,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Every closed folder keeps its last run: the sticker in the corner opens that report again, second look and all. The pile shows what the printer is set to; the weekly counts its days.',
   },
+  {
+    file: '29-v09-market',
+    version: 'v0.9',
+    date: '2026-09-19',
+    title: 'The market opens',
+    caption:
+      'Files pay paper clips; clips buy Lucien a coat and a hat, the cat a new fur, the desk a globe. Holding the coin adds an allowance, and nothing bought moves a score.',
+  },
 ];
