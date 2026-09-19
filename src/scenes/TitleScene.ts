@@ -352,6 +352,8 @@ export class TitleScene extends Phaser.Scene {
       { variant: 'ink' },
     );
     fs.setDepth(DEPTH.hud).setX(GAME_WIDTH - fs.bw - 6);
+    // iPhones can't go fullscreen from a page; the button would be a dud there.
+    if (!document.fullscreenEnabled) fs.setVisible(false);
     // The wallet lives on the phone (NetScope > coin page); this is the way in from the desk.
     // Optional: the game plays the same without it.
     const walletLabel = () => {
@@ -362,7 +364,7 @@ export class TitleScene extends Phaser.Scene {
     const walletBtn = new PixelButton(
       this,
       GAME_WIDTH - 134,
-      GAME_HEIGHT - 48,
+      fs.visible ? GAME_HEIGHT - 48 : GAME_HEIGHT - 24,
       walletLabel(),
       () => BrowserPanel.toggle(this, 'coin'),
       {

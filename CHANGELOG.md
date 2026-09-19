@@ -59,6 +59,8 @@
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
   mark at the corner); the small section headings are darker and read at a glance.
+- The title's Fullscreen button stays hidden where the browser can't do fullscreen (iPhone
+  Safari); the wallet chip takes its corner.
 - On a touch screen the desk's hints say tap and hold instead of click, hover and type
   (the title's footer, the desk's key line, the rush's).
 - Fixed (touch): a finger dragging to scroll the report, a phone page or a notebook page
