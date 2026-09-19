@@ -140,7 +140,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button(`${TOKEN.symbol} - the coin`, () => ctx.panel.go('coin'));
     ctx.button('Leaderboard', () => ctx.panel.go('board'));
     ctx.button('The news', () => ctx.panel.go('news'), { sameLine: true });
-    ctx.button(`The market  ·  ${clipBalance()} clips`, () => ctx.panel.go('market'), { x: 82 });
+    const deal = dealToday();
+    ctx.button(
+      `The market  ·  ${clipBalance()} clips${owns(deal.item.id) ? '' : `  ·  today: ${deal.item.name} ${deal.price}`}`,
+      () => ctx.panel.go('market'),
+      { x: 82 },
+    );
     ctx.button('Help', () => ctx.panel.go('help'), { sameLine: true });
     ctx.button('About', () => ctx.panel.go('about'), { x: 60 });
     ctx.button(
