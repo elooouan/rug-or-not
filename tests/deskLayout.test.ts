@@ -8,6 +8,7 @@ import {
   deskPos,
   DESK_TOP,
   layoutChanged,
+  mirroredX,
   moveExtra,
   moveProp,
   nextSpotPrice,
@@ -154,5 +155,20 @@ describe('sanitising', () => {
     });
     expect(s.desk.extras).toEqual([{ kind: 'globe', x: 600, y: 320 }]);
     expect(s.desk.spots).toBe(1);
+  });
+});
+
+describe('mirroring', () => {
+  it('sends a prop to the other side, clear of the paperwork', () => {
+    // The mug (30,176, 44x34) lands by the notebook's edge, on the grid.
+    expect(mirroredX({ x: 30, y: 176, w: 44, h: 34 })).toBe(568);
+    // The folder stack (14,232, 100x74) would sit on the stamps, then the file: it slides
+    // left until it is clear, back on its own side.
+    const folders = mirroredX({ x: 14, y: 232, w: 100, h: 74 })!;
+    expect(folders).toBeLessThanOrEqual(PAPER.x - 100);
+    expect(underPaperwork({ x: folders, y: 232, w: 100, h: 74 })).toBeNull();
+    // Mirroring twice comes home (to the grid).
+    const back = mirroredX({ x: 568, y: 176, w: 44, h: 34 });
+    expect(back).toBe(28);
   });
 });

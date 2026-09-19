@@ -9,7 +9,7 @@ import {
   buySpot,
   clampPos,
   deskExtras,
-  GRID,
+  mirroredX,
   defaultPos,
   DESK_TOP,
   layoutChanged,
@@ -277,13 +277,9 @@ export class DeskEditor extends Phaser.GameObjects.Container {
     let moved = 0;
     for (const item of this.items) {
       if (!item.shown) continue;
-      let x = GAME_WIDTH - item.x - item.w;
-      const box = { y: item.y, w: item.w, h: item.h };
-      // A mirror image that lands under the file or the stamps slides left until it's clear.
-      for (let tries = 0; tries < 60 && underPaperwork({ x, ...box }); tries++) x -= GRID * 2;
-      if (underPaperwork({ x, ...box })) continue;
-      const p = clampPos(x, item.y, item.w, item.h);
-      this.place(item, p.x, p.y);
+      const x = mirroredX(item);
+      if (x === null) continue;
+      this.place(item, x, item.y);
       this.commit(item);
       moved++;
     }

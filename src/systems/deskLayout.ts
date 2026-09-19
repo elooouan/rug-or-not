@@ -129,6 +129,16 @@ export function underPaperwork(box: Box): string | null {
   return PAPERWORK.find((p) => !p.soft && overlaps(box, p))?.name ?? null;
 }
 
+/**
+ * Where a box lands when the desk is mirrored left for right: its mirror image, slid left
+ * in grid steps until it is clear of the paperwork; null when nowhere on that row is.
+ */
+export function mirroredX(box: Box): number | null {
+  let x = GAME_WIDTH - box.x - box.w;
+  for (let tries = 0; tries < 80 && underPaperwork({ ...box, x }); tries++) x -= GRID * 2;
+  return underPaperwork({ ...box, x }) ? null : clampPos(x, box.y, box.w, box.h).x;
+}
+
 /** Snap a top-left corner to the grid and keep the box on the desk. */
 export function clampPos(x: number, y: number, w: number, h: number): Pos {
   const snap = (v: number) => Math.round(v / GRID) * GRID;
