@@ -55,6 +55,8 @@
   account this site isn't approved for clears the stale address and says so; RPC, price
   and board calls give up after a few seconds instead of hanging the page; the help page
   and the coin page point phone users at Phantom's in-app browser.
+- Drawer folders wrap their title onto a second line instead of cutting it mid-word, and
+  the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
   mark at the corner); the small section headings are darker and read at a glance.
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that

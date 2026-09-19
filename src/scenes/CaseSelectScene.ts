@@ -132,20 +132,25 @@ export class CaseSelectScene extends Phaser.Scene {
         color: 'shadow',
       }).setOrigin(0.5, 0),
     );
-    cont.add(
-      makeText(this, 40, 30, unlocked ? c.title.slice(0, 15) : c.secret ? 'no name' : 'locked', {
-        size: FONT.size.tiny,
-        color: 'woodDark',
-      }).setOrigin(0.5, 0),
+    // The title wraps onto a second line rather than being cut mid-word.
+    const title = unlocked ? wrapMono(c.title, 16).slice(0, 2) : [c.secret ? 'no name' : 'locked'];
+    title.forEach((line, li) =>
+      cont.add(
+        makeText(this, 40, (title.length > 1 ? 27 : 30) + li * 8, line, {
+          size: FONT.size.tiny,
+          color: 'woodDark',
+        }).setOrigin(0.5, 0),
+      ),
     );
-    cont.add(difficultyPips(this, 40 - 17, 44, c.difficulty));
+    cont.add(difficultyPips(this, 40 - 17, title.length > 1 ? 46 : 44, c.difficulty));
     if (!unlocked) {
       cont.add(this.make.image({ x: 62, y: 8, key: TEX.iconPadlock }, false).setOrigin(0));
       img.setAlpha(0.7);
     }
     if (grade) {
-      const gx = 68;
-      const gy = 18;
+      // Top-right corner, clear of long tickers like $MOONPUP.
+      const gx = 70;
+      const gy = 7;
       const box = rect(this, gx, gy, 14, 14).setStrokeStyle(1, HEX.stampGreen).setOrigin(0.5);
       const t = makeText(this, gx, gy, grade, {
         size: FONT.size.small,
