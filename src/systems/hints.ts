@@ -20,6 +20,11 @@ export function claimHint(id: ScriptId | TipId): boolean {
   return true;
 }
 
+/** Give a claim back (the box it was for never opened). */
+export function unclaimHint(id: ScriptId | TipId): void {
+  saveStore.update((d) => (d.seenHints = d.seenHints.filter((h) => h !== id)));
+}
+
 export function resetHints(): void {
   saveStore.update((d) => (d.seenHints = []));
 }

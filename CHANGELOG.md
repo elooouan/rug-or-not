@@ -67,6 +67,10 @@
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
   wrapped to a second line ran into the row below it; rows now make room. The desk's key
   hint no longer mentions the lens when there isn't one.
+- Fixed: a desk quip (the coffee, the cat, the radio) landing while one of Lucien's chained
+  lessons was up (the report's, on a wrong verdict) crashed the screen with a half-built
+  dialogue box. The lesson's follow-up wins now, and the quip keeps its turn for later.
+  Found by the monkey test, which now also aims clicks at real buttons and lines.
 - Fixed: a toast with a long line ("Silver rim · Settings, Office page") ran off the right
   edge of the screen; the card now grows to fit its text.
 - Fixed: closing the pause menu or the phone with a click over the paper dropped a stray

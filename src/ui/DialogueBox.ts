@@ -4,7 +4,7 @@ import { DIALOGUE, FONT } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { LUCIEN, type DialogueLine, type ScriptId } from '@/data/dialogue';
 import { audio } from '@/systems/audio';
-import { claimHint } from '@/systems/hints';
+import { claimHint, unclaimHint } from '@/systems/hints';
 import { saveStore } from '@/systems/save';
 import { squish } from './squish';
 import { rect } from './shapes';
@@ -33,10 +33,10 @@ const OPEN = new WeakMap<Phaser.Scene, DialogueBox>();
 export class DialogueBox extends Phaser.GameObjects.Container {
   private lines: DialogueLine[];
   private index = -1;
-  private textObj: Phaser.GameObjects.Text;
-  private promptObj: Phaser.GameObjects.Text;
-  private arrow: Phaser.GameObjects.Text;
-  private mascot: Phaser.GameObjects.Image;
+  private textObj!: Phaser.GameObjects.Text;
+  private promptObj!: Phaser.GameObjects.Text;
+  private arrow!: Phaser.GameObjects.Text;
+  private mascot!: Phaser.GameObjects.Image;
   private shown = 0;
   private acc = 0;
   private typing = false;
@@ -53,6 +53,13 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     const prev = OPEN.get(scene);
     OPEN.set(scene, this);
     prev?.finish(true);
+    // The old box's onDone may have opened the next lesson, which took the slot and
+    // finished this one before it was built: stay a dead box rather than build on top.
+    if (this.finished) {
+      this.lines = [];
+      this.conditions = {};
+      return;
+    }
     this.lines = lines;
     this.conditions = opts.conditions ?? {};
     this.onDone = opts.onDone;
@@ -304,7 +311,13 @@ export function lucienSays(
   opts: DialogueOpts = {},
 ): DialogueBox | null {
   if (!claimHint(id)) return null;
-  return new DialogueBox(scene, LUCIEN[id], opts);
+  const box = new DialogueBox(scene, LUCIEN[id], opts);
+  // Lost the slot to the lesson the previous box chained into: it can be said another time.
+  if (!box.isActive) {
+    unclaimHint(id);
+    return null;
+  }
+  return box;
 }
 
 /** Always show (for easter eggs / replays). */

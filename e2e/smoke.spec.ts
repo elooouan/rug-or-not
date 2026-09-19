@@ -523,3 +523,78 @@ test('the second look reopens a closed file with the misses marked', async ({ pa
   expect(back).toEqual({ revisit: true, typed: true, total: before });
   expect(errors).toEqual([]);
 });
+
+test('a desk quip during a chained lesson gives way to the next lesson', async ({ page }) => {
+  // Hints on: the report's lesson chains into "first wrong", and the coffee has a line too.
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'rug-or-not:save:v1',
+      JSON.stringify({
+        version: 1,
+        settings: { hints: true, music: false, reducedMotion: true, quips: false },
+      }),
+    );
+  });
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
+  await skipTalk(page);
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await skipTalk(page);
+  // The wrong stamp, so the report's lesson has a follow-up.
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+      stamps: { trigger(fn: (v: string) => void): void }[];
+      onStamp(v: string): void;
+    };
+    inv.stamps[1].trigger((v) => inv.onStamp(v));
+  });
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(800);
+  await page.evaluate(() => {
+    (
+      window.__game.scene.getScene('ReportScene') as unknown as { typewriter: { skip(): void } }
+    ).typewriter.skip();
+  });
+  type Box = { constructor: { name: string }; lines?: { text: string }[]; active: boolean };
+  const boxes = () =>
+    page.evaluate(() =>
+      (
+        window.__game.scene.getScene('ReportScene') as unknown as { children: { list: Box[] } }
+      ).children.list
+        .filter((o) => o.constructor.name === 'DialogueBox')
+        .map((b) => b.lines?.[0]?.text.slice(0, 20)),
+    );
+  await page.waitForFunction(
+    () =>
+      (
+        window.__game.scene.getScene('ReportScene') as unknown as { children: { list: Box[] } }
+      ).children.list.some((o) => o.constructor.name === 'DialogueBox'),
+    null,
+    { timeout: SLOW },
+  );
+  expect(await boxes()).toEqual(['The report shows eve']);
+  // Six sips while the lesson is up (a sip needs a moment before the next counts): the
+  // coffee line would open a second box.
+  for (let i = 0; i < 7; i++) {
+    await page.evaluate(() => {
+      const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+        children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
+      };
+      rs.children.list.find((o) => o.texture?.key === 'desk-mug')?.emit('pointerover');
+    });
+    await page.waitForTimeout(2200);
+  }
+  await page.waitForTimeout(500);
+  // One box, and it is the next lesson, not the quip; the quip's claim is given back.
+  expect(await boxes()).toEqual(['Happens to the best ']);
+  const seen = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).seenHints as string[],
+  );
+  expect(seen).toContain('first-wrong');
+  expect(seen).not.toContain('coffee');
+  expect(errors).toEqual([]);
+});
