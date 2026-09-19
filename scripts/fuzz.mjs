@@ -155,6 +155,8 @@ const openMarket = () =>
     .evaluate(() => {
       const scenes = window.__game.scene.getScenes(true);
       const has = (o, name) => o.constructor.name === name;
+      // The wall or the notebook over the desk: the phone under them won't open. Escape first.
+      if (scenes.some((sc) => /HistoryScene|NotebookScene/.test(sc.scene.key))) return false;
       for (const sc of scenes) {
         let panel = sc.children.list.find((o) => has(o, 'BrowserPanel'));
         if (!panel) {
@@ -318,7 +320,7 @@ while (Date.now() < end) {
           // Market mode: mostly the drawers and their Buy/Wear buttons.
           const shopping = market
             ? inPanel.filter((o) =>
-                /^(Buy \d+|Wear|Tier \d|Coat|Hat|Cat|Ornament|Mug|Curtains|Radio)$/.test(
+                /^(Buy \d+|Wear|Tier \d|Coat|Hat|Cat|Collar|Ornament|Mug|Curtains|Radio)$/.test(
                   o.list?.find((c) => c.type === 'Text')?.text ?? '',
                 ),
               )
