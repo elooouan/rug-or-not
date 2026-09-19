@@ -43,7 +43,7 @@ import type { PageCtx } from './PageCtx';
 import { ALL_PAGES, type PageId } from './PageCtx';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
-import { itemsFor, SHOP_SLOTS, type ShopItem, type ShopSlot } from '@/data/shop';
+import { itemsFor, SHOP, SHOP_SLOTS, type ShopItem, type ShopSlot } from '@/data/shop';
 import {
   boughtCount,
   buy,
@@ -835,7 +835,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.heading(`The market  ·  ${clipBalance()} clips to spend`, 'ink');
     ctx.line('Dressing for the desk, paid in paper clips. Nothing here changes a score.');
     ctx.line(
-      `${earnedClips()} earned from files${holder ? `  ·  ${holder} holder allowance` : ''}${spent ? `  ·  ${spent} spent` : ''}`,
+      `${earnedClips()} earned from files${holder ? `  ·  ${holder} holder allowance` : ''}${spent ? `  ·  ${spent} spent` : ''}  ·  ${SHOP.filter((i) => owns(i.id)).length}/${SHOP.length} in the collection`,
       { color: 'woodMid' },
     );
     if (!holder) {

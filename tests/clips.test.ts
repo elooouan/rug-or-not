@@ -39,6 +39,7 @@ describe('the market catalogue', () => {
   });
   it('has unique ids and prices a determined detective can reach', () => {
     expect(new Set(SHOP.map((i) => i.id)).size).toBe(SHOP.length);
+    expect(SHOP.length).toBe(35); // the number the changelog and the tweets quote
     for (const i of SHOP) expect(i.price).toBeLessThanOrEqual(CLIPS.holderCap);
   });
 });
