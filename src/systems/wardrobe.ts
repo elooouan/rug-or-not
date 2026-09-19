@@ -142,9 +142,8 @@ export function applyLook(scene: Phaser.Scene): void {
   }
   const cat = worn('cat').style;
   if (cat.slot === 'cat') {
+    // The cat is four still frames swapped by hand (no animation to rebuild).
     drop([0, 1, 2, 3].map((i) => `${TEX.cat}-${i}`));
-    for (const anim of scene.anims.toJSON().anims)
-      if (anim.key.startsWith('cat')) scene.anims.remove(anim.key);
     makeCat(scene, { fur: cat.fur, dark: cat.dark, eye: cat.eye });
   }
   const radio = worn('radio').style;
