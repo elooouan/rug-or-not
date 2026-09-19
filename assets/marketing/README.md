@@ -44,7 +44,9 @@ Regenerate after a change with the dev server running:
 | theme-sepia / theme-midnight / theme-newsprint / theme-speakeasy | Office colours: the same desk in four other palettes. |
 | theme-midnight-reading | Reading a contract in the Blue hour theme. |
 | settings | Settings. |
+| notebook-herring-hunt-button / herring-hunt | Herring hunts: the notebook page's button, and a hunt page (click what only looks bad). |
 | clip-solve-a-case | Title to report in twenty seconds. |
+| clip-herring-hunt | Five pages of herring hunting. |
 | clip-red-flag-rush | Six pages of rush. |
 | clip-desk-toys | Coffee, lamp, cat, radio, a typed word. |
 | clip-handbook | Flipping through the handbook. |

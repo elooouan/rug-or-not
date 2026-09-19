@@ -390,6 +390,36 @@ const SHOTS = {
     await sleep(2200);
     await shot(page, 'rush-results');
   },
+  async hunt(page) {
+    await boot(page, VETERAN);
+    await skipTalk(page);
+    await startScene(page, 'NotebookScene', { chapter: 'herrings', id: 'community-jokes' });
+    await sleep(1200);
+    await skipTalk(page);
+    await shot(page, 'notebook-herring-hunt-button');
+    await startScene(page, 'RushScene', { hunt: 'community-jokes' });
+    await page.waitForFunction(
+      () => window.__game.scene.getScene('RushScene').phase === 'playing',
+      null,
+      { timeout: SLOW },
+    );
+    await sleep(1500);
+    const spots = await page.evaluate(() => {
+      const r = window.__game.scene.getScene('RushScene');
+      const out = [];
+      r.doc?.rows.forEach((row) =>
+        row.spots.forEach((s) => {
+          const b = s.getBounds();
+          out.push({ x: b.centerX, y: b.centerY, flag: !!s.clue?.flagId });
+        }),
+      );
+      return out;
+    });
+    const her = spots.find((s) => !s.flag);
+    if (her) await move(page, her.x, her.y);
+    await sleep(500);
+    await shot(page, 'herring-hunt');
+  },
   async phone(page) {
     await boot(page, VETERAN, '', FAKE_WALLET);
     await skipTalk(page);
@@ -542,6 +572,38 @@ const CLIPS = {
     }
     await sleep(600);
     await stopRecording(page, 'red-flag-rush');
+  },
+  async 'herring-hunt'(page) {
+    await boot(page, VETERAN);
+    await skipTalk(page);
+    await startScene(page, 'RushScene', { hunt: 'community-jokes' });
+    await page.waitForFunction(
+      () => window.__game.scene.getScene('RushScene').phase === 'playing',
+      null,
+      { timeout: SLOW },
+    );
+    await record(page);
+    for (let i = 0; i < 5; i++) {
+      const spots = await page.evaluate(() => {
+        const r = window.__game.scene.getScene('RushScene');
+        const out = [];
+        r.doc?.rows.forEach((row) =>
+          row.spots.forEach((s) => {
+            const b = s.getBounds();
+            out.push({ x: b.centerX, y: b.centerY, flag: !!s.clue?.flagId });
+          }),
+        );
+        return out;
+      });
+      const her = spots.find((s) => !s.flag);
+      if (!her) break;
+      await move(page, her.x, her.y, 18);
+      await sleep(400);
+      await click(page, her.x, her.y);
+      await sleep(900);
+    }
+    await sleep(2500);
+    await stopRecording(page, 'herring-hunt');
   },
   async 'desk-toys'(page) {
     await boot(page, VETERAN);
