@@ -311,9 +311,9 @@ media: v0.8-notebook-red-flags.png
 
 ## Wed, 30 Sept, 15:30  ·  `try-on`
 
-(232)
+(252)
 
-> Hover a coat and he wears it before you buy it. One item a day is a third off, the same one for everyone. Coin holders pay half. That's the whole economy: clips from closed files, dressing for the desk, nothing that touches a score.
+> Hover a coat (tap it on a phone) and he wears it before you buy it. One item a day is a third off, the same one for everyone. Coin holders pay half. That's the whole economy: clips from closed files, dressing for the desk, nothing that touches a score.
 
 media: v0.9-dressed-desk.png
 
