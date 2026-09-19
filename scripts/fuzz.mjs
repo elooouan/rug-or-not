@@ -7,6 +7,8 @@
  *
  * It starts from a played-in save so every screen is reachable, and it favours keys the
  * game actually listens to (Esc, Enter, Space, R, L, digits, arrows) over noise.
+ * FUZZ_MARKET=1 keeps the phone open on the market (reopening it whenever it closes), so
+ * the texture swaps behind a purchase get hammered on whatever screen is up.
  */
 import { chromium } from '@playwright/test';
 import { createServer } from 'node:http';
@@ -69,6 +71,11 @@ const KEYS = [
 // FUZZ_TOUCH=1 plays with a finger: taps and touch drags instead of mouse presses, so the
 // lift-to-fire buttons, the lens-under-a-finger and drag scrolling get the same treatment.
 const TOUCH = !!process.env.FUZZ_TOUCH;
+const MARKET = !!process.env.FUZZ_MARKET;
+/** Cumulative odds of each action kind; market mode is mostly aimed presses. */
+const T = MARKET
+  ? { click: 0.15, target: 0.75, key: 0.9, wheel: 0.95 }
+  : { click: 0.55, target: 0.63, key: 0.85, wheel: 0.93 };
 console.log(`fuzz: ${seconds}s, seed ${seed}${TOUCH ? ' (touch)' : ''}`);
 const browser = await chromium.launch({ args: ['--enable-precise-memory-info'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, hasTouch: TOUCH });
@@ -142,6 +149,39 @@ await page.goto(`${BASE}/?fuzz=${Date.now()}`);
 await page.waitForFunction(() => typeof window.__game !== 'undefined', null, { timeout: 30000 });
 await page.waitForTimeout(3000);
 
+/** The phone, then the market, on whatever desk is up (nothing where there is no phone). */
+const openMarket = () =>
+  page
+    .evaluate(() => {
+      const scenes = window.__game.scene.getScenes(true);
+      const has = (o, name) => o.constructor.name === name;
+      for (const sc of scenes) {
+        let panel = sc.children.list.find((o) => has(o, 'BrowserPanel'));
+        if (!panel) {
+          const phone = sc.children.list.find(
+            (o) => o.texture?.key === 'desk-phone' && o.input?.enabled,
+          );
+          if (!phone) continue;
+          phone.emit('pointerdown');
+          panel = sc.children.list.find((o) => has(o, 'BrowserPanel'));
+        }
+        if (!panel) continue;
+        const all = [];
+        const visit = (o) => {
+          o.list?.forEach(visit);
+          all.push(o);
+        };
+        visit(panel);
+        const onMarket = all.some((o) => o.type === 'Text' && /^The market/.test(o.text));
+        if (!onMarket)
+          all.find((o) => has(o, 'PixelButton') && o.label?.text === 'Market')?.emit('pointerdown');
+        return true;
+      }
+      return false;
+    })
+    .catch(() => false);
+if (MARKET) await openMarket();
+
 const visited = new Map();
 let leakSeen = false;
 let lastHeap = 0;
@@ -161,25 +201,25 @@ const wanted = (n) => !only || only.some(([a, b]) => n >= a && n <= (b ?? a));
 while (Date.now() < end) {
   const roll = rand();
   lastAction =
-    roll < 0.55
+    roll < T.click
       ? 'click'
-      : roll < 0.63
+      : roll < T.target
         ? 'target'
-        : roll < 0.85
+        : roll < T.key
           ? 'key'
-          : roll < 0.93
+          : roll < T.wheel
             ? 'wheel'
             : 'drag';
   const trace = process.env.FUZZ_TRACE && actions >= Number(process.env.FUZZ_TRACE);
   if (!wanted(actions)) {
     // Burn the same random numbers the action would have used.
-    if (roll < 0.55) {
+    if (roll < T.click) {
       rand();
       rand();
       rand();
-    } else if (roll < 0.63) rand();
-    else if (roll < 0.85) rand();
-    else if (roll < 0.93) {
+    } else if (roll < T.target) rand();
+    else if (roll < T.key) rand();
+    else if (roll < T.wheel) {
       rand();
       rand();
       rand();
@@ -199,7 +239,7 @@ while (Date.now() < end) {
       actions,
       await page.evaluate(() => localStorage.getItem('rug-or-not:save:v1')),
     );
-  if (roll < 0.55) {
+  if (roll < T.click) {
     const x = rand() * 1280;
     const y = rand() * 720;
     const hold = rand() < 0.2 ? 250 : 40;
@@ -255,41 +295,59 @@ while (Date.now() < end) {
       }
       await page.mouse.up();
     }
-  } else if (roll < 0.63) {
+  } else if (roll < T.target) {
     // A click on something that is actually interactive (a button, a report line, a clue
     // spot): random coordinates rarely land on the small targets.
     const r = rand();
     const at = await page
-      .evaluate((r) => {
-        const objs = window.__game.scene
-          .getScenes(true)
-          .flatMap((sc) => sc.input.list ?? [])
-          .filter((o) => o.active && o.input?.enabled && o.willRender?.(o.scene.cameras.main));
-        if (objs.length === 0) return null;
-        // With the phone open, lean on its buttons: the pages (and the market's texture
-        // swaps) are several clicks deep and a fair pick would rarely get there.
-        const inPanel = objs.filter((o) => {
-          for (let p = o.parentContainer; p; p = p.parentContainer)
-            if (p.constructor.name === 'BrowserPanel') return true;
-          return false;
-        });
-        const pool = inPanel.length && r < 0.7 ? inPanel : objs;
-        const o = pool[Math.floor(((r * 997) % 1) * pool.length)];
-        const b = o.getBounds ? o.getBounds() : null;
-        if (!b || b.width <= 0 || b.height <= 0) return null;
-        return { x: b.centerX, y: b.centerY, what: o.constructor.name };
-      }, r)
+      .evaluate(
+        ([r, market]) => {
+          const objs = window.__game.scene
+            .getScenes(true)
+            // Phaser keeps the interactive objects in a private `_list` (no public getter).
+            .flatMap((sc) => sc.input._list ?? sc.input.list ?? [])
+            .filter((o) => o.active && o.input?.enabled && o.willRender?.(o.scene.cameras.main));
+          if (objs.length === 0) return null;
+          // With the phone open, lean on its buttons: the pages (and the market's texture
+          // swaps) are several clicks deep and a fair pick would rarely get there.
+          const inPanel = objs.filter((o) => {
+            for (let p = o.parentContainer; p; p = p.parentContainer)
+              if (p.constructor.name === 'BrowserPanel') return true;
+            return false;
+          });
+          // Market mode: mostly the drawers and their Buy/Wear buttons.
+          const shopping = market
+            ? inPanel.filter((o) =>
+                /^(Buy \d+|Wear|Tier \d|Coat|Hat|Cat|Ornament|Mug|Curtains|Radio)$/.test(
+                  o.list?.find((c) => c.type === 'Text')?.text ?? '',
+                ),
+              )
+            : [];
+          const pool =
+            shopping.length && r < 0.8 ? shopping : inPanel.length && r < 0.7 ? inPanel : objs;
+          const o = pool[Math.floor(((r * 997) % 1) * pool.length)];
+          const b = o.getBounds ? o.getBounds() : null;
+          if (!b || b.width <= 0 || b.height <= 0) return null;
+          const label = o.list?.find((c) => c.type === 'Text')?.text;
+          return {
+            x: b.centerX,
+            y: b.centerY,
+            what: label ? `${o.constructor.name}:${label}` : o.constructor.name,
+          };
+        },
+        [r, MARKET],
+      )
       .catch(() => null);
     if (at && at.x >= 0 && at.x < 640 && at.y >= 0 && at.y < 360) {
       if (trace)
         console.log(actions, 'target', at.what, Math.round(at.x), Math.round(at.y), await scene());
       await press(at.x * 2, at.y * 2, 40);
     }
-  } else if (roll < 0.85) {
+  } else if (roll < T.key) {
     const key = pick(KEYS);
     if (trace) console.log(actions, 'key', key, await scene());
     await page.keyboard.press(key);
-  } else if (roll < 0.93) {
+  } else if (roll < T.wheel) {
     const x = rand() * 1280;
     const y = rand() * 720;
     const dy = pick([-200, -100, 100, 200, 400]);
@@ -330,6 +388,12 @@ while (Date.now() < end) {
     }
   }
   actions++;
+  if (MARKET && actions % 4 === 0) {
+    const t0 = Date.now();
+    const ok = await openMarket();
+    if (process.env.FUZZ_TRACE) console.log(actions, 'openMarket', ok, Date.now() - t0, 'ms');
+    if (!ok) await page.keyboard.press('Escape');
+  }
   if (actions % 5 === 0) {
     const s = await scene();
     visited.set(s, (visited.get(s) ?? 0) + 1);
