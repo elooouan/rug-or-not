@@ -367,10 +367,13 @@ export class ReportScene extends Phaser.Scene {
       color: 'shadow',
     });
     if (this.payload.clips)
-      L.push({
-        text: `+${this.payload.clips.total} clips for the market  (${this.payload.clips.reasons.join(' · ')})  ·  ${clipBalance()} on the desk`,
-        color: 'woodDark',
-      });
+      L.push(
+        ...wrap(
+          `+${this.payload.clips.total} clips for the market (${this.payload.clips.reasons.join(', ')}); ${clipBalance()} on the desk.`,
+          0,
+          'woodDark',
+        ),
+      );
     if (newFlagIds.length > 0) {
       const names = newFlagIds.map((id) => FLAGS[id as keyof typeof FLAGS]?.title ?? id);
       L.push(...wrap(`New in your notebook: ${names.join('; ')}`, 0, 'ink'));
