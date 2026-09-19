@@ -150,7 +150,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
   ],
   'first-wrong': [
-    { text: 'Happens to the best of us. Read the report, learn the tell, get back on the horse.' },
+    {
+      text: 'Happens to the best of us. Read the report, take the second look at the paper, learn the tell. Then get back on the horse.',
+    },
   ],
   'first-daily': [
     {
