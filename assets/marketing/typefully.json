@@ -1,5 +1,5 @@
 {
-  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The account is on the Business plan (2026-09-19), so every item in queue.json is scheduled; the two coin drafts stay unscheduled until the coin is live. Clips: queue.json names the committed GIFs, but every draft carries the 1280x720 MP4 twin (media ids below, files regenerated locally with `PROMO_GIF=0 node scripts/promo.mjs clips`). Queue slots (Typefully schedule rules, Paris time): Mon–Fri 09:00, 15:30, 21:00; Sat–Sun 12:00, 20:00. The desk-editor drafts (devlog-desk-editor-1/2, desk-editor-launch) should get a clip of the editor once one is taken; devlog-desk-editor-1 carries media ac6b0e76-2e9f-4154-89bf-684b0b8e44e0, uploaded by an earlier session, file unknown.",
+  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The account is on the Business plan (2026-09-19), so every item in queue.json is scheduled; the two coin drafts stay unscheduled until the coin is live. Clips: queue.json names the committed GIFs, but every draft carries the 1280x720 MP4 twin (media ids below, files regenerated locally with `PROMO_GIF=0 node scripts/promo.mjs clips`). Queue slots (Typefully schedule rules, Paris time): Mon–Fri 09:00, 15:30, 21:00; Sat–Sun 12:00, 20:00. The desk-editor drafts carry v0.10-desk-editor.png and the v0.10 editor clip (a GIF recorded in a headless container; `PROMO_TAG=v0.10 node scripts/promo.mjs desk-editor` on a desktop Chrome gives a smoother take and an MP4 to swap in).",
   "social_set_id": 332931,
   "drafts": {
     "intro-thread": 10832778,
@@ -170,7 +170,9 @@
     "v0.8-theme-newsprint.png": "aac64fb7-aee7-4a87-a9eb-347c46a42175",
     "v0.8-case-folder-intake.png": "9ea6ab62-a8e3-42df-bd39-78c1cbeb241a",
     "v0.8-handbook-how-to-play.png": "afa9b4c9-bae2-4d37-8a06-bcff36e69afe",
-    "v0.8-settings.png": "7c202d6f-1a72-4eb5-a44a-efd8f8f69a6f"
+    "v0.8-settings.png": "7c202d6f-1a72-4eb5-a44a-efd8f8f69a6f",
+    "v0.10-desk-editor.png": "d70fdb95-1949-4014-b611-54a2ef1a9d98",
+    "v0.10-clip-desk-editor.gif": "5802e681-5d6c-4225-b98f-f5bd55653763"
   },
   "pending_media": {},
   "status": {

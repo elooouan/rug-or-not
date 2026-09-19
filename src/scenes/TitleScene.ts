@@ -628,8 +628,11 @@ export class TitleScene extends Phaser.Scene {
       TitleScene.seenIntro = true;
       desk.light.setVisible(false);
       card.setY(GAME_HEIGHT).setAlpha(0);
+      // Arrange desk pressed before the lamp is even on: the editor owns the lamp and the
+      // card from then on, so the rest of the intro stands down.
       this.time.delayedCall(450, () => {
         desk.light.setVisible(true);
+        if (DeskEditor.current) return;
         audio.play('click');
         this.tweens.add({
           targets: desk.light,
@@ -639,6 +642,7 @@ export class TitleScene extends Phaser.Scene {
         });
       });
       this.time.delayedCall(700, () => {
+        if (DeskEditor.current) return;
         audio.play('slide');
         this.tweens.add({ targets: card, y: 0, alpha: 1, duration: 520, ease: 'Back.easeOut' });
       });

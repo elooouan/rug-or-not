@@ -616,7 +616,9 @@
       "note": "drafted in the sibling session",
       "tweets": [
         {
-          "text": "Coming to the desk: an editor.\n\nPick things up. Put them where you want them. Take the ones you never touch off entirely.\n\nClips buy the slots. None of it moves a score.\n\nIt's your office."
+          "text": "Coming to the desk: an editor.\n\nPick things up. Put them where you want them. Take the ones you never touch off entirely.\n\nClips buy the slots. None of it moves a score.\n\nIt's your office.",
+          "media": "v0.10-desk-editor.png",
+          "alt": "The desk editor: the paperwork gone, a grid over the wood, every prop in an amber handle, the radio being carried across the desk."
         }
       ]
     },
@@ -725,9 +727,9 @@
       "note": "drafted in the sibling session",
       "tweets": [
         {
-          "text": "The editor doesn't open, it takes over. The lamp dims, the paperwork slides off, the desk lifts into a grid and every object you own gets a handle.\n\nDrag it where you like. Put it back. Buy another shelf.\n\nThen the lamp comes up and it's your desk again.",
-          "media": "v0.8-clip-office-colours.gif",
-          "alt": "The desk repainting through its five office colours."
+          "text": "The editor doesn't open, it takes over. The lamp dims, the paperwork slides off, the desk lifts into a grid and every object you own gets a handle.\n\nDrag it where you like. Put it back. Buy another spot.\n\nThen the lamp comes up and it's your desk again.",
+          "media": "v0.10-clip-desk-editor.gif",
+          "alt": "The desk editor opening: the lamp dims, the title card slides off, a grid rises, the radio is dragged across the desk, the folders come off, a plant takes a bought spot, then the lamp comes back up."
         }
       ]
     },
@@ -818,8 +820,8 @@
       "tweets": [
         {
           "text": "The desk editor is in. Pick anything up and put it where you like. Take off what you never touch. The desk remembers, and every screen follows.\n\nYour office now.\n\n{PLAY_URL}",
-          "media": "v0.8-title-the-desk.png",
-          "alt": "The detective's desk at night."
+          "media": "v0.10-clip-desk-editor.gif",
+          "alt": "The desk editor opening: the lamp dims, the title card slides off, a grid rises, the radio is dragged across the desk, the folders come off, a plant takes a bought spot, then the lamp comes back up."
         }
       ]
     },

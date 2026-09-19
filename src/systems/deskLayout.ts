@@ -29,10 +29,22 @@ export type { DeskExtra, DeskLayout, Pos, PropId } from '@/config/deskProps';
  * more ornaments down on spots bought with clips. Every screen that draws the desk reads
  * positions from here, so a moved radio is moved everywhere. Pure logic: no Phaser.
  */
-/** Where paperwork lives while a file is open; a prop under it would never be seen. */
-export const PAPERWORK: { x: number; y: number; w: number; h: number; name: string }[] = [
+/**
+ * Where paperwork lives. The file and the stamps cover the middle and the corner on every
+ * screen that matters (the title card sits where the file does), so nothing may go under
+ * them; the notebook only covers its patch while a file is open, so that patch is drawn
+ * as a warning and left open.
+ */
+export const PAPERWORK: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  name: string;
+  soft?: boolean;
+}[] = [
   { x: PAPER.x, y: PAPER.y, w: PAPER.w, h: PAPER.h, name: 'the file' },
-  { x: NOTEBOOK.x, y: NOTEBOOK.y, w: NOTEBOOK.w, h: NOTEBOOK.h, name: 'the notebook' },
+  { x: NOTEBOOK.x, y: NOTEBOOK.y, w: NOTEBOOK.w, h: NOTEBOOK.h, name: 'the notebook', soft: true },
   {
     x: DESK.stampRug.x,
     y: DESK.stampRug.y,
@@ -114,7 +126,7 @@ const overlaps = (a: Box, b: Box): boolean =>
 
 /** The paperwork a box would hide under, or null when it's in the clear. */
 export function underPaperwork(box: Box): string | null {
-  return PAPERWORK.find((p) => overlaps(box, p))?.name ?? null;
+  return PAPERWORK.find((p) => !p.soft && overlaps(box, p))?.name ?? null;
 }
 
 /** Snap a top-left corner to the grid and keep the box on the desk. */

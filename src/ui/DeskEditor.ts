@@ -77,6 +77,7 @@ interface Handle {
   destroy(): void;
 }
 
+const GRID_TEX = 'desk-editor-grid';
 const TOOLBAR_H = 34;
 const TRAY_H = 22;
 /** Where a new ornament lands: the clear corner past the stamps. */
@@ -93,7 +94,8 @@ export class DeskEditor extends Phaser.GameObjects.Container {
 
   private items: Item[] = [];
   private handles: Handle[] = [];
-  private grid: Phaser.GameObjects.Graphics;
+  /** The squared paper, drawn once into a texture: a few hundred lines a frame is a lot for a phone. */
+  private grid: Phaser.GameObjects.Image;
   private toolbar: Phaser.GameObjects.Container;
   private escBinding?: { key: Phaser.Input.Keyboard.Key; fn: () => void };
   private held = true;
@@ -116,8 +118,7 @@ export class DeskEditor extends Phaser.GameObjects.Container {
     this.setDepth(DEPTH.hud);
     scene.add.existing(this);
 
-    this.grid = scene.add.graphics().setDepth(DEPTH.notebook).setAlpha(0);
-    this.drawGrid();
+    this.grid = this.makeGrid().setDepth(DEPTH.notebook).setAlpha(0);
     this.toolbar = scene.add.container(0, -TOOLBAR_H - TRAY_H - 8).setDepth(DEPTH.hud + 1);
     this.collectItems();
     this.buildHandles(true);
@@ -304,18 +305,22 @@ export class DeskEditor extends Phaser.GameObjects.Container {
   // ---- drawing --------------------------------------------------------------------
 
   /** Squared paper through the wood, and the paperwork's places hatched out. */
-  private drawGrid(): void {
-    const g = this.grid;
-    g.clear();
+  private makeGrid(): Phaser.GameObjects.Image {
+    const scene = this.scene;
+    if (scene.textures.exists(GRID_TEX)) scene.textures.remove(GRID_TEX);
+    const g = scene.make.graphics({ x: 0, y: 0 }, false);
     g.lineStyle(1, HEX.amber, 0.13);
     for (let x = 0; x <= GAME_WIDTH; x += 16) g.lineBetween(x, DESK_TOP, x, GAME_HEIGHT);
     for (let y = DESK_TOP; y <= GAME_HEIGHT; y += 16) g.lineBetween(0, y, GAME_WIDTH, y);
     for (const p of PAPERWORK) {
-      g.fillStyle(HEX.bg, 0.22);
-      g.fillRect(p.x, p.y, p.w, p.h);
-      g.lineStyle(1, HEX.paperShadow, 0.35);
+      // The notebook's patch is only covered while a file is open: a lighter hatch, no fill.
+      if (!p.soft) {
+        g.fillStyle(HEX.bg, 0.22);
+        g.fillRect(p.x, p.y, p.w, p.h);
+      }
+      g.lineStyle(1, HEX.paperShadow, p.soft ? 0.16 : 0.35);
       g.strokeRect(p.x + 0.5, p.y + 0.5, p.w - 1, p.h - 1);
-      for (let d = -p.h; d < p.w; d += 12) {
+      for (let d = -p.h; d < p.w; d += p.soft ? 24 : 12) {
         const x0 = Math.max(p.x, p.x + d);
         const y0 = p.y + (x0 - (p.x + d));
         const x1 = Math.min(p.x + p.w, p.x + d + p.h);
@@ -323,6 +328,9 @@ export class DeskEditor extends Phaser.GameObjects.Container {
         if (x1 > x0) g.lineBetween(x0, y0, x1, y1);
       }
     }
+    g.generateTexture(GRID_TEX, GAME_WIDTH, GAME_HEIGHT);
+    g.destroy();
+    return scene.add.image(0, 0, GRID_TEX).setOrigin(0);
   }
 
   private buildHandles(entering: boolean): void {

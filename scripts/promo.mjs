@@ -201,6 +201,46 @@ const click = async (page, x, y) => {
   await page.mouse.up();
 };
 
+/**
+ * A drag done from inside the page, one pointer event per animation frame, so a page busy
+ * encoding frames doesn't stretch it: Playwright's own steps each wait for the page.
+ */
+const drag = (page, from, to, ms = 700) =>
+  page.evaluate(
+    ([x0, y0, x1, y1, ms]) =>
+      new Promise((done) => {
+        const c = document.querySelector('canvas');
+        const r = c.getBoundingClientRect();
+        const fire = (type, x, y, buttons) =>
+          // Mouse events: Phaser's input listens for these, not for pointer events.
+          c.dispatchEvent(
+            new MouseEvent(type, {
+              clientX: r.x + (x / 640) * r.width,
+              clientY: r.y + (y / 360) * r.height,
+              bubbles: true,
+              cancelable: true,
+              button: 0,
+              buttons,
+            }),
+          );
+        fire('mousemove', x0, y0, 0);
+        fire('mousedown', x0, y0, 1);
+        const t0 = performance.now();
+        const step = () => {
+          const t = Math.min(1, (performance.now() - t0) / ms);
+          const e = 1 - (1 - t) * (1 - t);
+          fire('mousemove', x0 + (x1 - x0) * e, y0 + (y1 - y0) * e, 1);
+          if (t < 1) requestAnimationFrame(step);
+          else {
+            fire('mouseup', x1, y1, 0);
+            done();
+          }
+        };
+        requestAnimationFrame(step);
+      }),
+    [from.x, from.y, to.x, to.y, ms],
+  );
+
 /** Clue spots of the current document, world coordinates, flags first. */
 const clueSpots = (page) =>
   page.evaluate(() => {
@@ -449,6 +489,21 @@ async function openPhone(page, bookmark) {
 }
 
 const SHOTS = {
+  async 'desk-editor'(page) {
+    // Mid-edit: the paperwork gone, the grid up, the radio being carried across the desk.
+    await boot(page, DRESSED);
+    await skipTalk(page);
+    const arrange = await buttonAt(page, 'TitleScene', 'Arrange desk');
+    await click(page, arrange.x, arrange.y);
+    await sleep(1400);
+    await skipTalk(page);
+    await move(page, 48, 124, 10);
+    await page.mouse.down();
+    await move(page, 540, 150, 20);
+    await sleep(300);
+    await shot(page, 'desk-editor');
+    await page.mouse.up();
+  },
   async 'market-page'(page) {
     await boot(page, SHOPPER);
     await skipTalk(page);
@@ -729,6 +784,37 @@ const SHOTS = {
 };
 
 const CLIPS = {
+  async 'desk-editor'(page) {
+    // The paperwork lifts off, the radio crosses the desk, the folders come off, a plant
+    // takes a bought spot, and the lamp comes back up on Done.
+    await boot(page, DRESSED);
+    await skipTalk(page);
+    await record(page);
+    await sleep(600);
+    const arrange = await buttonAt(page, 'TitleScene', 'Arrange desk');
+    await move(page, arrange.x, arrange.y, 8);
+    await click(page, arrange.x, arrange.y);
+    await sleep(1500);
+    await skipTalk(page);
+    // The radio's box starts at (24, 108); the folders' cross sits at its top-right corner.
+    await drag(page, { x: 48, y: 124 }, { x: 560, y: 140 }, 900);
+    await sleep(500);
+    await move(page, 116, 230, 6);
+    await click(page, 116, 230);
+    await sleep(700);
+    const add = await buttonAt(page, 'TitleScene', '+ spot');
+    await move(page, add.x, add.y, 6);
+    await click(page, add.x, add.y);
+    await sleep(900);
+    // The plant lands past the stamps; carry it up beside the radio.
+    await drag(page, { x: 618, y: 338 }, { x: 600, y: 150 }, 800);
+    await sleep(400);
+    const done = await buttonAt(page, 'TitleScene', 'Done');
+    await move(page, done.x, done.y, 6);
+    await click(page, done.x, done.y);
+    await sleep(1600);
+    await stopRecording(page, 'desk-editor');
+  },
   async curtains(page) {
     // Velvet curtains from the market: drawn across the rain, then opened again.
     await boot(page, { ...DRESSED, settings: { ...DRESSED.settings, weather: 'rain' } });

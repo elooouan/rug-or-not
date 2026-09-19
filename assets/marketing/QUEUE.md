@@ -596,6 +596,8 @@ _drafted in the sibling session_
 > 
 > It's your office.
 
+media: v0.10-desk-editor.png
+
 ## Sat 10 Oct, 17:00  ·  `saturday-3`
 
 _drafted in the sibling session_
@@ -712,15 +714,15 @@ _drafted in the sibling session_
 
 _drafted in the sibling session_
 
-(254)
+(253)
 
 > The editor doesn't open, it takes over. The lamp dims, the paperwork slides off, the desk lifts into a grid and every object you own gets a handle.
 > 
-> Drag it where you like. Put it back. Buy another shelf.
+> Drag it where you like. Put it back. Buy another spot.
 > 
 > Then the lamp comes up and it's your desk again.
 
-media: v0.8-clip-office-colours.gif
+media: v0.10-clip-desk-editor.gif
 
 ## Wed 14 Oct, 09:00  ·  `the-safe`
 
@@ -822,7 +824,7 @@ media: v0.8-case-report.png
 > 
 > {PLAY_URL}
 
-media: v0.8-title-the-desk.png
+media: v0.10-clip-desk-editor.gif
 
 ## Sat 17 Oct, 12:00  ·  `saturday-4`
 
