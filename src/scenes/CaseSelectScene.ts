@@ -236,7 +236,10 @@ export class CaseSelectScene extends Phaser.Scene {
             maxChars,
           ),
           ...(best?.lastRun
-            ? [`last run: ${lastScore(c, best.lastRun)}  ·  the grade sticker opens its report`]
+            ? wrapMono(
+                `last run: ${lastScore(c, best.lastRun)}  ·  the grade sticker opens its report`,
+                maxChars,
+              )
             : []),
         ]
       : wrapMono(
