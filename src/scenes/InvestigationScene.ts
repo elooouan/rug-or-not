@@ -420,12 +420,10 @@ export class InvestigationScene extends Phaser.Scene {
     else this.notebook.setExamined(0, this.totalSpots);
     this.refreshNotebook();
 
-    this.clock = new DeskClock(this);
-    this.clock.setDepth(DEPTH.deskProps);
-    this.clock.setInteractive(
-      new Phaser.Geom.Rectangle(0, 0, 30, 34),
-      Phaser.Geom.Rectangle.Contains,
-    );
+    const clock = new DeskClock(this);
+    this.clock = clock;
+    clock.setDepth(DEPTH.deskProps);
+    clock.setInteractive(new Phaser.Geom.Rectangle(0, 0, 30, 34), Phaser.Geom.Rectangle.Contains);
     this.clock.on('pointerdown', () => {
       audio.play('tick');
       const relaxed = saveStore.get().settings.relaxed;
@@ -434,12 +432,7 @@ export class InvestigationScene extends Phaser.Scene {
         : relaxed
           ? ['time is a construct', 'no rush', 'take your time']
           : ['tick tock', 'no pressure', 'clocks cannot be bribed', 'it is later than you think'];
-      floatText(
-        this,
-        DESK.clock.x + 15,
-        DESK.clock.y - 4,
-        lines[Phaser.Math.Between(0, lines.length - 1)],
-      );
+      floatText(this, clock.x + 15, clock.y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
     });
     if (this.review) this.clock.setRealTime();
     else if (s.relaxed) this.clock.setRelaxed();

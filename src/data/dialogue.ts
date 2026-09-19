@@ -49,7 +49,8 @@ export type ScriptId =
   | 'market'
   | 'secret-unlocked'
   | 'secret-solved'
-  | 'desk-tour';
+  | 'desk-tour'
+  | 'editor';
 
 /** Campaign story beats: shown on the report after the case at this index (0-based) is closed. */
 export const STORY_BEATS: Record<number, ScriptId> = {
@@ -74,6 +75,8 @@ export const DOC_TIPS: Record<string, string> = {
 
 /** What changed, in Lucien's words, for players coming back after an update. */
 export const WHATS_NEW: Record<string, string> = {
+  'v0.10':
+    'New tonight: the desk is yours to arrange. Arrange desk on the title lifts the paperwork off; drag things where you like, cross off what you never touch, stand more ornaments on spots bought with clips. Every screen follows.',
   'v0.9':
     'New tonight: the market on the phone. Files pay paper clips; clips buy Lucien a coat, the cat a new fur, the desk an ornament. Holding the coin adds an allowance. Nothing bought moves a score.',
   'v0.8':
@@ -255,6 +258,11 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   konami: [
     { text: 'A cheat code? In my office? Cute. No points for you, but here is some confetti.' },
+  ],
+  editor: [
+    {
+      text: 'The desk is yours to arrange. Drag a thing where you like; the cross takes it off, the strip up top brings it back. Nothing under the paperwork, though. I need to see the file.',
+    },
   ],
   wall: [
     {

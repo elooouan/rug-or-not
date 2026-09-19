@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.10 — the desk editor
+
+- Arrange desk (a chip on the title, a row under Settings > Office, or type "desk") puts the
+  desk in your hands: the lamp dims, the title card slides off, a grid rises through the
+  wood and every prop gets a handle. Drag the mug, the radio, the clock, the phone, the
+  safe, the folders, the ink pad and the ornament where you like; the cross takes one off,
+  the strip at the top puts it back. Nothing can sit under the file, the notebook or the
+  stamps (they are hatched out), so a moved thing is never lost under paperwork. Every
+  screen draws the desk the same way; the pumpkin follows the mug.
+- Spots: an ornament from the market can stand on more than one. The first extra spot is
+  30 clips, then 50, then 80; tap the label under an extra to swap it for another you own.
+  Reset puts the desk back as it came and the spots stay bought.
+- A Feng Shui badge for the first rearrangement, a handbook page on it, and a word from
+  Lucien the first time the paperwork lifts.
+
 ## v0.9 — the market
 
 - Paper clips: the desk's own currency. Closing any file pays 3 (+2 for a first solve, +2

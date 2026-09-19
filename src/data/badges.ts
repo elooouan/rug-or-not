@@ -93,6 +93,7 @@ export const BADGES: Badge[] = [
     description: 'Take the second look at five reports.',
   },
   { id: 'collector', name: 'Collector', description: 'Buy five things at the market.' },
+  { id: 'feng-shui', name: 'Feng Shui', description: 'Rearrange the desk.', secret: true },
   {
     id: 'gilded',
     name: 'Gilded',

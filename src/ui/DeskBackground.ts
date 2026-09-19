@@ -22,6 +22,17 @@ import { squish } from './squish';
 import { WEATHERS } from '@/systems/settings';
 import { addText } from './text';
 import { drawPixels } from '@/art/pixelUtil';
+import { makeOrnament } from '@/art';
+import type { OrnamentKind } from '@/data/shop';
+import {
+  deskExtras,
+  deskPos,
+  PROP_IDS,
+  PROP_NAME,
+  propHidden,
+  type Pos,
+  type PropId,
+} from '@/systems/deskLayout';
 
 export interface DeskOptions {
   /** Draw mug, folder stack, ink pad (title/select scenes want a tidier desk). */
@@ -89,6 +100,41 @@ function tuneRadio(): Station {
 /** Curtains pulled across the glass stay that way from screen to screen, for the session. */
 let curtainsDrawn = false;
 
+/** Ornament art is drawn in a 28px box; the sprite pivots at the bottom centre of it. */
+const ORNAMENT_SIZE = 28;
+const ORNAMENT_LINES: Record<string, string[]> = {
+  plant: ['rustle', 'still alive', 'needs water'],
+  trophy: ['shiny', 'least caught', 'a joke gift'],
+  globe: ['spin', 'rugs everywhere', 'round, apparently'],
+  fishbowl: ['blub', 'liquidity says hi', 'locked in'],
+  skull: ['memento rug', '...', 'alas'],
+  bobble: ['nod nod', 'agrees', 'yes. yes. yes.'],
+};
+
+type PartObj = Phaser.GameObjects.GameObject &
+  Phaser.GameObjects.Components.Transform &
+  Phaser.GameObjects.Components.Visible;
+/** A prop the editor can pick up: its box (top-left, size) and the objects that move with it. */
+interface Part {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  shown: boolean;
+  objs: { obj: PartObj; dx: number; dy: number }[];
+}
+
+/** What the desk editor sees of a prop. Extras are `extra-<index into the save>`. */
+export interface DeskMovable {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  shown: boolean;
+}
+
 /**
  * The shared noir desk: wood, a rainy city window with a cat on the sill,
  * corkboard, lamp, props, then the amber light pool and vignette on top.
@@ -117,6 +163,10 @@ export class DeskBackground {
   private cat!: Phaser.GameObjects.Image;
   private mug?: Phaser.GameObjects.Image;
   private ornament?: Phaser.GameObjects.Image;
+  /** The editor's extra ornaments, in save order. */
+  private extras: Phaser.GameObjects.Image[] = [];
+  /** Every prop the editor can move, by id (see deskLayout.ts). */
+  private parts = new Map<string, Part>();
   private radio?: Phaser.GameObjects.Image;
   private curtains!: Phaser.GameObjects.Graphics;
   /** How far the curtains are drawn across the glass, 0 (open) to 1 (met in the middle). */
@@ -228,11 +278,14 @@ export class DeskBackground {
       this.buildRadio();
       this.buildOrnament();
       this.buildSeasonal();
+      this.buildExtras();
     }
     // Bought something at the market while this desk is up: the props swap textures
     // themselves (see wardrobe.ts); the ornament and curtains are drawn from the look.
     scene.events.on('look:changed', this.onLookChanged, this);
     if (opts.stamps !== false) this.buildInkPad();
+    // Props the editor took off the desk are built (so it can put them back) and hidden.
+    for (const id of PROP_IDS) if (propHidden(id) && this.parts.has(id)) this.showPart(id, false);
 
     this.light = scene.add
       .image(0, 0, TEX.lampLight)
@@ -299,8 +352,10 @@ export class DeskBackground {
     const has = this.scene.textures.exists(TEX.ornament);
     if (this.ornament && !this.ornament.active) this.ornament = undefined;
     if (this.ornament && !has) {
+      this.scene.tweens.killTweensOf(this.ornament);
       this.ornament.destroy();
       this.ornament = undefined;
+      this.parts.delete('ornament');
     } else if (!this.ornament && has) this.buildOrnament();
     // The thing just bought lands with a little bounce, so the eye finds it.
     if (!this.motion) return;
@@ -319,55 +374,94 @@ export class DeskBackground {
 
   /** Whatever the market put on the desk's corner. Clicking it does very little, on purpose. */
   private buildOrnament(): void {
+    if (!this.scene.textures.exists(TEX.ornament)) return;
+    const kind = (): OrnamentKind => {
+      const style = worn('ornament').style;
+      return style.slot === 'ornament' ? style.kind : 'none';
+    };
+    const { x, y } = deskPos('ornament');
+    const orn = this.ornamentAt(TEX.ornament, kind, x, y);
+    this.ornament = orn;
+    this.registerPart('ornament', { x, y }, ORNAMENT_SIZE, ORNAMENT_SIZE, [
+      { obj: orn, dx: ORNAMENT_SIZE / 2, dy: ORNAMENT_SIZE },
+    ]);
+    if (propHidden('ornament')) this.showPart('ornament', false);
+  }
+
+  /** The editor's extra ornaments: one per bought spot, wherever they were put down. */
+  private buildExtras(): void {
     const scene = this.scene;
-    if (!scene.textures.exists(TEX.ornament)) return;
-    const { x, y } = DESK.ornament;
-    // Pivots at its base, so a nod or a lean grows from the desk rather than a corner.
+    deskExtras().forEach((e, i) => {
+      const key = `${TEX.ornament}-${e.kind}`;
+      if (!scene.textures.exists(key)) makeOrnament(scene, e.kind, key);
+      if (!scene.textures.exists(key)) return;
+      const orn = this.ornamentAt(key, () => e.kind, e.x, e.y);
+      this.extras.push(orn);
+      this.registerPart(`extra-${i}`, { x: e.x, y: e.y }, ORNAMENT_SIZE, ORNAMENT_SIZE, [
+        { obj: orn, dx: ORNAMENT_SIZE / 2, dy: ORNAMENT_SIZE },
+      ]);
+    });
+  }
+
+  /** The editor put an ornament down or took one up: redraw the extras from the save. */
+  rebuildExtras(): void {
+    for (const orn of this.extras) {
+      this.scene.tweens.killTweensOf(orn);
+      orn.destroy();
+    }
+    this.extras = [];
+    for (const id of [...this.parts.keys()]) if (id.startsWith('extra-')) this.parts.delete(id);
+    if (this.props) this.buildExtras();
+  }
+
+  /**
+   * An ornament drawn from `key`, standing in a 28px box whose top-left is (x, y). It
+   * pivots at its base, so a nod or a lean grows from the desk rather than a corner.
+   */
+  private ornamentAt(
+    key: string,
+    kind: () => OrnamentKind,
+    x: number,
+    y: number,
+  ): Phaser.GameObjects.Image {
+    const scene = this.scene;
     const orn = scene.add
-      .image(x + 14, y + 28, TEX.ornament)
+      .image(x + ORNAMENT_SIZE / 2, y + ORNAMENT_SIZE, key)
       .setOrigin(0.5, 1)
       .setDepth(DEPTH.deskProps);
-    this.ornament = orn;
     orn.setInteractive({ useHandCursor: false });
     this.liftOnHover(orn);
-    const LINES: Record<string, string[]> = {
-      plant: ['rustle', 'still alive', 'needs water'],
-      trophy: ['shiny', 'least caught', 'a joke gift'],
-      globe: ['spin', 'rugs everywhere', 'round, apparently'],
-      fishbowl: ['blub', 'liquidity says hi', 'locked in'],
-      skull: ['memento rug', '...', 'alas'],
-      bobble: ['nod nod', 'agrees', 'yes. yes. yes.'],
+    const alt = `${key}-1`;
+    const flipOnce = () => {
+      if (!orn.active) return;
+      const next = orn.texture.key === alt ? key : alt;
+      if (scene.textures.exists(next)) orn.setTexture(next);
     };
     orn.on('pointerdown', () => {
-      const style = worn('ornament').style;
-      const lines = (style.slot === 'ornament' && LINES[style.kind]) || ['hm'];
+      const lines = ORNAMENT_LINES[kind()] ?? ['hm'];
       audio.play('click');
-      floatText(scene, x + 14, y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
+      floatText(
+        scene,
+        orn.x,
+        orn.y - ORNAMENT_SIZE - 4,
+        lines[Phaser.Math.Between(0, lines.length - 1)],
+      );
       if (!this.motion || !orn.active) return;
       squish(scene, orn, 1.1, 0.9, 180);
       // Two-frame ornaments spin (the globe) or splash (the fish) when poked.
-      if (scene.textures.exists(`${TEX.ornament}-1`))
-        scene.time.addEvent({
-          delay: 70,
-          repeat: 7,
-          callback: () => {
-            if (!orn.active) return;
-            const alt = `${TEX.ornament}-1`;
-            const next = orn.texture.key === alt ? TEX.ornament : alt;
-            if (scene.textures.exists(next)) orn.setTexture(next);
-          },
-        });
+      if (scene.textures.exists(alt))
+        scene.time.addEvent({ delay: 70, repeat: 7, callback: flipOnce });
     });
     // A little life: the bobblehead nods now and then, the plant leans with a draught.
-    const style = worn('ornament').style;
-    if (this.motion && style.slot === 'ornament' && style.kind === 'bobble') {
+    const built = kind();
+    if (this.motion && built === 'bobble') {
       const nod = scene.time.addEvent({
         delay: Phaser.Math.Between(6000, 9000),
         loop: true,
         callback: () => orn.active && squish(scene, orn, 1.04, 0.94, 300),
       });
       orn.once(Phaser.GameObjects.Events.DESTROY, () => nod.remove(false));
-    } else if (this.motion && style.slot === 'ornament' && style.kind === 'plant') {
+    } else if (this.motion && built === 'plant') {
       scene.tweens.add({
         targets: orn,
         angle: { from: -2, to: 2 },
@@ -378,19 +472,57 @@ export class DeskBackground {
       });
     }
     // Two-frame ornaments (the fish crosses its bowl, the globe turns) swap now and then.
-    if (this.motion && scene.textures.exists(`${TEX.ornament}-1`)) {
+    if (this.motion && scene.textures.exists(alt)) {
       const flip = scene.time.addEvent({
         delay: Phaser.Math.Between(1800, 3200),
         loop: true,
-        callback: () => {
-          if (!orn.active) return;
-          const alt = `${TEX.ornament}-1`;
-          const next = orn.texture.key === alt ? TEX.ornament : alt;
-          if (scene.textures.exists(next)) orn.setTexture(next);
-        },
+        callback: flipOnce,
       });
       orn.once(Phaser.GameObjects.Events.DESTROY, () => flip.remove(false));
     }
+    return orn;
+  }
+
+  // ---- the editor's view of the props ---------------------------------------------
+
+  private registerPart(id: string, pos: Pos, w: number, h: number, objs: Part['objs']): void {
+    this.parts.set(id, { x: pos.x, y: pos.y, w, h, shown: true, objs });
+  }
+
+  /** Everything the desk editor can pick up on this desk, boxes at their top-left. */
+  movables(): DeskMovable[] {
+    return [...this.parts].map(([id, p]) => ({
+      id,
+      name: id.startsWith('extra-') ? 'ornament' : PROP_NAME[id as PropId],
+      x: p.x,
+      y: p.y,
+      w: p.w,
+      h: p.h,
+      shown: p.shown,
+    }));
+  }
+
+  /** Move a prop's box to (x, y); everything that belongs to it comes along. */
+  movePart(id: string, x: number, y: number): void {
+    const p = this.parts.get(id);
+    if (!p) return;
+    p.x = x;
+    p.y = y;
+    for (const { obj, dx, dy } of p.objs) if (obj.active) obj.setPosition(x + dx, y + dy);
+  }
+
+  /** Take a prop off the desk (or put it back where its box is). */
+  showPart(id: string, on: boolean): void {
+    const p = this.parts.get(id);
+    if (!p) return;
+    p.shown = on;
+    for (const { obj, dx, dy } of p.objs) {
+      if (!obj.active) continue;
+      obj.setVisible(on);
+      if (obj.input) obj.input.enabled = on;
+      if (on) obj.setPosition(p.x + dx, p.y + dy);
+    }
+    if (id === 'mug') this.setSteam(this.motion);
   }
 
   /**
@@ -450,8 +582,10 @@ export class DeskBackground {
 
   /** Clickable props lift a pixel under the pointer so the desk reads as touchable. */
   private liftOnHover(obj: Phaser.GameObjects.Image, sound = true): void {
-    const y0 = obj.y;
+    // Measured on the way in, not at build time: the editor may have moved the prop since.
+    let y0 = obj.y;
     obj.on('pointerover', () => {
+      y0 = obj.y;
       if (sound) audio.play('hover');
       obj.setY(y0 - 1);
     });
@@ -1162,10 +1296,14 @@ export class DeskBackground {
   }
 
   private buildFolderStack(): void {
+    const { x, y } = deskPos('folderStack');
     const stack = this.scene.add
-      .image(DESK.folderStack.x, DESK.folderStack.y, TEX.folderStack)
+      .image(x, y, TEX.folderStack)
       .setOrigin(0)
       .setDepth(DEPTH.folderStack);
+    this.registerPart('folderStack', { x, y }, stack.width, stack.height, [
+      { obj: stack, dx: 0, dy: 0 },
+    ]);
     stack.setInteractive({ useHandCursor: false });
     this.liftOnHover(stack, false);
     const lines = [
@@ -1180,14 +1318,14 @@ export class DeskBackground {
       audio.play('paper');
       floatText(
         this.scene,
-        DESK.folderStack.x + 48,
-        DESK.folderStack.y - 4,
+        stack.x + 48,
+        stack.y - 4,
         lines[Phaser.Math.Between(0, lines.length - 1)],
       );
       if (this.motion) {
         this.scene.tweens.add({
           targets: stack,
-          y: DESK.folderStack.y - 3,
+          y: stack.y - 3,
           duration: 90,
           yoyo: true,
           ease: 'Quad.easeOut',
@@ -1198,7 +1336,7 @@ export class DeskBackground {
 
   private buildPhone(): void {
     const scene = this.scene;
-    const { x, y } = DESK.phone;
+    const { x, y } = deskPos('phone');
     // A soft glow pulses when today's daily case hasn't been played yet.
     const glow = scene.add
       .image(x - 4, y - 4, TEX.phoneGlow)
@@ -1217,6 +1355,10 @@ export class DeskBackground {
       });
     }
     const phone = scene.add.image(x, y, TEX.phone).setOrigin(0).setDepth(DEPTH.deskProps);
+    this.registerPart('phone', { x, y }, phone.width, phone.height, [
+      { obj: phone, dx: 0, dy: 0 },
+      { obj: glow, dx: -4, dy: -4 },
+    ]);
     phone.setInteractive({ useHandCursor: false });
     this.liftOnHover(phone);
     phone.on('pointerdown', () => {
@@ -1235,9 +1377,11 @@ export class DeskBackground {
     const month = now.getMonth();
     const day = now.getDate();
     if (month === 9 && day >= 24) {
-      const g = scene.add
-        .graphics({ x: DESK.mug.x + 40, y: DESK.mug.y + 4 })
-        .setDepth(DEPTH.deskProps);
+      // It sits by the mug, and goes wherever the editor puts the mug.
+      const mug = this.parts.get('mug');
+      const base = mug ? { x: mug.x, y: mug.y } : deskPos('mug');
+      const g = scene.add.graphics({ x: base.x + 40, y: base.y + 4 }).setDepth(DEPTH.deskProps);
+      mug?.objs.push({ obj: g, dx: 40, dy: 4 });
       drawPixels(
         g,
         [
@@ -1294,13 +1438,17 @@ export class DeskBackground {
 
   private buildRadio(): void {
     const scene = this.scene;
-    const { x, y } = DESK.radio;
+    const { x, y } = deskPos('radio');
     const radio = scene.add.image(x, y, TEX.radio).setOrigin(0).setDepth(DEPTH.deskProps);
     this.radio = radio;
     const light = scene.add
       .rectangle(x + 30, y + 22, 2, 2, HEX.amber)
       .setOrigin(0)
       .setDepth(DEPTH.deskProps);
+    this.registerPart('radio', { x, y }, radio.width, radio.height, [
+      { obj: radio, dx: 0, dy: 0 },
+      { obj: light, dx: 30, dy: 22 },
+    ]);
     let lucienTimer: Phaser.Time.TimerEvent | undefined;
     const apply = (st: Station) => {
       light.setVisible(st !== 'off');
@@ -1330,7 +1478,7 @@ export class DeskBackground {
       const next = tuneRadio();
       audio.play('click');
       apply(next);
-      floatText(scene, x + 22, y - 2, STATION_LABEL[next]);
+      floatText(scene, radio.x + 22, radio.y - 2, STATION_LABEL[next]);
       scene.events.emit('radio:tune', next);
       if (this.motion) {
         radio.setScale(1.06, 0.94);
@@ -1346,23 +1494,23 @@ export class DeskBackground {
   }
 
   private buildSafe(): void {
-    const { x, y } = DESK.safe;
+    const { x, y } = deskPos('safe');
     const safe = this.scene.add.image(x, y, TEX.safe).setOrigin(0).setDepth(DEPTH.deskProps);
+    this.registerPart('safe', { x, y }, safe.width, safe.height, [{ obj: safe, dx: 0, dy: 0 }]);
     safe.setInteractive({ useHandCursor: false });
     this.liftOnHover(safe);
     safe.on('pointerdown', () => new Vault(this.scene));
   }
 
   private buildInkPad(): void {
-    const pad = this.scene.add
-      .image(DESK.inkPad.x, DESK.inkPad.y, TEX.inkPad)
-      .setOrigin(0)
-      .setDepth(DEPTH.deskProps);
+    const { x, y } = deskPos('inkPad');
+    const pad = this.scene.add.image(x, y, TEX.inkPad).setOrigin(0).setDepth(DEPTH.deskProps);
+    this.registerPart('inkPad', { x, y }, pad.width, pad.height, [{ obj: pad, dx: 0, dy: 0 }]);
     pad.setInteractive({ useHandCursor: false });
     this.liftOnHover(pad, false);
     pad.on('pointerdown', () => {
       audio.play('pin');
-      floatText(this.scene, DESK.inkPad.x + 31, DESK.inkPad.y - 4, 'ink on your thumb');
+      floatText(this.scene, pad.x + 31, pad.y - 4, 'ink on your thumb');
       const cursor = this.scene.scene.get(CursorScene.KEY) as CursorScene | null;
       cursor?.setInked(6000);
     });
@@ -1372,15 +1520,17 @@ export class DeskBackground {
 
   private buildMug(): void {
     const scene = this.scene;
-    this.mug = scene.add
-      .image(DESK.mug.x, DESK.mug.y, TEX.mug)
-      .setOrigin(0)
-      .setDepth(DEPTH.deskProps);
+    const { x, y } = deskPos('mug');
+    this.mug = scene.add.image(x, y, TEX.mug).setOrigin(0).setDepth(DEPTH.deskProps);
     this.steam = scene.add
-      .sprite(DESK.mug.x + 10, DESK.mug.y - 17, `${TEX.steam}-0`)
+      .sprite(x + 10, y - 17, `${TEX.steam}-0`)
       .setOrigin(0)
       .setDepth(DEPTH.deskProps)
       .setAlpha(0.55);
+    this.registerPart('mug', { x, y }, this.mug.width, this.mug.height, [
+      { obj: this.mug, dx: 0, dy: 0 },
+      { obj: this.steam, dx: 10, dy: -17 },
+    ]);
     if (!scene.anims.exists('steam')) {
       scene.anims.create({
         key: 'steam',
@@ -1406,9 +1556,9 @@ export class DeskBackground {
       this.sips >= 8 && this.sips % 4 === 0
         ? 'too much coffee'
         : lines[Phaser.Math.Between(0, lines.length - 1)];
-    floatText(this.scene, DESK.mug.x + 22, DESK.mug.y - 20, line);
+    floatText(this.scene, this.mug.x + 22, this.mug.y - 20, line);
     const puff = this.scene.add
-      .image(DESK.mug.x + 22, DESK.mug.y - 10, TEX.steamPuff)
+      .image(this.mug.x + 22, this.mug.y - 10, TEX.steamPuff)
       .setDepth(DEPTH.deskProps)
       .setAlpha(0.7);
     if (!this.motion) {
@@ -1471,7 +1621,8 @@ export class DeskBackground {
 
   setSteam(on: boolean): void {
     if (!this.steam) return;
-    this.steam.setVisible(on);
+    // No steam off a mug the editor took away.
+    this.steam.setVisible(on && (this.parts.get('mug')?.shown ?? true));
     if (on) this.steam.play('steam');
     else this.steam.stop();
   }

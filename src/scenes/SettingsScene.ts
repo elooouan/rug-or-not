@@ -20,6 +20,7 @@ import { LucienBubble } from '@/ui/LucienBubble';
 import { awardBadge, noteSeen } from '@/systems/badges';
 import { addText } from '@/ui/text';
 import { backChip, goTo, setupScene } from './sceneUtil';
+import { layoutChanged } from '@/systems/deskLayout';
 import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette';
 import { syncTheme } from '@/systems/theme';
 import { clipBalance } from '@/systems/clips';
@@ -321,6 +322,13 @@ export class SettingsScene extends Phaser.Scene {
       hint: () => "coats, hats, mugs, the cat's fur: bought with clips from closed files",
     });
     if (!this.overlay) {
+      this.rows.push({
+        label: 'Arrange the desk',
+        tab: 'office',
+        value: () => (layoutChanged() ? 'rearranged' : 'as it came'),
+        change: () => goTo(this, 'TitleScene', { editor: true }),
+        hint: () => 'drag the props about, take some off, stand more ornaments on bought spots',
+      });
       this.rows.push({
         label: 'Export progress',
         tab: 'office',

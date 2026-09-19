@@ -85,7 +85,13 @@ that tunes between lo-fi, late jazz, static and off; sit with the static long en
 you'll hear a numbers station tapping the combination in morse. Badges track all of it (NetScope > Badges).
 The desk is yours to dress, too: files pay paper clips, and the market on the phone spends
 them on Lucien's coat and hat, the cat's fur, the mug, the radio, curtains and an ornament
-for the corner (a bobblehead that nods, a fish named Liquidity).
+for the corner (a bobblehead that nods, a fish named Liquidity). And to arrange: "Arrange
+desk" on the title (or Settings > Office, or type `desk`) dims the lamp, slides the paperwork
+off and puts a handle on every prop. Drag the mug, radio, clock, phone, safe, folders, ink
+pad and ornament where you like, cross off what you never touch, put it back from the strip
+at the top; nothing can sit under the file, the notebook or the stamps. Ornaments can stand
+on extra spots bought with clips (30, 50, 80). The layout (`src/systems/deskLayout.ts`) is
+part of the save and every screen draws from it.
 
 ## NetScope (the phone)
 

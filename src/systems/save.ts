@@ -1,7 +1,8 @@
 import { SAVE_KEY, SAVE_VERSION, type Grade } from '@/config/gameConfig';
 import { DEFAULT_SETTINGS, sanitizeSettings, type Settings } from './settings';
 import { isNameAllowed } from './names';
-import { DEFAULT_LOOK, SHOP_BY_ID, type ShopSlot } from '@/data/shop';
+import { DEFAULT_LOOK, SHOP, SHOP_BY_ID, type ShopSlot } from '@/data/shop';
+import { sanitizeDeskLayout, type DeskLayout } from '@/config/deskProps';
 
 /** What the last run of a file did, enough to print its report (and second look) again. */
 export interface LastRun {
@@ -68,6 +69,8 @@ export interface SaveData {
   owned: string[];
   /** The item worn or placed in each market slot. */
   look: Record<ShopSlot, string>;
+  /** Where the props sit, which are off the desk, and the extra ornaments (see deskLayout.ts). */
+  desk: DeskLayout;
   /** Last GAME_VERSION this save was opened with (drives the "new tonight" note). */
   lastSeenVersion: string;
   /** Earned badge ids (see src/data/badges.ts). */
@@ -155,6 +158,7 @@ export function defaultSave(): SaveData {
     clips: { earned: 0, spent: 0 },
     owned: [],
     look: { ...DEFAULT_LOOK },
+    desk: { pos: {}, hidden: [], extras: [], spots: 0 },
     lastSeenVersion: '',
     badges: [],
     stats: {
@@ -270,6 +274,11 @@ export function sanitizeSave(raw: unknown): SaveData {
         d.look[slot] = id;
     }
   }
+  // Extras on the desk can only show ornaments the market handed over.
+  const ornamentKinds = SHOP.filter(
+    (i) => i.style.slot === 'ornament' && (i.price === 0 || d.owned.includes(i.id)),
+  ).map((i) => (i.style.slot === 'ornament' ? i.style.kind : 'none'));
+  d.desk = sanitizeDeskLayout(r.desk, ornamentKinds);
   if (Array.isArray(r.badges))
     d.badges = r.badges.filter((x): x is string => typeof x === 'string');
   if (r.stats && typeof r.stats === 'object') {

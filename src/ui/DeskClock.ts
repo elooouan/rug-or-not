@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
-import { DESK, FONT } from '@/config/layout';
+import { FONT } from '@/config/layout';
+import { deskPos } from '@/systems/deskLayout';
 import { HEX, PALETTE } from '@/config/palette';
 import { makeText } from './text';
 
@@ -14,7 +15,8 @@ export class DeskClock extends Phaser.GameObjects.Container {
   private flashTimer?: Phaser.Time.TimerEvent;
 
   constructor(scene: Phaser.Scene) {
-    super(scene, DESK.clock.x, DESK.clock.y);
+    const { x, y } = deskPos('clock');
+    super(scene, x, y);
     this.add(scene.make.image({ x: 0, y: 0, key: TEX.clock }, false).setOrigin(0));
     this.hands = scene.make.graphics({ x: 15, y: 15 }, false);
     this.add(this.hands);

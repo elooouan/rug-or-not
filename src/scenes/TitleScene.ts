@@ -42,6 +42,7 @@ import { modalOpen } from '@/ui/escGuard';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 import type { PageId } from '@/ui/browser/PageCtx';
+import { DeskEditor } from '@/ui/DeskEditor';
 
 /** Whole hours until the next daily case (local midnight), never less than one. */
 function hoursToMidnight(): number {
@@ -85,13 +86,18 @@ export class TitleScene extends Phaser.Scene {
 
   /** A NetScope page to open once the desk is up (deep links: #market, #board, #coin). */
   private phonePage?: PageId;
+  /** Sent from Settings to arrange the desk. */
+  private wantEditor = false;
+  /** Opens the desk editor; set once the desk and its chrome exist. */
+  private openEditor?: () => void;
 
   constructor() {
     super(TitleScene.KEY);
   }
 
-  init(data?: { phone?: PageId }): void {
+  init(data?: { phone?: PageId; editor?: boolean }): void {
     this.phonePage = data?.phone;
+    this.wantEditor = data?.editor === true;
   }
 
   /** Typed words, the Konami code, and other nonsense. */
@@ -196,6 +202,9 @@ export class TitleScene extends Phaser.Scene {
       } else if (typed.endsWith('tailor')) {
         audio.play('tick');
         LucienBubble.tell(this, "Don't say that name in here. He has people in the chats.", 4200);
+        typed = '';
+      } else if (typed.endsWith('desk') || typed.endsWith('arrange')) {
+        this.openEditor?.();
         typed = '';
       } else if (typed.endsWith('safe')) {
         LucienBubble.tell(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
@@ -488,8 +497,30 @@ export class TitleScene extends Phaser.Scene {
                 : h < 22
                   ? 'evening. proper.'
                   : 'night shift';
-      floatText(this, DESK.clock.x + 15, DESK.clock.y - 4, line);
+      floatText(this, clock.x + 15, clock.y - 4, line);
     });
+
+    // The desk is yours to arrange: a chip above the wallet's, clear of the card.
+    const arrange = new PixelButton(
+      this,
+      0,
+      walletBtn.y - 24,
+      'Arrange desk',
+      () => this.openEditor?.(),
+      { variant: 'ink' },
+    );
+    arrange.setX(GAME_WIDTH - arrange.bw - 6).setDepth(DEPTH.hud);
+    this.openEditor = () => {
+      if (DeskEditor.current || dialogueOpen(this) || BrowserPanel.current?.scene === this) return;
+      // Pressed during the first night's intro: the card stops sliding in and leaves instead.
+      this.tweens.killTweensOf(card);
+      card.setY(0).setAlpha(1);
+      new DeskEditor(this, desk, {
+        paperwork: card,
+        chrome: [fs, walletBtn, arrange],
+        external: [{ id: 'clock', obj: clock, w: 30, h: 34 }],
+      });
+    };
 
     // Lucien hangs around the desk; poke him for a quip.
     const m = DIALOGUE.mascot;
@@ -630,6 +661,19 @@ export class TitleScene extends Phaser.Scene {
         if (!BrowserPanel.current) BrowserPanel.toggle(this, page);
       };
       this.time.delayedCall(reduced ? 200 : 1600, open);
+    }
+    // Sent here from Settings to arrange the desk: after Lucien, if he has something to say.
+    if (this.wantEditor) {
+      this.wantEditor = false;
+      const open = () => {
+        if (!this.scene.isActive()) return;
+        if (dialogueOpen(this)) {
+          this.time.delayedCall(500, open);
+          return;
+        }
+        this.openEditor?.();
+      };
+      this.time.delayedCall(reduced ? 100 : 400, open);
     }
   }
 

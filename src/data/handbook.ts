@@ -1,6 +1,7 @@
 import { RANKS, RUSH, SCORING } from '@/config/gameConfig';
 import { TOKEN } from '@/config/token';
 import { CLIPS } from '@/systems/clips';
+import { SPOT_PRICES } from '@/systems/deskLayout';
 import type { Feature } from '@/systems/discovery';
 
 /**
@@ -173,6 +174,16 @@ export const HANDBOOK: HandbookTopic[] = [
       { h: 'The coin' },
       `Holding ${TOKEN.symbol} adds an allowance that follows the balance the wallet reports (${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin} coins, up to ${CLIPS.holderCap}). Read-only: nothing is ever spent from the wallet, and a few items ask for a holder tier as well.`,
       'Nothing bought changes a score, a timer or a file. It is a desk; dress it.',
+    ],
+  },
+  {
+    id: 'editor',
+    title: 'Arranging the desk',
+    body: [
+      'Arrange desk on the title lifts the paperwork off and puts a handle on everything you own. Drag a thing where you like. The cross takes it off the desk; the strip at the top puts it back. Wherever things end up, every screen draws them there.',
+      { h: 'Spots' },
+      `An ornament from the market can stand on more than one spot: the first extra spot costs ${SPOT_PRICES[0]} clips, the next ${SPOT_PRICES[1]}, the last ${SPOT_PRICES[2]}. Tap the label under an extra ornament to swap it for another you own.`,
+      'Nothing can sit under the file, the notebook or the stamps: the hatched patches are where the paperwork goes. Reset puts the desk back as it came; the spots stay yours.',
     ],
   },
   {
