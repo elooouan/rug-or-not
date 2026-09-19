@@ -302,7 +302,11 @@ export class DeskBackground {
     const scene = this.scene;
     if (!scene.textures.exists(TEX.ornament)) return;
     const { x, y } = DESK.ornament;
-    const orn = scene.add.image(x, y, TEX.ornament).setOrigin(0).setDepth(DEPTH.deskProps);
+    // Pivots at its base, so a nod or a lean grows from the desk rather than a corner.
+    const orn = scene.add
+      .image(x + 14, y + 28, TEX.ornament)
+      .setOrigin(0.5, 1)
+      .setDepth(DEPTH.deskProps);
     this.ornament = orn;
     orn.setInteractive({ useHandCursor: false });
     this.liftOnHover(orn);
@@ -321,7 +325,7 @@ export class DeskBackground {
       floatText(scene, x + 14, y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
       if (this.motion && orn.active) squish(scene, orn, 1.1, 0.9, 180);
     });
-    // The bobblehead nods on its own now and then; it is what it is for.
+    // A little life: the bobblehead nods now and then, the plant leans with a draught.
     const style = worn('ornament').style;
     if (this.motion && style.slot === 'ornament' && style.kind === 'bobble') {
       const nod = scene.time.addEvent({
@@ -330,6 +334,15 @@ export class DeskBackground {
         callback: () => orn.active && squish(scene, orn, 1.04, 0.94, 300),
       });
       orn.once(Phaser.GameObjects.Events.DESTROY, () => nod.remove(false));
+    } else if (this.motion && style.slot === 'ornament' && style.kind === 'plant') {
+      scene.tweens.add({
+        targets: orn,
+        angle: { from: -2, to: 2 },
+        duration: 2600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
     }
   }
 
