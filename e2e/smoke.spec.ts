@@ -817,6 +817,87 @@ test('the market dresses Lucien and the desk while the title is up', async ({ pa
   expect(errors).toEqual([]);
 });
 
+test('a purchase from the settings page redresses the file paused underneath', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => {
+    window.__debug.clips(200);
+    window.__debug.startCase('bean');
+  });
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
+  await skipTalk(page);
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await skipTalk(page);
+  type Btn = { constructor: { name: string }; label?: { text: string }; emit(ev: string): void };
+  const press = (page: Page, sceneKey: string, label: string) =>
+    page.evaluate(
+      ([sceneKey, label]) => {
+        const sc = window.__game.scene.getScene(sceneKey) as unknown as {
+          children: { list: (Btn & { list?: Btn[] })[] };
+        };
+        const all: Btn[] = [];
+        const visit = (o: Btn & { list?: Btn[] }) => {
+          o.list?.forEach(visit);
+          all.push(o);
+        };
+        sc.children.list.forEach(visit);
+        const b = all.find((o) => o.constructor.name === 'PixelButton' && o.label?.text === label);
+        b?.emit('pointerdown');
+        return !!b;
+      },
+      [sceneKey, label],
+    );
+  // Pause, Settings (the file waits underneath), the desk row opens the market.
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  expect(await press(page, 'InvestigationScene', 'Settings')).toBe(true);
+  await waitForScene(page, 'SettingsScene');
+  await page.waitForTimeout(300);
+  await skipTalk(page);
+  expect(await press(page, 'SettingsScene', 'Office')).toBe(true);
+  await page.waitForTimeout(200);
+  const opened = await page.evaluate(() => {
+    const st = window.__game.scene.getScene('SettingsScene') as unknown as {
+      rows: { label: string; change(d: number): void }[];
+    };
+    const row = st.rows.find((r) => r.label === 'Desk & wardrobe');
+    row?.change(1);
+    return !!row;
+  });
+  expect(opened).toBe(true);
+  await page.waitForTimeout(300);
+  await skipTalk(page);
+  expect(await press(page, 'SettingsScene', 'Buy 80')).toBe(true);
+  await page.waitForTimeout(400);
+  const coat = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).look.coat,
+  );
+  expect(coat).toBe('coat-navy');
+  // Out of the phone, out of settings, back to the file: it must draw its corner face.
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(
+    () => !window.__game.scene.getScenes(true).some((s) => s.scene.key === 'SettingsScene'),
+    null,
+    { timeout: SLOW },
+  );
+  await page.waitForTimeout(300);
+  expect(await press(page, 'InvestigationScene', 'Resume')).toBe(true);
+  await page.waitForTimeout(800);
+  const faceOk = await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+      children: { list: { texture?: { key: string }; frame?: { source: unknown } }[] };
+    };
+    const face = inv.children.list.find((o) => o.texture?.key === 'lucien-face');
+    return !!face?.frame?.source;
+  });
+  expect(faceOk).toBe(true);
+  expect(errors).toEqual([]);
+});
+
 test.describe('touch', () => {
   test.use({ hasTouch: true });
 
