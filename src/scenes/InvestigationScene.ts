@@ -88,6 +88,8 @@ export class InvestigationScene extends Phaser.Scene {
   private said = new Set<string>();
   private hintsUsed = 0;
   private askLabel?: Phaser.GameObjects.Text;
+  /** Tab the last nudge was about; a second ask on it points at the line. */
+  private nudgedDoc = -1;
   private idleMs = 0;
 
   constructor() {
@@ -451,9 +453,19 @@ export class InvestigationScene extends Phaser.Scene {
     const unexaminedIn = (i: number) =>
       this.caseData.documents[i].clues.filter((cl) => !this.examined.has(cl.id)).length;
     let text: string;
-    if (unexaminedIn(this.current) > 0)
-      text = "There's something on this very page you haven't looked at closely.";
-    else {
+    if (unexaminedIn(this.current) > 0) {
+      // Asked twice about the same page: he points at the line itself (the focus ring lands
+      // on an unread spot; whether it's a flag or a herring is still the player's call).
+      if (this.nudgedDoc === this.current) {
+        const spot = this.caseData.documents[this.current].clues.find(
+          (cl) => !this.examined.has(cl.id),
+        );
+        if (spot && this.currentDoc()?.focusClue(spot.id)) {
+          text = 'Fine. That line, right there. Read it and make up your own mind.';
+        } else text = "There's something on this very page you haven't looked at closely.";
+      } else text = "There's something on this very page you haven't looked at closely.";
+      this.nudgedDoc = this.current;
+    } else {
       const other = this.caseData.documents.map((_, i) => i).find((i) => unexaminedIn(i) > 0);
       if (other !== undefined)
         text = `Have a closer look at the "${this.caseData.documents[other].title}" tab.`;

@@ -14,6 +14,8 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- Asking Lucien twice about the same page makes him point at the line (the focus ring lands
+  on an unread spot); the first nudge still only names the page.
 - Settings is two pages now: Game (sound, modes, Lucien, pointer size) and Office (colours,
   weather, lamp, cosmetics, save export/import/reset). A "Pointer size" row makes the
   pointer half again as big.
