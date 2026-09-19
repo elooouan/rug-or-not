@@ -136,7 +136,7 @@ export class TitleScene extends Phaser.Scene {
         lucienSaysNow(this, 'title-intro');
         typed = '';
       } else if (typed.endsWith('wagmi')) {
-        LucienBubble.say(
+        LucienBubble.tell(
           this,
           'We are all going to make... a careful decision after reading the audit.',
           4200,
@@ -147,14 +147,14 @@ export class TitleScene extends Phaser.Scene {
         floatText(this, DESK.window.x + DESK.window.w - 60, 14, 'to the moon (and back, usually)');
         typed = '';
       } else if (typed.endsWith('wen')) {
-        LucienBubble.say(this, 'Wen? When you have read the tokenomics.', 3600);
+        LucienBubble.tell(this, 'Wen? When you have read the tokenomics.', 3600);
         typed = '';
       } else if (typed.endsWith('gm')) {
-        LucienBubble.say(this, 'gm. Now read the contract.', 3000);
+        LucienBubble.tell(this, 'gm. Now read the contract.', 3000);
         typed = '';
       } else if (typed.endsWith('biscuit')) {
         desk.petCat();
-        LucienBubble.say(this, 'She knows her name. She just does not care.', 3000);
+        LucienBubble.tell(this, 'She knows her name. She just does not care.', 3000);
         typed = '';
       } else if (typed.endsWith('train')) {
         desk.train();
@@ -166,10 +166,10 @@ export class TitleScene extends Phaser.Scene {
         typed = '';
       } else if (typed.endsWith('tailor')) {
         audio.play('tick');
-        LucienBubble.say(this, "Don't say that name in here. He has people in the chats.", 4200);
+        LucienBubble.tell(this, "Don't say that name in here. He has people in the chats.", 4200);
         typed = '';
       } else if (typed.endsWith('safe')) {
-        LucienBubble.say(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
+        LucienBubble.tell(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
         typed = '';
       }
     });

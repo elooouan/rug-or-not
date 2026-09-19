@@ -145,13 +145,13 @@ export class Vault extends Phaser.GameObjects.Container {
       });
     }
     if (this.attempts === 2)
-      LucienBubble.say(
+      LucienBubble.tell(
         this.scene,
         "Three digits. How many red flags does the notebook hold? That's your number.",
         5000,
       );
     if (this.attempts === 5)
-      LucienBubble.say(
+      LucienBubble.tell(
         this.scene,
         `Fine. Zero, ${VAULT_COMBO[1]}, ${VAULT_COMBO[2]}. I didn't tell you.`,
         5000,
