@@ -11,7 +11,8 @@ import { coldDifficulty, startColdCase, startDaily } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
-import { clipBalance, worn } from '@/systems/clips';
+import { clipBalance, owns, worn } from '@/systems/clips';
+import { SHOP } from '@/data/shop';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -193,6 +194,26 @@ export class TitleScene extends Phaser.Scene {
         typed = '';
       } else if (typed.endsWith('safe')) {
         LucienBubble.tell(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
+        typed = '';
+      } else if (typed.endsWith('shop') || typed.endsWith('market')) {
+        if (!BrowserPanel.current) BrowserPanel.toggle(this, 'market');
+        typed = '';
+      } else if (typed.endsWith('clips')) {
+        const n = clipBalance();
+        const cheapest = SHOP.filter((i) => i.price > 0 && !owns(i.id)).sort(
+          (a, b) => a.price - b.price,
+        )[0];
+        LucienBubble.tell(
+          this,
+          n === 0
+            ? 'No clips. Close a file; they come with the paperwork.'
+            : cheapest && n < cheapest.price
+              ? `${n} clips. ${cheapest.price - n} short of the ${cheapest.name.toLowerCase()}.`
+              : cheapest
+                ? `${n} clips. The ${cheapest.name.toLowerCase()} is ${cheapest.price}. Just saying.`
+                : `${n} clips and nothing left to buy. A collector.`,
+          4000,
+        );
         typed = '';
       }
     });
