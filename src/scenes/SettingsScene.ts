@@ -16,9 +16,10 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { resetHints } from '@/systems/hints';
 import { PixelButton } from '@/ui/PixelButton';
+import { LucienBubble } from '@/ui/LucienBubble';
 import { addText } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
-import { currentTheme, THEME_IDS, THEMES } from '@/config/palette';
+import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette';
 import { syncTheme } from '@/systems/theme';
 
 interface SettingsInit {
@@ -44,6 +45,15 @@ const TABS: { id: SettingsTab; label: string }[] = [
 
 const CARD = { x: 150, y: 6, w: 340, h: 348, pad: 10, rowH: 14 } as const;
 
+/** A word from the detective on each coat of paint. */
+const THEME_QUIPS: Record<ThemeId, string> = {
+  noir: 'Back to noir. The coffee tastes right again.',
+  sepia: 'Old file. Smells like a basement archive. I like basements.',
+  midnight: 'Blue hour. Every case looks colder in this light.',
+  newsprint: 'Newsprint. Now the whole office looks like evidence.',
+  speakeasy: 'Speakeasy green. Do not ask what is behind the bookshelf.',
+};
+
 /** Volume, modes, accessibility, cosmetics and reset. Works standalone or as a pause overlay. */
 export class SettingsScene extends Phaser.Scene {
   static readonly KEY = 'SettingsScene';
@@ -61,6 +71,8 @@ export class SettingsScene extends Phaser.Scene {
   private cosmeticsDirty = false;
   /** Row to land on after a theme change restarts the page. */
   private static reselect = -1;
+  /** Theme just picked, so the restarted page can let Lucien react. */
+  private static justThemed: ThemeId | null = null;
 
   constructor() {
     super(SettingsScene.KEY);
@@ -218,6 +230,7 @@ export class SettingsScene extends Phaser.Scene {
         // holds the old textures, so that case waits for the title.
         if (this.overlay) return;
         SettingsScene.reselect = this.selected;
+        SettingsScene.justThemed = s().theme;
         this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo, tab: this.tab });
       },
       hint: () =>
@@ -404,6 +417,10 @@ export class SettingsScene extends Phaser.Scene {
     kb?.on('keydown-SPACE', () => this.rows[this.selected].change(1));
     this.select(SettingsScene.reselect >= 0 ? SettingsScene.reselect : 0);
     SettingsScene.reselect = -1;
+    if (SettingsScene.justThemed) {
+      LucienBubble.say(this, THEME_QUIPS[SettingsScene.justThemed], 3200);
+      SettingsScene.justThemed = null;
+    }
     if (!this.overlay) lucienSays(this, 'settings');
 
     // The quick mute (M) is global; keep the volume row honest while it's on.

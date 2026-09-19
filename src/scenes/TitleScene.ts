@@ -483,9 +483,10 @@ export class TitleScene extends Phaser.Scene {
         'poke the detective  ·  open the safe  ·  read the wall',
         'click the clock  ·  ink your cursor  ·  M mutes, F fills the screen',
       ][Phaser.Math.Between(0, 4)],
-      { size: 8, color: 'woodLight' },
+      { size: 9, color: 'paperShadow' },
     )
       .setOrigin(0.5, 0)
+      .setAlpha(0.8)
       .setDepth(DEPTH.hud);
 
     // Intro: lamp clicks on, the case file slides in. Only once per session.
