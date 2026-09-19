@@ -44,6 +44,7 @@ import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { itemsFor, SHOP_SLOTS, type ShopSlot } from '@/data/shop';
 import {
+  boughtCount,
   buy,
   buyBlocker,
   CLIPS,
@@ -890,6 +891,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             redress(scene);
             audio.play('stamp');
             toast(scene, 'Bought', `${item.name}. ${clipBalance()} clips left.`);
+            if (boughtCount() >= 5) awardBadge(scene, 'collector');
             ctx.panel.render();
           },
           { sameLine: true, width: 64, disabled: !!blocker },

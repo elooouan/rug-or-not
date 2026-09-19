@@ -7,6 +7,7 @@ import { audio } from '@/systems/audio';
 import type { CaseData } from '@/data/schema';
 import { awardBadge, noteSeen } from '@/systems/badges';
 import { wallet } from '@/systems/wallet';
+import { postDesk } from '@/systems/leaderboard';
 import { saveStore } from '@/systems/save';
 import { gameState } from '@/systems/gameState';
 import { lucienSays } from './DialogueBox';
@@ -169,7 +170,9 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
       else if (st.error && st.error !== lastError) audio.play('wrong');
       wasConnected = st.connected;
       lastError = st.error;
-      if (this.page === 'coin') this.render();
+      // A fresh connection changes the holder allowance and the desk's row on the board.
+      if (st.connected && !wasConnected) void postDesk();
+      if (this.page === 'coin' || this.page === 'market') this.render();
     });
 
     if (!saveStore.get().settings.reducedMotion) {

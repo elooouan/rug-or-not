@@ -16,6 +16,9 @@ import {
   worn,
 } from '@/systems/clips';
 import { saveStore, sanitizeSave } from '@/systems/save';
+import { badgeProgress } from '@/systems/badges';
+
+const TOTALS = { cases: 16, rugs: 10, pages: 10, flags: 18, weathers: 5 };
 
 const setBalance = (n: number | null) =>
   saveStore.update((d) => {
@@ -104,6 +107,16 @@ describe('clips', () => {
     expect(wear('coat-oxblood')).toBe(false);
     expect(wear('nope')).toBe(false);
     expect(worn('coat').id).toBe('coat-navy');
+  });
+
+  it('counts bought things for the Collector badge, free ones excluded', () => {
+    earnClips(2000);
+    expect(badgeProgress('collector', TOTALS)).toEqual({ n: 0, of: 5 });
+    for (const id of ['coat-navy', 'hat-black', 'mug-ink', 'cat-soot']) expect(buy(id)).toBe(true);
+    wear('coat-tan');
+    expect(badgeProgress('collector', TOTALS)).toEqual({ n: 4, of: 5 });
+    expect(buy('orn-plant')).toBe(true);
+    expect(badgeProgress('collector', TOTALS)).toEqual({ n: 5, of: 5 });
   });
 
   it('keeps tiered items behind the holder tier even with the clips', () => {

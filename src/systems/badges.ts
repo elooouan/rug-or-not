@@ -2,6 +2,7 @@ import { HERRINGS } from '@/data/flags';
 import { THEME_IDS } from '@/config/palette';
 import type Phaser from 'phaser';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
+import { SHOP_BY_ID } from '@/data/shop';
 import { saveStore, type SaveData } from './save';
 
 type Toaster = (scene: Phaser.Scene, title: string, body: string) => void;
@@ -110,6 +111,8 @@ export function badgeProgress(
       return clamp(st.themesSeen.length, THEME_IDS.length);
     case 'hindsight':
       return clamp(st.secondLooks, 5);
+    case 'collector':
+      return clamp(d.owned.filter((id) => SHOP_BY_ID[id]?.price > 0).length, 5);
     default:
       return null;
   }

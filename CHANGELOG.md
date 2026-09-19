@@ -13,7 +13,9 @@
   Lucien bobblehead for partners). Three items ask for a holder tier as well as the price.
   Buying or wearing something redresses every screen that is up, including a file paused
   under the settings page; nothing bought changes a score.
-- The clip count sits on the title card, and a handbook page covers the market.
+- The clip count sits on the title card, and a handbook page covers the market. Five
+  purchases earn the Collector badge; the market page follows the wallet, so an allowance
+  shows the moment a holder connects.
 - The detectives board on the Hall of Detectives page: one row per desk with the career
   score, rank, clips earned, files solved and the coin balance the wallet reported, sorted
   by score or by clips. Rows are upserted after every file, so the board follows the save
