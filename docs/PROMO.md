@@ -34,6 +34,9 @@ account, cut it.
 - **X Premium** (the blue check): replies rank higher, long video uploads, analytics. Buy it
   before the first week, not after.
 - Turn on **X Analytics**; check "best hours" after two weeks and move the slots to match.
+- **Typefully:** the free plan publishes 10 posts a month; the queue is ~20 a week, so it
+  needs the paid plan before the first scheduled post. Drafts are created as _planned_
+  (inert) and armed from the Claude Code session, or one click each in Typefully.
 - Same handle on Telegram (a group with the game link pinned) and, later, Discord. Register
   the DexScreener token profile the day the coin exists (socials + logo, otherwise a fake
   one will).
