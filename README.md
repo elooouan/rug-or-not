@@ -110,7 +110,8 @@ the coin page once a mint is set; it's read-only and cached for a minute.
 - **Campaign**: fifteen cases in order (nine rugs, six legit, difficulty 1→5); each verdict
   unlocks the next folder. Stamp all fifteen correctly and a sixteenth folder with no name
   turns up in the drawer (`"secret": true` in its JSON keeps it out of the daily pool and
-  RugScan until then).
+  RugScan until then). Every closed folder keeps its last run: the grade sticker reopens
+  that run's report, second look included.
 - **Daily Case**: one case chosen deterministically from today's date (same for everyone),
   with a local streak counter. Every other day the daily is a generated file seeded by the
   date instead, so dailies never run dry. Every seventh night in a row earns a streak freeze
