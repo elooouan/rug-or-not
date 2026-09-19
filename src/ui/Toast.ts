@@ -25,9 +25,22 @@ export function toast(scene: Phaser.Scene, title: string, body: string): void {
 }
 
 function show(scene: Phaser.Scene, title: string, body: string): void {
-  const w = 170;
+  const titleText = makeText(scene, 0, 6 + 5, title, { size: FONT.size.tiny, color: 'stampRed' });
+  const bodyText = makeText(scene, 0, 6 + 15, body, {
+    font: 'body',
+    size: FONT.size.body,
+    color: 'shadow',
+  });
+  // The card grows with its line ("Silver rim · Settings, Office page") instead of
+  // running off the right edge of the screen.
+  const w = Math.min(
+    GAME_WIDTH - 16,
+    Math.max(170, Math.ceil(Math.max(titleText.width, bodyText.width)) + 34),
+  );
   const h = 34;
   const x = GAME_WIDTH - w - 8;
+  titleText.setX(x + 26);
+  bodyText.setX(x + 26);
   const c = scene.add.container(0, -h - 10).setDepth(DEPTH.toast);
   c.add(rect(scene, x + 3, 6 + 3, w, h, HEX.bg, 0.5));
   c.add(rect(scene, x - 2, 6 - 2, w + 4, h + 4, HEX.woodDark));
@@ -38,10 +51,7 @@ function show(scene: Phaser.Scene, title: string, body: string): void {
       .setOrigin(0)
       .setScale(1.5),
   );
-  c.add(makeText(scene, x + 26, 6 + 5, title, { size: FONT.size.tiny, color: 'stampRed' }));
-  c.add(
-    makeText(scene, x + 26, 6 + 15, body, { font: 'body', size: FONT.size.body, color: 'shadow' }),
-  );
+  c.add([titleText, bodyText]);
   audio.play('unlock');
   const reduced = saveStore.get().settings.reducedMotion;
   if (reduced) {
