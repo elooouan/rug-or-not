@@ -34,6 +34,16 @@
   made from a paused file waits for the title.
 - Phantom's mark on the wallet buttons; buttons can carry an icon. The title chip says
   which wallet it will connect.
+- The pause menu opens by itself when another window takes the focus mid-file; the rush
+  just holds its clock until you're back.
+- Lucien introduces the first cold case and the first weekly, and tells rookies what the
+  red dots on the tabs and the examined counter mean. A printed file's long pitch stays on
+  the folder label. The printer's pools are wider: more pitches, traits, chat lines,
+  questions, names and auditors.
+- Wallet: the refresh button is throttled and says when it's busy; switching Phantom to an
+  account this site isn't approved for clears the stale address and says so; RPC, price
+  and board calls give up after a few seconds instead of hanging the page; the help page
+  and the coin page point phone users at Phantom's in-app browser.
 - Fixed: closing the pause menu or the phone with a click over the paper dropped a stray
   pin (and cost 15 points) on the release; a release now only counts where the press began.
 - Fixed: changing a cosmetic (rim, ink, wood, lamp) in Settings left the pointer overlay
@@ -72,10 +82,8 @@
   window from December 10th. PixelForge carries the young-token herring.
 - Promotions get confetti; unlock toasts say where to equip the thing; Lucien's rookie
   remarks (first pin, unpin, idle nudge toward the lens) stop after the first few files.
-- The case clock waits while Lucien is talking, so the tutorial no longer eats the timer,
-  and the pause menu opens by itself when another window takes the focus mid-file (the
-  rush just holds its clock until you're back). With the lamp off the desk actually goes
-  dark.
+- The case clock waits while Lucien is talking, so the tutorial no longer eats the timer.
+  With the lamp off the desk actually goes dark.
 - Suspicions in the desk notebook are links: click one to jump back to that clue. Buttons
   press down a pixel (and take a slightly bigger tap on touch screens); tabs and the drawer's
   special folders lift under the pointer; screens fade up from the dark; dust drifts through
