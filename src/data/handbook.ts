@@ -93,7 +93,7 @@ export const HANDBOOK: HandbookTopic[] = [
       'Red flags fill in as you meet them: what the pattern is and how to spot it, plus your own record of pins and misses. Yellow herrings do the same for the things that look bad and are fine.',
       'The rogues gallery keeps a wanted poster for every rug you called correctly.',
       { h: 'Drills' },
-      `Every learned red flag has a Drill button: ${RUSH.drillPages} generated pages that all hide that flag, on a ${RUSH.drillTimeSec}-second clock. Clear them all to log the drill.`,
+      `Every learned red flag has a Drill button: ${RUSH.drillPages} generated pages that all hide that flag, on a ${RUSH.drillTimeSec}-second clock. Clear them all to log the drill. Yellow herrings get a Hunt instead: five pages where you click the thing that only looks bad.`,
     ],
   },
   {

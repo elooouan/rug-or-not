@@ -270,6 +270,13 @@ export class NotebookScene extends Phaser.Scene {
             color: 'stampGreen',
           }),
         );
+        if (known && saveStore.get().stats.hunted.includes(id))
+          this.listPage.add(
+            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * BOOK.rowH, 'hunted', {
+              size: FONT.size.tiny,
+              color: 'stampGreen',
+            }).setOrigin(1, 0),
+          );
       }
       return t;
     });
@@ -382,6 +389,33 @@ export class NotebookScene extends Phaser.Scene {
       this.detailY += 6;
       add('Why it is fine', { size: FONT.size.tiny, color: 'paperShadow' });
       wrapMono(h.reassurance, maxChars).forEach((l) => add(l, { font: 'body', color: 'shadow' }));
+      // Hunt: five generated pages that each carry this herring; click the harmless thing.
+      // Same rule as drills: not from a live investigation.
+      if (!this.overlay || this.returnTo === 'ReportScene') {
+        this.detailY += 8;
+        const hunted = saveStore.get().stats.hunted.includes(id);
+        const b = new PixelButton(
+          this,
+          0,
+          this.detailY,
+          hunted ? 'Hunt again' : 'Hunt this herring',
+          () => {
+            if (this.overlay) this.scene.stop(this.returnTo);
+            goTo(this, 'RushScene', { hunt: id });
+          },
+          { variant: 'ink' },
+        );
+        this.children.remove(b);
+        this.detail.add(b);
+        if (hunted)
+          this.detail.add(
+            makeText(this, b.bw + 8, this.detailY + 4, 'hunted', {
+              size: FONT.size.tiny,
+              color: 'stampGreen',
+            }),
+          );
+        this.detailY += b.bh + 4;
+      }
     }
     audio.play('tick');
   }

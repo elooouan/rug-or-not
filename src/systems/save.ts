@@ -75,6 +75,8 @@ export interface SaveData {
     coldBest: number;
     /** Red flags whose drill (five pages in a row) has been completed. */
     drilled: string[];
+    /** Yellow herrings hunted to the end (five pages each) in the notebook's hunts. */
+    hunted: string[];
     /** Week keys whose weekly cold case has been closed. */
     weeklyDone: string[];
   };
@@ -130,6 +132,7 @@ export function defaultSave(): SaveData {
       coldCorrect: 0,
       coldBest: 0,
       drilled: [],
+      hunted: [],
       weeklyDone: [],
     },
     wallet: { address: null, token: null, checkedAt: null, linked: false },
@@ -210,6 +213,7 @@ export function sanitizeSave(raw: unknown): SaveData {
       coldCorrect: num(st.coldCorrect),
       coldBest: num(st.coldBest),
       drilled: strs(st.drilled),
+      hunted: strs(st.hunted),
       weeklyDone: strs(st.weeklyDone),
     };
   }

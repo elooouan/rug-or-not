@@ -149,7 +149,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   notebook: [
     { text: 'This is where the knowledge lives. Locked pages open as you run into new tricks.' },
     {
-      text: 'The last chapter is the handbook: how everything on this desk works, in case I mumble.',
+      text: 'Red flags can be drilled and herrings hunted from their pages. The last chapter is the handbook, in case I mumble.',
     },
   ],
   'case-files': [

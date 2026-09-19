@@ -319,6 +319,8 @@ export interface GenOptions {
   difficulty?: number;
   /** Red flags that must appear (drills). Implies a rug. */
   forceFlags?: string[];
+  /** Yellow herrings that must appear (hunts). Implies a legit file, so nothing contradicts them. */
+  forceHerrings?: string[];
 }
 
 interface Plan {
@@ -1253,7 +1255,19 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   const forced = (opts.forceFlags ?? []).filter((f) =>
     (FLAG_POOL as readonly string[]).includes(f),
   );
-  const p = plan(rng, forced.length ? { ...opts, verdict: 'rug' } : opts);
+  const forcedHerrings = (opts.forceHerrings ?? []).filter((h) =>
+    (HERRING_POOL as readonly string[]).includes(h),
+  );
+  // A forced herring rides along with whatever the plan says (a rug's flags make the hunt
+  // harder); only real audit findings need a legit file to be true.
+  const p = plan(
+    rng,
+    forced.length
+      ? { ...opts, verdict: 'rug' }
+      : forcedHerrings.includes('real-audit-findings')
+        ? { ...opts, verdict: 'legit' }
+        : opts,
+  );
   const flags = new Set<string>([...forced, ...take(rng, FLAG_POOL, p.flags)]);
   // A contract can carry at most one exit mechanism worth of confusion; keep it readable.
   // Forced flags always survive the trimming.
@@ -1273,16 +1287,30 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   // Whales and wash trading both fill the transfer table; one per file.
   if (flags.has('wash-trading') && flags.has('whale-concentration'))
     flags.delete(keep('whale-concentration') ? 'wash-trading' : 'whale-concentration');
-  const herrings = new Set(take(rng, HERRING_POOL, p.herrings));
+  const herrings = new Set([...forcedHerrings, ...take(rng, HERRING_POOL, p.herrings)]);
   // Contradictions: no clean renounce next to a fake one, no long lock next to an unlock.
+  // A forced herring wins the argument and the flag goes instead.
+  const keepH = (h: string) => forcedHerrings.includes(h);
   if (flags.has('fake-renounce')) {
-    herrings.delete('renounced-cleanly');
-    herrings.delete('timelocked-admin');
+    if (keepH('renounced-cleanly') || keepH('timelocked-admin')) flags.delete('fake-renounce');
+    else {
+      herrings.delete('renounced-cleanly');
+      herrings.delete('timelocked-admin');
+    }
   }
-  if (flags.has('liquidity-unlocked')) herrings.delete('liquidity-locked-long');
+  if (flags.has('liquidity-unlocked')) {
+    if (keepH('liquidity-locked-long')) flags.delete('liquidity-unlocked');
+    else herrings.delete('liquidity-locked-long');
+  }
   if (flags.has('fake-audit') || p.verdict === 'rug') herrings.delete('real-audit-findings');
-  if (flags.has('unverified-contract')) CONTRACT_HERRINGS.forEach((h) => herrings.delete(h));
-  if (flags.has('sell-tax-adjustable')) herrings.delete('small-fixed-tax');
+  if (flags.has('unverified-contract')) {
+    if (CONTRACT_HERRINGS.some(keepH)) flags.delete('unverified-contract');
+    else CONTRACT_HERRINGS.forEach((h) => herrings.delete(h));
+  }
+  if (flags.has('sell-tax-adjustable')) {
+    if (keepH('small-fixed-tax')) flags.delete('sell-tax-adjustable');
+    else herrings.delete('small-fixed-tax');
+  }
   if (p.verdict === 'rug' && flags.size === 0) flags.add('mint-unlimited');
   const fineFor = new Map<string, boolean>();
   const fine = (id: string): boolean => {

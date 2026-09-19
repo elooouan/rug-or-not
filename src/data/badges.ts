@@ -76,6 +76,11 @@ export const BADGES: Badge[] = [
     name: 'Drill Sergeant',
     description: 'Complete the drill for every red flag.',
   },
+  {
+    id: 'herring-hunter',
+    name: 'Herring Hunter',
+    description: 'Finish the hunt for every yellow herring.',
+  },
   { id: 'cold-one', name: 'Cold One', description: 'Close a cold case (a generated file).' },
   { id: 'cold-ten', name: 'Night Desk', description: 'Call ten cold cases correctly.' },
   { id: 'rush-hour', name: 'Rush Hour', description: 'Finish a Red Flag Rush.' },

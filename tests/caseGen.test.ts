@@ -65,3 +65,22 @@ describe('cold case generator', () => {
     expect(rug.documents.flatMap((d) => d.clues).some(isFlagClue)).toBe(true);
   });
 });
+
+describe('forced herrings (hunts)', () => {
+  it('plants the requested herring and keeps the file consistent', async () => {
+    const { HERRINGS } = await import('@/data/flags');
+    for (const id of Object.keys(HERRINGS)) {
+      let found = 0;
+      for (let i = 0; i < 6; i++) {
+        const c = generateCase(`hunt-${id}-${i}`, { forceHerrings: [id] });
+        const res = validateCase(c);
+        expect(res.ok ? [] : res.errors).toEqual([]);
+        const clues = c.documents.flatMap((d) => d.clues);
+        if (c.verdict === 'legit') expect(clues.some(isFlagClue)).toBe(false);
+        if (c.documents.some((d) => d.clues.some((cl) => !('flagId' in cl) && cl.herringId === id)))
+          found++;
+      }
+      expect(found, id).toBeGreaterThan(0);
+    }
+  });
+});

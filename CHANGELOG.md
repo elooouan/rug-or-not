@@ -14,6 +14,10 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- Herring hunts: every yellow herring page in the notebook can print five pages that each
+  carry that herring, and the job is to click the thing that only looks bad. Red flags on
+  those pages cost seconds, like herrings do in the rush. Hunting them all earns Herring
+  Hunter. The generator can be asked for a herring the way drills ask for a flag.
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
 - Settings is two pages now: Game (sound, modes, Lucien, pointer size) and Office (colours,

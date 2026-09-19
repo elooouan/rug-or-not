@@ -4,7 +4,7 @@ import { RUSH } from '@/config/gameConfig';
 import { DESK, FONT, GAME_HEIGHT, GAME_WIDTH, NOTEBOOK, PAPER } from '@/config/layout';
 import { HEX, PALETTE } from '@/config/palette';
 import { HERRINGS, isFlagClue, type Clue } from '@/data/schema';
-import { FLAG_IDS, FLAGS, isFlagId, type FlagId } from '@/data/flags';
+import { FLAG_IDS, FLAGS, isFlagId, type FlagId, type HerringId } from '@/data/flags';
 import { audio } from '@/systems/audio';
 import { awardBadge } from '@/systems/badges';
 import { gameState } from '@/systems/gameState';
@@ -59,8 +59,9 @@ export class RushScene extends Phaser.Scene {
   private held = false;
   private strayCount = 0;
   private lastTickSecond = -1;
-  /** Herrings pinned this run, for the debrief on the results card. */
+  /** Herrings pinned this run (flags, on a hunt), for the debrief on the results card. */
   private herringsHit: string[] = [];
+  private flagsHit: string[] = [];
   private hud!: {
     score: Phaser.GameObjects.Text;
     mult: Phaser.GameObjects.Text;
@@ -71,14 +72,27 @@ export class RushScene extends Phaser.Scene {
 
   /** When set, this is a drill: five pages that all carry this red flag, no board. */
   private drill: FlagId | null = null;
+  /** Or a hunt: five pages that all carry this yellow herring, and the herring is the target. */
+  private hunt: HerringId | null = null;
   private drillPagesLeft = 0;
+
+  /** Drills and hunts are practice: a fixed deck, a gentler clock, no board. */
+  private get practice(): boolean {
+    return this.drill !== null || this.hunt !== null;
+  }
+
+  /** What counts as a hit tonight: red flags, or the herrings on a hunt. */
+  private isHit(clue: Clue): boolean {
+    return this.hunt ? !isFlagClue(clue) : isFlagClue(clue);
+  }
 
   constructor() {
     super(RushScene.KEY);
   }
 
-  init(data: { drill?: FlagId } | undefined): void {
+  init(data: { drill?: FlagId; hunt?: HerringId } | undefined): void {
     this.drill = data?.drill && isFlagId(data.drill) ? data.drill : null;
+    this.hunt = data?.hunt && data.hunt in HERRINGS ? data.hunt : null;
   }
 
   create(): void {
@@ -89,17 +103,26 @@ export class RushScene extends Phaser.Scene {
     this.strayCount = 0;
     this.lastTickSecond = -1;
     this.herringsHit = [];
+    this.flagsHit = [];
     this.doc = undefined;
     this.page = undefined;
-    this.deck = this.drill ? this.drillDeck(this.drill) : shuffle(rushPages(this.rushCases()));
-    this.drillPagesLeft = this.drill ? this.deck.length : 0;
+    this.deck = this.drill
+      ? this.drillDeck(this.drill)
+      : this.hunt
+        ? this.huntDeck(this.hunt)
+        : shuffle(rushPages(this.rushCases()));
+    this.drillPagesLeft = this.practice ? this.deck.length : 0;
 
     new DeskBackground(this, { props: true, stamps: false });
     addText(
       this,
       DESK.caseHeader.x,
       DESK.caseHeader.y,
-      this.drill ? `DRILL  ·  ${FLAGS[this.drill].title}` : 'RED FLAG RUSH  ·  one page at a time',
+      this.drill
+        ? `DRILL  ·  ${FLAGS[this.drill].title}`
+        : this.hunt
+          ? `HERRING HUNT  ·  ${HERRINGS[this.hunt].title}`
+          : 'RED FLAG RUSH  ·  one page at a time',
       { size: 10, color: 'paperShadow' },
     )
       .setOrigin(1, 0)
@@ -108,14 +131,16 @@ export class RushScene extends Phaser.Scene {
     this.buildHud();
     this.clock = new DeskClock(this);
     this.clock.setDepth(DEPTH.deskProps);
-    this.clock.start(this.drill ? RUSH.drillTimeSec : RUSH.timeSec);
+    this.clock.start(this.practice ? RUSH.drillTimeSec : RUSH.timeSec);
     this.clock.pause(true);
 
     addText(
       this,
       GAME_WIDTH - 96,
       GAME_HEIGHT - 12,
-      'click the red flag  ·  herring: -5s  ·  blank paper: -2s  ·  Tab/Enter works too',
+      this.hunt
+        ? 'click the yellow herring  ·  red flag: -5s  ·  blank paper: -2s  ·  Tab/Enter works too'
+        : 'click the red flag  ·  herring: -5s  ·  blank paper: -2s  ·  Tab/Enter works too',
       { size: 10, color: 'paperShadow' },
     )
       .setOrigin(1, 0)
@@ -159,6 +184,15 @@ export class RushScene extends Phaser.Scene {
       this.countdown();
       return;
     }
+    if (this.hunt) {
+      LucienBubble.say(
+        this,
+        `Five pages. Every one has "${HERRINGS[this.hunt].title}": looks bad, is fine. Click the thing that is fine.`,
+        4500,
+      );
+      this.countdown();
+      return;
+    }
     this.dialogue = lucienSays(this, 'first-rush', {
       onDone: () => {
         this.dialogue = null;
@@ -178,6 +212,22 @@ export class RushScene extends Phaser.Scene {
       });
       const doc = c.documents.find((d) =>
         d.clues.some((cl) => isFlagClue(cl) && cl.flagId === flag),
+      );
+      if (doc) pages.push({ caseId: c.id, doc });
+    }
+    return pages;
+  }
+
+  /** Five generated pages that each carry the hunted herring (rugs among them keep it honest). */
+  private huntDeck(herring: HerringId): RushPage[] {
+    const pages: RushPage[] = [];
+    for (let i = 0; pages.length < RUSH.drillPages && i < 14; i++) {
+      const c = generateCase(`hunt-${herring}-${Date.now().toString(36)}-${i}`, {
+        forceHerrings: [herring],
+        difficulty: 1 + (i % 3),
+      });
+      const doc = c.documents.find((d) =>
+        d.clues.some((cl) => !isFlagClue(cl) && cl.herringId === herring),
       );
       if (doc) pages.push({ caseId: c.id, doc });
     }
@@ -204,7 +254,7 @@ export class RushScene extends Phaser.Scene {
     for (let rx = 10; rx < w - 6; rx += 12) c.add(rect(this, rx, -6, 3, 8, HEX.paperShadow));
     c.add(rect(this, padding + 8, 4, 1, h - 8, HEX.stampRed, 0.35));
     c.add(
-      makeText(this, padding, padding - 2, this.drill ? 'DRILL' : 'RUSH', {
+      makeText(this, padding, padding - 2, this.drill ? 'DRILL' : this.hunt ? 'HUNT' : 'RUSH', {
         size: FONT.size.small,
         color: 'woodDark',
       }),
@@ -227,7 +277,9 @@ export class RushScene extends Phaser.Scene {
     const pages = mk(1, 'pages   0');
     const best = mk(
       2,
-      this.drill ? `pages   ${RUSH.drillPages} to go` : `best    ${saveStore.get().stats.rushBest}`,
+      this.practice
+        ? `pages   ${RUSH.drillPages} to go`
+        : `best    ${saveStore.get().stats.rushBest}`,
     );
     c.add([score, mult, streak, pages, best]);
     c.add(
@@ -254,7 +306,7 @@ export class RushScene extends Phaser.Scene {
     );
     this.hud.streak.setText(`streak  ${s.streak}`);
     this.hud.pages.setText(`pages   ${s.rounds}`);
-    if (this.drill)
+    if (this.practice)
       this.hud.best.setText(`pages   ${Math.max(0, this.drillPagesLeft - s.rounds)} to go`);
   }
 
@@ -297,7 +349,7 @@ export class RushScene extends Phaser.Scene {
   }
 
   private dealPage(): void {
-    if (this.drill && this.deck.length === 0) {
+    if (this.practice && this.deck.length === 0) {
       this.end();
       return;
     }
@@ -319,9 +371,9 @@ export class RushScene extends Phaser.Scene {
       onHoverSpot: () => {},
     };
     const doc = createDocumentView(this, next.doc, ctx).setDepth(DEPTH.documents);
-    // Make sure a red flag is on the page without scrolling.
+    // Make sure a target is on the page without scrolling.
     let guard = 0;
-    while (!doc.visibleSpots().some((s) => isFlagClue(s.clue)) && doc.scroll(1) && guard++ < 20);
+    while (!doc.visibleSpots().some((s) => this.isHit(s.clue)) && doc.scroll(1) && guard++ < 20);
     this.doc = doc;
     this.strayCount = 0;
     this.locked = false;
@@ -334,7 +386,7 @@ export class RushScene extends Phaser.Scene {
 
   private onPin(clue: Clue, pinned: boolean): void {
     if (this.phase !== 'playing' || this.locked || this.held || !pinned || !this.doc) return;
-    if (isFlagClue(clue)) {
+    if (this.isHit(clue)) {
       this.locked = true;
       const next = applyFlag(this.state);
       this.state = next;
@@ -350,7 +402,13 @@ export class RushScene extends Phaser.Scene {
         'amber',
       );
       // Name the tell as it goes by: the arcade is still a lesson.
-      floatText(this, PAPER.x + PAPER.w / 2, PAPER.y + 58, FLAGS[clue.flagId].title, 'stampGreen');
+      floatText(
+        this,
+        PAPER.x + PAPER.w / 2,
+        PAPER.y + 58,
+        isFlagClue(clue) ? FLAGS[clue.flagId].title : HERRINGS[clue.herringId].title,
+        'stampGreen',
+      );
       if (next.streak === 5)
         LucienBubble.say(this, 'Five in a row. Keep that pencil moving.', 2200);
       if (next.streak === 10) {
@@ -376,11 +434,13 @@ export class RushScene extends Phaser.Scene {
         });
       return;
     }
-    // A yellow herring: the pin stays in as a reminder, the clock pays for it.
+    // The wrong kind of thing: the pin stays in as a reminder, the clock pays for it.
+    // (A herring in the rush, a red flag on a hunt.)
     if (!isFlagClue(clue) && !this.herringsHit.includes(clue.herringId))
       this.herringsHit.push(clue.herringId);
+    if (isFlagClue(clue) && !this.flagsHit.includes(clue.flagId)) this.flagsHit.push(clue.flagId);
     this.state = applyHerring(this.state);
-    this.penalty(this.state.timeDelta, 'herring');
+    this.penalty(this.state.timeDelta, this.hunt ? 'red flag' : 'herring');
   }
 
   private onStray(count: number): void {
@@ -414,16 +474,18 @@ export class RushScene extends Phaser.Scene {
     const s = this.state;
     const grade = rushGrade(s.score);
     let improved = false;
-    if (this.drill) {
-      // A drill counts when every page was cleared; it never touches the board.
+    if (this.practice) {
+      // Practice counts when every page was cleared; it never touches the board.
       const done = s.rounds >= this.drillPagesLeft;
       if (done)
         saveStore.update((d) => {
-          if (!d.stats.drilled.includes(this.drill as string))
-            d.stats.drilled.push(this.drill as string);
+          if (this.drill && !d.stats.drilled.includes(this.drill)) d.stats.drilled.push(this.drill);
+          if (this.hunt && !d.stats.hunted.includes(this.hunt)) d.stats.hunted.push(this.hunt);
         });
       if (saveStore.get().stats.drilled.length >= FLAG_IDS.length)
         awardBadge(this, 'drill-sergeant');
+      if (saveStore.get().stats.hunted.length >= Object.keys(HERRINGS).length)
+        awardBadge(this, 'herring-hunter');
       audio.play(done ? 'caseClosed' : 'stamp');
       this.showResults(grade, false, done);
       return;
@@ -455,7 +517,7 @@ export class RushScene extends Phaser.Scene {
 
   private showResults(grade: string, improved: boolean, drillDone = false): void {
     const s = this.state;
-    const lessons = this.herringsHit.slice(0, 2);
+    const lessons = (this.hunt ? this.flagsHit : this.herringsHit).slice(0, 2);
     const w = 270;
     const h = 170 + (lessons.length ? 18 + lessons.length * 36 : 0);
     const x = PAPER.x + (PAPER.w - w) / 2;
@@ -469,7 +531,7 @@ export class RushScene extends Phaser.Scene {
         this,
         x + w / 2,
         y + 10,
-        this.drill ? (drillDone ? 'DRILL DONE' : "TIME'S UP") : "TIME'S UP",
+        drillDone ? (this.hunt ? 'HUNT DONE' : 'DRILL DONE') : "TIME'S UP",
         {
           size: FONT.size.heading,
           color: 'shadow',
@@ -485,10 +547,10 @@ export class RushScene extends Phaser.Scene {
     const rows = [
       `pages cleared   ${s.rounds}`,
       `best streak     ${s.bestStreak}  ·  peak x${rushMultiplier(s.bestStreak).toFixed(2).replace(/0$/, '')}`,
-      this.drill
+      this.practice
         ? drillDone
           ? 'the notebook remembers this'
-          : `clear all ${this.drillPagesLeft} pages to log the drill`
+          : `clear all ${this.drillPagesLeft} pages to log the ${this.hunt ? 'hunt' : 'drill'}`
         : improved
           ? 'personal best!'
           : `personal best   ${saveStore.get().stats.rushBest}`,
@@ -502,28 +564,35 @@ export class RushScene extends Phaser.Scene {
         }),
       ),
     );
-    // The herrings that cost you seconds, and why they were fine.
+    // The herrings that cost you seconds and why they were fine; on a hunt, the red flags
+    // mistaken for harmless and what they are.
     if (lessons.length) {
       const cw = charWidth(this, 'body', FONT.size.body);
       const maxChars = Math.floor((w - 32) / cw);
       c.add(
-        makeText(this, x + 16, y + 120, 'looked scary, was fine:', {
-          size: FONT.size.tiny,
-          color: 'paperShadow',
-        }),
+        makeText(
+          this,
+          x + 16,
+          y + 120,
+          this.hunt ? 'looked fine, was not:' : 'looked scary, was fine:',
+          {
+            size: FONT.size.tiny,
+            color: 'paperShadow',
+          },
+        ),
       );
       lessons.forEach((id, i) => {
-        const hr = HERRINGS[id as keyof typeof HERRINGS];
+        const hr = this.hunt ? FLAGS[id as FlagId] : HERRINGS[id as keyof typeof HERRINGS];
         if (!hr) return;
         const ly = y + 132 + i * 36;
         c.add(
           makeText(this, x + 16, ly, hr.title, {
             font: 'body',
             size: FONT.size.body,
-            color: 'stampGreen',
+            color: this.hunt ? 'stampRed' : 'stampGreen',
           }),
         );
-        wrapMono(hr.reassurance, maxChars)
+        wrapMono('reassurance' in hr ? hr.reassurance : hr.explanation, maxChars)
           .slice(0, 2)
           .forEach((l, k) =>
             c.add(
@@ -536,8 +605,8 @@ export class RushScene extends Phaser.Scene {
           );
       });
     }
-    // Grade stamp in the corner (drills are practice: no grade).
-    if (!this.drill) {
+    // Grade stamp in the corner (practice has no grade).
+    if (!this.practice) {
       const mark = this.add.container(x + w - 34, y + 46).setAngle(-12);
       mark.add(rect(this, 0, 0, 30, 30).setStrokeStyle(2, HEX.stampRed).setOrigin(0.5));
       mark.add(
@@ -552,10 +621,13 @@ export class RushScene extends Phaser.Scene {
       x + 12,
       y + h - 42,
       'Again',
-      () => this.scene.restart(this.drill ? { drill: this.drill } : {}),
+      () =>
+        this.scene.restart(
+          this.drill ? { drill: this.drill } : this.hunt ? { hunt: this.hunt } : {},
+        ),
       { width: bw, hotkey: 'ENTER' },
     );
-    const share = this.drill
+    const share = this.practice
       ? null
       : new PixelButton(
           this,
@@ -572,7 +644,7 @@ export class RushScene extends Phaser.Scene {
       this,
       x + w - 12 - bw,
       y + h - 42,
-      this.drill ? 'Notebook' : 'Menu',
+      this.practice ? 'Notebook' : 'Menu',
       () => this.quit(),
       { width: bw, variant: 'ink' },
     );
@@ -590,17 +662,21 @@ export class RushScene extends Phaser.Scene {
       c.setScale(0.9).setAlpha(0);
       this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 200, ease: 'Back.easeOut' });
     }
-    const line = this.drill
+    const line = this.hunt
       ? drillDone
-        ? "That's the pattern. You'll see it before they finish the pitch."
-        : 'Not every page cleared. Once more, slower.'
-      : s.score === 0
-        ? "Nothing on the board. The flags don't find themselves."
-        : grade === 'S'
-          ? 'That was a rush. Coffee is on me.'
-          : s.bestStreak >= 5
-            ? 'Good eye. The streak is where the points live.'
-            : 'Not bad. Faster next time, and skip the herrings.';
+        ? "That's what fine looks like. Now you won't pin it in a real file."
+        : 'Not every page cleared. Looks bad is not the same as is bad. Once more.'
+      : this.drill
+        ? drillDone
+          ? "That's the pattern. You'll see it before they finish the pitch."
+          : 'Not every page cleared. Once more, slower.'
+        : s.score === 0
+          ? "Nothing on the board. The flags don't find themselves."
+          : grade === 'S'
+            ? 'That was a rush. Coffee is on me.'
+            : s.bestStreak >= 5
+              ? 'Good eye. The streak is where the points live.'
+              : 'Not bad. Faster next time, and skip the herrings.';
     this.time.delayedCall(
       500,
       () => this.phase === 'over' && LucienBubble.say(this, line, 4000, 14),
@@ -608,7 +684,11 @@ export class RushScene extends Phaser.Scene {
   }
 
   private quit(): void {
-    goTo(this, this.drill ? 'NotebookScene' : 'TitleScene');
+    goTo(
+      this,
+      this.drill ? 'NotebookScene' : 'TitleScene',
+      this.drill ? undefined : this.hunt ? { chapter: 'herrings', id: this.hunt } : undefined,
+    );
   }
 
   /** Result text for the clipboard, with a fallback note. */
