@@ -261,6 +261,11 @@ export class NotebookScene extends Phaser.Scene {
     if (ch === 'rogues' && learned === this.ids.length && this.ids.length > 0)
       awardBadge(this, 'most-wanted');
     if (ch === 'rogues') lucienSays(this, 'rogues');
+    // Rows squeeze a little when a chapter outgrows the page (the library keeps growing).
+    const rowH = Math.min(
+      BOOK.rowH,
+      Math.max(12, Math.floor((BOOK.h - BOOK.pad * 2 - 16) / Math.max(1, this.ids.length))),
+    );
     this.entries = this.ids.map((id, i) => {
       const known = this.known(id);
       const title =
@@ -271,7 +276,7 @@ export class NotebookScene extends Phaser.Scene {
             : ch === 'handbook'
               ? (HANDBOOK[i]?.title ?? id)
               : this.rogueTitle(id);
-      const t = makeText(this, 14, 16 + i * BOOK.rowH, known ? title : '? ? ? ? ?', {
+      const t = makeText(this, 14, 16 + i * rowH, known ? title : '? ? ? ? ?', {
         size: FONT.size.body,
         font: 'body',
         color: known ? 'shadow' : 'paperShadow',
@@ -282,7 +287,7 @@ export class NotebookScene extends Phaser.Scene {
       if (ch === 'flags') {
         const sev = FLAGS[id as FlagId].severity;
         this.listPage.add(
-          makeText(this, 0, 18 + i * BOOK.rowH, known ? SEV_MARK[sev] : '', {
+          makeText(this, 0, 18 + i * rowH, known ? SEV_MARK[sev] : '', {
             size: FONT.size.tiny,
             color: SEV_COLOR[sev],
           }),
@@ -290,14 +295,14 @@ export class NotebookScene extends Phaser.Scene {
         // A green tick at the end of the row once the drill is done.
         if (known && saveStore.get().stats.drilled.includes(id))
           this.listPage.add(
-            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * BOOK.rowH, 'drilled', {
+            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * rowH, 'drilled', {
               size: FONT.size.tiny,
               color: 'stampGreen',
             }).setOrigin(1, 0),
           );
       } else if (ch === 'rogues') {
         this.listPage.add(
-          makeText(this, 0, 18 + i * BOOK.rowH, known ? 'x' : '', {
+          makeText(this, 0, 18 + i * rowH, known ? 'x' : '', {
             size: FONT.size.tiny,
             color: 'stampRed',
           }),
@@ -308,21 +313,21 @@ export class NotebookScene extends Phaser.Scene {
         const soon = topic?.feature && !unlocked(topic.feature);
         if (soon) t.setColor(PALETTE.paperShadow);
         this.listPage.add(
-          makeText(this, 0, 18 + i * BOOK.rowH, String(i + 1), {
+          makeText(this, 0, 18 + i * rowH, String(i + 1), {
             size: FONT.size.tiny,
             color: soon ? 'paperShadow' : 'woodMid',
           }),
         );
       } else {
         this.listPage.add(
-          makeText(this, 0, 18 + i * BOOK.rowH, known ? 'ok' : '', {
+          makeText(this, 0, 18 + i * rowH, known ? 'ok' : '', {
             size: FONT.size.tiny,
             color: 'stampGreen',
           }),
         );
         if (known && saveStore.get().stats.hunted.includes(id))
           this.listPage.add(
-            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * BOOK.rowH, 'hunted', {
+            makeText(this, BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2, 18 + i * rowH, 'hunted', {
               size: FONT.size.tiny,
               color: 'stampGreen',
             }).setOrigin(1, 0),
