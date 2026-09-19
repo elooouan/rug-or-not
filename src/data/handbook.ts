@@ -26,8 +26,8 @@ export const HANDBOOK: HandbookTopic[] = [
       'Every night a folder lands on the desk. Open it, read what is inside, decide whether the coin is a rug pull or legit, and stamp it. That is the whole job.',
       { h: 'Around the folder' },
       'The phone runs NetScope (explorer, board, coin page, news). The notebook keeps what you learn. The clock is the timer. The radio, cat, lamp and safe are yours to poke.',
-      { h: 'Keys' },
-      'Esc pauses or goes back, F fills the screen, M mutes. Most buttons show their hotkey in brackets.',
+      { h: 'Keys, where there are keys' },
+      'Esc pauses or goes back, F fills the screen, M mutes. Most buttons show their hotkey in brackets. On a touch screen the buttons do it all.',
     ],
   },
   {
