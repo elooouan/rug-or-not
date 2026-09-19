@@ -93,6 +93,12 @@ export const BADGES: Badge[] = [
     description: 'Take the second look at five reports.',
   },
   { id: 'collector', name: 'Collector', description: 'Buy five things at the market.' },
+  {
+    id: 'gilded',
+    name: 'Gilded',
+    description: "Wear the coin-gold fedora and the board member's coat together.",
+    secret: true,
+  },
   { id: 'cold-one', name: 'Cold One', description: 'Close a cold case (a generated file).' },
   { id: 'cold-ten', name: 'Night Desk', description: 'Call ten cold cases correctly.' },
   { id: 'rush-hour', name: 'Rush Hour', description: 'Finish a Red Flag Rush.' },

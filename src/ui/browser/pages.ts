@@ -99,6 +99,14 @@ const BOUGHT_QUIPS: Record<ShopSlot, string[]> = {
   radio: ['Same static, better box.', 'The numbers station approves.'],
 };
 
+/** Head to toe in coin gold: a badge and a word, once. */
+function checkGilded(scene: Phaser.Scene): void {
+  if (worn('hat').id === 'hat-gold' && worn('coat').id === 'coat-boardroom') {
+    awardBadge(scene, 'gilded');
+    LucienBubble.say(scene, 'Dressed like the board. Now read like the audit.', 4000);
+  }
+}
+
 /** The market's open drawer; remembered across renders so buying doesn't jump the page. */
 let marketSlot: ShopSlot = 'coat';
 const SLOT_TAB: Record<ShopSlot, string> = {
@@ -938,6 +946,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             if (!wear(item.id)) return;
             redress(scene);
             audio.play('click');
+            checkGilded(scene);
             ctx.panel.render();
           },
           { sameLine: true, width: 64 },
@@ -968,6 +977,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             const quips = BOUGHT_QUIPS[item.style.slot];
             LucienBubble.say(scene, quips[Phaser.Math.Between(0, quips.length - 1)]);
             if (boughtCount() >= 5) awardBadge(scene, 'collector');
+            checkGilded(scene);
             ctx.panel.render();
           },
           // Short of clips: still pressable, so the press can say how many are missing.

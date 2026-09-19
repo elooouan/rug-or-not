@@ -19,7 +19,7 @@
   Lucien in that coat, the cat in that fur.
 - `#market`, `#board` and `#coin` links open the title with the phone on that page.
 - The clip count sits on the title card, and a handbook page covers the market. Five
-  purchases earn the Collector badge; the market page follows the wallet, so an allowance
+  purchases earn the Collector badge (and there is a secret one for a certain all-gold look); the market page follows the wallet, so an allowance
   shows the moment a holder connects.
 - The detectives board on the Hall of Detectives page: one row per desk with the career
   score, rank, clips earned, files solved and the coin balance the wallet reported, sorted
