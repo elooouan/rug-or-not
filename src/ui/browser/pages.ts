@@ -59,9 +59,9 @@ import { redress } from '@/systems/wardrobe';
 
 /** One line per tier on the coin page. */
 const TIER_BLURB: Record<number, string> = {
-  1: "gilded rim, board mark, aurora, holders' file",
-  2: 'mahogany desk',
-  3: 'coin-gold shade, your tier on the ID card',
+  1: "gilded rim, board mark, aurora, holders' file, gold hat",
+  2: 'mahogany desk, the Lucien bobblehead',
+  3: "coin-gold shade, ID card title, board member's coat",
 };
 
 export const URLS: Record<PageId, string> = {
@@ -284,7 +284,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const s = wallet.state;
     ctx.heading(`${TOKEN.name} (${TOKEN.symbol})`, 'ink');
     ctx.line(
-      "The precinct's own coin. Holding it opens extra dressing for the office and a weekly file; it changes nothing about scoring, ever, and you never need it to play.",
+      "The precinct's own coin. Holding it opens extra dressing for the office, a weekly file and an allowance of clips at the market; it changes nothing about scoring, ever, and you never need it to play.",
     );
     ctx.gap();
     if (!TOKEN.mint) {
@@ -388,6 +388,14 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         { color: got ? 'lampGreen' : 'shadow' },
       );
     }
+    // The allowance follows the balance rather than a tier: every coin counts a little.
+    const allowance = holderClips();
+    ctx.line(
+      allowance > 0
+        ? `[x] Market allowance · ${allowance} clips for the ${Math.round(bal).toLocaleString()} held (${Math.round(CLIPS.perToken * TOKEN.holderMin)} per ${TOKEN.holderMin.toLocaleString()}, up to ${CLIPS.holderCap.toLocaleString()})`
+        : `[ ] Market allowance · ${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin.toLocaleString()} held, up to ${CLIPS.holderCap.toLocaleString()}`,
+      { color: allowance > 0 ? 'lampGreen' : 'shadow' },
+    );
     // The weekly holders' file: extra content, never a scoring edge.
     ctx.gap(4);
     const wk = weekKey();
