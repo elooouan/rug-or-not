@@ -204,6 +204,10 @@ const MEME_HANDLES = [
   'Professor Dumpling',
   'Lady Marmalade',
   'Corporal Biscuit',
+  'Sergeant Scone',
+  'Countess Pretzel',
+  'Major Muffin',
+  'Reverend Bagel',
 ];
 const JOKES = [
   'if this token is a harbour, I am the harbourmaster of my bathtub',
@@ -222,6 +226,14 @@ const JOKES = [
   'wife says it is either {noun} or her. long-term holder here',
   'this is my retirement plan and my lunch plan',
   'if it goes to zero at least the memes were free',
+  'set a price alert and it woke me up to say nothing happened',
+  'my barber asked about {noun}. my barber. we are early or we are done',
+  'I do not know what a proxy is but I am against it on principle',
+  'explained {noun} to my mum. she now owns more than me',
+  'the roadmap says Q3. it does not say which year',
+  'refreshing the explorer like it owes me money',
+  'my strategy is vibes and I am fully deployed',
+  'holding through the dip, the second dip, and whatever this is',
 ];
 const QUESTIONS = [
   'who can change the fee and what is the cap?',
@@ -240,6 +252,14 @@ const QUESTIONS = [
   'what is the actual sell tax right now, not the roadmap one?',
   'can we get the lock contract address, not a screenshot?',
   'why does the team wallet vest faster than the presale?',
+  'the verified source and the deployed bytecode: same file?',
+  'who holds the upgrade key, and how many signatures does it take?',
+  'does the blacklist have an off switch, and who holds it?',
+  'the audit date is before the last deploy. was it re-run?',
+  'what does the treasury actually spend on, with tx links?',
+  "the 'partnership' logo on the site: is there an announcement from their end?",
+  'is the burn a real burn address or a wallet someone controls?',
+  'how many of the top ten holders were funded by the deployer?',
 ];
 const AUDITORS_REAL = [
   'Kestrel Security',
