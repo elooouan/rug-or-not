@@ -99,5 +99,7 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
 ## Notes
 
 - Keep "all cases are fictional, not financial advice" somewhere in the thread.
+- Links can land on a page: `…/#market` opens the phone on the market, `#board` the Hall of
+  Detectives, `#coin` the coin page, `#rush` a rush, `#daily` today's file.
 - GIFs upload as video on X; MP4s (via ffmpeg, see README) look sharper.
 - Stills are 1280x720; X shows them at 16:9 without cropping.
