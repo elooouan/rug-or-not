@@ -98,7 +98,7 @@ every squish returns to rest), make interactions respond immediately, check UI e
 - Touch: Phaser only listens for touch events when the device reports touch at boot, so in
   the browser pane set a viewport under 768 px wide (touch emulation) and reload before
   dispatching synthetic `TouchEvent`s on the canvas; in Playwright use `test.use({ hasTouch:
-  true })` (see the touch block in `e2e/smoke.spec.ts`). Fingers fire buttons on lift, so a
+true })` (see the touch block in `e2e/smoke.spec.ts`). Fingers fire buttons on lift, so a
   drag that starts on a button scrolls instead; `emit('pointerdown')` with no pointer is
   the mouse path and fires at once.
 - CI runners render through software GL: e2e waits must be condition-based (see `e2e/`).
