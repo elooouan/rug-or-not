@@ -79,9 +79,9 @@ media: v0.8-clip-weather.gif
 
 ## Tue, 22 Sept, 09:00  ·  `devlog-coats`
 
-(233)
+(269)
 
-> How the coats work: Lucien is one PNG. The market recolours only the pixels that are trench-coat cloth (a hue band, a saturation floor) and leaves skin and brass alone, hat above a line, coat below. Seven coats, six hats, no new art.
+> How the coats work: Lucien is one PNG. The market finds the trench cloth by colour (a hue band, a saturation floor) and splits it into connected pieces: the one that starts up top is the hat, the rest is the coat. Skin and brass stay. Seven coats, six hats, no new art.
 
 media: v0.9-market-page.png
 

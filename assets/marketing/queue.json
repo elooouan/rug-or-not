@@ -71,7 +71,7 @@
       "when": "2026-09-22T09:00",
       "tweets": [
         {
-          "text": "How the coats work: Lucien is one PNG. The market recolours only the pixels that are trench-coat cloth (a hue band, a saturation floor) and leaves skin and brass alone, hat above a line, coat below. Seven coats, six hats, no new art.",
+          "text": "How the coats work: Lucien is one PNG. The market finds the trench cloth by colour (a hue band, a saturation floor) and splits it into connected pieces: the one that starts up top is the hat, the rest is the coat. Skin and brass stay. Seven coats, six hats, no new art.",
           "media": "v0.9-market-page.png",
           "alt": "The in-game market page: Lucien's coats for sale, a strip showing him in the coat being hovered."
         }

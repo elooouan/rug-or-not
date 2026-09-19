@@ -1,5 +1,5 @@
 {
-  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts and the extra October ones are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }. Clips: queue.json names the committed GIFs, but every draft carries the 1280x720 MP4 twin (media ids below, files regenerated locally with `PROMO_GIF=0 node scripts/promo.mjs clips`).",
+  "_readme": "Typefully state for queue.json: social set 332931 (@0xRugOrNot), draft ids by queue id, uploaded media ids by file. The free plan publishes 10 drafts a month, so 10 September and 10 October drafts are scheduled; the other 18 September drafts and the extra October ones are planned (inert) until the plan is upgraded, then arm them with edit_draft { publish_at: <their scheduled_date> }. Clips: queue.json names the committed GIFs, but every draft carries the 1280x720 MP4 twin (media ids below, files regenerated locally with `PROMO_GIF=0 node scripts/promo.mjs clips`). 2026-09-19 evening: dressed-desk, market-page, market-shopping and curtains were retaken after the wardrobe fix and re-attached (new ids).",
   "social_set_id": 332931,
   "drafts": {
     "intro-thread": 10832778,
@@ -53,7 +53,7 @@
     "v0.9-clip-market-shopping.gif": "20a0c6a2-41fc-4008-a69d-16f9a4480752",
     "v0.8-red-flag-trading-switch.png": "db5d8f4e-a405-4d98-98bc-4bec719904f0",
     "v0.8-clip-weather.gif": "8ffef959-543e-4720-b432-dfbcee996c81",
-    "v0.9-market-page.png": "ac6b0e76-2e9f-4154-89bf-684b0b8e44e0",
+    "v0.9-market-page.png": "43da301e-acc6-4945-a751-679818ad2bc3",
     "v0.8-red-flag-rush.png": "fc8f20f9-4b81-420f-bd97-a8b09b9acad7",
     "v0.8-case-report.png": "838d85f9-c673-4e8c-b9e6-88c17e3a57bf",
     "v0.9-hall-of-detectives.png": "0fce299e-86e2-4260-b516-7450e5a3a50e",
@@ -63,7 +63,7 @@
     "v0.8-second-look.png": "7e6d2d60-5b91-4582-852b-42e500813b1a",
     "v0.8-clip-herring-hunt.gif": "e31ad3b1-8511-48f8-99d2-bd24ae868f45",
     "v0.8-clip-office-colours.gif": "726aff18-67c2-4b39-8ab9-5cebd45104e1",
-    "v0.9-dressed-desk.png": "f81c27d3-7076-4976-a7e8-6c37765fe4a3",
+    "v0.9-dressed-desk.png": "89428676-1606-48dd-8831-6564786d8da8",
     "v0.8-theme-midnight-reading.png": "7c9936d0-dc70-47d9-9b6e-ccdfdc2da1a4",
     "v0.8-weather-snow.png": "4a99c7af-9e59-4b6d-8d51-8d3c318578b5",
     "v0.8-cold-case-printed-file.png": "0581a2aa-36f7-4d56-8bee-fdb9b27b685f",
@@ -83,13 +83,13 @@
     "v0.9-clip-second-look.mp4": "28a06b63-5180-4b93-a55a-33b214760944",
     "v0.9-clip-red-flag-rush.mp4": "5f09f9d1-c3a9-401a-ae4d-5ebf058c5281",
     "v0.9-clip-desk-toys.mp4": "c118e84f-f49e-4db8-822f-0cf82ae131da",
-    "v0.9-clip-market-shopping.mp4": "1faf7753-b613-4a07-bc93-a84c59852e38",
+    "v0.9-clip-market-shopping.mp4": "f40c74a3-8fff-4c3f-9354-a3a0ce6be4e0",
     "v0.9-clip-weather.mp4": "e2e1752a-96e3-479f-9228-b82c82d9bf49",
     "v0.9-clip-herring-hunt.mp4": "e5f30c16-6917-4dfe-8235-b21cdde68fe6",
     "v0.9-clip-office-colours.mp4": "0893ab24-17e0-4de9-af2f-cda8c925f3b5",
     "v0.9-clip-handbook.mp4": "d59c9945-ff12-4ccf-afc4-92fa6115ec4d",
     "v0.9-clip-title-intro.mp4": "79bad4a9-ea22-46fa-8ed1-ffc1ffc03dab",
-    "v0.9-clip-curtains.mp4": "02a73b2e-4cf7-4f19-ada7-32b0ba4be114"
+    "v0.9-clip-curtains.mp4": "3bd22756-3e26-4dd1-8301-d52ab1cb4da6"
   },
   "pending_media": {},
   "status": {
