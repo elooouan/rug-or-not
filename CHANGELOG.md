@@ -18,7 +18,8 @@
   corner has a little life. Buying anything rings the till and bounces what landed.
 - One item a day is a third off at the market (the same one for everyone; half off for
   coin holders of any tier), and hovering a row tries it on: the strip at the top shows
-  Lucien in that coat, the cat in that fur.
+  Lucien in that coat, the cat in that fur. Fingers can't hover, so on a phone a tap on the
+  name does it and a second tap takes it off.
 - An uncaught error in a production build shows a plain strip with Reload and Report
   instead of a silently frozen desk.
 - On a phone, "Save card" (the report, the ID card, a wall photo) opens the system share
