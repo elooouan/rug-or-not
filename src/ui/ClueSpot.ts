@@ -128,6 +128,7 @@ export class ClueSpot extends Phaser.GameObjects.Container {
           delay,
           duration: 260,
           ease: 'Back.easeOut',
+          onStart: () => audio.play('tick'),
         });
       }
     }
