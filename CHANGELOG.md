@@ -14,6 +14,7 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- Esc mid-rush asks first ("Esc again to leave") so a stray press can't throw a run away.
 - The detective name picker takes typing: letters and digits fill the slots, Backspace
   clears, arrows move and spin, Enter saves, Esc cancels. Typed letters there no longer
   reach the desk's easter eggs or the M/F hotkeys.

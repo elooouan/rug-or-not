@@ -33,6 +33,7 @@ import type { DocumentView } from '@/ui/DocumentView';
 import { createDocumentView } from '@/ui/documents';
 import { escTaken } from '@/ui/escGuard';
 import { LucienBubble } from '@/ui/LucienBubble';
+import { toast } from '@/ui/Toast';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { SharePopover } from '@/ui/SharePopover';
@@ -55,6 +56,8 @@ export class RushScene extends Phaser.Scene {
   private clock!: DeskClock;
   private dialogue: DialogueBox | null = null;
   private locked = false;
+  /** When Esc was last pressed mid-run (a second press within a moment quits). */
+  private escAt = -10000;
   /** The window lost focus mid-run: the clock waits until it comes back. */
   private held = false;
   private strayCount = 0;
@@ -707,7 +710,17 @@ export class RushScene extends Phaser.Scene {
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
     const inPlay = () => this.phase === 'playing' && !this.locked && !this.held && !!this.doc;
-    on('ESC', () => !this.dialogue?.isActive && !escTaken() && this.quit());
+    // Mid-run, one Esc is a question and the second is the answer: a stray press
+    // shouldn't throw away a good streak. Over or before the run, it just leaves.
+    on('ESC', () => {
+      if (this.dialogue?.isActive || escTaken()) return;
+      if (this.phase === 'playing' && this.time.now - this.escAt > 2500) {
+        this.escAt = this.time.now;
+        toast(this, 'QUIT THE RUN?', 'Esc again to leave');
+        return;
+      }
+      this.quit();
+    });
     on('TAB', (e?: KeyboardEvent) => inPlay() && this.doc?.focusMove(e?.shiftKey ? -1 : 1));
     on('DOWN', () => inPlay() && this.doc?.focusMove(1));
     on('RIGHT', () => inPlay() && this.doc?.focusMove(1));
