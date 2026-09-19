@@ -119,15 +119,26 @@ the coin page once a mint is set; it's read-only and cached for a minute.
 - **Drills**: every red-flag page in the notebook has a "Drill this flag" button: five generated
   pages that all hide that flag, on a gentle clock. Clearing all five logs the drill (Drill
   Sergeant badge for the full set).
-- **Detective's Notebook**: three chapters. Every red flag you meet in a report unlocks its
+- **Herring hunts**: the mirror of a drill. Every yellow-herring page has a "Hunt this herring"
+  button: five generated pages that each carry it, and the job is to click the thing that
+  only looks bad (red flags on those pages cost seconds). Herring Hunter for the full set.
+- **Detective's Notebook**: four chapters. Every red flag you meet in a report unlocks its
   glossary page; every yellow herring you run into fills the "looks scary, is fine" chapter;
-  and every rug you call correctly pins a WANTED poster (procedural mugshot, charges, reward)
-  in the rogues gallery.
+  every rug you call correctly pins a WANTED poster (procedural mugshot, charges, reward) in
+  the rogues gallery; and the handbook explains how the whole office works, one page per
+  subject ("How to play" on the title opens it).
   Flag and herring lines in a report are links straight to the page.
+- **The desk opens up gradually** (`src/systems/discovery.ts`): a fresh save sees the folder,
+  the daily, the notebook and settings; the drawer, the rush, the pile and the weekly turn
+  up after one, two, three and four closed files, each announced once by Lucien. Shared
+  links skip the gate.
 - **Progress**: everything lives in `localStorage`; Settings can export a save code to the
   clipboard and import one on another device.
 - **Unlockables**: cosmetic desk woods, lamp shades, magnifier rims and stamp inks earned by
   rank, cases closed, grades, streaks and flags learned. They never affect gameplay.
+- **Office colours**: five palettes for the whole place (Noir, Old file, Blue hour, Newsprint,
+  Speakeasy) on the Office page of Settings. Every texture is drawn from the twelve named
+  colours in `src/config/palette.ts`, so a theme is twelve new values and a repaint.
 
 ## How to play
 
@@ -141,6 +152,10 @@ the coin page once a mint is set; it's read-only and cached for a minute.
   fullscreen, `M` mutes.
 - Rendering: the world is 640×360 pixel-art units drawn on a 2× (3× on retina) canvas so
   sprites stay chunky while text stays sharp; the canvas scales to fit the window.
+
+Marketing stills and GIF clips live in `assets/marketing/` and are regenerated with
+`node scripts/promo.mjs` (dev server up); `node scripts/fuzz.mjs [seconds] [seed]` is a
+monkey test that clicks and types at random and reports page errors.
 
 Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case, `#cold=<seed>` prints
 that cold case, `#custom=<id>` opens a file saved from the editor and `#rush` starts a rush.
