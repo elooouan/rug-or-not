@@ -254,10 +254,11 @@ export interface CatStyle {
   eye: PaletteKey;
 }
 
-export function makeCat(scene: Phaser.Scene, style?: CatStyle): void {
+/** `prefix` other than the desk's own draws a copy for the market's try-on (frames `<prefix>-N`). */
+export function makeCat(scene: Phaser.Scene, style?: CatStyle, prefix: string = TEX.cat): void {
   const map = style ? { ...CAT_MAP, b: style.fur, d: style.dark, e: style.eye } : CAT_MAP;
   CAT_FRAMES.forEach((rows, i) => {
-    makeGraphicsTexture(scene, `${TEX.cat}-${i}`, 28, 20, (g) => {
+    makeGraphicsTexture(scene, `${prefix}-${i}`, 28, 20, (g) => {
       drawPixels(g, rows, map, 0, 0, 2);
       // Rim light along the back so the silhouette reads against the night sky.
       g.fillStyle(HEX.woodLight, 0.7);

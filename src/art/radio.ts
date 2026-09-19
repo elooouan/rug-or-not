@@ -27,10 +27,10 @@ export interface RadioStyle {
   dark: PaletteKey;
 }
 
-export function makeRadio(scene: Phaser.Scene, style?: RadioStyle): void {
+export function makeRadio(scene: Phaser.Scene, style?: RadioStyle, key: string = TEX.radio): void {
   const body = style?.body ?? 'woodMid';
   const dark = style?.dark ?? 'woodDark';
-  makeGraphicsTexture(scene, TEX.radio, 44, 30, (g) => {
+  makeGraphicsTexture(scene, key, 44, 30, (g) => {
     drawPixels(
       g,
       RADIO,

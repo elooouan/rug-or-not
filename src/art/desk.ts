@@ -204,9 +204,11 @@ export interface MugStyle {
   band: PaletteKey;
 }
 
-export function makeMug(scene: Phaser.Scene, style?: MugStyle): void {
+/** `key` other than the desk's own draws a copy (the market's try-on) and leaves the steam alone. */
+export function makeMug(scene: Phaser.Scene, style?: MugStyle, key: string = TEX.mug): void {
   const map = style ? { ...MUG_MAP, w: style.body, c: style.band } : MUG_MAP;
-  makeGraphicsTexture(scene, TEX.mug, 44, 34, (g) => drawPixels(g, MUG, map, 0, 0, 2));
+  makeGraphicsTexture(scene, key, 44, 34, (g) => drawPixels(g, MUG, map, 0, 0, 2));
+  if (key !== TEX.mug) return;
   for (let f = 0; f < STEAM_FRAMES; f++) {
     makeGraphicsTexture(scene, `${TEX.steam}-${f}`, 14, 16, (g) => {
       g.fillStyle(HEX.paper, 1);
@@ -560,10 +562,8 @@ const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
 };
 
 /** The ornament on the desk corner, or nothing when the corner is clear. */
-export function makeOrnament(scene: Phaser.Scene, kind: string): void {
+export function makeOrnament(scene: Phaser.Scene, kind: string, key: string = TEX.ornament): void {
   const art = ORNAMENTS[kind];
   if (!art) return;
-  makeGraphicsTexture(scene, TEX.ornament, 28, 28, (g) =>
-    drawPixels(g, art.rows, art.map, 0, 0, 2),
-  );
+  makeGraphicsTexture(scene, key, 28, 28, (g) => drawPixels(g, art.rows, art.map, 0, 0, 2));
 }

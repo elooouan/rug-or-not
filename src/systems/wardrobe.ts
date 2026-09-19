@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { makeCat, makeMug, makeOrnament, makeRadio, TEX } from '@/art';
 import { crisp } from '@/art/pixelUtil';
-import type { Tint } from '@/data/shop';
+import type { ShopItem, Tint } from '@/data/shop';
 import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
 import { worn } from './clips';
 
@@ -155,6 +155,49 @@ export function applyLook(scene: Phaser.Scene): void {
   const orn = worn('ornament').style;
   drop([TEX.ornament]);
   if (orn.slot === 'ornament' && orn.kind !== 'none') makeOrnament(scene, orn.kind);
+}
+
+const tintOf = (slot: 'coat' | 'hat'): Tint | null => {
+  const st = worn(slot).style;
+  return st.slot === slot ? st.tint : null;
+};
+
+/**
+ * A texture of `item` on the current look, for the market's try-on: Lucien in that coat
+ * or hat, the cat in that fur, the mug, the radio, the ornament. One key per slot, redrawn
+ * on each call; null for things that have no picture (curtains, a cleared corner).
+ */
+export function previewTexture(scene: Phaser.Scene, item: ShopItem): string | null {
+  const st = item.style;
+  const key = `preview-${st.slot}`;
+  const drop = (k: string) => scene.textures.exists(k) && scene.textures.remove(k);
+  switch (st.slot) {
+    case 'coat':
+      dressSprite(scene, LUCIEN_BASE, key, st.tint, tintOf('hat'));
+      return key;
+    case 'hat':
+      dressSprite(scene, LUCIEN_BASE, key, tintOf('coat'), st.tint);
+      return key;
+    case 'mug':
+      drop(key);
+      makeMug(scene, { body: st.body, band: st.band }, key);
+      return key;
+    case 'cat':
+      [0, 1, 2, 3].forEach((i) => drop(`${key}-${i}`));
+      makeCat(scene, { fur: st.fur, dark: st.dark, eye: st.eye }, key);
+      return `${key}-0`;
+    case 'radio':
+      drop(key);
+      makeRadio(scene, { body: st.body, dark: st.dark }, key);
+      return key;
+    case 'ornament':
+      if (st.kind === 'none') return null;
+      drop(key);
+      makeOrnament(scene, st.kind, key);
+      return key;
+    default:
+      return null;
+  }
 }
 
 /** Every texture key the look can replace. */

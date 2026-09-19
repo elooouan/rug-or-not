@@ -43,7 +43,7 @@ import type { PageCtx } from './PageCtx';
 import { ALL_PAGES, type PageId } from './PageCtx';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
-import { itemsFor, SHOP_SLOTS, type ShopSlot } from '@/data/shop';
+import { itemsFor, SHOP_SLOTS, type ShopItem, type ShopSlot } from '@/data/shop';
 import {
   boughtCount,
   buy,
@@ -56,7 +56,7 @@ import {
   wear,
   worn,
 } from '@/systems/clips';
-import { redress } from '@/systems/wardrobe';
+import { previewTexture, redress } from '@/systems/wardrobe';
 
 /** One line per tier on the coin page. */
 const TIER_BLURB: Record<number, string> = {
@@ -832,22 +832,51 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       );
     ctx.gap(4);
 
-    // Your desk as it stands: the props at their real size, Lucien to scale.
+    // Your desk as it stands: the props at their real size, Lucien to scale. Hovering a
+    // row below tries that item on here.
     const strip = ctx.y + 62;
     let px = 4;
-    const show = (key: string, h?: number) => {
-      if (!scene.textures.exists(key)) return;
-      const img = scene.make.image({ x: px, y: strip, key }, false).setOrigin(0, 1);
+    const stripImg: Partial<Record<ShopSlot, Phaser.GameObjects.Image>> = {};
+    const show = (key: string, slot: ShopSlot, h?: number) => {
+      const img = scene.make
+        .image({ x: px, y: strip, key: scene.textures.exists(key) ? key : TEX.pixel }, false)
+        .setOrigin(0, 1)
+        .setVisible(scene.textures.exists(key));
       if (h) img.setDisplaySize(Math.round(img.width * (h / img.height)), h);
       ctx.content.add(img);
-      px += img.displayWidth + 12;
+      stripImg[slot] = img;
+      px += (img.visible ? img.displayWidth : 28) + 12;
     };
-    show(LUCIEN_TEX, 60);
-    show(`${TEX.cat}-0`);
-    show(TEX.mug);
-    show(TEX.radio);
-    show(TEX.ornament);
+    show(LUCIEN_TEX, 'coat', 60);
+    stripImg.hat = stripImg.coat;
+    show(`${TEX.cat}-0`, 'cat');
+    show(TEX.mug, 'mug');
+    show(TEX.radio, 'radio');
+    show(TEX.ornament, 'ornament');
     ctx.y = strip + 6;
+    /** Put `item` on the strip, or (with null) whatever the desk really wears. */
+    const tryOn = (item: ShopItem | null, slot: ShopSlot) => {
+      const img = stripImg[slot];
+      if (!img?.active) return;
+      const realKey =
+        slot === 'coat' || slot === 'hat'
+          ? LUCIEN_TEX
+          : slot === 'cat'
+            ? `${TEX.cat}-0`
+            : slot === 'ornament'
+              ? TEX.ornament
+              : slot === 'mug'
+                ? TEX.mug
+                : TEX.radio;
+      const key = item ? previewTexture(scene, item) : realKey;
+      const shown = key && scene.textures.exists(key) ? key : null;
+      img.setVisible(!!shown);
+      if (!shown) return;
+      const h = slot === 'coat' || slot === 'hat' ? 60 : undefined;
+      img.setTexture(shown);
+      if (h) img.setDisplaySize(Math.round(img.width * (h / img.height)), h);
+      else img.setDisplaySize(img.width, img.height);
+    };
 
     // One drawer per slot.
     let tx = 0;
@@ -866,7 +895,10 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.y += UI.buttonH + 8;
 
     const slotName = SHOP_SLOTS.find((s) => s.id === marketSlot)?.name ?? '';
-    ctx.line(`${slotName}  ·  wearing ${worn(marketSlot).name}`, { color: 'woodMid' });
+    ctx.line(
+      `${slotName}  ·  wearing ${worn(marketSlot).name}${touchScreen() || marketSlot === 'curtains' ? '' : '  ·  hover a row to try it on'}`,
+      { color: 'woodMid' },
+    );
     ctx.gap(2);
     for (const item of itemsFor(marketSlot)) {
       const rowY = ctx.y;
@@ -874,12 +906,13 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       const has = owns(item.id);
       const tierShort = !!item.tier && (currentTier()?.level ?? 0) < item.tier;
       const blocker = has ? null : buyBlocker(item);
+      let rowButton: PixelButton | null = null;
       if (inUse) {
         ctx.content.add(
           makeText(scene, 4, rowY + 3, 'in use', { size: FONT.size.tiny, color: 'stampGreen' }),
         );
       } else if (has) {
-        ctx.button(
+        rowButton = ctx.button(
           'Wear',
           () => {
             if (!wear(item.id)) return;
@@ -890,7 +923,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           { sameLine: true, width: 64 },
         );
       } else if (tierShort) {
-        ctx.button(
+        rowButton = ctx.button(
           `Tier ${item.tier}`,
           () =>
             toast(
@@ -901,7 +934,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           { sameLine: true, width: 64, variant: 'paper' },
         );
       } else {
-        ctx.button(
+        rowButton = ctx.button(
           `Buy ${item.price}`,
           () => {
             if (!buy(item.id)) {
@@ -918,6 +951,10 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           },
           { sameLine: true, width: 64, disabled: !!blocker },
         );
+      }
+      if (rowButton && !inUse && item.style.slot !== 'curtains') {
+        rowButton.on('pointerover', () => tryOn(item, item.style.slot));
+        rowButton.on('pointerout', () => tryOn(null, item.style.slot));
       }
       const price = item.price ? `${item.price} clips` : 'free';
       ctx.content.add(
