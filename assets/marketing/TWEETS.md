@@ -25,6 +25,7 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
 5. **[v0.8-second-look.png]**
    New: the second look. Missed something? The report reopens the file with your pins
    where they were and every miss marked in amber. Click a mark and Lucien tells you why.
+   The drawer keeps every file's last report, so you can go back to it any night.
 
 6. **[v0.8-notebook-red-flags.png]**
    The Detective's Notebook: 18 red flags and 15 yellow herrings (things that look bad and
