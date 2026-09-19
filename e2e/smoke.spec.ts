@@ -804,6 +804,44 @@ test('the market dresses Lucien and the desk while the title is up', async ({ pa
   expect(await panelButton(page, 'Market')).toBe(true);
   await page.waitForTimeout(300);
   await skipTalk(page);
+  // Hovering a coat tries it on in the strip; leaving puts the real one back.
+  const stripKey = () =>
+    page.evaluate(() => {
+      const title = window.__game.scene.getScene('TitleScene') as unknown as {
+        children: { list: { constructor: { name: string }; list?: unknown[] }[] };
+      };
+      const panel = title.children.list.find((o) => o.constructor.name === 'BrowserPanel');
+      const all: { type?: string; texture?: { key: string }; list?: unknown[] }[] = [];
+      const visit = (o: { list?: unknown[] }) => {
+        (o.list as { list?: unknown[] }[] | undefined)?.forEach(visit);
+        all.push(o as { type?: string });
+      };
+      if (panel) visit(panel as { list?: unknown[] });
+      return all.find((o) => o.type === 'Image')?.texture?.key;
+    });
+  const hoverBuy = (over: boolean) =>
+    page.evaluate((over) => {
+      const title = window.__game.scene.getScene('TitleScene') as unknown as {
+        children: { list: { constructor: { name: string }; list?: unknown[] }[] };
+      };
+      const panel = title.children.list.find((o) => o.constructor.name === 'BrowserPanel');
+      const all: Btn[] = [];
+      const visit = (o: Btn & { list?: Btn[] }) => {
+        o.list?.forEach(visit);
+        all.push(o);
+      };
+      if (panel) visit(panel as unknown as Btn);
+      all
+        .find((o) => o.constructor.name === 'PixelButton' && o.label?.text === 'Buy 80')
+        ?.emit(over ? 'pointerover' : 'pointerout');
+    }, over);
+  expect(await stripKey()).toBe('lucien');
+  await hoverBuy(true);
+  await page.waitForTimeout(150);
+  expect(await stripKey()).toBe('preview-coat');
+  await hoverBuy(false);
+  await page.waitForTimeout(150);
+  expect(await stripKey()).toBe('lucien');
   expect(await panelButton(page, 'Buy 80')).toBe(true);
   await page.waitForTimeout(400);
   const after = await page.evaluate(() => {
