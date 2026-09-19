@@ -415,6 +415,7 @@ while (Date.now() < end) {
             if (
               (c === 'DialogueBox' && o.isActive) ||
               c === 'BrowserPanel' ||
+              c === 'DeskEditor' ||
               c === 'Vault' ||
               c === 'NamePicker'
             )

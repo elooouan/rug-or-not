@@ -30,7 +30,7 @@ import {
 } from '@/systems/deskLayout';
 import { saveStore } from '@/systems/save';
 import { floatText, type DeskBackground } from './DeskBackground';
-import { lucienSays } from './DialogueBox';
+import { dialogueOpen, lucienSays } from './DialogueBox';
 import { markEscConsumed, popModal, popOverlay, pushModal, pushOverlay } from './escGuard';
 import { touchScreen } from './lensLift';
 import { PixelButton } from './PixelButton';
@@ -128,6 +128,8 @@ export class DeskEditor extends Phaser.GameObjects.Container {
     if (kb) {
       const key = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
       const fn = () => {
+        // Lucien is talking over the grid: that Esc is his to take.
+        if (dialogueOpen(scene)) return;
         markEscConsumed();
         this.close();
       };
