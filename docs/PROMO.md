@@ -166,6 +166,7 @@ didn't.
   then stop. Never argue about price.
 - Bugs reported in replies: "on it" with the commit hash when it's fixed. That's the whole
   brand.
+- Worked examples for the usual comments: [REPLIES.md](REPLIES.md).
 - What Claude can do here: paste comments into the session and get drafted replies in this
   voice; it can't watch X or reply on its own.
 
