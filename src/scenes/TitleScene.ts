@@ -15,7 +15,7 @@ import { clipBalance, worn } from '@/systems/clips';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
-import { lucienSays, lucienSaysNow } from '@/ui/DialogueBox';
+import { dialogueOpen, lucienSays, lucienSaysNow } from '@/ui/DialogueBox';
 import { StickyNote } from '@/ui/StickyNote';
 import { StampMark } from '@/ui/Stamp';
 import { floatText } from '@/ui/DeskBackground';
@@ -586,9 +586,17 @@ export class TitleScene extends Phaser.Scene {
     if (this.phonePage) {
       const page = this.phonePage;
       this.phonePage = undefined;
-      this.time.delayedCall(reduced ? 200 : 1600, () => {
-        if (this.scene.isActive() && !BrowserPanel.current) BrowserPanel.toggle(this, page);
-      });
+      // After the intro, and after Lucien has finished whatever he is saying: a lesson
+      // opening over his first lines would cut them off.
+      const open = () => {
+        if (!this.scene.isActive()) return;
+        if (dialogueOpen(this)) {
+          this.time.delayedCall(500, open);
+          return;
+        }
+        if (!BrowserPanel.current) BrowserPanel.toggle(this, page);
+      };
+      this.time.delayedCall(reduced ? 200 : 1600, open);
     }
   }
 
