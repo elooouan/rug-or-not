@@ -313,3 +313,37 @@ test('the desk opens up as files close', async ({ page }) => {
   expect(later).toContain('Cold case');
   expect(errors).toEqual([]);
 });
+
+test('a theme change repaints the office without breaking the next screens', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => {
+    const title = window.__game.scene.getScene('TitleScene') as {
+      scene: { start(k: string, d?: unknown): void };
+    };
+    title.scene.start('SettingsScene', { tab: 'office' });
+  });
+  await waitForScene(page, 'SettingsScene');
+  await skipTalk(page);
+  // Cycle the colours twice (each one restarts and repaints the page).
+  for (let i = 0; i < 2; i++) {
+    await page.evaluate(() => {
+      const st = window.__game.scene.getScene('SettingsScene') as {
+        rows: { label: string; change(d: number): void }[];
+      };
+      st.rows.find((r) => r.label === 'Office colours')?.change(1);
+    });
+    await page.waitForTimeout(600);
+    await waitForScene(page, 'SettingsScene');
+  }
+  const theme = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).settings.theme,
+  );
+  expect(theme).toBe('midnight');
+  await page.keyboard.press('Escape');
+  await waitForScene(page, 'TitleScene');
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await page.waitForTimeout(800);
+  expect(errors).toEqual([]);
+});
