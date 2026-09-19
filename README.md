@@ -39,6 +39,9 @@ Other scripts:
 | `npm run lint`           | ESLint                                               |
 | `npm run format`         | Prettier                                             |
 
+Shipping a version (checks, tag, release notes, Pages, launch env) is written up in
+[docs/RELEASE.md](docs/RELEASE.md); the demo script is [docs/DEMO.md](docs/DEMO.md).
+
 `index.html` carries Open Graph / Twitter card tags pointing at `public/img/og.png` on the
 GitHub Pages URL; change those absolute URLs if the game moves to another host.
 Production builds register a small network-first service worker (`public/sw.js`) so the game
