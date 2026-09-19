@@ -350,6 +350,13 @@ export class NotebookScene extends Phaser.Scene {
     this.pageOffset = Phaser.Math.Clamp(this.pageOffset + dy, 0, this.pageMax);
     this.detail.setY(this.pageTop - this.pageOffset);
     this.moreHint?.setVisible(this.pageOffset < this.pageMax - 1);
+    // The mask hides what scrolls off the page; buttons there must not take clicks either.
+    const pageH = BOOK.h - BOOK.pad * 2;
+    for (const o of this.detail.list)
+      if (o.input && o instanceof Phaser.GameObjects.Container) {
+        const y = o.y - this.pageOffset;
+        o.setVisible(y > -12 && y < pageH);
+      }
   }
 
   private buildPage(i: number): void {
