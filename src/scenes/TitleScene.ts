@@ -11,7 +11,7 @@ import { coldDifficulty, startColdCase, startDaily } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
-import { clipBalance } from '@/systems/clips';
+import { clipBalance, worn } from '@/systems/clips';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -60,6 +60,21 @@ function timeQuips(hour: number): string[] {
   if (hour >= 12 && hour < 14) return ['Lunch is a concept. The coffee is real.'];
   if (hour >= 22 || hour === 0) return ['Late. Good. The night shift sees the good ones.'];
   return [];
+}
+
+/** A word about whatever the market put on him or the desk. */
+function lookQuips(): string[] {
+  const out: string[] = [];
+  if (worn('coat').id !== 'coat-tan') out.push('New coat. Same rain.');
+  if (worn('hat').id !== 'hat-brown') out.push('The hat is new. The headaches are not.');
+  if (worn('cat').id !== 'cat-biscuit')
+    out.push('Biscuit changed her coat. She will not discuss it.');
+  const orn = worn('ornament');
+  if (orn.style.slot === 'ornament' && orn.style.kind !== 'none')
+    out.push(`The ${orn.name.toLowerCase()} stays. It has seniority now.`);
+  if (worn('curtains').id !== 'cur-none')
+    out.push('Curtains. Finally, the city can mind its own business.');
+  return out;
 }
 
 export class TitleScene extends Phaser.Scene {
@@ -455,7 +470,7 @@ export class TitleScene extends Phaser.Scene {
     idle.setDisplaySize(Math.round(idle.width * (m.height / idle.height)), m.height);
     idle.setInteractive({ useHandCursor: false });
     // The clock on the wall is real: a few quips know what time it is.
-    const quips = [...LUCIEN_QUIPS, ...timeQuips(new Date().getHours())];
+    const quips = [...LUCIEN_QUIPS, ...timeQuips(new Date().getHours()), ...lookQuips()];
     let quip = Phaser.Math.Between(0, quips.length - 1);
     idle.on('pointerdown', () => {
       quip = (quip + 1) % quips.length;
