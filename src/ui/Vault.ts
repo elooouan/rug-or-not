@@ -13,6 +13,7 @@ import { LucienBubble } from './LucienBubble';
 import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { attachScroll } from './dragScroll';
+import { touchScreen } from './lensLift';
 import { charWidth, makeText, wrapMono } from './text';
 
 /** The combination is the number of red flags in the notebook, zero-padded. */
@@ -177,10 +178,18 @@ export class Vault extends Phaser.GameObjects.Container {
       }),
     );
     this.add(
-      makeText(scene, x + w - pad, y + pad, 'wheel to scroll  ·  Esc to close', {
-        size: FONT.size.tiny,
-        color: 'woodMid',
-      }).setOrigin(1, 0),
+      makeText(
+        scene,
+        x + w - pad,
+        y + pad,
+        touchScreen()
+          ? 'drag to scroll  ·  tap outside to close'
+          : 'wheel to scroll  ·  Esc to close',
+        {
+          size: FONT.size.tiny,
+          color: 'woodMid',
+        },
+      ).setOrigin(1, 0),
     );
 
     const content = scene.add.container(x + pad, y + pad + 18);
