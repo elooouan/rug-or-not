@@ -44,6 +44,7 @@ export type ScriptId =
   | 'story-3'
   | 'story-4'
   | 'story-5'
+  | 'second-look'
   | 'secret-unlocked'
   | 'secret-solved'
   | 'desk-tour';
@@ -148,6 +149,16 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: 'When you have a verdict, click a stamp on the right, or press R for RUG and L for LEGIT.',
       touch: 'When you have a verdict, drag a stamp from the right onto the paper.',
+    },
+  ],
+  'second-look': [
+    {
+      text: 'The second look. Same paper, your pins where you left them, and every flag you walked past in amber.',
+    },
+    {
+      text: "Click a mark and I'll say why it mattered. Nothing counts here; it's for next time. Esc takes you back to the report.",
+      touch:
+        "Tap a mark and I'll say why it mattered. Nothing counts here; it's for next time. The button in the corner takes you back.",
     },
   ],
   'first-report': [

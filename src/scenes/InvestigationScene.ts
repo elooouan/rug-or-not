@@ -236,12 +236,15 @@ export class InvestigationScene extends Phaser.Scene {
     const first = marks.findIndex((n) => n > 0);
     if (first > 0) this.showDocument(first, false);
     if (bumpStat('secondLooks') >= 5) awardBadge(this, 'hindsight');
+    // The first time, the full explanation; after that, a word in the corner.
+    if (this.setDialogue(lucienSays(this, 'second-look', { onDone: () => (this.dialogue = null) })))
+      return;
     this.time.delayedCall(500, () =>
       LucienBubble.tell(
         this,
         missed > 0
-          ? "Amber is what walked past you. Click a mark and I'll say why it mattered."
-          : 'Nothing slipped past you here. Click any mark for the story.',
+          ? `Amber is what walked past you. ${touchScreen() ? 'Tap' : 'Click'} a mark and I'll say why it mattered.`
+          : `Nothing slipped past you here. ${touchScreen() ? 'Tap' : 'Click'} any mark for the story.`,
         6000,
       ),
     );
