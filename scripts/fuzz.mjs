@@ -133,7 +133,16 @@ const only = process.env.FUZZ_ONLY
 const wanted = (n) => !only || only.some(([a, b]) => n >= a && n <= (b ?? a));
 while (Date.now() < end) {
   const roll = rand();
-  lastAction = roll < 0.55 ? 'click' : roll < 0.85 ? 'key' : roll < 0.93 ? 'wheel' : 'drag';
+  lastAction =
+    roll < 0.55
+      ? 'click'
+      : roll < 0.63
+        ? 'target'
+        : roll < 0.85
+          ? 'key'
+          : roll < 0.93
+            ? 'wheel'
+            : 'drag';
   const trace = process.env.FUZZ_TRACE && actions >= Number(process.env.FUZZ_TRACE);
   if (!wanted(actions)) {
     // Burn the same random numbers the action would have used.
@@ -141,7 +150,8 @@ while (Date.now() < end) {
       rand();
       rand();
       rand();
-    } else if (roll < 0.85) rand();
+    } else if (roll < 0.63) rand();
+    else if (roll < 0.85) rand();
     else if (roll < 0.93) {
       rand();
       rand();
@@ -212,6 +222,31 @@ while (Date.now() < end) {
       await page.waitForTimeout(hold);
     }
     await page.mouse.up();
+  } else if (roll < 0.63) {
+    // A click on something that is actually interactive (a button, a report line, a clue
+    // spot): random coordinates rarely land on the small targets.
+    const r = rand();
+    const at = await page
+      .evaluate((r) => {
+        const objs = window.__game.scene
+          .getScenes(true)
+          .flatMap((sc) => sc.input.list ?? [])
+          .filter((o) => o.active && o.input?.enabled && o.willRender?.(o.scene.cameras.main));
+        if (objs.length === 0) return null;
+        const o = objs[Math.floor(r * objs.length)];
+        const b = o.getBounds ? o.getBounds() : null;
+        if (!b || b.width <= 0 || b.height <= 0) return null;
+        return { x: b.centerX, y: b.centerY, what: o.constructor.name };
+      }, r)
+      .catch(() => null);
+    if (at && at.x >= 0 && at.x < 640 && at.y >= 0 && at.y < 360) {
+      if (trace)
+        console.log(actions, 'target', at.what, Math.round(at.x), Math.round(at.y), await scene());
+      await page.mouse.move(at.x * 2, at.y * 2, { steps: 3 });
+      await page.mouse.down();
+      await page.waitForTimeout(40);
+      await page.mouse.up();
+    }
   } else if (roll < 0.85) {
     const key = pick(KEYS);
     if (trace) console.log(actions, 'key', key, await scene());

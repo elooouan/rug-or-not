@@ -15,6 +15,7 @@ export interface SuspicionEntry {
 export class NotebookPanel extends Phaser.GameObjects.Container {
   private lines: Phaser.GameObjects.Text[] = [];
   private pinIcons: Phaser.GameObjects.Image[] = [];
+  private title: Phaser.GameObjects.Text;
   private countText: Phaser.GameObjects.Text;
   private emptyText: Phaser.GameObjects.Text;
   private examinedText: Phaser.GameObjects.Text;
@@ -41,12 +42,11 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
     }
     // Red margin line.
     this.add(rect(scene, padding + 8, 4, 1, h - 8, HEX.stampRed, 0.35));
-    this.add(
-      makeText(scene, padding, padding - 2, 'SUSPICIONS', {
-        size: FONT.size.small,
-        color: 'woodDark',
-      }),
-    );
+    this.title = makeText(scene, padding, padding - 2, 'SUSPICIONS', {
+      size: FONT.size.small,
+      color: 'woodDark',
+    });
+    this.add(this.title);
     this.countText = makeText(scene, w - padding, padding - 1, '0', {
       size: FONT.size.tiny,
       color: 'paperShadow',
@@ -105,6 +105,11 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
       `examined ${n}/${total}${n >= total && total > 0 ? '  all seen' : ''}`,
       n >= total && total > 0 ? 'stampGreen' : 'woodMid',
     );
+  }
+
+  /** The heading: SUSPICIONS while a file is open, something else for the second look. */
+  setTitle(text: string, color: PaletteKey = 'woodDark'): void {
+    this.title.setText(text).setColor(PALETTE[color]);
   }
 
   /** The small line at the foot of the page. */

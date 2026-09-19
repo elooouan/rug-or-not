@@ -211,8 +211,9 @@ export class InvestigationScene extends Phaser.Scene {
       .map((cl) => ({ id: cl.id, label: cl.label }));
     this.refreshNotebook();
     const missed = marks.reduce((a, b) => a + b, 0);
+    this.notebook?.setTitle('SECOND LOOK', 'stampRed');
     this.notebook?.setStatus(
-      missed > 0 ? `second look: ${missed} missed` : 'second look: nothing missed',
+      missed > 0 ? `${missed} missed, in amber` : 'nothing missed',
       missed > 0 ? 'stampRed' : 'stampGreen',
     );
     // Open on the first page that has something to show.
