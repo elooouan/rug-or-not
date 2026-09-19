@@ -12,6 +12,9 @@
 - Spots: an ornament from the market can stand on more than one. The first extra spot is
   30 clips, then 50, then 80; tap the label under an extra to swap it for another you own.
   Reset puts the desk back as it came and the spots stay bought.
+- Mirror, on the editor's strip, swaps the desk left for right in one press (a mirror image
+  that would land under the file or the stamps slides left until it is clear), for anyone
+  who wanted the lamp side busy and the stamp side too.
 - Photo, on the editor's strip: a picture of the desk as arranged, lamp up and handles out
   of frame, through the share sheet on a phone and as a download elsewhere.
 - A Feng Shui badge for the first rearrangement, a handbook page on it, and a word from

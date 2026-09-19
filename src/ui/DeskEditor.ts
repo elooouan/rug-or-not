@@ -9,6 +9,7 @@ import {
   buySpot,
   clampPos,
   deskExtras,
+  GRID,
   defaultPos,
   DESK_TOP,
   layoutChanged,
@@ -79,7 +80,7 @@ interface Handle {
 }
 
 const GRID_TEX = 'desk-editor-grid';
-const TOOLBAR_H = 34;
+const TOOLBAR_H = 42;
 const TRAY_H = 22;
 /** Where a new ornament lands: the clear corner past the stamps. */
 const NEW_SPOT = { x: 604, y: 324 };
@@ -269,6 +270,25 @@ export class DeskEditor extends Phaser.GameObjects.Container {
     audio.play('click');
     this.desk.rebuildExtras();
     this.rebuild();
+  }
+
+  /** Swap the desk left for right: what sat by the lamp sits by the stamps, and back. */
+  private mirror(): void {
+    let moved = 0;
+    for (const item of this.items) {
+      if (!item.shown) continue;
+      let x = GAME_WIDTH - item.x - item.w;
+      const box = { y: item.y, w: item.w, h: item.h };
+      // A mirror image that lands under the file or the stamps slides left until it's clear.
+      for (let tries = 0; tries < 60 && underPaperwork({ x, ...box }); tries++) x -= GRID * 2;
+      if (underPaperwork({ x, ...box })) continue;
+      const p = clampPos(x, item.y, item.w, item.h);
+      this.place(item, p.x, p.y);
+      this.commit(item);
+      moved++;
+    }
+    audio.play('slide');
+    floatText(this.scene, 320, TOOLBAR_H + 30, moved ? 'mirrored' : 'nothing to mirror');
   }
 
   private reset(): void {
@@ -492,18 +512,18 @@ export class DeskEditor extends Phaser.GameObjects.Container {
     const verb = touchScreen()
       ? 'drag a thing, tap x to take it off'
       : 'drag a thing, x takes it off';
-    tb.add(makeText(scene, 8, 6, 'ARRANGE THE DESK', { size: FONT.size.small, color: 'stampRed' }));
+    tb.add(makeText(scene, 8, 5, 'ARRANGE THE DESK', { size: FONT.size.small, color: 'stampRed' }));
     tb.add(
-      makeText(scene, 8, 18, `${verb}  ·  ${clipBalance()} clips`, {
+      makeText(scene, 112, 5, `${verb}  ·  ${clipBalance()} clips`, {
         font: 'body',
         size: FONT.size.body,
         color: 'shadow',
       }),
     );
-    // Buttons sit mid-strip: the right end is where toasts land (a bought spot, a badge).
-    let bx = 250;
+    // Buttons on their own row, left: the right end is where toasts land (a badge).
+    let bx = 8;
     const btn = (label: string, fn: () => void, variant: 'paper' | 'ink' = 'paper') => {
-      const b = new PixelButton(scene, bx, 8, label, fn, { variant });
+      const b = new PixelButton(scene, bx, 19, label, fn, { variant });
       bx += b.bw + 4;
       scene.children.remove(b);
       tb.add(b);
@@ -519,6 +539,7 @@ export class DeskEditor extends Phaser.GameObjects.Container {
           : `+ spot (${price} clips)`,
       () => this.addOrnament(),
     );
+    btn('Mirror', () => this.mirror());
     btn('Reset', () => this.reset());
     btn('Photo', () => void this.photo());
     btn(touchScreen() ? 'Done' : 'Done [Esc]', () => this.close(), 'ink');
