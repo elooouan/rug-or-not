@@ -201,4 +201,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'The same office in other colours: every texture is drawn from twelve named colours, so a theme is just twelve new values and a repaint. This one is Blue hour.',
   },
+  {
+    file: '26-v08-hunt',
+    version: 'v0.8',
+    date: '2026-09-19',
+    title: 'Herring hunt',
+    caption:
+      'The mirror of a drill: five printed pages, and the target is the thing that only looks bad. The chart joke is the answer; the countdown above it is the trap.',
+  },
 ];
