@@ -7,7 +7,7 @@ import { charWidth, makeText, wrapMono, type TextOpts } from '../text';
 import type { BrowserPanel } from '../BrowserPanel';
 
 export type PageId =
-  'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | 'about' | '404';
+  'home' | 'rugscan' | 'coin' | 'board' | 'news' | 'help' | 'badges' | 'market' | 'about' | '404';
 export const ALL_PAGES: PageId[] = [
   'home',
   'rugscan',
@@ -16,6 +16,7 @@ export const ALL_PAGES: PageId[] = [
   'news',
   'help',
   'badges',
+  'market',
   'about',
   '404',
 ];
@@ -63,11 +64,20 @@ export class PageCtx {
   button(
     label: string,
     onClick: () => void,
-    opts: { x?: number; variant?: 'paper' | 'ink'; sameLine?: boolean; icon?: string } = {},
+    opts: {
+      x?: number;
+      variant?: 'paper' | 'ink';
+      sameLine?: boolean;
+      icon?: string;
+      width?: number;
+      disabled?: boolean;
+    } = {},
   ): PixelButton {
     const b = new PixelButton(this.scene, opts.x ?? 0, this.y, label, onClick, {
       variant: opts.variant ?? 'ink',
       icon: opts.icon,
+      width: opts.width,
+      disabled: opts.disabled,
     });
     this.scene.children.remove(b);
     this.content.add(b);

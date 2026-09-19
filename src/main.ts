@@ -17,6 +17,7 @@ import { toast } from '@/ui/Toast';
 import { modalOpen, overlayDepth, overlayOwners } from '@/ui/escGuard';
 import { touchScreen } from '@/ui/lensLift';
 import { caseById, gameState } from '@/systems/gameState';
+import { earnClips } from '@/systems/clips';
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -128,6 +129,8 @@ if (import.meta.env.DEV) {
       overlays(): number;
       overlayOwners(): { type: string; scene: string; active: boolean }[];
       snapshot(name: string): Promise<string>;
+      /** Drop clips on the desk (to try the market without closing forty files). */
+      clips(n: number): number;
       wallet: typeof wallet;
       /** The live audio manager (station, static, levels). */
       audio: typeof audio;
@@ -265,6 +268,7 @@ if (import.meta.env.DEV) {
       a.click();
       return 'downloaded';
     },
+    clips: (n: number) => earnClips(n),
     startCase(id: string) {
       const c = caseById(id);
       if (!c) throw new Error(`unknown case ${id}`);

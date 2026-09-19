@@ -11,6 +11,7 @@ import { coldDifficulty, startColdCase, startDaily } from '@/systems/coldCase';
 import { dailyPool, playableCases } from '@/systems/secretCase';
 import { nextRankInfo, rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
+import { clipBalance } from '@/systems/clips';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -337,12 +338,17 @@ export class TitleScene extends Phaser.Scene {
       card.add(rect(this, bx, by, bw, 2, HEX.paperShadow));
       if (frac > 0) card.add(rect(this, bx, by, Math.max(1, Math.round(bw * frac)), 2, HEX.ink));
     }
-    t(
-      GAME_WIDTH / 2,
-      cy + cardH - 24,
-      `${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges  ·  ${save.stats.coldRuns} cold`,
-      { size: 12, color: 'woodMid', font: 'body' },
-    ).setOrigin(0.5, 0);
+    const tally = () =>
+      `${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges  ·  ${save.stats.coldRuns} cold${clipBalance() > 0 ? `  ·  ${clipBalance()} clips` : ''}`;
+    const tallyText = t(GAME_WIDTH / 2, cy + cardH - 24, tally(), {
+      size: 12,
+      color: 'woodMid',
+      font: 'body',
+    }).setOrigin(0.5, 0);
+    // Spent some at the market (NetScope opens over the title): the count follows.
+    const refresh = () => tallyText.active && tallyText.setText(tally());
+    this.events.on('look:changed', refresh);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('look:changed', refresh));
     t(
       GAME_WIDTH / 2,
       cy + cardH - 12,

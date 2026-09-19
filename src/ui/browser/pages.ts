@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BROWSER, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
+import { BROWSER, FONT, GAME_HEIGHT, GAME_WIDTH, UI } from '@/config/layout';
 import { HEX } from '@/config/palette';
 import { shortAddress, TOKEN } from '@/config/token';
 import { GAME_VERSION } from '@/config/gameConfig';
@@ -35,6 +35,19 @@ import type { PageCtx } from './PageCtx';
 import { ALL_PAGES, type PageId } from './PageCtx';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
+import { itemsFor, SHOP_SLOTS, type ShopSlot } from '@/data/shop';
+import {
+  buy,
+  buyBlocker,
+  CLIPS,
+  clipBalance,
+  earnedClips,
+  holderClips,
+  owns,
+  wear,
+  worn,
+} from '@/systems/clips';
+import { redress } from '@/systems/wardrobe';
 
 /** One line per tier on the coin page. */
 const TIER_BLURB: Record<number, string> = {
@@ -52,6 +65,7 @@ export const URLS: Record<PageId, string> = {
   help: 'netscope://help',
   about: 'netscope://about',
   badges: 'board.example/badges',
+  market: 'market.example/desk',
   '404': 'nowhere.example/lost',
 };
 
@@ -59,6 +73,18 @@ export const URLS: Record<PageId, string> = {
 
 /** How many rows each board list held when last fetched (see the board page). */
 const boardRows = new Map<string, number>();
+
+/** The market's open drawer; remembered across renders so buying doesn't jump the page. */
+let marketSlot: ShopSlot = 'coat';
+const SLOT_TAB: Record<ShopSlot, string> = {
+  coat: 'Coat',
+  hat: 'Hat',
+  cat: 'Cat',
+  ornament: 'Ornament',
+  mug: 'Mug',
+  curtains: 'Curtains',
+  radio: 'Radio',
+};
 
 export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
   home(ctx) {
@@ -80,7 +106,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     ctx.button('RugScan explorer', () => ctx.panel.go('rugscan'));
     ctx.button(`${TOKEN.symbol} - the coin`, () => ctx.panel.go('coin'));
     ctx.button('Leaderboard', () => ctx.panel.go('board'));
-    ctx.button('The news', () => ctx.panel.go('news'));
+    ctx.button('The news', () => ctx.panel.go('news'), { sameLine: true });
+    ctx.button(`The market  ·  ${clipBalance()} clips`, () => ctx.panel.go('market'), { x: 82 });
     ctx.button('Help', () => ctx.panel.go('help'), { sameLine: true });
     ctx.button('About', () => ctx.panel.go('about'), { x: 60 });
     ctx.button(
@@ -711,6 +738,126 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     }
     ctx.gap();
     ctx.small('Badges are for bragging. They change nothing about scoring.');
+  },
+
+  market(ctx) {
+    const scene = ctx.scene;
+    lucienSays(scene, 'market');
+    const holder = holderClips();
+    const spent = saveStore.get().clips.spent;
+    ctx.heading(`The market  ·  ${clipBalance()} clips to spend`, 'ink');
+    ctx.line('Dressing for the desk, paid in paper clips. Nothing here changes a score.');
+    ctx.line(
+      `${earnedClips()} earned from files${holder ? `  ·  ${holder} holder allowance` : ''}${spent ? `  ·  ${spent} spent` : ''}`,
+      { color: 'woodMid' },
+    );
+    if (!holder)
+      ctx.small(
+        `Holding ${TOKEN.symbol} adds an allowance: ${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin} coins, up to ${CLIPS.holderCap}. Read-only; nothing is spent from the wallet.`,
+      );
+    ctx.gap(4);
+
+    // Your desk as it stands: the props at their real size, Lucien to scale.
+    const strip = ctx.y + 62;
+    let px = 4;
+    const show = (key: string, h?: number) => {
+      if (!scene.textures.exists(key)) return;
+      const img = scene.make.image({ x: px, y: strip, key }, false).setOrigin(0, 1);
+      if (h) img.setDisplaySize(Math.round(img.width * (h / img.height)), h);
+      ctx.content.add(img);
+      px += img.displayWidth + 12;
+    };
+    show(LUCIEN_TEX, 60);
+    show(`${TEX.cat}-0`);
+    show(TEX.mug);
+    show(TEX.radio);
+    show(TEX.ornament);
+    ctx.y = strip + 6;
+
+    // One drawer per slot.
+    let tx = 0;
+    for (const slot of SHOP_SLOTS) {
+      const open = slot.id === marketSlot;
+      const b = ctx.button(
+        SLOT_TAB[slot.id],
+        () => {
+          marketSlot = slot.id;
+          ctx.panel.render();
+        },
+        { x: tx, sameLine: true, variant: open ? 'ink' : 'paper' },
+      );
+      tx += b.bw + 3;
+    }
+    ctx.y += UI.buttonH + 8;
+
+    const slotName = SHOP_SLOTS.find((s) => s.id === marketSlot)?.name ?? '';
+    ctx.line(`${slotName}  ·  wearing ${worn(marketSlot).name}`, { color: 'woodMid' });
+    ctx.gap(2);
+    for (const item of itemsFor(marketSlot)) {
+      const rowY = ctx.y;
+      const inUse = worn(marketSlot).id === item.id;
+      const has = owns(item.id);
+      const tierShort = !!item.tier && (currentTier()?.level ?? 0) < item.tier;
+      const blocker = has ? null : buyBlocker(item);
+      if (inUse) {
+        ctx.content.add(
+          makeText(scene, 4, rowY + 3, 'in use', { size: FONT.size.tiny, color: 'stampGreen' }),
+        );
+      } else if (has) {
+        ctx.button(
+          'Wear',
+          () => {
+            if (!wear(item.id)) return;
+            redress(scene);
+            audio.play('click');
+            ctx.panel.render();
+          },
+          { sameLine: true, width: 64 },
+        );
+      } else if (tierShort) {
+        ctx.button(
+          `Tier ${item.tier}`,
+          () =>
+            toast(
+              scene,
+              'Holders only',
+              `${item.name} takes holder tier ${item.tier}. The ${TOKEN.symbol} page has the numbers.`,
+            ),
+          { sameLine: true, width: 64, variant: 'paper' },
+        );
+      } else {
+        ctx.button(
+          `Buy ${item.price}`,
+          () => {
+            if (!buy(item.id)) {
+              toast(scene, 'Not yet', blocker ?? 'Something got in the way.');
+              return;
+            }
+            redress(scene);
+            audio.play('stamp');
+            toast(scene, 'Bought', `${item.name}. ${clipBalance()} clips left.`);
+            ctx.panel.render();
+          },
+          { sameLine: true, width: 64, disabled: !!blocker },
+        );
+      }
+      const price = item.price ? `${item.price} clips` : 'free';
+      ctx.content.add(
+        makeText(scene, 72, rowY + 2, `${item.name}  ·  ${price}`, {
+          font: 'body',
+          size: FONT.size.body,
+          color: has || !blocker ? 'shadow' : 'woodMid',
+        }),
+      );
+      ctx.content.add(
+        makeText(scene, 72, rowY + 13, item.blurb, { size: FONT.size.tiny, color: 'woodMid' }),
+      );
+      ctx.y = rowY + 26;
+    }
+    ctx.gap();
+    ctx.small(
+      `Files pay ${CLIPS.file} clips (+${CLIPS.firstSolve} for a first solve, +${CLIPS.sGrade} for an S, +${CLIPS.daily} for the daily); a rush pays ${CLIPS.rushPerThousand} per 1,000 points.`,
+    );
   },
 
   help(ctx) {

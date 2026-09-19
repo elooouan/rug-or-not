@@ -22,6 +22,8 @@ import { addText } from '@/ui/text';
 import { backChip, goTo, setupScene } from './sceneUtil';
 import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette';
 import { syncTheme } from '@/systems/theme';
+import { clipBalance } from '@/systems/clips';
+import { BrowserPanel } from '@/ui/BrowserPanel';
 
 interface SettingsInit {
   overlay?: boolean;
@@ -310,6 +312,13 @@ export class SettingsScene extends Phaser.Scene {
       cosmetic('Magnifier rim', 'rim', 'rim');
       cosmetic('Stamp ink', 'ink', 'ink');
     }
+    this.rows.push({
+      label: 'Desk & wardrobe',
+      tab: 'office',
+      value: () => `${clipBalance()} clips`,
+      change: () => BrowserPanel.toggle(this, 'market'),
+      hint: () => "coats, hats, mugs, the cat's fur: bought with clips from closed files",
+    });
     if (!this.overlay) {
       this.rows.push({
         label: 'Export progress',
@@ -439,6 +448,10 @@ export class SettingsScene extends Phaser.Scene {
     kb?.on('keydown-SPACE', () => this.rows[this.selected].change(1));
     this.select(SettingsScene.reselect >= 0 ? SettingsScene.reselect : 0);
     SettingsScene.reselect = -1;
+    // The market opens over this page; its clip count follows each purchase.
+    const onLook = () => this.refresh();
+    this.events.on('look:changed', onLook);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('look:changed', onLook));
     if (SettingsScene.justThemed) {
       LucienBubble.say(this, THEME_QUIPS[SettingsScene.justThemed], 3200);
       SettingsScene.justThemed = null;

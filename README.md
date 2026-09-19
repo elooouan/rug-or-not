@@ -22,6 +22,10 @@ finger; add the page to the home screen for a full-screen desk).
 | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | ![A closed file reopened with the misses marked](assets/marketing/v0.8-second-look.png) | ![Sixty seconds, one page at a time](assets/marketing/v0.8-red-flag-rush.png) | ![The case files](assets/marketing/v0.8-case-files-drawer.png) |
 
+| The market                                                                    | The desk, dressed                                                                                 |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| ![Coats, hats and ornaments for clips](assets/marketing/v0.9-market-page.png) | ![Oxblood trench, velvet curtains, a globe on the corner](assets/marketing/v0.9-dressed-desk.png) |
+
 ![A file from folder to report](assets/marketing/v0.8-clip-solve-a-case.gif)
 
 ## Run it
@@ -101,6 +105,14 @@ The phone on the desk opens an in-game browser:
   [`server/leaderboard`](server/leaderboard/README.md) (one KV namespace, free tier, three
   commands to deploy). Pick your arcade-style handle on the page, and save a Detective ID card
   (a PNG with your rank, record and badges) from there.
+- **Market** - dressing for the desk, paid in paper clips (`src/systems/clips.ts`): closing a
+  file pays 3 (+2 for a first solve, +2 for an S, +1 cold, +2 daily), a rush 1 per thousand
+  points, and holding the coin adds an allowance that follows the balance the wallet reports
+  (25 clips per `VITE_TOKEN_HOLDER_MIN` coins, capped at 1,000; read-only, nothing is spent
+  from the wallet). The catalogue (`src/data/shop.ts`) has coats and hats for Lucien
+  (recoloured from the original sprites in `src/systems/wardrobe.ts`), furs for the cat,
+  mugs, radios, curtains and desk ornaments; three items also ask for a holder tier. Buying
+  redresses every screen that is up. Nothing bought changes a score.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
 Configure the coin through env vars (see `.env.example`); nothing is hard-coded. An optional
@@ -297,6 +309,10 @@ to tweak.
 - Unlockables: add to `src/data/unlockables.ts`. The `source` field is a tagged union; new
   source kinds only need a resolver in `sourceResolvers` (`src/systems/unlocks.ts`).
   Unlockables are cosmetic only.
+- Market items: add to `SHOP` in `src/data/shop.ts` with a price and a `style` for its slot
+  (a tint for coats and hats, palette keys for the mug, cat and radio, a kind for
+  ornaments — draw new ones in `ORNAMENTS`, `src/art/desk.ts`). `save.ts` only keeps a look
+  the player owns, so a removed item falls back to the free one.
 
 ## Licences
 

@@ -44,6 +44,8 @@ export const DESK = {
   phone: { x: 118, y: 296 },
   safe: { x: 70, y: 314 },
   radio: { x: 24, y: 108 },
+  /** The corner ornament from the market sits between the radio and the clock. */
+  ornament: { x: 96, y: 118 },
   clock: { x: 104, y: 214 },
   inkPad: { x: 516, y: 300 },
   stampRug: { x: 520, y: 262 },

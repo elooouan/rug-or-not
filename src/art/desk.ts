@@ -3,7 +3,13 @@ import { HEX, type PaletteKey } from '@/config/palette';
 import { DESK, DRAWER, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { makeRng } from '@/systems/rng';
 import { TEX, STEAM_FRAMES } from './keys';
-import { drawPixels, makeCanvasTexture, makeGraphicsTexture, paintRadial } from './pixelUtil';
+import {
+  drawPixels,
+  makeCanvasTexture,
+  makeGraphicsTexture,
+  paintRadial,
+  type PixelMap,
+} from './pixelUtil';
 
 /** Wood tones can be swapped by cosmetic unlocks, but always stay in-palette. */
 export interface WoodStyle {
@@ -193,8 +199,14 @@ const MUG = [
   '....kkkkkkkkkkkk......',
 ];
 
-export function makeMug(scene: Phaser.Scene): void {
-  makeGraphicsTexture(scene, TEX.mug, 44, 34, (g) => drawPixels(g, MUG, MUG_MAP, 0, 0, 2));
+export interface MugStyle {
+  body: PaletteKey;
+  band: PaletteKey;
+}
+
+export function makeMug(scene: Phaser.Scene, style?: MugStyle): void {
+  const map = style ? { ...MUG_MAP, w: style.body, c: style.band } : MUG_MAP;
+  makeGraphicsTexture(scene, TEX.mug, 44, 34, (g) => drawPixels(g, MUG, map, 0, 0, 2));
   for (let f = 0; f < STEAM_FRAMES; f++) {
     makeGraphicsTexture(scene, `${TEX.steam}-${f}`, 14, 16, (g) => {
       g.fillStyle(HEX.paper, 1);
@@ -434,4 +446,124 @@ export function makeDrawer(scene: Phaser.Scene): void {
     for (let r = 0; r < DRAWER.rows; r++)
       g.fillRect(14, 30 + r * (DRAWER.folderH + DRAWER.gapY), w - 28, 2);
   });
+}
+
+// ---- market ornaments ----------------------------------------------------------------
+
+const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
+  plant: {
+    rows: [
+      '.....gg.......',
+      '....gggg..gg..',
+      '..gg.ggg.ggg..',
+      '.ggg..gg.gg...',
+      '..gg..ggg.....',
+      '...gg.gg.gg...',
+      '....gggg.g....',
+      '.....gg.......',
+      '....dddddd....',
+      '...tttttttt...',
+      '...tttttttt...',
+      '....tttttt....',
+      '....tttttt....',
+      '....kkkkkk....',
+    ],
+    map: { g: 'lampGreen', d: 'shadow', t: 'stampRed', k: 'shadow' },
+  },
+  trophy: {
+    rows: [
+      '..aaaaaaaa....',
+      '.aaaaaaaaaa...',
+      '.aa.aaaa.aa...',
+      '.aa.aaaa.aa...',
+      '..a.aaaa.a....',
+      '....aaaa......',
+      '.....aa.......',
+      '.....aa.......',
+      '....aaaa......',
+      '...kkkkkk.....',
+      '..kkkkkkkk....',
+      '..kkkkkkkk....',
+    ],
+    map: { a: 'amber', k: 'shadow' },
+  },
+  globe: {
+    rows: [
+      '....bbbbbb....',
+      '...bbggbbbb...',
+      '..bbgggbbbbb..',
+      '..bbbggbbgbb..',
+      '..bbbbbbbggb..',
+      '..bggbbbbbbb..',
+      '..bbggbbbbbb..',
+      '...bbbbbbbb...',
+      '....bbbbbb....',
+      '......kk......',
+      '.....kkkk.....',
+      '....kkkkkk....',
+    ],
+    map: { b: 'ink', g: 'lampGreen', k: 'woodDark' },
+  },
+  fishbowl: {
+    rows: [
+      '....pppppp....',
+      '...p......p...',
+      '..p........p..',
+      '..p..bbbbb.p..',
+      '..p.bbbbbbbp..',
+      '..p.bbaabbbp..',
+      '..p.bbbbbbbp..',
+      '..p..bbbbb.p..',
+      '..p....a...p..',
+      '...p......p...',
+      '....pppppp....',
+      '...kkkkkkkk...',
+    ],
+    map: { p: 'paper', b: 'ink', a: 'amber', k: 'shadow' },
+  },
+  skull: {
+    rows: [
+      '....pppppp....',
+      '...pppppppp...',
+      '..pppppppppp..',
+      '..pkkppppkkp..',
+      '..pkkppppkkp..',
+      '..pppppkppp...',
+      '..ppppkkpppp..',
+      '...pppppppp...',
+      '...pkpkpkpp...',
+      '....pppppp....',
+      '..............',
+      '..............',
+    ],
+    map: { p: 'paper', k: 'shadow' },
+  },
+  // A little Lucien: fedora, monocle, tan trench, on a black base. Outlined so it reads on wood.
+  bobble: {
+    rows: [
+      '....ssssss....',
+      '...shhhhhhs...',
+      '.sshhhhhhhhss.',
+      '.ssssssssssss.',
+      '...sffffffs...',
+      '...sfmfoffs...',
+      '...sffffffs...',
+      '....sffffs....',
+      '....sccccs....',
+      '...sccccccs...',
+      '...sccccccs...',
+      '..skkkkkkkks..',
+      '..skkkkkkkks..',
+    ],
+    map: { h: 'woodDark', f: 'paper', m: 'ink', o: 'amber', c: 'amber', k: 'bg', s: 'shadow' },
+  },
+};
+
+/** The ornament on the desk corner, or nothing when the corner is clear. */
+export function makeOrnament(scene: Phaser.Scene, kind: string): void {
+  const art = ORNAMENTS[kind];
+  if (!art) return;
+  makeGraphicsTexture(scene, TEX.ornament, 28, 28, (g) =>
+    drawPixels(g, art.rows, art.map, 0, 0, 2),
+  );
 }

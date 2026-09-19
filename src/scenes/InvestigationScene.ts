@@ -6,6 +6,7 @@ import { audio } from '@/systems/audio';
 import { localDateKey, recordDailyPlay, weekKey } from '@/systems/dailyCase';
 import { gameState, type ReviewState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
+import { clipsForFile, earnClips } from '@/systems/clips';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
 import { newlyUnlocked, stampInk } from '@/systems/unlocks';
 import { rankForScore } from '@/systems/ranks';
@@ -63,6 +64,8 @@ export interface ReportPayload {
   elapsedSec: number | null;
   /** Back from the second look: the report is already read, so it lands quietly. */
   revisit?: boolean;
+  /** Paper clips this run paid, itemised (see src/systems/clips.ts). */
+  clips?: { total: number; reasons: string[] };
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -730,6 +733,7 @@ export class InvestigationScene extends Phaser.Scene {
     // Generated files (cold cases, and the generated half of the dailies) keep their own
     // tally and never touch the campaign, the rank or the rogues gallery.
     const generated = gameState.mode === 'cold' || c.id.startsWith('cold-');
+    const prevSolved = before.caseResults[c.id]?.solved ?? false;
     const caughtName =
       !generated &&
       c.verdict === 'rug' &&
@@ -804,6 +808,15 @@ export class InvestigationScene extends Phaser.Scene {
       if (gameState.mode !== 'daily')
         d.campaignUnlocked = Math.max(d.campaignUnlocked, gameState.currentIndex + 2);
     });
+
+    // A few clips for the market, whatever the grade; a first solve and an S pay extra.
+    const clips = clipsForFile({
+      grade: breakdown.grade,
+      correct: breakdown.verdictCorrect,
+      firstSolve: caughtName !== null || (!generated && breakdown.verdictCorrect && !prevSolved),
+      mode: generated ? 'cold' : gameState.mode === 'daily' ? 'daily' : 'campaign',
+    });
+    earnClips(clips.total);
 
     const notes: [string, string][] = [];
     const afterDaily = saveStore.get().daily;
@@ -893,6 +906,7 @@ export class InvestigationScene extends Phaser.Scene {
       caughtName,
       elapsedSec: relaxed || !this.clock ? null : c.timeLimitSec - this.clock.timeLeft,
       notes,
+      clips,
     };
     this.scene.start('ReportScene', payload);
   }

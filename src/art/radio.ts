@@ -1,5 +1,5 @@
 import type Phaser from 'phaser';
-import { HEX } from '@/config/palette';
+import { HEX, type PaletteKey } from '@/config/palette';
 import { TEX } from './keys';
 import { drawPixels, makeGraphicsTexture } from './pixelUtil';
 
@@ -22,12 +22,19 @@ const RADIO = [
 ];
 
 /** A little bakelite radio: speaker grille, glowing dial, two knobs, a bent antenna. */
-export function makeRadio(scene: Phaser.Scene): void {
+export interface RadioStyle {
+  body: PaletteKey;
+  dark: PaletteKey;
+}
+
+export function makeRadio(scene: Phaser.Scene, style?: RadioStyle): void {
+  const body = style?.body ?? 'woodMid';
+  const dark = style?.dark ?? 'woodDark';
   makeGraphicsTexture(scene, TEX.radio, 44, 30, (g) => {
     drawPixels(
       g,
       RADIO,
-      { k: 'bg', s: 'shadow', m: 'woodMid', d: 'woodDark', a: 'amber', p: 'paper', D: 'woodDark' },
+      { k: 'bg', s: 'shadow', m: body, d: dark, a: 'amber', p: 'paper', D: dark },
       0,
       0,
       2,

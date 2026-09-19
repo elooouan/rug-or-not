@@ -46,6 +46,7 @@ export type ScriptId =
   | 'story-5'
   | 'story-6'
   | 'second-look'
+  | 'market'
   | 'secret-unlocked'
   | 'secret-solved'
   | 'desk-tour';
@@ -73,6 +74,8 @@ export const DOC_TIPS: Record<string, string> = {
 
 /** What changed, in Lucien's words, for players coming back after an update. */
 export const WHATS_NEW: Record<string, string> = {
+  'v0.9':
+    'New tonight: the market on the phone. Files pay paper clips; clips buy Lucien a coat, the cat a new fur, the desk an ornament. Holding the coin adds an allowance. Nothing bought moves a score.',
   'v0.8':
     'New tonight: a handbook in the notebook (How to play on the title), office colours under Settings, herring hunts next to the drills, and a second look at any file you missed something in.',
   'v0.7':
@@ -234,6 +237,11 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   ],
   leaderboard: [
     { text: 'Best runs in the city. Yours, mostly, until we wire up the precinct server.' },
+  ],
+  market: [
+    {
+      text: 'The market. Paper clips buy coats, hats, a mug, the cat a new fur. Files pay a few clips each; holding the coin adds an allowance. None of it moves a score.',
+    },
   ],
   konami: [
     { text: 'A cheat code? In my office? Cute. No points for you, but here is some confetti.' },

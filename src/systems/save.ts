@@ -1,6 +1,7 @@
 import { SAVE_KEY, SAVE_VERSION, type Grade } from '@/config/gameConfig';
 import { DEFAULT_SETTINGS, sanitizeSettings, type Settings } from './settings';
 import { isNameAllowed } from './names';
+import { DEFAULT_LOOK, SHOP_BY_ID, type ShopSlot } from '@/data/shop';
 
 /** What the last run of a file did, enough to print its report (and second look) again. */
 export interface LastRun {
@@ -59,6 +60,12 @@ export interface SaveData {
   discovered: string[];
   /** Arcade-style handle shown on the leaderboard. */
   detectiveName: string;
+  /** The desk's own currency (see src/systems/clips.ts): earned by closing files, spent at the market. */
+  clips: { earned: number; spent: number };
+  /** Market items bought (the free ones don't need listing). */
+  owned: string[];
+  /** The item worn or placed in each market slot. */
+  look: Record<ShopSlot, string>;
   /** Last GAME_VERSION this save was opened with (drives the "new tonight" note). */
   lastSeenVersion: string;
   /** Earned badge ids (see src/data/badges.ts). */
@@ -142,6 +149,9 @@ export function defaultSave(): SaveData {
     seenHints: [],
     discovered: [],
     detectiveName: 'ANON',
+    clips: { earned: 0, spent: 0 },
+    owned: [],
+    look: { ...DEFAULT_LOOK },
     lastSeenVersion: '',
     badges: [],
     stats: {
@@ -235,6 +245,27 @@ export function sanitizeSave(raw: unknown): SaveData {
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
     d.detectiveName = isNameAllowed(r.detectiveName) ? r.detectiveName.slice(0, 12) : 'ANON';
   if (typeof r.lastSeenVersion === 'string') d.lastSeenVersion = r.lastSeenVersion.slice(0, 16);
+  if (r.clips && typeof r.clips === 'object') {
+    const c = r.clips as Record<string, unknown>;
+    const n = (v: unknown) =>
+      typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
+    d.clips = { earned: n(c.earned), spent: n(c.spent) };
+  }
+  if (Array.isArray(r.owned))
+    d.owned = r.owned.filter((x): x is string => typeof x === 'string' && x in SHOP_BY_ID);
+  if (r.look && typeof r.look === 'object') {
+    const l = r.look as Record<string, unknown>;
+    for (const slot of Object.keys(DEFAULT_LOOK) as ShopSlot[]) {
+      const id = l[slot];
+      // Only an item of the right slot that is free or owned can be on the desk.
+      if (
+        typeof id === 'string' &&
+        SHOP_BY_ID[id]?.style.slot === slot &&
+        (SHOP_BY_ID[id].price === 0 || d.owned.includes(id))
+      )
+        d.look[slot] = id;
+    }
+  }
   if (Array.isArray(r.badges))
     d.badges = r.badges.filter((x): x is string => typeof x === 'string');
   if (r.stats && typeof r.stats === 'object') {

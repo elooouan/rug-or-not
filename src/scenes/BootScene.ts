@@ -18,7 +18,7 @@ import { applyCosmetics } from '@/systems/cosmetics';
 import { CursorScene } from './CursorScene';
 import { TitleScene } from './TitleScene';
 import { setupScene } from './sceneUtil';
-import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
+import { applyLook, LUCIEN_BASE, LUCIEN_FACE_BASE } from '@/systems/wardrobe';
 import { installToasts } from '@/ui/Toast';
 
 /** Generates textures, waits for fonts, validates case data, then starts the title. */
@@ -30,8 +30,9 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    this.load.image(LUCIEN_TEX, 'img/lucien.png');
-    this.load.image(LUCIEN_FACE_TEX, 'img/lucien-face.png');
+    // Loaded under "-base" keys: the market dresses him from these (see systems/wardrobe).
+    this.load.image(LUCIEN_BASE, 'img/lucien.png');
+    this.load.image(LUCIEN_FACE_BASE, 'img/lucien-face.png');
   }
 
   create(): void {
@@ -65,6 +66,7 @@ export class BootScene extends Phaser.Scene {
     await this.loadFonts();
     generateAllTextures(this);
     applyCosmetics(this, saveStore.get().cosmetics);
+    applyLook(this);
 
     const loaded = loadCases();
     reportCaseErrors(loaded);

@@ -11,6 +11,7 @@ import { gameState, newColdSeed } from '@/systems/gameState';
 import { coldDifficulty, startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
 import { saveStore } from '@/systems/save';
+import { clipBalance } from '@/systems/clips';
 import { ButtonGroup } from '@/ui/ButtonGroup';
 import { DeskBackground } from '@/ui/DeskBackground';
 import { LUCIEN_TEX, lucienSays } from '@/ui/DialogueBox';
@@ -365,6 +366,11 @@ export class ReportScene extends Phaser.Scene {
       size: 12,
       color: 'shadow',
     });
+    if (this.payload.clips)
+      L.push({
+        text: `+${this.payload.clips.total} clips for the market  (${this.payload.clips.reasons.join(' · ')})  ·  ${clipBalance()} on the desk`,
+        color: 'woodDark',
+      });
     if (newFlagIds.length > 0) {
       const names = newFlagIds.map((id) => FLAGS[id as keyof typeof FLAGS]?.title ?? id);
       L.push(...wrap(`New in your notebook: ${names.join('; ')}`, 0, 'ink'));

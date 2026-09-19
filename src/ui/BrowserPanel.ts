@@ -93,19 +93,39 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
       return b;
     };
     tb('<', x + 4, () => this.back());
-    let bx = x + 30;
-    const marks: [string, PageId][] = [
-      ['Home', 'home'],
-      ['RugScan', 'rugscan'],
-      [TOKEN.symbol, 'coin'],
-      ['Board', 'board'],
-      ['News', 'news'],
-      ['Badges', 'badges'],
-      ['Help', 'help'],
+    // Bookmarks, with shorter names when the coin's ticker leaves no room for the long ones.
+    const rows: [string, PageId][][] = [
+      [
+        ['Home', 'home'],
+        ['RugScan', 'rugscan'],
+        [TOKEN.symbol, 'coin'],
+        ['Board', 'board'],
+        ['News', 'news'],
+        ['Market', 'market'],
+        ['Badges', 'badges'],
+        ['Help', 'help'],
+      ],
+      [
+        ['Home', 'home'],
+        ['Scan', 'rugscan'],
+        ['Coin', 'coin'],
+        ['Board', 'board'],
+        ['News', 'news'],
+        ['Market', 'market'],
+        ['Badges', 'badges'],
+        ['Help', 'help'],
+      ],
     ];
-    for (const [label, id] of marks) {
-      const b = tb(label, bx, () => this.go(id));
-      bx += b.bw + 3;
+    for (const marks of rows) {
+      let bx = x + 28;
+      const made: PixelButton[] = [];
+      for (const [label, id] of marks) {
+        const b = tb(label, bx, () => this.go(id));
+        made.push(b);
+        bx += b.bw + 2;
+      }
+      if (bx - 2 <= x + w - 4) break;
+      made.forEach((b) => b.destroy());
     }
     // URL lives in the title bar so the bookmarks have the toolbar to themselves.
     this.urlText = makeText(scene, x + w - 44, y + 3, '', {

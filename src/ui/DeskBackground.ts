@@ -17,6 +17,8 @@ import { lucienSays } from './DialogueBox';
 import { localDateKey } from '@/systems/dailyCase';
 import { awardBadge, bumpStat, noteSeen } from '@/systems/badges';
 import { holderPerks } from '@/systems/wallet';
+import { worn } from '@/systems/clips';
+import { squish } from './squish';
 import { WEATHERS } from '@/systems/settings';
 import { addText } from './text';
 import { drawPixels } from '@/art/pixelUtil';
@@ -111,6 +113,9 @@ export class DeskBackground {
   private flash!: Phaser.GameObjects.Image;
   private cat!: Phaser.GameObjects.Image;
   private mug?: Phaser.GameObjects.Image;
+  private ornament?: Phaser.GameObjects.Image;
+  private curtains!: Phaser.GameObjects.Graphics;
+  private props = true;
   private timers: Phaser.Time.TimerEvent[] = [];
   private flickerOn = true;
   private motion = true;
@@ -205,14 +210,19 @@ export class DeskBackground {
     });
     this.buildLamp();
 
-    if (opts.props !== false) {
+    this.props = opts.props !== false;
+    if (this.props) {
       this.buildFolderStack();
       this.buildMug();
       this.buildPhone();
       this.buildSafe();
       this.buildRadio();
+      this.buildOrnament();
       this.buildSeasonal();
     }
+    // Bought something at the market while this desk is up: the props swap textures
+    // themselves (see wardrobe.ts); the ornament and curtains are drawn from the look.
+    scene.events.on('look:changed', this.onLookChanged, this);
     if (opts.stamps !== false) this.buildInkPad();
 
     this.light = scene.add
@@ -268,7 +278,72 @@ export class DeskBackground {
 
     this.setFlicker(s.lampFlicker && this.motion);
     if (this.motion && opts.props !== false) this.scheduleFly();
-    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.destroy());
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      scene.events.off('look:changed', this.onLookChanged, this);
+      this.destroy();
+    });
+  }
+
+  private onLookChanged(): void {
+    this.drawCurtains();
+    if (!this.props) return;
+    const has = this.scene.textures.exists(TEX.ornament);
+    if (this.ornament && !this.ornament.active) this.ornament = undefined;
+    if (this.ornament && !has) {
+      this.ornament.destroy();
+      this.ornament = undefined;
+    } else if (!this.ornament && has) this.buildOrnament();
+  }
+
+  // ---- the ornament -----------------------------------------------------------
+
+  /** Whatever the market put on the desk's corner. Clicking it does very little, on purpose. */
+  private buildOrnament(): void {
+    const scene = this.scene;
+    if (!scene.textures.exists(TEX.ornament)) return;
+    const { x, y } = DESK.ornament;
+    const orn = scene.add.image(x, y, TEX.ornament).setOrigin(0).setDepth(DEPTH.deskProps);
+    this.ornament = orn;
+    orn.setInteractive({ useHandCursor: false });
+    this.liftOnHover(orn);
+    const LINES: Record<string, string[]> = {
+      plant: ['rustle', 'still alive', 'needs water'],
+      trophy: ['shiny', 'least caught', 'a joke gift'],
+      globe: ['spin', 'rugs everywhere', 'round, apparently'],
+      fishbowl: ['blub', 'liquidity says hi', 'locked in'],
+      skull: ['memento rug', '...', 'alas'],
+      bobble: ['nod nod', 'agrees', 'yes. yes. yes.'],
+    };
+    orn.on('pointerdown', () => {
+      const style = worn('ornament').style;
+      const lines = (style.slot === 'ornament' && LINES[style.kind]) || ['hm'];
+      audio.play('click');
+      floatText(scene, x + 14, y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
+      if (this.motion && orn.active) squish(scene, orn, 1.1, 0.9, 180);
+    });
+  }
+
+  /** Curtains at both ends of the window, in the market's colour; nothing when bare. */
+  private drawCurtains(): void {
+    const g = this.curtains;
+    g.clear();
+    const style = worn('curtains').style;
+    if (style.slot !== 'curtains' || !style.color) return;
+    const { x, y, w, h } = DESK.window;
+    const cw = 14;
+    const fold = 4;
+    for (const side of [x, x + w - cw]) {
+      g.fillStyle(HEX[style.color], 1);
+      g.fillRect(side, y, cw, h);
+      // A darker fold down the middle and a pelmet across the top.
+      g.fillStyle(HEX.bg, 0.35);
+      g.fillRect(side + fold, y, 3, h);
+      g.fillRect(side + cw - fold - 3, y, 3, h);
+    }
+    g.fillStyle(HEX[style.color], 1);
+    g.fillRect(x, y, w, 4);
+    g.fillStyle(HEX.bg, 0.35);
+    g.fillRect(x, y + 4, w, 1);
   }
 
   /** Clickable props lift a pixel under the pointer so the desk reads as touchable. */
@@ -453,6 +528,9 @@ export class DeskBackground {
       .setOrigin(0)
       .setDepth(DEPTH.windowRain)
       .setVisible(false);
+
+    this.curtains = scene.add.graphics().setDepth(DEPTH.windowRain);
+    this.drawCurtains();
 
     // Click the glass to change the weather; click the moon because why not.
     glass.setInteractive({ useHandCursor: false });

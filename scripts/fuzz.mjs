@@ -39,6 +39,8 @@ const SAVE = {
   settings: { hints: true, quips: true, music: false, volume: 0, reducedMotion: false },
   discovered: ['drawer', 'rush', 'cold', 'weekly'],
   stats: { runs: 6, coldRuns: 1 },
+  // A full pocket, so the market's buy buttons are live and textures get swapped mid-play.
+  clips: { earned: 3000, spent: 0 },
 };
 
 const KEYS = [
@@ -393,10 +395,14 @@ if (leak > 0) {
   console.log(`overlay leak: ${leak} still counted on a quiet title`);
   errors.push({ at: 'end', error: `overlay leak: ${leak}` });
 }
+// How far the monkey got into the market (texture swaps mid-play are the risky part).
+const bought = await page
+  .evaluate(() => JSON.parse(localStorage.getItem('rug-or-not:save:v1') ?? '{}').owned?.length ?? 0)
+  .catch(() => 0);
 await browser.close();
 cpServer.close();
 
-console.log(`${actions} actions; scenes seen:`, Object.fromEntries(visited));
+console.log(`${actions} actions, ${bought} market buys; scenes seen:`, Object.fromEntries(visited));
 if (errors.length === 0) console.log('no errors');
 else {
   const grouped = new Map();

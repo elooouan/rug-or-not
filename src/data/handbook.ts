@@ -1,5 +1,6 @@
 import { RANKS, RUSH, SCORING } from '@/config/gameConfig';
 import { TOKEN } from '@/config/token';
+import { CLIPS } from '@/systems/clips';
 import type { Feature } from '@/systems/discovery';
 
 /**
@@ -151,7 +152,7 @@ export const HANDBOOK: HandbookTopic[] = [
     title: 'NetScope (the phone)',
     body: [
       'Click the phone on the desk. RugScan is the explorer: the current file, and every token on record. Board is the Hall of Detectives. News is mostly nonsense, which is the point.',
-      'Badges lists every badge and how to earn it. Help repeats the basics. The wall (behind the corkboard polaroid) is the making-of.',
+      'Market spends your clips on dressing for the desk. Badges lists every badge and how to earn it. Help repeats the basics. The wall (behind the corkboard polaroid) is the making-of.',
       'Esc closes the phone. The wallet lives on its coin page.',
     ],
   },
@@ -162,6 +163,16 @@ export const HANDBOOK: HandbookTopic[] = [
       `${TOKEN.name} (${TOKEN.symbol}) is the precinct's own coin. Holding some opens extra dressing for the office and a weekly file for holders. It changes nothing about scoring, and you never need it to play.`,
       { h: 'Connecting' },
       'The chip on the title opens the coin page. Connecting shares your public address so the game can read balances. Nothing is signed, nothing is sent, and the game never asks for a seed phrase.',
+    ],
+  },
+  {
+    id: 'market',
+    title: 'The market and clips',
+    body: [
+      `Closing a file pays a few paper clips (${CLIPS.file}, plus ${CLIPS.firstSolve} for a first solve, ${CLIPS.sGrade} for an S, ${CLIPS.daily} for the daily); a rush pays ${CLIPS.rushPerThousand} per thousand points. Clips are spent at the Market on the phone: Lucien's coat and hat, the mug, the radio, the cat's fur, an ornament for the corner, curtains.`,
+      { h: 'The coin' },
+      `Holding ${TOKEN.symbol} adds an allowance that follows the balance the wallet reports (${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin} coins, up to ${CLIPS.holderCap}). Read-only: nothing is ever spent from the wallet, and a few items ask for a holder tier as well.`,
+      'Nothing bought changes a score, a timer or a file. It is a desk; dress it.',
     ],
   },
   {

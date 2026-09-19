@@ -25,6 +25,7 @@ import {
   type RushState,
 } from '@/systems/rush';
 import { saveStore } from '@/systems/save';
+import { clipsForRush, earnClips } from '@/systems/clips';
 import { holderPerks, wallet } from '@/systems/wallet';
 import { DeskBackground, floatText } from '@/ui/DeskBackground';
 import { DeskClock } from '@/ui/DeskClock';
@@ -520,6 +521,11 @@ export class RushScene extends Phaser.Scene {
     if (s.score >= 2000) awardBadge(this, 'speed-reader');
     this.hud.best.setText(`best    ${saveStore.get().stats.rushBest}`);
     audio.play('stamp');
+    const clips = clipsForRush(s.score);
+    if (clips > 0) {
+      earnClips(clips);
+      toast(this, 'CLIPS', `+${clips} for the market`);
+    }
     this.showResults(grade, improved);
   }
 

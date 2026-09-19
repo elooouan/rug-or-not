@@ -54,6 +54,8 @@ export const TEX = {
   cork: 'wall-cork',
   safe: 'desk-safe',
   radio: 'desk-radio',
+  /** The market's desk ornament (plant, trophy, globe...), drawn for whatever is placed. */
+  ornament: 'desk-ornament',
   button: 'ui-button',
   buttonHover: 'ui-button-hover',
 } as const;

@@ -25,7 +25,18 @@ import { makePaper } from './paper';
 
 export { TEX, STEAM_FRAMES, portraitKey } from './keys';
 export { makePortrait, PORTRAIT_SIZE, type PortraitStyle } from './portraits';
-export { makeWood, makeLamp, makeStamps, type WoodStyle, DEFAULT_WOOD } from './desk';
+export {
+  makeWood,
+  makeLamp,
+  makeStamps,
+  makeMug,
+  makeOrnament,
+  type WoodStyle,
+  type MugStyle,
+  DEFAULT_WOOD,
+} from './desk';
+export { makeCat, type CatStyle } from './window';
+export { makeRadio, type RadioStyle } from './radio';
 export { makeMagnifier, type RimStyle, DEFAULT_RIM } from './magnifier';
 
 /**

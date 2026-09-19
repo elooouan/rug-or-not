@@ -12,6 +12,7 @@ declare global {
     };
     __debug: {
       startCase(id: string): void;
+      clips(n: number): number;
       overlays(): number;
       audio: { isMuted: boolean };
       wallet: {
@@ -740,6 +741,66 @@ test('the drawer reopens the last report of a closed file', async ({ page }) => 
     return { revisit: rs.payload.revisit, total: rs.payload.breakdown.total };
   });
   expect(again).toEqual({ revisit: true, total: scored });
+  expect(errors).toEqual([]);
+});
+
+test('the market dresses Lucien and the desk while the title is up', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  type Btn = { constructor: { name: string }; label?: { text: string }; emit(ev: string): void };
+  const panelButton = (page: Page, label: string) =>
+    page.evaluate((label) => {
+      const title = window.__game.scene.getScene('TitleScene') as unknown as {
+        children: { list: { constructor: { name: string }; list?: unknown[] }[] };
+      };
+      const panel = title.children.list.find((o) => o.constructor.name === 'BrowserPanel');
+      const all: Btn[] = [];
+      const visit = (o: Btn & { list?: Btn[] }) => {
+        o.list?.forEach(visit);
+        all.push(o);
+      };
+      if (panel) visit(panel as unknown as Btn);
+      const b = all.find((o) => o.constructor.name === 'PixelButton' && o.label?.text === label);
+      b?.emit('pointerdown');
+      return !!b;
+    }, label);
+  // Enough clips for a coat, then the phone, the market, the first coat on sale.
+  await page.evaluate(() => {
+    window.__debug.clips(200);
+    const title = window.__game.scene.getScene('TitleScene') as unknown as {
+      children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
+    };
+    title.children.list.find((o) => o.texture?.key === 'desk-phone')?.emit('pointerdown');
+  });
+  await page.waitForTimeout(300);
+  await skipTalk(page);
+  expect(await panelButton(page, 'Market')).toBe(true);
+  await page.waitForTimeout(300);
+  await skipTalk(page);
+  expect(await panelButton(page, 'Buy 80')).toBe(true);
+  await page.waitForTimeout(400);
+  const after = await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string);
+    const title = window.__game.scene.getScene('TitleScene') as unknown as {
+      children: { list: { texture?: { key: string }; frame?: { source: unknown } }[] };
+    };
+    const lucien = title.children.list.find((o) => o.texture?.key === 'lucien');
+    return {
+      look: save.look.coat,
+      owned: save.owned,
+      spent: save.clips.spent,
+      ok: !!lucien?.frame?.source,
+    };
+  });
+  expect(after).toEqual({ look: 'coat-navy', owned: ['coat-navy'], spent: 80, ok: true });
+  // Back to the free coat and out; the next screen must draw the desk without errors.
+  expect(await panelButton(page, 'Wear')).toBe(true);
+  await page.waitForTimeout(300);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await page.waitForTimeout(800);
   expect(errors).toEqual([]);
 });
 

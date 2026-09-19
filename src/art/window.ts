@@ -1,5 +1,5 @@
 import type Phaser from 'phaser';
-import { HEX } from '@/config/palette';
+import { HEX, type PaletteKey } from '@/config/palette';
 import { DESK } from '@/config/layout';
 import { makeRng } from '@/systems/rng';
 import { TEX } from './keys';
@@ -248,10 +248,17 @@ const CAT_FRAMES = [
   ],
 ];
 
-export function makeCat(scene: Phaser.Scene): void {
+export interface CatStyle {
+  fur: PaletteKey;
+  dark: PaletteKey;
+  eye: PaletteKey;
+}
+
+export function makeCat(scene: Phaser.Scene, style?: CatStyle): void {
+  const map = style ? { ...CAT_MAP, b: style.fur, d: style.dark, e: style.eye } : CAT_MAP;
   CAT_FRAMES.forEach((rows, i) => {
     makeGraphicsTexture(scene, `${TEX.cat}-${i}`, 28, 20, (g) => {
-      drawPixels(g, rows, CAT_MAP, 0, 0, 2);
+      drawPixels(g, rows, map, 0, 0, 2);
       // Rim light along the back so the silhouette reads against the night sky.
       g.fillStyle(HEX.woodLight, 0.7);
       g.fillRect(2, 8, 2, 2);
