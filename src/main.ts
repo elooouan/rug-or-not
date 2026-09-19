@@ -202,6 +202,8 @@ if (import.meta.env.DEV) {
         'sip',
         'meow',
         'thunder',
+        'siren',
+        'buy',
       ] as const;
       const out: Record<string, number> = {};
       for (const name of names) {
