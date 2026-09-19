@@ -840,7 +840,10 @@ export class InvestigationScene extends Phaser.Scene {
   // ---- pause / keys ---------------------------------------------------------------
 
   private togglePause(): void {
-    if (this.phase === 'stamped' || this.review) return;
+    // Not over a lesson: the box would sit under the dim, still holding Esc, and the
+    // overlays opened from the menu would find their Esc dead.
+    if (this.phase === 'stamped' || this.review || (!this.paused && this.dialogue?.isActive))
+      return;
     if (this.paused) {
       this.pauseMenu?.destroy();
       this.pauseMenu = undefined;

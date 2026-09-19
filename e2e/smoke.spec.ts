@@ -11,6 +11,7 @@ declare global {
     };
     __debug: {
       startCase(id: string): void;
+      overlays(): number;
       audio: { isMuted: boolean };
       wallet: {
         connect(): Promise<void>;
@@ -592,5 +593,79 @@ test('a desk quip during a chained lesson gives way to the next lesson', async (
   );
   expect(seen).toContain('first-wrong');
   expect(seen).not.toContain('cat');
+  expect(errors).toEqual([]);
+});
+
+test('Esc works in an overlay opened over a lesson', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'rug-or-not:save:v1',
+      JSON.stringify({
+        version: 1,
+        settings: { hints: true, music: false, reducedMotion: true, quips: false },
+      }),
+    );
+  });
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
+  await skipTalk(page);
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await skipTalk(page);
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+      stamps: { trigger(fn: (v: string) => void): void }[];
+      onStamp(v: string): void;
+    };
+    inv.stamps[0].trigger((v) => inv.onStamp(v));
+  });
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(600);
+  await page.evaluate(() =>
+    (
+      window.__game.scene.getScene('ReportScene') as unknown as { typewriter: { skip(): void } }
+    ).typewriter.skip(),
+  );
+  type Obj = { constructor: { name: string }; label?: { text: string }; emit(ev: string): void };
+  // The report's lesson is up; open the notebook over it without finishing the lesson.
+  await page.waitForFunction(
+    () =>
+      (
+        window.__game.scene.getScene('ReportScene') as unknown as { children: { list: Obj[] } }
+      ).children.list.some((o) => o.constructor.name === 'DialogueBox'),
+    null,
+    { timeout: SLOW },
+  );
+  await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+      children: { list: Obj[] };
+    };
+    rs.children.list
+      .find((o) => o.constructor.name === 'PixelButton' && o.label?.text === 'Notebook')
+      ?.emit('pointerdown');
+  });
+  await waitForScene(page, 'NotebookScene');
+  await page.waitForTimeout(400);
+  // The notebook's own lesson goes first (active scenes only: the report's box stays).
+  await skipTalk(page);
+  await page.waitForTimeout(200);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(
+    () => !window.__game.scene.getScenes(true).some((s) => s.scene.key === 'NotebookScene'),
+    null,
+    { timeout: SLOW },
+  );
+  expect(await activeScenes(page)).toEqual(['ReportScene']);
+  // The lesson is still on the report, and nothing counts as an overlay from the notebook.
+  const after = await page.evaluate(() => ({
+    box: (
+      window.__game.scene.getScene('ReportScene') as unknown as { children: { list: Obj[] } }
+    ).children.list.some((o) => o.constructor.name === 'DialogueBox'),
+    overlays: window.__debug.overlays(),
+  }));
+  expect(after).toEqual({ box: true, overlays: 1 });
   expect(errors).toEqual([]);
 });

@@ -5,12 +5,19 @@
  * Back hotkeys ask here before acting.
  */
 let consumedAt = 0;
+/** What an overlay claim is held by: a game object, whose scene may be paused. */
+interface Owner {
+  active: boolean;
+  scene?: { scene: { isActive(): boolean } };
+}
+
 /**
  * The overlays that are up. Each is the game object that owns the claim, so one that gets
  * destroyed without releasing (a scene torn down mid-tween, say) stops counting on its own
- * instead of eating every Esc from then on.
+ * instead of eating every Esc from then on. A claim in a paused scene (a lesson box under
+ * the notebook overlay) doesn't count either: the scene on top owns Esc while it's up.
  */
-const overlays = new Set<{ active: boolean }>();
+const overlays = new Set<Owner>();
 
 export function markEscConsumed(): void {
   consumedAt = performance.now();
@@ -21,19 +28,19 @@ export function escConsumedRecently(windowMs = 80): boolean {
 }
 
 /** Call when an Esc-closable overlay opens; pair with popOverlay(owner). */
-export function pushOverlay(owner: { active: boolean }): void {
+export function pushOverlay(owner: Owner): void {
   overlays.add(owner);
 }
 
-export function popOverlay(owner: { active: boolean }): void {
+export function popOverlay(owner: Owner): void {
   overlays.delete(owner);
 }
 
 function liveOverlays(): number {
   let n = 0;
   for (const o of overlays) {
-    if (o.active) n++;
-    else overlays.delete(o);
+    if (!o.active) overlays.delete(o);
+    else if (!o.scene || o.scene.scene.isActive()) n++;
   }
   return n;
 }
@@ -61,4 +68,12 @@ export function escTaken(): boolean {
 /** Dev peek for debugging overlay bookkeeping. */
 export function overlayDepth(): number {
   return liveOverlays();
+}
+
+/** Dev peek: who holds a claim right now (class name, scene key, whether it's alive). */
+export function overlayOwners(): { type: string; scene: string; active: boolean }[] {
+  return [...overlays].map((o) => {
+    const go = o as { constructor: { name: string }; scene?: { scene?: { key: string } } };
+    return { type: go.constructor.name, scene: go.scene?.scene?.key ?? '-', active: o.active };
+  });
 }

@@ -14,7 +14,7 @@ import { RushScene } from '@/scenes/RushScene';
 import { audio } from '@/systems/audio';
 import { wallet } from '@/systems/wallet';
 import { toast } from '@/ui/Toast';
-import { modalOpen, overlayDepth } from '@/ui/escGuard';
+import { modalOpen, overlayDepth, overlayOwners } from '@/ui/escGuard';
 import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
@@ -105,6 +105,7 @@ if (import.meta.env.DEV) {
       audioLevels(): Promise<Record<string, number>>;
       musicLevel(): Promise<{ peak: number; rms: number }>;
       overlays(): number;
+      overlayOwners(): { type: string; scene: string; active: boolean }[];
       snapshot(name: string): Promise<string>;
       wallet: typeof wallet;
       /** The live audio manager (station, static, levels). */
@@ -204,6 +205,7 @@ if (import.meta.env.DEV) {
       };
     },
     overlays: () => overlayDepth(),
+    overlayOwners: () => overlayOwners(),
     /**
      * Photograph the current frame at 480x270 for the history wall. With the
      * snapshot dev server (scripts/photograph.sh) it saves straight into

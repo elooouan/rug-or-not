@@ -77,9 +77,11 @@
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
   wrapped to a second line ran into the row below it; rows now make room. The desk's key
   hint no longer mentions the lens when there isn't one.
-- Fixed: the Esc bookkeeping counted overlays; one torn down without releasing its claim
-  (the monkey test caught a rare case) would have eaten every Esc afterwards. Claims are now
-  owned by the box, panel or safe that made them and lapse when it dies.
+- Fixed: a lesson left up on a screen that then opened the notebook or settings over it
+  (the report's Notebook button, say) kept its hold on Esc, so Esc did nothing in the
+  overlay until the Back button was clicked. Esc claims now belong to the box, panel or
+  safe that made them, lapse when it dies, and don't count while its screen is paused
+  under another. The desk's Menu button no longer opens the pause menu over a lesson.
 - Fixed: a desk quip (the coffee, the cat, the radio) landing while one of Lucien's chained
   lessons was up (the report's, on a wrong verdict) crashed the screen with a half-built
   dialogue box. The lesson's follow-up wins now, and the quip keeps its turn for later.

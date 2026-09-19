@@ -304,12 +304,23 @@ while (Date.now() < end) {
             )
               n++;
           }
-        return { n, overlays: window.__debug.overlays() };
+        return {
+          n,
+          overlays: window.__debug.overlays(),
+          owners: window.__debug.overlayOwners?.() ?? [],
+          scenes: window.__game.scene.scenes
+            .filter((sc) => sc.scene.settings.status >= 5)
+            .map((sc) => `${sc.scene.key}:${sc.scene.settings.status}`),
+        };
       })
       .catch(() => null);
     if (live && live.overlays > live.n && !leakSeen) {
       leakSeen = true;
-      console.log(`overlay count ${live.overlays} > ${live.n} alive after ${actions} in ${s}`);
+      console.log(
+        `overlay count ${live.overlays} > ${live.n} alive after ${actions} in ${s}`,
+        JSON.stringify(live.owners),
+        live.scenes.join(' '),
+      );
     }
     // Don't get stuck: if nothing but the cursor overlay is running, go home.
     if (s === '' || s === '?') {
@@ -322,9 +333,14 @@ while (Date.now() < end) {
 // some overlay was destroyed without giving its Esc claim back, and Esc misbehaves after.
 const leak = await page
   .evaluate(async () => {
-    window.__game.scene
-      .getScenes(true)
-      .forEach((s) => s.scene.key !== 'CursorScene' && s.scene.stop());
+    // Every scene but the pointer overlay, paused ones included (an overlay scene leaves
+    // the one under it paused, and a paused scene keeps its objects).
+    window.__game.scene.scenes.forEach(
+      (s) =>
+        s.scene.key !== 'CursorScene' &&
+        [5, 6, 7].includes(s.scene.settings.status) && // running, paused, sleeping
+        s.scene.stop(),
+    );
     window.__game.scene.start('TitleScene');
     await new Promise((r) => setTimeout(r, 1500));
     for (const s of window.__game.scene.getScenes(true))
