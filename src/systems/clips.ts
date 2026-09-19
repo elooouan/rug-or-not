@@ -25,6 +25,8 @@ export const CLIPS = {
   cold: 1,
   /** The daily, on top of the file. */
   daily: 2,
+  /** The weekly file (everyone's or the holders'), on top of the file. */
+  weekly: 3,
   /** Every full thousand points in a rush. */
   rushPerThousand: 1,
   /** Holder allowance: clips per whole coin held, so tier 1 (holderMin) is worth 25. */
@@ -62,7 +64,7 @@ export function clipsForFile(opts: {
   grade: string;
   correct: boolean;
   firstSolve: boolean;
-  mode: 'campaign' | 'daily' | 'cold';
+  mode: 'campaign' | 'daily' | 'cold' | 'weekly';
   /** Times this file was closed before tonight (campaign only). */
   completions?: number;
 }): { total: number; reasons: string[] } {
@@ -85,6 +87,10 @@ export function clipsForFile(opts: {
   if (opts.mode === 'daily') {
     total += CLIPS.daily;
     reasons.push(`${CLIPS.daily} daily`);
+  }
+  if (opts.mode === 'weekly') {
+    total += CLIPS.weekly;
+    reasons.push(`${CLIPS.weekly} weekly`);
   }
   return { total, reasons };
 }

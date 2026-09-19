@@ -822,7 +822,13 @@ export class InvestigationScene extends Phaser.Scene {
       grade: breakdown.grade,
       correct: breakdown.verdictCorrect,
       firstSolve: caughtName !== null || (!generated && breakdown.verdictCorrect && !prevSolved),
-      mode: generated ? 'cold' : gameState.mode === 'daily' ? 'daily' : 'campaign',
+      mode: generated
+        ? /^(week|holders)-/.test(gameState.coldSeed ?? '')
+          ? 'weekly'
+          : 'cold'
+        : gameState.mode === 'daily'
+          ? 'daily'
+          : 'campaign',
       completions: before.caseResults[c.id]?.completions ?? 0,
     });
     const firstClips = before.clips.earned === 0;
