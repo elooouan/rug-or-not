@@ -4,6 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 declare global {
   interface Window {
     __game: {
+      canvas: HTMLCanvasElement;
       scene: {
         getScenes(active: boolean): { scene: { key: string } }[];
         getScene(k: string): unknown;
@@ -740,4 +741,138 @@ test('the drawer reopens the last report of a closed file', async ({ page }) => 
   });
   expect(again).toEqual({ revisit: true, total: scored });
   expect(errors).toEqual([]);
+});
+
+test.describe('touch', () => {
+  test.use({ hasTouch: true });
+
+  test('a finger pins with a tap, scrolls with a drag, and only lifts buttons it stayed on', async ({
+    page,
+  }) => {
+    const errors = await boot(page);
+    await skipTalk(page);
+    await page.evaluate(() => window.__debug.startCase('moonpup'));
+    await waitForScene(page, 'InvestigationScene');
+    await waitForPhase(page, 'intake');
+    await skipTalk(page);
+    await page.keyboard.press('Enter');
+    await waitForPhase(page, 'investigating');
+    await skipTalk(page);
+    // Synthetic touches on the canvas: world coordinates go through the canvas rect.
+    await page.evaluate(() => {
+      const canvas = window.__game.canvas;
+      const r = canvas.getBoundingClientRect();
+      const at = (wx: number, wy: number) => ({
+        x: r.left + (wx * r.width) / 640,
+        y: r.top + (wy * r.height) / 360,
+      });
+      (window as unknown as { __touch: (type: string, wx: number, wy: number) => void }).__touch = (
+        type,
+        wx,
+        wy,
+      ) => {
+        const c = at(wx, wy);
+        const t = new Touch({
+          identifier: 1,
+          target: canvas,
+          clientX: c.x,
+          clientY: c.y,
+          pageX: c.x,
+          pageY: c.y,
+        });
+        const list = type === 'touchend' ? [] : [t];
+        canvas.dispatchEvent(
+          new TouchEvent(type, {
+            touches: list,
+            targetTouches: list,
+            changedTouches: [t],
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+    });
+    type W = { __touch: (type: string, wx: number, wy: number) => void };
+    const touch = (type: string, wx: number, wy: number) =>
+      page.evaluate(([t, x, y]) => (window as unknown as W).__touch(t, x, y), [type, wx, wy] as [
+        string,
+        number,
+        number,
+      ]);
+    const spot = await page.evaluate(() => {
+      const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+        docs: {
+          allSpots(): {
+            clue: { id: string };
+            rect: { x: number; y: number };
+            getWorldTransformMatrix(): { tx: number; ty: number };
+          }[];
+        }[];
+      };
+      const s = inv.docs[0].allSpots()[0];
+      const m = s.getWorldTransformMatrix();
+      return { id: s.clue.id, x: m.tx + s.rect.x + 20, y: m.ty + s.rect.y + 6 };
+    });
+    // A drag that ends on the spot is reading, not pinning.
+    await touch('touchstart', spot.x - 60, spot.y + 40);
+    for (let i = 1; i <= 6; i++) {
+      await touch('touchmove', spot.x - 60 + i * 10, spot.y + 40 - i * 7);
+      await page.waitForTimeout(30);
+    }
+    await touch('touchend', spot.x, spot.y - 2);
+    await page.waitForTimeout(200);
+    const pinnedIds = () =>
+      page.evaluate(() =>
+        (
+          window.__game.scene.getScene('InvestigationScene') as unknown as {
+            docs: { pinnedIds(): string[] }[];
+          }
+        ).docs[0].pinnedIds(),
+      );
+    expect(await pinnedIds()).toEqual([]);
+    // A tap pins.
+    await touch('touchstart', spot.x, spot.y);
+    await page.waitForTimeout(40);
+    await touch('touchend', spot.x, spot.y);
+    await page.waitForTimeout(200);
+    expect(await pinnedIds()).toEqual([spot.id]);
+    // The Menu button: a drag that starts on it does nothing; a tap opens the pause menu.
+    const menu = await page.evaluate(() => {
+      type Obj = {
+        constructor: { name: string };
+        label?: { text: string };
+        bw: number;
+        bh: number;
+        getWorldTransformMatrix(): { tx: number; ty: number };
+      };
+      const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+        children: { list: Obj[] };
+      };
+      const b = inv.children.list.find(
+        (o) => o.constructor.name === 'PixelButton' && o.label?.text.startsWith('Menu'),
+      )!;
+      const m = b.getWorldTransformMatrix();
+      return { x: m.tx + b.bw / 2, y: m.ty + b.bh / 2 };
+    });
+    const paused = () =>
+      page.evaluate(
+        () =>
+          (window.__game.scene.getScene('InvestigationScene') as unknown as { paused: boolean })
+            .paused,
+      );
+    await touch('touchstart', menu.x, menu.y);
+    for (let i = 1; i <= 5; i++) {
+      await touch('touchmove', menu.x, menu.y - i * 8);
+      await page.waitForTimeout(30);
+    }
+    await touch('touchend', menu.x, menu.y - 40);
+    await page.waitForTimeout(200);
+    expect(await paused()).toBe(false);
+    await touch('touchstart', menu.x, menu.y);
+    await page.waitForTimeout(40);
+    await touch('touchend', menu.x, menu.y);
+    await page.waitForTimeout(300);
+    expect(await paused()).toBe(true);
+    expect(errors).toEqual([]);
+  });
 });
