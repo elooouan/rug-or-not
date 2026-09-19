@@ -33,10 +33,11 @@
   that run's report again, second look included. (The fastest-call record also survives a
   slower replay now; it used to be dropped.)
 - The second look: when a report has a missed flag, a false accusation or a wrong verdict,
-  a line on it (or the S key) opens the file again read-only, with the run's pins where they were and every missed
-  flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the
-  herring explained in Lucien's bubble; the fine print still needs the lens. Esc or "Back
-  to report" returns to the report, which lands quietly the second time.
+  a line on it (or the S key) opens the file again read-only, with the run's pins where
+  they were and every missed flag marked with an amber tag (tabs with marks keep a dot).
+  Clicking a mark gets the flag or the herring explained in Lucien's bubble; the fine
+  print still needs the lens. Esc or "Back to report" returns to the report, which lands
+  quietly the second time. Lucien explains it properly the first time.
 - A new red flag in the library and the printer: "Trading switch in one hand", a
   tradingOpen flag the owner (or the operator behind a fake renounce) can flip with nothing
   that reopens it. The notebook, the drills, the rush decks and the safe's combination all
