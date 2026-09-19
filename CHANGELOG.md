@@ -16,6 +16,8 @@
   under the settings page; nothing bought changes a score.
 - The fish crosses its bowl, the globe turns, the plant leans, the bobblehead nods: the
   corner has a little life. Buying anything rings the till and bounces what landed.
+- Curtains from the market can be drawn: click the cloth and they meet across the glass,
+  click again to let the city back in. They stay drawn from screen to screen.
 - One item a day is a third off at the market (the same one for everyone; half off for
   coin holders of any tier), and hovering a row tries it on: the strip at the top shows
   Lucien in that coat, the cat in that fur. Fingers can't hover, so on a phone a tap on the

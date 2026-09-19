@@ -197,7 +197,7 @@ export const HANDBOOK: HandbookTopic[] = [
     id: 'toys',
     title: 'Desk toys',
     body: [
-      'Almost everything on the desk does something. Hover the coffee. Click the lamp, the window, the moon, the cat, the clock, the corkboard, the radio (four stations), the ink pad, the safe.',
+      'Almost everything on the desk does something. Hover the coffee. Click the lamp, the window, the moon, the curtains (once the market has hung some), the cat, the clock, the corkboard, the radio (four stations), the ink pad, the safe.',
       'The title screen listens for typed words. The safe wants three digits that are hidden somewhere in the office. Lucien has opinions if you click him.',
     ],
   },

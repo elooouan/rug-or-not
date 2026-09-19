@@ -86,6 +86,9 @@ function tuneRadio(): Station {
   return next;
 }
 
+/** Curtains pulled across the glass stay that way from screen to screen, for the session. */
+let curtainsDrawn = false;
+
 /**
  * The shared noir desk: wood, a rainy city window with a cat on the sill,
  * corkboard, lamp, props, then the amber light pool and vignette on top.
@@ -116,6 +119,9 @@ export class DeskBackground {
   private ornament?: Phaser.GameObjects.Image;
   private radio?: Phaser.GameObjects.Image;
   private curtains!: Phaser.GameObjects.Graphics;
+  /** How far the curtains are drawn across the glass, 0 (open) to 1 (met in the middle). */
+  private curtainDraw = 0;
+  private curtainTween?: Phaser.Tweens.Tween;
   private props = true;
   private timers: Phaser.Time.TimerEvent[] = [];
   private flickerOn = true;
@@ -385,27 +391,56 @@ export class DeskBackground {
     }
   }
 
-  /** Curtains at both ends of the window, in the market's colour; nothing when bare. */
+  /**
+   * Curtains at both ends of the window, in the market's colour; nothing when bare. Drawn
+   * across the glass they meet in the middle, folds every few pixels.
+   */
   private drawCurtains(): void {
     const g = this.curtains;
     g.clear();
     const style = worn('curtains').style;
-    if (style.slot !== 'curtains' || !style.color) return;
+    if (style.slot !== 'curtains' || !style.color) {
+      this.curtainDraw = 0;
+      curtainsDrawn = false;
+      return;
+    }
     const { x, y, w, h } = DESK.window;
-    const cw = 14;
+    const cw = Math.round(14 + this.curtainDraw * (w / 2 - 14));
     const fold = 4;
     for (const side of [x, x + w - cw]) {
       g.fillStyle(HEX[style.color], 1);
       g.fillRect(side, y, cw, h);
-      // A darker fold down the middle and a pelmet across the top.
+      // Darker folds down the cloth and a pelmet across the top.
       g.fillStyle(HEX.bg, 0.35);
-      g.fillRect(side + fold, y, 3, h);
-      g.fillRect(side + cw - fold - 3, y, 3, h);
+      for (let fx = side + fold; fx + 3 <= side + cw - fold; fx += 7) g.fillRect(fx, y, 3, h);
     }
     g.fillStyle(HEX[style.color], 1);
     g.fillRect(x, y, w, 4);
     g.fillStyle(HEX.bg, 0.35);
     g.fillRect(x, y + 4, w, 1);
+  }
+
+  /** Pull the curtains across the glass, or open them again. */
+  private toggleCurtains(): void {
+    const to = this.curtainDraw > 0.5 ? 0 : 1;
+    curtainsDrawn = to === 1;
+    this.curtainTween?.stop();
+    audio.play('paper');
+    if (!this.motion) {
+      this.curtainDraw = to;
+      this.drawCurtains();
+      return;
+    }
+    this.curtainTween = this.scene.tweens.addCounter({
+      from: this.curtainDraw,
+      to,
+      duration: 420,
+      ease: 'Sine.easeInOut',
+      onUpdate: (tw) => {
+        this.curtainDraw = tw.getValue() ?? to;
+        this.drawCurtains();
+      },
+    });
   }
 
   /** Clickable props lift a pixel under the pointer so the desk reads as touchable. */
@@ -592,11 +627,33 @@ export class DeskBackground {
       .setVisible(false);
 
     this.curtains = scene.add.graphics().setDepth(DEPTH.windowRain);
+    this.curtainDraw = curtainsDrawn ? 1 : 0;
     this.drawCurtains();
+    // The cloth at either end draws the curtains; bare window edges leave the glass to it.
+    for (const side of [x, x + w - 14]) {
+      const cloth = scene.add
+        .zone(side, y, 14, h)
+        .setOrigin(0)
+        .setDepth(DEPTH.windowRain)
+        .setInteractive({ useHandCursor: false });
+      cloth.on(
+        'pointerdown',
+        (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+          if (worn('curtains').style.slot !== 'curtains') return;
+          ev.stopPropagation();
+          this.toggleCurtains();
+        },
+      );
+    }
 
     // Click the glass to change the weather; click the moon because why not.
     glass.setInteractive({ useHandCursor: false });
     glass.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      // Drawn curtains cover the glass: a click there opens them instead.
+      if (this.curtainDraw > 0.5) {
+        this.toggleCurtains();
+        return;
+      }
       const next = cycleWeather();
       this.setWeather(next);
       if (noteSeen('weathersSeen', next).length >= WEATHERS.length)
@@ -613,6 +670,10 @@ export class DeskBackground {
       'pointerdown',
       (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
         ev.stopPropagation();
+        if (this.curtainDraw > 0.5) {
+          this.toggleCurtains();
+          return;
+        }
         audio.play('hover');
         const lines = [
           'made of cheese. allegedly.',

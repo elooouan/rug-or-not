@@ -74,7 +74,8 @@ in `assets/`; the transparent in-game PNGs are in `public/img/`.
 ## The desk is alive
 
 Hover the coffee to take a sip. Click the lamp (it has feelings after ten clicks), the window
-(cycles the weather: rain, thunderstorm, snow, clear night, fog), the moon, the corkboard
+(cycles the weather: rain, thunderstorm, snow, clear night, fog), the moon, the curtains
+once the market has hung some (they draw across the glass and open again), the corkboard
 (real detective tips), the folder stack, the ink pad (inks your cursor), the clock, and
 Biscuit the cat on the sill. The title card has a few typed-word and Konami surprises (try
 "shop" or "clips"), and the
