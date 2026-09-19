@@ -788,6 +788,11 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       window.open('https://github.com/elooouan/rug-or-not', '_blank', 'noopener');
     });
     ctx.button(
+      'Something broke? Report it (new tab)',
+      () => window.open('https://github.com/elooouan/rug-or-not/issues', '_blank', 'noopener'),
+      { variant: 'paper' },
+    );
+    ctx.button(
       'Case editor (opens a new tab)',
       () => {
         window.open('./editor.html', '_blank', 'noopener');
