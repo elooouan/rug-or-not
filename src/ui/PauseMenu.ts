@@ -43,6 +43,21 @@ export class PauseMenu extends Phaser.GameObjects.Container {
           color: 'woodMid',
         }).setOrigin(0.5, 0),
       );
+    // Quitting throws the run away, so it asks once: the button changes its mind for a
+    // few seconds and a second press goes.
+    let quitArmed = false;
+    const quit = () => {
+      if (quitArmed) {
+        actions.onQuit();
+        return;
+      }
+      quitArmed = true;
+      quitBtn.setLabel('Sure? Quit');
+      scene.time.delayedCall(2500, () => {
+        quitArmed = false;
+        if (quitBtn.active) quitBtn.setLabel('Quit to title');
+      });
+    };
     // Fullscreen only where the browser allows it (not on an iPhone).
     const rows: [string, () => void][] = [
       ['Resume', actions.onResume],
@@ -51,12 +66,13 @@ export class PauseMenu extends Phaser.GameObjects.Container {
       ...(document.fullscreenEnabled
         ? [['Fullscreen [F]', () => toggleFullscreen()] as [string, () => void]]
         : []),
-      ['Quit to title', actions.onQuit],
+      ['Quit to title', quit],
     ];
     const buttons = rows.map(
       ([label, fn], i) =>
         new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 48 + i * 22, label, fn, { width: 100 }),
     );
+    const quitBtn = buttons[buttons.length - 1];
     buttons.forEach((b) => {
       scene.children.remove(b);
       this.add(b);
