@@ -73,6 +73,8 @@
   Every settings row now has a line under it saying what it does.
 - Settings has a "Printer difficulty" row: auto (grows with the campaign, as before) or a
   pinned 1 to 5 for every cold case the pile, the title button and "Next cold one" print.
+- Title: "Continue" names the next file (#9 $VLT), a thin bar under the rank line shows
+  how far the next rank is, and the drawer's grade stickers take the report's colours.
 - The pile folder shows tonight's printer difficulty; the weekly folder counts the days
   until the next one. Story beats after the seventh file (between the template and the
   name) and the fifteenth (the drawer that looks empty).
