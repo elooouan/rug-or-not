@@ -269,6 +269,9 @@ export class CaseSelectScene extends Phaser.Scene {
         color: 'woodDark',
       }).setOrigin(0.5, 0),
     );
+    // Where the printer is set tonight (it sometimes goes one harder).
+    const base = Math.max(1, Math.min(5, 1 + Math.floor(solvedRegular() / 3)));
+    cont.add(difficultyPips(this, 40 - 17, 44, base));
     cont.setSize(DRAWER.folderW, DRAWER.folderH);
     cont.setInteractive(
       new Phaser.Geom.Rectangle(
@@ -289,7 +292,10 @@ export class CaseSelectScene extends Phaser.Scene {
       const tip = this.add.container(0, 0).setDepth(DEPTH.toast);
       tip.add(rect(this, tx + 2, ty + 3, w, 34, HEX.bg, 0.5));
       tip.add(rect(this, tx, ty, w, 34, HEX.paper));
-      ['Cold cases: files the printer makes up.', 'Endless. Their own board.'].forEach((l, i) =>
+      [
+        'Cold cases: files the printer makes up.',
+        `Endless. Difficulty ${base}${base < 5 ? ` or ${base + 1}` : ''}. Own board.`,
+      ].forEach((l, i) =>
         tip.add(
           makeText(this, tx + 6, ty + 5 + i * 12, l, {
             font: 'body',
