@@ -183,6 +183,7 @@ if (import.meta.env.DEV) {
         m.setRain(false);
         m.unlock(ctx);
         m.setVolume(1);
+        if (m.isMuted) m.toggleMute(); // the dev-mute flag must not zero the render
         m.play(name);
         const buf = await ctx.startRendering();
         const d = buf.getChannelData(0);
@@ -201,6 +202,7 @@ if (import.meta.env.DEV) {
       m.setMusic(true);
       m.unlock(ctx);
       m.setVolume(1);
+      if (m.isMuted) m.toggleMute();
       // The scheduler runs on wall-clock intervals; offline rendering needs the steps queued up front.
       const mm = m as unknown as {
         playStep(step: number, t: number): void;
