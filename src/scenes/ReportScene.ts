@@ -117,8 +117,13 @@ export class ReportScene extends Phaser.Scene {
     const isDaily = gameState.mode === 'daily';
     const isCold = gameState.mode === 'cold';
     const nextIndex = gameState.currentIndex + 1;
+    // The next folder, when there is one and it's open (a locked file's report can be
+    // revisited from the drawer after a daily; it must not lead into the one after it).
     const hasNext =
-      isCold || (!isDaily && nextIndex < playableCases(saveStore.get(), gameState.cases).length);
+      isCold ||
+      (!isDaily &&
+        nextIndex < playableCases(saveStore.get(), gameState.cases).length &&
+        nextIndex < saveStore.get().campaignUnlocked);
     if (hasNext) {
       buttons.push(
         new PixelButton(
