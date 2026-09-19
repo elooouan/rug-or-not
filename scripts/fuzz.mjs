@@ -64,9 +64,33 @@ const KEYS = [
   'PageUp',
 ];
 
-console.log(`fuzz: ${seconds}s, seed ${seed}`);
+// FUZZ_TOUCH=1 plays with a finger: taps and touch drags instead of mouse presses, so the
+// lift-to-fire buttons, the lens-under-a-finger and drag scrolling get the same treatment.
+const TOUCH = !!process.env.FUZZ_TOUCH;
+console.log(`fuzz: ${seconds}s, seed ${seed}${TOUCH ? ' (touch)' : ''}`);
 const browser = await chromium.launch({ args: ['--enable-precise-memory-info'] });
-const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, hasTouch: TOUCH });
+const cdpTouch = TOUCH ? await page.context().newCDPSession(page) : null;
+/** One finger, in page pixels: touchStart / touchMove / touchEnd. */
+const finger = async (type, x, y) => {
+  await cdpTouch.send('Input.dispatchTouchEvent', {
+    type,
+    touchPoints: type === 'touchEnd' ? [] : [{ x, y }],
+  });
+};
+/** Press at (x, y) for `hold` ms, mouse or finger. */
+const press = async (x, y, hold) => {
+  if (TOUCH) {
+    await finger('touchStart', x, y);
+    await page.waitForTimeout(hold);
+    await finger('touchEnd', x, y);
+    return;
+  }
+  await page.mouse.move(x, y, { steps: 3 });
+  await page.mouse.down();
+  await page.waitForTimeout(hold);
+  await page.mouse.up();
+};
 const errors = [];
 let actions = 0;
 const scene = () =>
@@ -179,50 +203,56 @@ while (Date.now() < end) {
     const hold = rand() < 0.2 ? 250 : 40;
     if (trace)
       console.log(actions, 'click', Math.round(x / 2), Math.round(y / 2), hold, await scene());
-    await page.mouse.move(x, y, { steps: 3 });
-    if (process.env.FUZZ_WATCH && actions === Number(process.env.FUZZ_WATCH))
-      await page.evaluate(() => {
-        // Narrate the game loop through the checkpoint channel until the crash.
-        const g = window.__game;
-        for (const ev of ['prestep', 'step', 'poststep', 'prerender', 'postrender'])
-          g.events.on(ev, () => window.__cp(`game:${ev}`));
-        const hook = (sc) => {
-          for (const ev of [
-            'preupdate',
-            'update',
-            'postupdate',
-            'render',
-            'create',
-            'start',
-            'ready',
-            'shutdown',
-          ])
-            sc.events.on(ev, () => window.__cp(`${sc.scene.key}:${ev}`));
-        };
-        g.scene.scenes.forEach(hook);
-      });
-    if (process.env.FUZZ_WATCH && actions === Number(process.env.FUZZ_WATCH)) {
-      // Freeze whatever the page is doing a moment after the press and print its stack:
-      // a tight loop shows up here even when nothing else can get through.
-      const cdp = await page.context().newCDPSession(page);
-      await cdp.send('Debugger.enable');
-      const paused = new Promise((r) => cdp.once('Debugger.paused', r));
-      await page.mouse.down();
-      await page.waitForTimeout(400);
-      await cdp.send('Debugger.pause').catch(() => {});
-      const ev = await Promise.race([paused, new Promise((r) => setTimeout(() => r(null), 5000))]);
-      if (ev)
-        for (const f of ev.callFrames.slice(0, 14))
-          console.log(
-            `  at ${f.functionName || '(anon)'}  ${f.url.split('/').slice(-2).join('/')}:${f.location.lineNumber + 1}`,
-          );
-      else console.log('  (no pause event)');
-      await cdp.send('Debugger.resume').catch(() => {});
-    } else {
-      await page.mouse.down();
-      await page.waitForTimeout(hold);
+    if (TOUCH) await press(x, y, hold);
+    else {
+      await page.mouse.move(x, y, { steps: 3 });
+      if (process.env.FUZZ_WATCH && actions === Number(process.env.FUZZ_WATCH))
+        await page.evaluate(() => {
+          // Narrate the game loop through the checkpoint channel until the crash.
+          const g = window.__game;
+          for (const ev of ['prestep', 'step', 'poststep', 'prerender', 'postrender'])
+            g.events.on(ev, () => window.__cp(`game:${ev}`));
+          const hook = (sc) => {
+            for (const ev of [
+              'preupdate',
+              'update',
+              'postupdate',
+              'render',
+              'create',
+              'start',
+              'ready',
+              'shutdown',
+            ])
+              sc.events.on(ev, () => window.__cp(`${sc.scene.key}:${ev}`));
+          };
+          g.scene.scenes.forEach(hook);
+        });
+      if (process.env.FUZZ_WATCH && actions === Number(process.env.FUZZ_WATCH)) {
+        // Freeze whatever the page is doing a moment after the press and print its stack:
+        // a tight loop shows up here even when nothing else can get through.
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Debugger.enable');
+        const paused = new Promise((r) => cdp.once('Debugger.paused', r));
+        await page.mouse.down();
+        await page.waitForTimeout(400);
+        await cdp.send('Debugger.pause').catch(() => {});
+        const ev = await Promise.race([
+          paused,
+          new Promise((r) => setTimeout(() => r(null), 5000)),
+        ]);
+        if (ev)
+          for (const f of ev.callFrames.slice(0, 14))
+            console.log(
+              `  at ${f.functionName || '(anon)'}  ${f.url.split('/').slice(-2).join('/')}:${f.location.lineNumber + 1}`,
+            );
+        else console.log('  (no pause event)');
+        await cdp.send('Debugger.resume').catch(() => {});
+      } else {
+        await page.mouse.down();
+        await page.waitForTimeout(hold);
+      }
+      await page.mouse.up();
     }
-    await page.mouse.up();
   } else if (roll < 0.63) {
     // A click on something that is actually interactive (a button, a report line, a clue
     // spot): random coordinates rarely land on the small targets.
@@ -243,10 +273,7 @@ while (Date.now() < end) {
     if (at && at.x >= 0 && at.x < 640 && at.y >= 0 && at.y < 360) {
       if (trace)
         console.log(actions, 'target', at.what, Math.round(at.x), Math.round(at.y), await scene());
-      await page.mouse.move(at.x * 2, at.y * 2, { steps: 3 });
-      await page.mouse.down();
-      await page.waitForTimeout(40);
-      await page.mouse.up();
+      await press(at.x * 2, at.y * 2, 40);
     }
   } else if (roll < 0.85) {
     const key = pick(KEYS);
@@ -257,8 +284,15 @@ while (Date.now() < end) {
     const y = rand() * 720;
     const dy = pick([-200, -100, 100, 200, 400]);
     if (trace) console.log(actions, 'wheel', Math.round(x / 2), Math.round(y / 2), dy);
-    await page.mouse.move(x, y);
-    await page.mouse.wheel(0, dy);
+    if (TOUCH) {
+      // No wheel under a finger: a short vertical drag instead.
+      await finger('touchStart', x, y);
+      for (let i = 1; i <= 4; i++) await finger('touchMove', x, y - (dy / 4) * i);
+      await finger('touchEnd', x, y - dy);
+    } else {
+      await page.mouse.move(x, y);
+      await page.mouse.wheel(0, dy);
+    }
   } else {
     // A quick drag across the paper.
     const x = rand() * 1280;
@@ -274,10 +308,16 @@ while (Date.now() < end) {
         Math.round(dx / 2),
         Math.round(dy / 2),
       );
-    await page.mouse.move(x, y);
-    await page.mouse.down();
-    await page.mouse.move(x + dx, y + dy, { steps: 6 });
-    await page.mouse.up();
+    if (TOUCH) {
+      await finger('touchStart', x, y);
+      for (let i = 1; i <= 6; i++) await finger('touchMove', x + (dx / 6) * i, y + (dy / 6) * i);
+      await finger('touchEnd', x + dx, y + dy);
+    } else {
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x + dx, y + dy, { steps: 6 });
+      await page.mouse.up();
+    }
   }
   actions++;
   if (actions % 5 === 0) {
