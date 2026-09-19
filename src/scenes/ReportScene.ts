@@ -450,10 +450,13 @@ export class ReportScene extends Phaser.Scene {
 
   /** A quick verdict on your verdict, every time. */
   /** Flag and herring lines are links into the notebook (overlay, comes back here). */
-  /** Worth a second look: something got past the player, or something innocent got pinned. */
+  /**
+   * Worth a second look: something got past the player, something innocent got pinned, or
+   * the verdict was wrong (a legit file stamped RUG has herrings worth a click).
+   */
   private secondLookOffered(): boolean {
     const b = this.payload.breakdown;
-    return b.flagsMissed.length > 0 || b.falseAccusations.length > 0;
+    return b.flagsMissed.length > 0 || b.falseAccusations.length > 0 || !b.verdictCorrect;
   }
 
   /** The file again, read-only: the run's pins where they were, the misses in amber. */

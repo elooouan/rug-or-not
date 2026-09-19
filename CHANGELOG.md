@@ -31,8 +31,8 @@
 - The drawer keeps the last run of every file: the grade sticker on a closed folder opens
   that run's report again, second look included. (The fastest-call record also survives a
   slower replay now; it used to be dropped.)
-- The second look: when a report has a missed flag or a false accusation, a line on it
-  (or the S key) opens the file again read-only, with the run's pins where they were and every missed
+- The second look: when a report has a missed flag, a false accusation or a wrong verdict,
+  a line on it (or the S key) opens the file again read-only, with the run's pins where they were and every missed
   flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the
   herring explained in Lucien's bubble; the fine print still needs the lens. Esc or "Back
   to report" returns to the report, which lands quietly the second time.

@@ -226,10 +226,15 @@ export class InvestigationScene extends Phaser.Scene {
       .map((cl) => ({ id: cl.id, label: cl.label }));
     this.refreshNotebook();
     const missed = marks.reduce((a, b) => a + b, 0);
+    const legit = this.caseData.verdict === 'legit';
     this.notebook?.setTitle('SECOND LOOK', 'stampRed');
     this.notebook?.setEmptyLine('nothing was pinned\non this run');
     this.notebook?.setStatus(
-      missed > 0 ? `${missed} missed, in amber` : 'nothing missed',
+      missed > 0
+        ? `${missed} missed, in amber`
+        : legit
+          ? 'no red flags on this file'
+          : 'nothing missed',
       missed > 0 ? 'stampRed' : 'stampGreen',
     );
     // Open on the first page that has something to show.
@@ -239,12 +244,15 @@ export class InvestigationScene extends Phaser.Scene {
     // The first time, the full explanation; after that, a word in the corner.
     if (this.setDialogue(lucienSays(this, 'second-look', { onDone: () => (this.dialogue = null) })))
       return;
+    const tap = touchScreen() ? 'Tap' : 'Click';
     this.time.delayedCall(500, () =>
       LucienBubble.tell(
         this,
         missed > 0
-          ? `Amber is what walked past you. ${touchScreen() ? 'Tap' : 'Click'} a mark and I'll say why it mattered.`
-          : `Nothing slipped past you here. ${touchScreen() ? 'Tap' : 'Click'} any mark for the story.`,
+          ? `Amber is what walked past you. ${tap} a mark and I'll say why it mattered.`
+          : legit
+            ? `Nothing here was a red flag. ${tap} anything that looked bad and I'll say why it's fine.`
+            : `Nothing slipped past you here. ${tap} any mark for the story.`,
         6000,
       ),
     );

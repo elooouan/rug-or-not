@@ -195,6 +195,8 @@ async function secondLook() {
     return { look: true, marks, pinned: inv.review.pinnedIds.length };
   });
   await page.waitForTimeout(300);
+  // Lucien's first-time explanation of the second look would take the Esc otherwise.
+  await skip();
   await page.keyboard.press('Escape');
   await page.waitForFunction(
     () => window.__game.scene.getScenes(true).some((s) => s.scene.key === 'ReportScene'),
