@@ -1,6 +1,8 @@
 import { TOKEN } from '@/config/token';
-import { DEFAULT_LOOK, SHOP_BY_ID, type ShopItem, type ShopSlot } from '@/data/shop';
+import { DEFAULT_LOOK, SHOP, SHOP_BY_ID, type ShopItem, type ShopSlot } from '@/data/shop';
+import { localDateKey } from './dailyCase';
 import { currentBalance, currentTier } from './entitlements';
+import { makeRng } from './rng';
 import { saveStore } from './save';
 
 /**
@@ -86,6 +88,19 @@ export function clipsForRush(score: number): number {
   return Math.floor(Math.max(0, score) / 1000) * CLIPS.rushPerThousand;
 }
 
+/** Today's deal: one priced, untiered item a third off, the same for everyone that day. */
+export function dealToday(date = new Date()): { item: ShopItem; price: number } {
+  const pool = SHOP.filter((i) => i.price > 0 && !i.tier);
+  const item = makeRng(`deal-${localDateKey(date)}`).pick(pool);
+  return { item, price: Math.max(1, Math.round((item.price * 2) / 3 / 5) * 5) };
+}
+
+/** What `item` costs right now: its price, or today's deal. */
+export function priceOf(item: ShopItem, date = new Date()): number {
+  const deal = dealToday(date);
+  return deal.item.id === item.id ? deal.price : item.price;
+}
+
 export function owns(id: string): boolean {
   const item = SHOP_BY_ID[id];
   return !!item && (item.price === 0 || saveStore.get().owned.includes(id));
@@ -96,7 +111,8 @@ export function buyBlocker(item: ShopItem): string | null {
   if (owns(item.id)) return 'owned';
   if (item.tier && (currentTier()?.level ?? 0) < item.tier)
     return `holder tier ${item.tier} (${TOKEN.symbol})`;
-  if (clipBalance() < item.price) return `${item.price - clipBalance()} more clips`;
+  const price = priceOf(item);
+  if (clipBalance() < price) return `${price - clipBalance()} more clips`;
   return null;
 }
 
@@ -104,8 +120,9 @@ export function buyBlocker(item: ShopItem): string | null {
 export function buy(id: string): boolean {
   const item = SHOP_BY_ID[id];
   if (!item || buyBlocker(item)) return false;
+  const price = priceOf(item);
   saveStore.update((d) => {
-    d.clips.spent += item.price;
+    d.clips.spent += price;
     if (!d.owned.includes(id)) d.owned.push(id);
     d.look[item.style.slot] = id;
   });

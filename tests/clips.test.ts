@@ -9,9 +9,11 @@ import {
   clipBalance,
   clipsForFile,
   clipsForRush,
+  dealToday,
   earnClips,
   holderClips,
   owns,
+  priceOf,
   wear,
   worn,
 } from '@/systems/clips';
@@ -64,6 +66,26 @@ describe('clips', () => {
     expect(clipsForRush(0)).toBe(0);
     expect(clipsForRush(999)).toBe(0);
     expect(clipsForRush(3450)).toBe(3 * CLIPS.rushPerThousand);
+  });
+
+  it('puts one untiered item on sale a day, the same for everyone', () => {
+    const d1 = new Date(2026, 8, 19);
+    const a = dealToday(d1);
+    expect(a).toEqual(dealToday(new Date(2026, 8, 19, 23, 59)));
+    expect(a.item.price).toBeGreaterThan(0);
+    expect(a.item.tier).toBeUndefined();
+    expect(a.price).toBeLessThan(a.item.price);
+    expect(a.price % 5).toBe(0);
+    // Over a month the deal moves around.
+    const ids = new Set<string>();
+    for (let day = 1; day <= 30; day++) ids.add(dealToday(new Date(2026, 9, day)).item.id);
+    expect(ids.size).toBeGreaterThan(5);
+    // Buying at the deal price spends the deal price.
+    earnClips(a.price);
+    expect(priceOf(a.item, d1)).toBe(a.price);
+    expect(buyBlocker(a.item)).toBe(
+      priceOf(a.item) === a.price ? null : `${a.item.price - a.price} more clips`,
+    );
   });
 
   it('are earned, spent, and never go negative', () => {

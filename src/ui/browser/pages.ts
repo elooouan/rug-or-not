@@ -50,9 +50,11 @@ import {
   buyBlocker,
   CLIPS,
   clipBalance,
+  dealToday,
   earnedClips,
   holderClips,
   owns,
+  priceOf,
   wear,
   worn,
 } from '@/systems/clips';
@@ -832,6 +834,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       );
       ctx.small('Read-only: nothing is ever spent from the wallet.');
     }
+    const deal = dealToday();
+    if (!owns(deal.item.id))
+      ctx.line(
+        `Today's deal: ${deal.item.name}, ${deal.price} clips instead of ${deal.item.price} (${SLOT_TAB[deal.item.style.slot]} drawer).`,
+        { color: 'stampRed' },
+      );
     ctx.gap(4);
 
     // Your desk as it stands: the props at their real size, Lucien to scale. Hovering a
@@ -937,7 +945,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         );
       } else {
         rowButton = ctx.button(
-          `Buy ${item.price}`,
+          `Buy ${priceOf(item)}`,
           () => {
             if (!buy(item.id)) {
               toast(scene, 'Not yet', blocker ?? 'Something got in the way.');
@@ -958,12 +966,17 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         rowButton.on('pointerover', () => tryOn(item, item.style.slot));
         rowButton.on('pointerout', () => tryOn(null, item.style.slot));
       }
-      const price = item.price ? `${item.price} clips` : 'free';
+      const onDeal = !has && deal.item.id === item.id;
+      const price = onDeal
+        ? `${deal.price} clips today (was ${item.price})`
+        : item.price
+          ? `${item.price} clips`
+          : 'free';
       ctx.content.add(
         makeText(scene, 72, rowY + 2, `${item.name}  ·  ${price}`, {
           font: 'body',
           size: FONT.size.body,
-          color: has || !blocker ? 'shadow' : 'woodMid',
+          color: onDeal ? 'stampRed' : has || !blocker ? 'shadow' : 'woodMid',
         }),
       );
       ctx.content.add(
