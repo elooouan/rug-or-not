@@ -11,6 +11,7 @@ declare global {
     };
     __debug: {
       startCase(id: string): void;
+      audio: { isMuted: boolean };
       wallet: {
         connect(): Promise<void>;
         disconnect(): Promise<void>;
@@ -380,5 +381,59 @@ test('a herring hunt deals pages that carry the herring and scores a hit on it',
     return { hunt: r.hunt, target: true, score: r.state.score, rounds: r.state.rounds };
   });
   expect(result).toEqual({ hunt: 'community-jokes', target: true, score: 100, rounds: 1 });
+  expect(errors).toEqual([]);
+});
+
+test('the name picker takes typing and keeps the letters away from the desk', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  // Phone > NetScope > Hall of Detectives > Change name, pressed the way a pointer would.
+  const opened = await page.evaluate(() => {
+    type Obj = { constructor: { name: string }; label?: { text: string }; list?: Obj[] };
+    type Btn = Obj & { emit: (ev: string) => void };
+    const walk = (o: Obj, out: Obj[] = []): Obj[] => {
+      out.push(o);
+      o.list?.forEach((c) => walk(c, out));
+      return out;
+    };
+    const title = window.__game.scene.getScene('TitleScene') as { children: { list: Obj[] } };
+    const all = () => title.children.list.flatMap((o) => walk(o));
+    const button = (text: string) =>
+      all().find((o) => o.constructor.name === 'PixelButton' && o.label?.text.startsWith(text)) as
+        Btn | undefined;
+    button('Connect')?.emit('pointerdown');
+    const panel = all().find((o) => o.constructor.name === 'BrowserPanel') as
+      (Obj & { go: (p: string) => void }) | undefined;
+    panel?.go('board');
+    const change = button('Change name');
+    change?.emit('pointerdown');
+    return { panel: !!panel, change: !!change };
+  });
+  expect(opened).toEqual({ panel: true, change: true });
+  await page.waitForTimeout(300);
+  for (const ch of 'rugm') {
+    await page.keyboard.press(ch);
+    await page.waitForTimeout(60);
+  }
+  await page.waitForTimeout(500);
+  const before = await page.evaluate(() => {
+    type Obj = { constructor: { name: string }; letters?: { text: string }[] };
+    const t = window.__game.scene.getScene('TitleScene') as { children: { list: Obj[] } };
+    const picker = t.children.list.find((o) => o.constructor.name === 'NamePicker');
+    return {
+      letters: picker?.letters?.map((l) => l.text).join(''),
+      stamps: t.children.list.filter((o) => o.constructor.name === 'StampMark').length,
+    };
+  });
+  // "rug" typed into the picker is not the typed easter egg, and the M did not mute.
+  expect(before.letters).toBe('RUGM__');
+  expect(before.stamps).toBe(0);
+  expect(await page.evaluate(() => window.__debug.audio.isMuted)).toBe(false);
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(300);
+  const name = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).detectiveName,
+  );
+  expect(name).toBe('RUGM');
   expect(errors).toEqual([]);
 });
