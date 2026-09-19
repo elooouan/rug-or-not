@@ -58,6 +58,7 @@ const HANDBOOK_ICONS: Record<string, string> = {
   rush: TEX.clock,
   phone: TEX.phone,
   coin: TEX.iconPhantom,
+  market: TEX.paperclip,
   badges: TEX.iconCheck,
   share: TEX.paperclip,
   toys: TEX.mug,
