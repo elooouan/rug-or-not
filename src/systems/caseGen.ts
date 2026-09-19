@@ -119,6 +119,14 @@ const TRAITS = [
   'Small team, real names.',
   'Nothing to sell you.',
 ];
+/** Two different traits for the pitch: "Two years old. Two years old." reads like a tell. */
+function twoTraits(rng: Rng): string {
+  const a = rng.pick(TRAITS);
+  let b = rng.pick(TRAITS);
+  if (b === a) b = TRAITS[(TRAITS.indexOf(a) + 1) % TRAITS.length];
+  return `${a} ${b}`;
+}
+
 const FIRST = [
   'Mara',
   'Tobias',
@@ -839,8 +847,9 @@ function teamDoc(
     3,
   );
   const surnames = take(rng, LAST, 4);
+  const firsts = take(rng, FIRST, 4); // no two Eliases on one team page
   for (let i = 0; i < (wants.meme || wants.duo ? 2 : 3); i++) {
-    const name = `${rng.pick(FIRST)} ${surnames[i]}`;
+    const name = `${firsts[i]} ${surnames[i]}`;
     members.push({
       name,
       role: roles[i],
@@ -1526,10 +1535,7 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
     id: `cold-${seed.toLowerCase().replace(/[^a-z0-9-]/g, '-')}`,
     title: title.slice(0, 40),
     ticker: nm.ticker,
-    pitch: `${nm.name}: ${rng.pick(PROMISES)}. ${rng.pick(TRAITS)} ${rng.pick(TRAITS)}`.slice(
-      0,
-      90,
-    ),
+    pitch: `${nm.name}: ${rng.pick(PROMISES)}. ${twoTraits(rng)}`.slice(0, 90),
     intro: rng.pick(
       p.difficulty >= 4
         ? [
