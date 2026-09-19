@@ -39,6 +39,7 @@ import { addText } from '@/ui/text';
 import { PixelButton } from '@/ui/PixelButton';
 import { floatText } from '@/ui/DeskBackground';
 import { goTo, setupScene } from './sceneUtil';
+import { touchScreen } from '@/ui/lensLift';
 import type { PaletteKey } from '@/config/palette';
 
 type Phase = 'intake' | 'opening' | 'investigating' | 'stamped';
@@ -422,9 +423,11 @@ export class InvestigationScene extends Phaser.Scene {
       GAME_HEIGHT - 12,
       this.review
         ? 'amber: missed  ·  red: pinned  ·  click a mark'
-        : s.noMagnifier
-          ? 'click: pin  ·  R / L: stamp  ·  wheel: scroll'
-          : 'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
+        : touchScreen()
+          ? `${s.noMagnifier ? '' : 'hold: lens  ·  '}tap: pin  ·  drag a stamp onto the paper`
+          : s.noMagnifier
+            ? 'click: pin  ·  R / L: stamp  ·  wheel: scroll'
+            : 'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
       { size: 10, color: 'paperShadow' },
     )
       .setOrigin(1, 0)

@@ -4,3 +4,8 @@ import { LENS } from '@/config/layout';
 export function lensLift(p: { wasTouch: boolean }): number {
   return p.wasTouch ? LENS.touchLift : 0;
 }
+
+/** Is the main pointer a finger? (Hover, wheel and typing hints don't apply then.) */
+export function touchScreen(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+}

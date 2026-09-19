@@ -5,6 +5,7 @@ import { audio } from '@/systems/audio';
 import { makeText } from './text';
 import { escTaken } from './escGuard';
 import { rect } from '@/ui/shapes';
+import { touchScreen } from './lensLift';
 
 export interface ButtonOpts {
   width?: number;
@@ -21,7 +22,7 @@ const ICON_W = 14;
 const ICON_GAP = 5;
 
 /** A chunky pixel button with hover/focus states and optional hotkey. */
-const COARSE_POINTER = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+const COARSE_POINTER = touchScreen();
 
 export class PixelButton extends Phaser.GameObjects.Container {
   private face: Phaser.GameObjects.Rectangle;

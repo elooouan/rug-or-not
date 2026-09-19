@@ -39,6 +39,7 @@ import { rect } from '@/ui/shapes';
 import { SharePopover } from '@/ui/SharePopover';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
+import { touchScreen } from '@/ui/lensLift';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'over';
 
@@ -141,9 +142,7 @@ export class RushScene extends Phaser.Scene {
       this,
       GAME_WIDTH - 96,
       GAME_HEIGHT - 12,
-      this.hunt
-        ? 'click the yellow herring  ·  red flag: -5s  ·  blank paper: -2s  ·  Tab/Enter works too'
-        : 'click the red flag  ·  herring: -5s  ·  blank paper: -2s  ·  Tab/Enter works too',
+      `${touchScreen() ? 'tap' : 'click'} the ${this.hunt ? 'yellow herring  ·  red flag' : 'red flag  ·  herring'}: -5s  ·  blank paper: -2s${touchScreen() ? '' : '  ·  Tab/Enter works too'}`,
       { size: 10, color: 'paperShadow' },
     )
       .setOrigin(1, 0)

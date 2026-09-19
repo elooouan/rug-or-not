@@ -30,6 +30,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
+import { touchScreen } from '@/ui/lensLift';
 import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
 import { markDiscovered, pendingDiscovery, unlocked, type Feature } from '@/systems/discovery';
@@ -489,13 +490,22 @@ export class TitleScene extends Phaser.Scene {
       this,
       GAME_WIDTH / 2,
       GAME_HEIGHT - 12,
-      [
-        'hover the coffee  ·  click the lamp  ·  pet the cat',
-        'click the window  ·  click the moon  ·  turn the radio dial',
-        'try typing a word  ·  swat the fly  ·  wish on a falling star',
-        'poke the detective  ·  open the safe  ·  read the wall',
-        'click the clock  ·  ink your cursor  ·  M mutes, F fills the screen',
-      ][Phaser.Math.Between(0, 4)],
+      // Fingers can't hover or type; they get the lines that work by touch.
+      (touchScreen()
+        ? [
+            'tap the coffee  ·  tap the lamp  ·  pet the cat',
+            'tap the window  ·  tap the moon  ·  turn the radio dial',
+            'swat the fly  ·  wish on a falling star  ·  read the wall',
+            'poke the detective  ·  open the safe  ·  tap the clock',
+          ]
+        : [
+            'hover the coffee  ·  click the lamp  ·  pet the cat',
+            'click the window  ·  click the moon  ·  turn the radio dial',
+            'try typing a word  ·  swat the fly  ·  wish on a falling star',
+            'poke the detective  ·  open the safe  ·  read the wall',
+            'click the clock  ·  ink your cursor  ·  M mutes, F fills the screen',
+          ]
+      ).sort(() => Math.random() - 0.5)[0],
       { size: 9, color: 'paperShadow' },
     )
       .setOrigin(0.5, 0)
