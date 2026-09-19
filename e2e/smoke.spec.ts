@@ -1159,3 +1159,249 @@ test.describe('touch', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test('the desk editor moves, hides and adds props, and every desk follows', async ({ page }) => {
+  // Clips for a spot and an ornament to stand on it.
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'rug-or-not:save:v1',
+      JSON.stringify({
+        version: 1,
+        clips: { earned: 100, spent: 0 },
+        owned: ['orn-plant'],
+        settings: { hints: false, music: false, reducedMotion: true, quips: false },
+      }),
+    );
+  });
+  const errors = await boot(page);
+  await skipTalk(page);
+  type Obj = {
+    type: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    depth: number;
+    visible: boolean;
+    isStroked?: boolean;
+    input?: unknown;
+    texture?: { key: string };
+    list?: Obj[];
+    text?: string;
+    constructor: { name: string };
+    emit(ev: string): void;
+  };
+  // Buttons on the title, the editor's strip included (they nest in containers).
+  const pressChip = (label: string) =>
+    page.evaluate((label) => {
+      const sc = window.__game.scene.getScene('TitleScene') as unknown as {
+        children: { list: Obj[] };
+      };
+      const all: Obj[] = [];
+      const visit = (o: Obj) => {
+        o.list?.forEach(visit);
+        all.push(o);
+      };
+      sc.children.list.forEach(visit);
+      const b = all.find(
+        (o) =>
+          o.constructor.name === 'PixelButton' &&
+          o.list?.some((c) => c.type === 'Text' && c.text === label),
+      );
+      b?.emit('pointerdown');
+      return !!b;
+    }, label);
+  const frames = () =>
+    page.evaluate(() =>
+      (
+        window.__game.scene.getScene('TitleScene') as unknown as { children: { list: Obj[] } }
+      ).children.list
+        .filter((o) => o.type === 'Rectangle' && o.depth === 60 && o.isStroked && o.input)
+        .map((o) => ({ x: o.x, y: o.y, w: o.width, h: o.height })),
+    );
+  const desk = () =>
+    page.evaluate(() => JSON.parse(localStorage.getItem('rug-or-not:save:v1') ?? '{}').desk);
+  const cardY = () =>
+    page.evaluate(() => {
+      const c = (
+        window.__game.scene.getScene('TitleScene') as unknown as { children: { list: Obj[] } }
+      ).children.list.find(
+        (o) =>
+          o.type === 'Container' && o.depth === 10 && o.list?.some((k) => k.text === 'RUG OR NOT?'),
+      );
+      return c?.y ?? -1;
+    });
+  const rect = await page.evaluate(() => {
+    const r = window.__game.canvas.getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
+  });
+  const at = (wx: number, wy: number) => ({
+    x: rect.x + (wx / 640) * rect.w,
+    y: rect.y + (wy / 360) * rect.h,
+  });
+  const drag = async (from: { x: number; y: number }, to: { x: number; y: number }) => {
+    const a = at(from.x, from.y);
+    const b = at(to.x, to.y);
+    await page.mouse.move(a.x, a.y);
+    await page.mouse.down();
+    await page.mouse.move(b.x, b.y, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(150);
+  };
+
+  expect(await pressChip('Arrange desk')).toBe(true);
+  await page.waitForTimeout(300);
+  // The paperwork is off the desk and every prop has a handle.
+  expect(await cardY()).toBeGreaterThanOrEqual(360);
+  let fr = await frames();
+  // Seven: the corner has no ornament until the market puts one there.
+  expect(fr.length).toBe(7);
+  // The mug (30,176) goes to the bottom right; the safe (70,314) dropped on the file bounces back.
+  const mug = fr.find((f) => Math.abs(f.x - 28) < 3 && Math.abs(f.y - 174) < 3)!;
+  await drag({ x: mug.x + mug.w / 2, y: mug.y + mug.h / 2 }, { x: 580, y: 340 });
+  expect((await desk()).pos.mug).toEqual({ x: 560, y: 324 });
+  fr = await frames();
+  const safe = fr.find((f) => Math.abs(f.x - 68) < 3)!;
+  await drag({ x: safe.x + safe.w / 2, y: safe.y + safe.h / 2 }, { x: 300, y: 200 });
+  expect((await desk()).pos.safe).toBeUndefined();
+  // The radio's cross (top-right corner of its frame) takes it off; the strip offers it back.
+  const radio = fr.find((f) => Math.abs(f.x - 22) < 3 && Math.abs(f.y - 106) < 3)!;
+  const cross = at(radio.x + radio.w, radio.y);
+  await page.mouse.click(cross.x, cross.y);
+  await page.waitForTimeout(150);
+  expect((await desk()).hidden).toEqual(['radio']);
+  expect(await pressChip('+ radio')).toBe(true);
+  await page.waitForTimeout(150);
+  expect((await desk()).hidden).toEqual([]);
+  // A spot for the plant.
+  expect(await pressChip('+ spot (30 clips)')).toBe(true);
+  await page.waitForTimeout(200);
+  const d = await desk();
+  expect(d.spots).toBe(1);
+  expect(d.extras).toEqual([{ kind: 'plant', x: 604, y: 324 }]);
+  expect(await page.evaluate(() => window.__debug.clips(0))).toBe(70);
+  // Done: the card comes back, the editor is gone.
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  expect(await cardY()).toBe(0);
+  expect(await frames()).toEqual([]);
+  // The file's desk draws the mug where it was left and the plant on its spot.
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await page.waitForTimeout(800);
+  const placed = await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+      children: { list: { texture?: { key: string }; x: number; y: number }[] };
+    };
+    const mug = inv.children.list.find((o) => o.texture?.key === 'desk-mug');
+    const plant = inv.children.list.find((o) => o.texture?.key === 'desk-ornament-plant');
+    return { mug: mug && { x: mug.x, y: mug.y }, plant: plant && { x: plant.x, y: plant.y } };
+  });
+  expect(placed).toEqual({ mug: { x: 560, y: 324 }, plant: { x: 618, y: 352 } });
+  expect(errors).toEqual([]);
+});
+
+test.describe('touch, the editor', () => {
+  test.use({ hasTouch: true });
+
+  test('a finger drags a prop and taps a cross in the desk editor', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'rug-or-not:save:v1',
+        JSON.stringify({
+          version: 1,
+          settings: { hints: false, music: false, reducedMotion: true, quips: false },
+        }),
+      );
+    });
+    const errors = await boot(page);
+    await skipTalk(page);
+    type Obj = {
+      type: string;
+      text?: string;
+      list?: Obj[];
+      constructor: { name: string };
+      emit(e: string): void;
+    };
+    const pressChip = (label: string) =>
+      page.evaluate((label) => {
+        const sc = window.__game.scene.getScene('TitleScene') as unknown as {
+          children: { list: Obj[] };
+        };
+        const all: Obj[] = [];
+        const visit = (o: Obj) => {
+          o.list?.forEach(visit);
+          all.push(o);
+        };
+        sc.children.list.forEach(visit);
+        const b = all.find(
+          (o) =>
+            o.constructor.name === 'PixelButton' &&
+            o.list?.some((c) => c.type === 'Text' && c.text === label),
+        );
+        b?.emit('pointerdown');
+        return !!b;
+      }, label);
+    expect(await pressChip('Arrange desk')).toBe(true);
+    await page.waitForTimeout(300);
+    await page.evaluate(() => {
+      const canvas = window.__game.canvas;
+      const r = canvas.getBoundingClientRect();
+      const at = (wx: number, wy: number) => ({
+        x: r.left + (wx * r.width) / 640,
+        y: r.top + (wy * r.height) / 360,
+      });
+      (window as unknown as { __touch: (type: string, wx: number, wy: number) => void }).__touch = (
+        type,
+        wx,
+        wy,
+      ) => {
+        const c = at(wx, wy);
+        const t = new Touch({
+          identifier: 1,
+          target: canvas,
+          clientX: c.x,
+          clientY: c.y,
+          pageX: c.x,
+          pageY: c.y,
+        });
+        const list = type === 'touchend' ? [] : [t];
+        canvas.dispatchEvent(
+          new TouchEvent(type, {
+            touches: list,
+            targetTouches: list,
+            changedTouches: [t],
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+      };
+    });
+    type W = { __touch: (type: string, wx: number, wy: number) => void };
+    const touch = (type: string, wx: number, wy: number) =>
+      page.evaluate(([t, x, y]) => (window as unknown as W).__touch(t, x, y), [type, wx, wy] as [
+        string,
+        number,
+        number,
+      ]);
+    const desk = () =>
+      page.evaluate(() => JSON.parse(localStorage.getItem('rug-or-not:save:v1') ?? '{}').desk);
+    // The mug's handle (30,176, 44x34) carried to the bottom right, one move per frame.
+    await touch('touchstart', 52, 193);
+    for (let i = 1; i <= 8; i++) {
+      await touch('touchmove', 52 + ((580 - 52) * i) / 8, 193 + ((340 - 193) * i) / 8);
+      await page.waitForTimeout(40);
+    }
+    await touch('touchend', 580, 340);
+    await page.waitForTimeout(200);
+    expect((await desk()).pos.mug).toEqual({ x: 560, y: 324 });
+    // A tap on the radio's cross (the frame's top-right corner) takes it off.
+    await touch('touchstart', 72, 108);
+    await touch('touchend', 72, 108);
+    await page.waitForTimeout(200);
+    expect((await desk()).hidden).toEqual(['radio']);
+    expect(await pressChip('Done')).toBe(true);
+    await page.waitForTimeout(300);
+    expect(errors).toEqual([]);
+  });
+});

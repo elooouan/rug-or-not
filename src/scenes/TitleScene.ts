@@ -43,6 +43,7 @@ import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 import type { PageId } from '@/ui/browser/PageCtx';
 import { DeskEditor } from '@/ui/DeskEditor';
+import { propHidden } from '@/systems/deskLayout';
 
 /** Whole hours until the next daily case (local midnight), never less than one. */
 function hoursToMidnight(): number {
@@ -482,6 +483,11 @@ export class TitleScene extends Phaser.Scene {
     clock.setDepth(DEPTH.deskProps);
     clock.setRealTime();
     clock.setInteractive(new Phaser.Geom.Rectangle(0, 0, 30, 34), Phaser.Geom.Rectangle.Contains);
+    // Taken off the desk in the editor: gone from the title, back on a file as the timer.
+    if (propHidden('clock')) {
+      clock.setVisible(false);
+      if (clock.input) clock.input.enabled = false;
+    }
     clock.on('pointerdown', () => {
       audio.play('tick');
       const h = new Date().getHours();

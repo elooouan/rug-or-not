@@ -29,6 +29,7 @@ import {
   type PropId,
 } from '@/systems/deskLayout';
 import { saveStore } from '@/systems/save';
+import { shareOrDownloadCanvas } from '@/systems/shareCard';
 import { floatText, type DeskBackground } from './DeskBackground';
 import { dialogueOpen, lucienSays } from './DialogueBox';
 import { markEscConsumed, popModal, popOverlay, pushModal, pushOverlay } from './escGuard';
@@ -100,6 +101,7 @@ export class DeskEditor extends Phaser.GameObjects.Container {
   private escBinding?: { key: Phaser.Input.Keyboard.Key; fn: () => void };
   private held = true;
   private closing = false;
+  private shooting = false;
   private readonly motion: boolean;
   private readonly paperworkY: number;
   private readonly changedBefore: boolean;
@@ -518,6 +520,7 @@ export class DeskEditor extends Phaser.GameObjects.Container {
       () => this.addOrnament(),
     );
     btn('Reset', () => this.reset());
+    btn('Photo', () => void this.photo());
     btn(touchScreen() ? 'Done' : 'Done [Esc]', () => this.close(), 'ink');
     if (hidden.length) {
       tb.add(
@@ -536,6 +539,50 @@ export class DeskEditor extends Phaser.GameObjects.Container {
         tb.add(b);
         tx += b.bw + 4;
       }
+    }
+  }
+
+  /**
+   * A picture of the desk as arranged, lamp up, handles and strip out of frame: the share
+   * sheet on a phone, a download elsewhere.
+   */
+  private async photo(): Promise<void> {
+    if (this.closing || this.shooting) return;
+    this.shooting = true;
+    const scene = this.scene;
+    const hidden = [
+      ...this.handles.flatMap((h) => [h.frame, h.cross, h.tag]),
+      this.grid,
+      this.toolbar,
+    ];
+    const light = this.desk.light.alpha;
+    hidden.forEach((o) => o.setVisible(false));
+    this.desk.light.setAlpha(1);
+    audio.play('click');
+    try {
+      // The snapshot is taken after the next render, with the desk dressed for it.
+      const img = await new Promise<HTMLImageElement>((res) =>
+        scene.game.renderer.snapshot((i) => res(i as HTMLImageElement)),
+      );
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      c.getContext('2d')?.drawImage(img, 0, 0);
+      const out = await shareOrDownloadCanvas(
+        c,
+        'rug-or-not-desk.png',
+        'My desk, arranged. Rug or Not?',
+      );
+      const word = { shared: 'shared', downloaded: 'saved', cancelled: 'kept', failed: 'no photo' }[
+        out
+      ];
+      floatText(scene, 320, TOOLBAR_H + 30, word, out === 'failed' ? 'stampRed' : 'paper');
+    } finally {
+      if (this.active) {
+        hidden.forEach((o) => o.active && o.setVisible(true));
+        this.desk.light.setAlpha(light);
+      }
+      this.shooting = false;
     }
   }
 

@@ -828,9 +828,11 @@ media: v0.10-clip-desk-editor.gif
 
 ## Sat 17 Oct, 12:00  ·  `saturday-4`
 
-(80)
+(186)
 
 > The desk, the phone, the wall, and fog.
+> 
+> Yours looks different by now: Arrange desk, then Photo, and post it. Best desk gets a reply from Lucien.
 > 
 > #screenshotsaturday #pixelart #indiedev
 

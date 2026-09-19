@@ -183,7 +183,7 @@ export const HANDBOOK: HandbookTopic[] = [
       'Arrange desk on the title lifts the paperwork off and puts a handle on everything you own. Drag a thing where you like. The cross takes it off the desk; the strip at the top puts it back. Wherever things end up, every screen draws them there.',
       { h: 'Spots' },
       `An ornament from the market can stand on more than one spot: the first extra spot costs ${SPOT_PRICES[0]} clips, the next ${SPOT_PRICES[1]}, the last ${SPOT_PRICES[2]}. Tap the label under an extra ornament to swap it for another you own.`,
-      'Nothing can sit under the file, the notebook or the stamps: the hatched patches are where the paperwork goes. Reset puts the desk back as it came; the spots stay yours.',
+      'Nothing can sit under the file or the stamps (the darker hatched patches); the notebook only covers its corner while a file is open. A clock taken off the desk still comes back for a file: it is the timer. Reset puts the desk back as it came; the spots stay yours. Photo saves a picture of the desk as arranged (the share sheet on a phone).',
     ],
   },
   {
