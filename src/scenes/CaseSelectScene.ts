@@ -346,10 +346,18 @@ export class CaseSelectScene extends Phaser.Scene {
     cont.add(
       makeText(this, 40, 14, 'WEEKLY', { size: FONT.size.body, color: 'ink' }).setOrigin(0.5, 0),
     );
+    // Days until Monday brings a new one (Monday-based weeks, like the seed).
+    const left = (8 - new Date().getDay()) % 7 || 7;
     cont.add(
       makeText(this, 40, 30, done ? 'closed' : wk, {
         size: FONT.size.tiny,
         color: done ? 'stampGreen' : 'woodDark',
+      }).setOrigin(0.5, 0),
+    );
+    cont.add(
+      makeText(this, 40, 40, left === 1 ? 'new one tomorrow' : `${left} days left`, {
+        size: FONT.size.tiny,
+        color: 'woodMid',
       }).setOrigin(0.5, 0),
     );
     if (done) {
