@@ -9,7 +9,7 @@ import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
 import { readCustomCases } from '@/systems/customCases';
 import { startColdCase, startCustomCase } from '@/systems/coldCase';
-import { leaderboard, type ScoreEntry } from '@/systems/leaderboard';
+import { leaderboard, recentRuns, type ScoreEntry } from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
@@ -478,6 +478,20 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         `Most missed flag: ${FLAGS[missed[0] as keyof typeof FLAGS]?.title ?? missed[0]} (${missed[1]}x)`,
         { color: 'stampRed' },
       );
+    // The desk's own log: the last few files, newest first, whatever the board is.
+    const recent = recentRuns(6);
+    if (recent.length) {
+      ctx.rule();
+      ctx.line('Recent files on this desk:', { color: 'woodMid' });
+      for (const e of recent) {
+        const kind = e.mode === 'rush' ? 'rush' : e.mode === 'cold' ? 'cold' : 'case';
+        const name = e.caseId.replace(/^cold-/, '');
+        ctx.line(
+          `${e.date.slice(5, 10)}  ${kind.padEnd(5)} ${name.padEnd(14).slice(0, 14)} ${String(e.score).padStart(4)}  ${e.grade}`,
+          { color: 'shadow' },
+        );
+      }
+    }
     ctx.rule();
     ctx.line(
       `Best runs (${leaderboard.kind === 'remote' ? 'precinct server' : 'this device'})${ctx.panel.holdersOnly ? ', holders only' : ''}:`,

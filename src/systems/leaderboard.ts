@@ -85,6 +85,11 @@ export class LocalLeaderboard implements LeaderboardProvider {
     return rankEntries(pool, limit, mode);
   }
 
+  /** The last runs on this device, newest first, every mode together. */
+  recent(limit = 8): ScoreEntry[] {
+    return [...this.read()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
+  }
+
   async submit(entry: ScoreEntry): Promise<void> {
     // Each board keeps its own top MAX_ENTRIES so rush scores can't crowd out case runs.
     const merged = [...this.read(), entry];
@@ -150,3 +155,8 @@ function safeStorage(): Storage | null {
 export const leaderboard: LeaderboardProvider = TOKEN.leaderboardUrl
   ? new RemoteLeaderboard(TOKEN.leaderboardUrl)
   : new LocalLeaderboard();
+
+/** This device's own log of recent runs, whatever the board is. */
+export function recentRuns(limit = 8): ScoreEntry[] {
+  return new LocalLeaderboard().recent(limit);
+}

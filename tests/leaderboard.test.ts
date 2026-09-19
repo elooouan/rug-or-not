@@ -88,3 +88,26 @@ describe('leaderboard', () => {
     expect(b.holder).toBeUndefined();
   });
 });
+
+describe('recent runs', () => {
+  it('lists this device runs newest first across modes', async () => {
+    const { LocalLeaderboard } = await import('@/systems/leaderboard');
+    const store = new Map<string, string>();
+    const board = new LocalLeaderboard({
+      getItem: (k) => store.get(k) ?? null,
+      setItem: (k, v) => void store.set(k, v),
+    });
+    const entry = (caseId: string, date: string, mode?: 'rush' | 'cold') => ({
+      name: 'A',
+      score: 100,
+      caseId,
+      grade: 'B' as const,
+      date,
+      mode,
+    });
+    await board.submit(entry('moonpup', '2026-09-17T10:00:00Z'));
+    await board.submit(entry('rush', '2026-09-18T10:00:00Z', 'rush'));
+    await board.submit(entry('cold-x', '2026-09-19T10:00:00Z', 'cold'));
+    expect(board.recent(2).map((e) => e.caseId)).toEqual(['cold-x', 'rush']);
+  });
+});

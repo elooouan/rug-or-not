@@ -14,6 +14,8 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- The board page opens with the desk's own log: the last six files, newest first, whatever
+  the board is set to.
 - Two new badges: Herring Hunter (every hunt done) and Decorator (all five office colours
   tried); the badges page counts progress for both.
 - Herring hunts: every yellow herring page in the notebook can print five pages that each
