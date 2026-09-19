@@ -337,10 +337,10 @@ export class AudioManager {
         break;
       case 'buy':
         // A till: two quick bright blips and the drawer sliding shut.
-        this.tone(t, 'square', 1319, 1319, 0.05, 0.09);
-        this.tone(t + 0.07, 'square', 1760, 1760, 0.07, 0.09);
-        this.noise(t + 0.16, 0.08, 0.2, 1200, 'lowpass', 400);
-        this.tone(t + 0.18, 'sine', 160, 90, 0.1, 0.25);
+        this.tone(t, 'square', 1319, 1319, 0.05, 0.14);
+        this.tone(t + 0.07, 'square', 1760, 1760, 0.07, 0.14);
+        this.noise(t + 0.16, 0.08, 0.3, 1200, 'lowpass', 400);
+        this.tone(t + 0.18, 'sine', 160, 90, 0.1, 0.35);
         break;
       case 'sip':
         this.noise(t, 0.32, 0.18, 500, 'bandpass', 1100);
