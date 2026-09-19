@@ -116,7 +116,7 @@ The phone on the desk opens an in-game browser:
   mints; nothing personal leaves the device beyond the name, the numbers and, if connected,
   the public address).
 - **Market** - dressing for the desk, paid in paper clips (`src/systems/clips.ts`): closing a
-  file pays 3 (+2 for a first solve, +2 for an S, +1 cold, +2 daily), a rush 1 per thousand
+  file pays 3 (+2 for a first solve, +2 for an S, +1 cold, +2 daily, +3 weekly), a rush 1 per thousand
   points, and holding the coin adds an allowance that follows the balance the wallet reports
   (25 clips per `VITE_TOKEN_HOLDER_MIN` coins, capped at 1,000; read-only, nothing is spent
   from the wallet). The catalogue (`src/data/shop.ts`) has coats and hats for Lucien
