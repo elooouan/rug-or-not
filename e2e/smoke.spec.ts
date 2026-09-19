@@ -525,7 +525,7 @@ test('the second look reopens a closed file with the misses marked', async ({ pa
 });
 
 test('a desk quip during a chained lesson gives way to the next lesson', async ({ page }) => {
-  // Hints on: the report's lesson chains into "first wrong", and the coffee has a line too.
+  // Hints on: the report's lesson chains into "first wrong", and the cat has a line too.
   await page.addInitScript(() => {
     localStorage.setItem(
       'rug-or-not:save:v1',
@@ -577,28 +577,13 @@ test('a desk quip during a chained lesson gives way to the next lesson', async (
     { timeout: SLOW },
   );
   expect(await boxes()).toEqual(['The report shows eve']);
-  // Six sips while the lesson is up (a sip needs a moment before the next counts): the
-  // coffee line would open a second box.
-  const sips = () =>
-    page.evaluate(
-      () =>
-        (JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).stats?.sips ??
-          0) as number,
-    );
-  const start = await sips();
-  for (let i = 1; i <= 6; i++) {
-    for (let tries = 0; tries < 14 && (await sips()) < start + i; tries++) {
-      await page.evaluate(() => {
-        const rs = window.__game.scene.getScene('ReportScene') as unknown as {
-          children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
-        };
-        rs.children.list.find((o) => o.texture?.key === 'desk-mug')?.emit('pointerover');
-      });
-      await page.waitForTimeout(700);
-    }
-    await page.waitForTimeout(1500);
-  }
-  expect(await sips()).toBe(start + 6);
+  // One pet of the cat while the lesson is up: the cat's line would open a second box.
+  await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+      children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
+    };
+    rs.children.list.find((o) => o.texture?.key.startsWith('desk-cat'))?.emit('pointerdown');
+  });
   await page.waitForTimeout(500);
   // One box, and it is the next lesson, not the quip; the quip's claim is given back.
   expect(await boxes()).toEqual(['Happens to the best ']);
@@ -606,6 +591,6 @@ test('a desk quip during a chained lesson gives way to the next lesson', async (
     () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).seenHints as string[],
   );
   expect(seen).toContain('first-wrong');
-  expect(seen).not.toContain('coffee');
+  expect(seen).not.toContain('cat');
   expect(errors).toEqual([]);
 });
