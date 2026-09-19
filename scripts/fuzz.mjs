@@ -295,6 +295,25 @@ while (Date.now() < end) {
   }
   await page.waitForTimeout(30 + rand() * 120);
 }
+// Back on a quiet title, nothing should still count as an open overlay: a leak here means
+// some overlay was destroyed without giving its Esc claim back, and Esc misbehaves after.
+const leak = await page
+  .evaluate(async () => {
+    window.__game.scene
+      .getScenes(true)
+      .forEach((s) => s.scene.key !== 'CursorScene' && s.scene.stop());
+    window.__game.scene.start('TitleScene');
+    await new Promise((r) => setTimeout(r, 1500));
+    for (const s of window.__game.scene.getScenes(true))
+      for (const o of s.children.list) if (o.constructor.name === 'DialogueBox') o.finish(true);
+    await new Promise((r) => setTimeout(r, 300));
+    return window.__debug.overlays();
+  })
+  .catch(() => -1);
+if (leak > 0) {
+  console.log(`overlay leak: ${leak} still counted on a quiet title`);
+  errors.push({ at: 'end', error: `overlay leak: ${leak}` });
+}
 await browser.close();
 cpServer.close();
 
