@@ -10,7 +10,7 @@ import { coldDifficulty, solvedRegular, startColdCase } from '@/systems/coldCase
 import { secretUnlocked } from '@/systems/secretCase';
 import { weekKey } from '@/systems/dailyCase';
 import { rankForScore } from '@/systems/ranks';
-import { saveStore } from '@/systems/save';
+import { saveStore, type LastRun } from '@/systems/save';
 import { scoreCase } from '@/systems/scoring';
 import type { ReportPayload } from './InvestigationScene';
 import { DeskBackground } from '@/ui/DeskBackground';
@@ -21,6 +21,18 @@ import { goTo, setupScene } from './sceneUtil';
 import { unlocked } from '@/systems/discovery';
 import { difficultyPips, rect } from '@/ui/shapes';
 import { touchScreen } from '@/ui/lensLift';
+
+/** "174 pts (C)" for a stored run, scored the way the report scores it. */
+function lastScore(c: CaseData, last: LastRun): string {
+  const b = scoreCase({
+    caseData: c,
+    verdict: last.verdict,
+    pins: { clueIds: last.clueIds, strayPins: last.strayPins, hintsUsed: last.hintsUsed },
+    timeLeftSec: last.timeLeftSec,
+    hardMode: last.hard,
+  });
+  return `${b.total} pts (${b.grade})`;
+}
 
 /** A filing-cabinet drawer of case folders. Locked ones wear a padlock. */
 export class CaseSelectScene extends Phaser.Scene {
@@ -223,7 +235,9 @@ export class CaseSelectScene extends Phaser.Scene {
               : 'not played yet',
             maxChars,
           ),
-          ...(best?.lastRun ? ['the grade sticker opens the last report'] : []),
+          ...(best?.lastRun
+            ? [`last run: ${lastScore(c, best.lastRun)}  ·  the grade sticker opens its report`]
+            : []),
         ]
       : wrapMono(
           c.secret
