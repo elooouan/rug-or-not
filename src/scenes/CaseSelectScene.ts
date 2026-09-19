@@ -71,8 +71,10 @@ export class CaseSelectScene extends Phaser.Scene {
       GAME_WIDTH / 2,
       GAME_HEIGHT - 26,
       `${rankForScore(save.totalScore)}  ·  ${save.totalScore} pts  ·  ${Object.keys(save.caseResults).length}/${cases.length} closed${
-        Object.values(save.caseResults).some((r) => r.lastRun) ? '  ·  R: last report' : ''
-      }${unlocked('cold') ? '  ·  P: the pile' : ''}${unlocked('weekly') ? '  W: weekly' : ''}`,
+        touchScreen()
+          ? ''
+          : `${Object.values(save.caseResults).some((r) => r.lastRun) ? '  ·  R: last report' : ''}${unlocked('cold') ? '  ·  P: the pile' : ''}${unlocked('weekly') ? '  W: weekly' : ''}`
+      }`,
       {
         size: FONT.size.small,
         color: 'paperShadow',

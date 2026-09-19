@@ -655,7 +655,7 @@ export class RushScene extends Phaser.Scene {
     this.children.remove(menu);
     c.add(share ? [again, share, menu] : [again, menu]);
     c.add(
-      makeText(this, x + w / 2, y + h - 10, 'Enter: again  ·  Esc: menu', {
+      makeText(this, x + w / 2, y + h - 10, touchScreen() ? '' : 'Enter: again  ·  Esc: menu', {
         size: FONT.size.tiny,
         color: 'woodMid',
       }).setOrigin(0.5, 1),
