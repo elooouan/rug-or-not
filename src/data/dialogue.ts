@@ -90,6 +90,11 @@ export const LUCIEN_QUIPS: string[] = [
   'Pin what you can explain. Drop what you cannot.',
   'A team photo with a watermark is a team of one: the intern who downloaded it.',
   'Quiet night. Suspiciously quiet. Probably fine.',
+  'The second look is not an admission. It is a method.',
+  'A trading switch in one hand. Your money in the other. Guess which one they let go of.',
+  'I have never seen a timelock lie. I have seen a lot of screenshots do.',
+  'The printer never sleeps. Neither, I suspect, does the Tailor.',
+  'If the audit was easy to read, read it again. If it was hard to read, read it twice.',
 ];
 
 export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
