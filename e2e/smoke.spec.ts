@@ -579,15 +579,26 @@ test('a desk quip during a chained lesson gives way to the next lesson', async (
   expect(await boxes()).toEqual(['The report shows eve']);
   // Six sips while the lesson is up (a sip needs a moment before the next counts): the
   // coffee line would open a second box.
-  for (let i = 0; i < 7; i++) {
-    await page.evaluate(() => {
-      const rs = window.__game.scene.getScene('ReportScene') as unknown as {
-        children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
-      };
-      rs.children.list.find((o) => o.texture?.key === 'desk-mug')?.emit('pointerover');
-    });
-    await page.waitForTimeout(2200);
+  const sips = () =>
+    page.evaluate(
+      () =>
+        (JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).stats?.sips ??
+          0) as number,
+    );
+  const start = await sips();
+  for (let i = 1; i <= 6; i++) {
+    for (let tries = 0; tries < 14 && (await sips()) < start + i; tries++) {
+      await page.evaluate(() => {
+        const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+          children: { list: { texture?: { key: string }; emit(ev: string): void }[] };
+        };
+        rs.children.list.find((o) => o.texture?.key === 'desk-mug')?.emit('pointerover');
+      });
+      await page.waitForTimeout(700);
+    }
+    await page.waitForTimeout(1500);
   }
+  expect(await sips()).toBe(start + 6);
   await page.waitForTimeout(500);
   // One box, and it is the next lesson, not the quip; the quip's claim is given back.
   expect(await boxes()).toEqual(['Happens to the best ']);
