@@ -8,6 +8,7 @@ import { claimHint, unclaimHint } from '@/systems/hints';
 import { saveStore } from '@/systems/save';
 import { squish } from './squish';
 import { rect } from './shapes';
+import { touchScreen } from './lensLift';
 import { makeText } from './text';
 import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
 
@@ -60,7 +61,14 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       this.conditions = {};
       return;
     }
-    this.lines = lines;
+    // A finger gets the lines written for it, where a script has them.
+    this.lines = touchScreen()
+      ? lines.map((l) => ({
+          ...l,
+          text: l.touch ?? l.text,
+          prompt: l.touchPrompt ?? l.prompt,
+        }))
+      : lines;
     this.conditions = opts.conditions ?? {};
     this.onDone = opts.onDone;
     const { x, y, w, h, padding } = DIALOGUE;
@@ -93,7 +101,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     })
       .setOrigin(1, 0)
       .setVisible(false);
-    const skip = makeText(scene, x + w - padding, y + 3, 'skip [Esc]', {
+    const skip = makeText(scene, x + w - padding, y + 3, touchScreen() ? 'skip' : 'skip [Esc]', {
       size: FONT.size.tiny,
       color: 'paperShadow',
     }).setOrigin(1, 0);

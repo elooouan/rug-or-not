@@ -5,10 +5,13 @@
  */
 export interface DialogueLine {
   text: string;
+  /** The same line for a finger: no clicking, hovering or keys in it. */
+  touch?: string;
   /** Name of a condition the scene checks each frame; the line waits until it's true. */
   waitFor?: string;
   /** Short prompt shown while waiting, e.g. "hover the paper". */
   prompt?: string;
+  touchPrompt?: string;
 }
 
 export type ScriptId =
@@ -102,6 +105,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     { text: 'First file of the night. Small fry, but they all start small.' },
     {
       text: 'Click the folder to open it, or press Enter.',
+      touch: 'Tap the folder to open it.',
       waitFor: 'opened',
       prompt: 'open the folder',
     },
@@ -109,16 +113,22 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   'first-investigation': [
     {
       text: 'Move your magnifier over the paper. The lens zooms in, and some fine print only shows up through it.',
+      touch:
+        'Press the paper and slide your finger. The lens floats above it, and some fine print only shows up through it.',
       waitFor: 'examined',
       prompt: 'hover a clue with the lens',
+      touchPrompt: 'slide over a clue with the lens',
     },
     {
       text: "That's a clue spot. If it smells wrong, click it to pin it. Pinned clues land in the notebook on the right.",
+      touch:
+        "That's a clue spot. If it smells wrong, tap it to pin it. Pinned clues land in the notebook on the right.",
       waitFor: 'pinned',
       prompt: 'pin a clue',
     },
     {
       text: "Good. There's more evidence in the tabs above the paper. Number keys work too.",
+      touch: "Good. There's more evidence in the tabs above the paper.",
       waitFor: 'tab',
       prompt: 'open another tab',
     },
@@ -127,9 +137,12 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
     {
       text: 'Stuck? Click my face in the corner and I will point at something. It costs ten points, so read first.',
+      touch:
+        'Stuck? Tap my face in the corner and I will point at something. It costs ten points, so read first.',
     },
     {
       text: 'When you have a verdict, click a stamp on the right, or press R for RUG and L for LEGIT.',
+      touch: 'When you have a verdict, drag a stamp from the right onto the paper.',
     },
   ],
   'first-report': [
@@ -234,6 +247,8 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     { text: 'Different game tonight. One page at a time, sixty seconds on the clock.' },
     {
       text: 'Every page hides at least one red flag. Find it, click it, next page. Each hit buys you three seconds.',
+      touch:
+        'Every page hides at least one red flag. Find it, tap it, next page. Each hit buys you three seconds.',
     },
     { text: 'Herrings cost you five. Blank paper costs two. Streaks multiply. Go.' },
   ],
