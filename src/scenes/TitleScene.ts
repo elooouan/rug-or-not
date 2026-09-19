@@ -301,6 +301,16 @@ export class TitleScene extends Phaser.Scene {
       mk('Notebook', () => goTo(this, 'NotebookScene'), 'left'),
       mk('Settings', () => goTo(this, 'SettingsScene'), 'right'),
     ].filter((b): b is PixelButton => b !== null);
+    // A streak on the line and the daily not done yet: a small amber wink on that row.
+    if (!dailyDone && streak > 0 && daily && !reduced) {
+      const dailyBtn = buttons[1];
+      const dot = this.add
+        .rectangle(dailyBtn.x + dailyBtn.bw - 7, dailyBtn.y + 6, 3, 3, HEX.amber)
+        .setOrigin(0);
+      this.children.remove(dot);
+      card.add(dot);
+      this.tweens.add({ targets: dot, alpha: 0.15, duration: 700, yoyo: true, repeat: -1 });
+    }
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'));
     this.input.on('pointermove', () => group.clearFocus());
 
