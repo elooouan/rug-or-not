@@ -318,7 +318,11 @@ type ContractFlag =
   | 'proxy-admin'
   | 'trading-pause';
 type ContractHerring =
-  'small-fixed-tax' | 'renounced-cleanly' | 'immutable-supply-note' | 'timelocked-admin';
+  | 'small-fixed-tax'
+  | 'renounced-cleanly'
+  | 'immutable-supply-note'
+  | 'timelocked-admin'
+  | 'expiring-pause';
 const CONTRACT_FLAGS: ContractFlag[] = [
   'mint-unlimited',
   'sell-tax-adjustable',
@@ -334,6 +338,7 @@ const CONTRACT_HERRINGS: ContractHerring[] = [
   'renounced-cleanly',
   'immutable-supply-note',
   'timelocked-admin',
+  'expiring-pause',
 ];
 
 export interface GenOptions {
@@ -551,6 +556,20 @@ function contractDoc(
     push('  address public pool;');
     push('  mapping(address => bool) public canSell;');
   }
+  // The herring twin of the switch: a pause the timelock pulls, which lifts itself.
+  if (herrings.includes('expiring-pause')) {
+    push('  uint256 public pausedUntil; // at most 48h, set via timelock');
+    const l = push('  function pause(uint256 hrs) external {');
+    push("    require(msg.sender == timelock, 'timelock');");
+    push('    pausedUntil = block.timestamp + (hrs > 48 ? 48 : hrs) * 1 hours;');
+    push('  }');
+    clues.push(
+      herringClue('g-expiring', 'Pause lifts itself', 'expiring-pause', {
+        kind: 'line',
+        line: l,
+      }),
+    );
+  }
   const pausable = flags.includes('trading-pause');
   if (pausable) {
     push('  bool public tradingOpen = true;');
@@ -632,10 +651,12 @@ function contractDoc(
   }
   // The transfer hook: where fees, freezes and the honeypot actually bite.
   const taxed = flags.includes('sell-tax-adjustable') || herrings.includes('small-fixed-tax');
-  if (taxed || honeypot || pausable || flags.includes('blacklist')) {
+  const expiring = herrings.includes('expiring-pause');
+  if (taxed || honeypot || pausable || expiring || flags.includes('blacklist')) {
     push('');
     push('  function _update(address from, address to, uint256 v)');
     push('    internal override {');
+    if (expiring) push("    require(block.timestamp >= pausedUntil, 'paused');");
     if (pausable)
       push(
         `    require(tradingOpen || from == ${fakeRenounce ? 'operator' : 'owner()'}, 'closed');`,
@@ -1274,6 +1295,7 @@ const HERRING_POOL = [
   'real-audit-findings',
   'young-token',
   'two-person-team',
+  'expiring-pause',
 ] as const;
 
 const FLAG_BLURB: Record<string, string> = {
@@ -1339,11 +1361,15 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   // Contradictions: no clean renounce next to a fake one, no long lock next to an unlock.
   // A forced herring wins the argument and the flag goes instead.
   const keepH = (h: string) => forcedHerrings.includes(h);
+  // The self-lifting pause is pulled through the timelock, so it brings one along.
+  if (herrings.has('expiring-pause')) herrings.add('timelocked-admin');
   if (flags.has('fake-renounce')) {
-    if (keepH('renounced-cleanly') || keepH('timelocked-admin')) flags.delete('fake-renounce');
+    if (keepH('renounced-cleanly') || keepH('timelocked-admin') || keepH('expiring-pause'))
+      flags.delete('fake-renounce');
     else {
       herrings.delete('renounced-cleanly');
       herrings.delete('timelocked-admin');
+      herrings.delete('expiring-pause');
     }
   }
   if (flags.has('liquidity-unlocked')) {
@@ -1361,10 +1387,12 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   }
   // A trading switch needs a hand on it: no clean renounce, no timelock next to it.
   if (flags.has('trading-pause')) {
-    if (keepH('renounced-cleanly') || keepH('timelocked-admin')) flags.delete('trading-pause');
+    if (keepH('renounced-cleanly') || keepH('timelocked-admin') || keepH('expiring-pause'))
+      flags.delete('trading-pause');
     else {
       herrings.delete('renounced-cleanly');
       herrings.delete('timelocked-admin');
+      herrings.delete('expiring-pause');
     }
   }
   if (p.verdict === 'rug' && flags.size === 0) flags.add('mint-unlimited');

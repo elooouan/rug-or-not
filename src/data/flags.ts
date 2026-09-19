@@ -280,6 +280,12 @@ export const HERRINGS = {
     reassurance:
       'Small teams ship. Two named people with public histories beat twelve stock photos.',
   },
+  'expiring-pause': {
+    id: 'expiring-pause',
+    title: 'Emergency pause that expires on its own',
+    reassurance:
+      'A pause that lifts itself after a day or two, and can only be pulled through the public timelock, is a fire exit, not a trap. The trap is the switch that stays off until one wallet says otherwise.',
+  },
 } as const satisfies Record<string, Herring>;
 
 export type HerringId = keyof typeof HERRINGS;

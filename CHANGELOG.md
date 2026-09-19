@@ -36,7 +36,8 @@
 - A new red flag in the library and the printer: "Trading switch in one hand", a
   tradingOpen flag the owner (or the operator behind a fake renounce) can flip with nothing
   that reopens it. The notebook, the drills, the rush decks and the safe's combination all
-  count it. A corkboard tip to match.
+  count it. A corkboard tip to match. Its yellow twin joins the herrings: an emergency
+  pause that only the public timelock can pull and that lifts itself within 48 hours.
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
 - A faint crawl of film grain over the office (Office page of Settings; off with reduced
