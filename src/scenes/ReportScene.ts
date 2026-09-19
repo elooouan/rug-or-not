@@ -268,7 +268,7 @@ export class ReportScene extends Phaser.Scene {
 
     if (c.verdict === 'rug') {
       L.push({
-        text: 'RED FLAGS  ·  click one for its notebook page',
+        text: `RED FLAGS  ·  ${touchScreen() ? 'tap' : 'click'} one for its notebook page`,
         font: 'ui',
         size: 10,
         color: 'woodDark',

@@ -8,6 +8,7 @@ import { saveStore } from '@/systems/save';
 import type { Verdict } from '@/systems/scoring';
 import { makeText } from './text';
 import { rect } from '@/ui/shapes';
+import { touchScreen } from './lensLift';
 
 export interface StampOpts {
   verdict: Verdict;
@@ -33,7 +34,8 @@ export class Stamp extends Phaser.GameObjects.Container {
     this.sprite = scene.make
       .image({ x: 0, y: 0, key: opts.verdict === 'rug' ? TEX.stampRug : TEX.stampLegit }, false)
       .setOrigin(0.5, 1);
-    const label = makeText(scene, 0, 3, opts.verdict === 'rug' ? 'RUG  [R]' : 'LEGIT  [L]', {
+    const key = touchScreen() ? '' : opts.verdict === 'rug' ? '  [R]' : '  [L]';
+    const label = makeText(scene, 0, 3, (opts.verdict === 'rug' ? 'RUG' : 'LEGIT') + key, {
       size: FONT.size.tiny,
       color: 'paper',
     }).setOrigin(0.5, 0);

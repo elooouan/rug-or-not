@@ -196,7 +196,7 @@ export class RushScene extends Phaser.Scene {
     if (this.hunt) {
       LucienBubble.say(
         this,
-        `Five pages. Every one has "${HERRINGS[this.hunt].title}": looks bad, is fine. Click the thing that is fine.`,
+        `Five pages. Every one has "${HERRINGS[this.hunt].title}": looks bad, is fine. ${touchScreen() ? 'Tap' : 'Click'} the thing that is fine.`,
         4500,
       );
       this.countdown();

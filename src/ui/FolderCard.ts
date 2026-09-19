@@ -9,6 +9,7 @@ import { saveStore } from '@/systems/save';
 import { gameState } from '@/systems/gameState';
 import { PixelButton } from './PixelButton';
 import { charWidth, makeText, wrapMono } from './text';
+import { touchScreen } from './lensLift';
 import { difficultyPips, rect } from '@/ui/shapes';
 
 /** Case intake: a manila folder slides onto the desk with the token's pitch. */
@@ -88,10 +89,16 @@ export class FolderCard extends Phaser.GameObjects.Container {
     this.remove(btn);
     this.add(btn);
     this.add(
-      makeText(scene, w / 2, h - 12, 'click the folder or press Enter', {
-        size: FONT.size.tiny,
-        color: 'woodDark',
-      }).setOrigin(0.5, 0),
+      makeText(
+        scene,
+        w / 2,
+        h - 12,
+        touchScreen() ? 'or tap the folder' : 'click the folder or press Enter',
+        {
+          size: FONT.size.tiny,
+          color: 'woodDark',
+        },
+      ).setOrigin(0.5, 0),
     );
     folder.setInteractive({ useHandCursor: false });
     folder.on('pointerdown', onOpen);

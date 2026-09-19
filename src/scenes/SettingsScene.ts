@@ -24,6 +24,7 @@ import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette'
 import { syncTheme } from '@/systems/theme';
 import { clipBalance } from '@/systems/clips';
 import { BrowserPanel } from '@/ui/BrowserPanel';
+import { touchScreen } from '@/ui/lensLift';
 
 interface SettingsInit {
   overlay?: boolean;
@@ -360,7 +361,8 @@ export class SettingsScene extends Phaser.Scene {
     this.rows.push({
       label: 'Reset progress',
       tab: 'office',
-      value: () => (this.confirmReset ? 'click again to confirm' : '...'),
+      value: () =>
+        this.confirmReset ? `${touchScreen() ? 'tap' : 'click'} again to confirm` : '...',
       change: () => {
         if (!this.confirmReset) {
           this.confirmReset = true;
