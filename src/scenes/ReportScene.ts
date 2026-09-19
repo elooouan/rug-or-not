@@ -74,12 +74,13 @@ export class ReportScene extends Phaser.Scene {
     this.content.setMask(new Phaser.Display.Masks.GeometryMask(this, mask));
 
     const lines = this.buildLines(w - pad * 2 - 52);
-    const instant = saveStore.get().settings.reducedMotion;
+    const revisit = !!this.payload.revisit;
+    const instant = saveStore.get().settings.reducedMotion || revisit;
     this.typewriter = new Typewriter(this, this.content, lines, 13, REPORT.typeSpeedMs, instant);
     this.maxScroll = Math.max(0, this.typewriter.height - viewH);
     this.typewriter.then(() => {
       this.showGrade();
-      this.time.delayedCall(900, () => this.lucienDebrief());
+      if (!revisit) this.time.delayedCall(900, () => this.lucienDebrief());
     });
 
     // Skip / scroll.
@@ -189,6 +190,8 @@ export class ReportScene extends Phaser.Scene {
     )
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.hud);
+    // Back from the second look, everything below already happened.
+    if (revisit) return;
     audio.play(this.payload.breakdown.verdictCorrect ? 'correct' : 'wrong');
     if (this.payload.rankUp) {
       this.time.delayedCall(900, () => {
@@ -289,6 +292,14 @@ export class ReportScene extends Phaser.Scene {
       }
     }
 
+    if (b.flagsMissed.length > 0 || b.falseAccusations.length > 0)
+      L.push({
+        text: '> SECOND LOOK  ·  open the file again with every mark on the paper',
+        color: 'ink',
+        gap: 4,
+        onClick: () => this.secondLook(),
+      });
+
     const missedFine = b.flagsMissed.filter((f) => f.clue.finePrint).length;
     if (missedFine > 0) {
       L.push(
@@ -338,7 +349,7 @@ export class ReportScene extends Phaser.Scene {
       L.push(...wrap(`New in your notebook: ${names.join('; ')}`, 0, 'ink'));
     }
     if (newUnlockNames.length > 0)
-      L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'amber'));
+      L.push(...wrap(`Unlocked: ${newUnlockNames.join(', ')} (see Settings)`, 0, 'stampGreen'));
     if (this.payload.caughtName)
       L.push(
         ...wrap(
@@ -348,13 +359,18 @@ export class ReportScene extends Phaser.Scene {
         ),
       );
     if (this.payload.rankUp)
-      L.push({ text: `PROMOTED: ${this.payload.rankUp}`, font: 'ui', size: 12, color: 'amber' });
+      L.push({
+        text: `PROMOTED: ${this.payload.rankUp}`,
+        font: 'ui',
+        size: 12,
+        color: 'stampGreen',
+      });
     if (this.payload.newBadges.length > 0)
       L.push(
         ...wrap(
           `Badges: ${this.payload.newBadges.map((id) => BADGE_BY_ID[id]?.name ?? id).join(', ')}`,
           0,
-          'amber',
+          'stampGreen',
         ),
       );
     return L;
@@ -433,6 +449,18 @@ export class ReportScene extends Phaser.Scene {
 
   /** A quick verdict on your verdict, every time. */
   /** Flag and herring lines are links into the notebook (overlay, comes back here). */
+  /** The file again, read-only: the run's pins where they were, the misses in amber. */
+  private secondLook(): void {
+    const b = this.payload.breakdown;
+    gameState.review = {
+      pinnedIds: [...b.flagsFound, ...b.falseAccusations].map((f) => f.clue.id),
+      report: this.payload,
+    };
+    gameState.currentCase = this.payload.caseData;
+    audio.play('paper');
+    goTo(this, 'InvestigationScene');
+  }
+
   private openNotebook(chapter: 'flags' | 'herrings', id?: string): void {
     audio.play('paper');
     this.scene.launch('NotebookScene', { overlay: true, returnTo: ReportScene.KEY, chapter, id });
@@ -460,7 +488,8 @@ export class ReportScene extends Phaser.Scene {
       line = 'Right call, but the fine print slipped by. Sweep the lens slower.';
     else if (b.falseAccusations.length > 0)
       line = 'Right call. Some of those pins were on innocent paper, though.';
-    else if (b.flagsMissed.length > 0) line = 'Right call. There was more to find.';
+    else if (b.flagsMissed.length > 0)
+      line = 'Right call. There was more to find; take the second look.';
     else line = 'Solid work, detective.';
     // Lifted clear of the button row along the report's bottom edge.
     LucienBubble.say(this, line, 5000, 52);

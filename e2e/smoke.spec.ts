@@ -437,3 +437,87 @@ test('the name picker takes typing and keeps the letters away from the desk', as
   expect(name).toBe('RUGM');
   expect(errors).toEqual([]);
 });
+
+test('the second look reopens a closed file with the misses marked', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => window.__debug.startCase('safeyield'));
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
+  await skipTalk(page);
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await skipTalk(page);
+  type Spot = { clue: { id: string; flagId?: string }; pinned: boolean; missed: boolean };
+  type Doc = { allSpots(): Spot[]; focusClue(id: string): boolean; activateFocused(): void };
+  type Inv = {
+    docs: Doc[];
+    stamps: { trigger(fn: (v: string) => void): void }[];
+    onStamp(v: string): void;
+    review: unknown;
+    tabs: { tabs: { dot: { visible: boolean; fillColor: number } }[] };
+  };
+  // Pin the first flag on the paper and nothing else, then call it a rug.
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as Inv;
+    const doc = inv.docs[0];
+    const first = doc.allSpots().find((s) => s.clue.flagId);
+    if (first) {
+      doc.focusClue(first.clue.id);
+      doc.activateFocused();
+    }
+    inv.stamps[0].trigger((v) => inv.onStamp(v));
+  });
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(600);
+  await skipTalk(page);
+  // The report offers the second look as a line; it lands back on the desk read-only.
+  const offered = await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+      typewriter: { skip(): void };
+      content: { list: { text?: string; emit(ev: string, ...a: unknown[]): void }[] };
+    };
+    rs.typewriter.skip();
+    const line = rs.content.list.find((o) => /SECOND LOOK/.test(o.text ?? ''));
+    line?.emit('pointerdown', {}, 0, 0, { stopPropagation: () => undefined });
+    return !!line;
+  });
+  expect(offered).toBe(true);
+  await waitForScene(page, 'InvestigationScene');
+  await page.waitForTimeout(800);
+  const look = await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as Inv;
+    const spots = inv.docs.flatMap((d) => d.allSpots());
+    return {
+      review: inv.review !== null,
+      stamps: inv.stamps.length,
+      pinned: spots.filter((s) => s.pinned).map((s) => s.clue.id),
+      missed: spots.filter((s) => s.missed).length,
+      flags: spots.filter((s) => s.clue.flagId).length,
+    };
+  });
+  expect(look.review).toBe(true);
+  expect(look.stamps).toBe(0);
+  expect(look.pinned).toEqual(['sy-admin']);
+  expect(look.missed).toBe(look.flags - 1);
+  // Esc goes back to the report, which is already typed and awards nothing twice.
+  const before = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).totalScore,
+  );
+  await page.keyboard.press('Escape');
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(500);
+  const back = await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+      payload: { revisit?: boolean };
+      typewriter: { done: boolean };
+    };
+    return {
+      revisit: rs.payload.revisit,
+      typed: rs.typewriter.done,
+      total: JSON.parse(localStorage.getItem('rug-or-not:save:v1') as string).totalScore,
+    };
+  });
+  expect(back).toEqual({ revisit: true, typed: true, total: before });
+  expect(errors).toEqual([]);
+});

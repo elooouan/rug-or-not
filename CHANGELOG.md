@@ -28,6 +28,11 @@
   carry that herring, and the job is to click the thing that only looks bad. Red flags on
   those pages cost seconds, like herrings do in the rush. Hunting them all earns Herring
   Hunter. The generator can be asked for a herring the way drills ask for a flag.
+- The second look: when a report has a missed flag or a false accusation, a line on it
+  opens the file again read-only, with the run's pins where they were and every missed
+  flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the
+  herring explained in Lucien's bubble; the fine print still needs the lens. Esc or "Back
+  to report" returns to the report, which lands quietly the second time.
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
 - A faint crawl of film grain over the office (Office page of Settings; off with reduced

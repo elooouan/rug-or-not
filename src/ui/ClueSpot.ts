@@ -26,8 +26,11 @@ export class ClueSpot extends Phaser.GameObjects.Container {
   readonly clue: Clue;
   readonly rect: SpotRect;
   pinned = false;
+  /** Second look: a red flag the run walked past, marked in amber. */
+  missed = false;
   private highlight: Phaser.GameObjects.Rectangle;
   private pin: Phaser.GameObjects.Image;
+  private tag?: Phaser.GameObjects.Rectangle;
   private focusRing: Phaser.GameObjects.Rectangle;
   private hovered = false;
   private focused = false;
@@ -83,10 +86,10 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     this.add([this.highlight, this.focusRing, zone, this.pin]);
   }
 
-  setPinned(p: boolean): void {
+  setPinned(p: boolean, animate = true): void {
     this.pinned = p;
     this.refresh();
-    if (p && !saveStore.get().settings.reducedMotion) {
+    if (p && animate && !saveStore.get().settings.reducedMotion) {
       // Drop the pin in from above with a little bounce.
       const y = this.rect.y - 4;
       this.pin.setY(y - 10).setAlpha(0);
@@ -108,6 +111,17 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     }
   }
 
+  /** An amber tag where the pin should have gone. */
+  setMissed(): void {
+    this.missed = true;
+    if (!this.tag) {
+      const { x, y } = this.rect;
+      this.tag = mkRect(this.scene, x - 3, y - 4, 7, 7, HEX.amber).setStrokeStyle(1, HEX.shadow);
+      this.add(this.tag);
+    }
+    this.refresh();
+  }
+
   setFocused(f: boolean): void {
     this.focused = f;
     this.focusRing.setVisible(f);
@@ -117,6 +131,9 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     this.pin.setVisible(this.pinned);
     if (this.pinned) {
       this.highlight.setFillStyle(HEX.stampRed, 0.12).setStrokeStyle(1, HEX.stampRed, 0.7);
+    } else if (this.missed) {
+      const lit = this.hovered || this.focused;
+      this.highlight.setFillStyle(HEX.amber, lit ? 0.34 : 0.22).setStrokeStyle(1, HEX.amber, 1);
     } else if ((this.hovered && !saveStore.get().settings.hardMode) || this.focused) {
       this.highlight.setFillStyle(HEX.amber, 0.22).setStrokeStyle(1, HEX.amber, 0.9);
     } else {

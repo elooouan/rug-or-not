@@ -281,6 +281,42 @@ async function openCase(page, id) {
   await skipTalk(page);
 }
 
+/**
+ * From an open file to the second look: pin the first flag on the first page only, stamp
+ * RUG, then take the report's offer. Lands on the first page with something marked.
+ */
+async function secondLook(page) {
+  const spots = await clueSpots(page);
+  const first = spots.find((s) => s.flag);
+  if (first) await click(page, first.x, first.y);
+  await sleep(400);
+  await page.keyboard.press('r');
+  await waitScene(page, 'ReportScene');
+  await sleep(1500);
+  await skipTalk(page);
+  await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene');
+    rs.typewriter.skip();
+  });
+  await sleep(400);
+  await skipTalk(page);
+  // Scroll the offer into view and click it where it sits.
+  const at = await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene');
+    const line = rs.content.list.find((o) => /SECOND LOOK/.test(o.text ?? ''));
+    if (!line) return null;
+    rs.scrollBy(line.y - 120);
+    const m = line.getWorldTransformMatrix();
+    return { x: m.tx + 40, y: m.ty + 6 };
+  });
+  if (!at) throw new Error('no second look on the report');
+  await sleep(300);
+  await move(page, at.x, at.y, 15);
+  await click(page, at.x, at.y);
+  await waitScene(page, 'InvestigationScene');
+  await sleep(1200);
+}
+
 const SHOTS = {
   async 'title-fresh'(page) {
     await boot(page, { ...FRESH, settings: { ...FRESH.settings, hints: true } });
@@ -330,6 +366,33 @@ const SHOTS = {
       await sleep(1200);
       await shot(page, 'share-card');
     }
+  },
+  async 'second-look'(page) {
+    await boot(page, VETERAN);
+    await openCase(page, 'safeyield');
+    await secondLook(page);
+    // The tokenomics page: its missed row sits high on the paper, clear of the bubble.
+    await page.keyboard.press('3');
+    await sleep(900);
+    const marks = await page.evaluate(() => {
+      const sc = window.__game.scene.getScene('InvestigationScene');
+      return sc.docs[sc.current]
+        .allSpots()
+        .filter((s) => s.missed)
+        .map((s) => {
+          const b = s.getBounds();
+          return { x: b.centerX, y: b.centerY };
+        });
+    });
+    if (marks[0]) {
+      await move(page, marks[0].x, marks[0].y, 20);
+      await sleep(400);
+      await click(page, marks[0].x, marks[0].y);
+      // Off the paper, so the lens doesn't sit on the mark or the bubble.
+      await move(page, 600, 250, 15);
+      await sleep(900);
+    }
+    await shot(page, 'second-look');
   },
   async notebook(page) {
     await boot(page, VETERAN);
@@ -670,6 +733,49 @@ const CLIPS = {
     await page.keyboard.type('rug', { delay: 120 });
     await sleep(1800);
     await stopRecording(page, 'desk-toys');
+  },
+  async 'second-look'(page) {
+    await boot(page, VETERAN);
+    await openCase(page, 'safeyield');
+    await record(page);
+    await move(page, 260, 150, 20);
+    await sleep(400);
+    await secondLook(page);
+    await sleep(1200);
+    const marks = await page.evaluate(() => {
+      const sc = window.__game.scene.getScene('InvestigationScene');
+      return sc.docs[sc.current]
+        .allSpots()
+        .filter((s) => s.missed)
+        .map((s) => {
+          const b = s.getBounds();
+          return { x: b.centerX, y: b.centerY };
+        });
+    });
+    if (marks[0]) {
+      await move(page, marks[0].x, marks[0].y, 30);
+      await sleep(500);
+      await click(page, marks[0].x, marks[0].y);
+      await move(page, 600, 250, 20);
+      await sleep(3000);
+    }
+    // Over to a tab with a mark on it, then back to the report.
+    const tab = await page.evaluate(() => {
+      const sc = window.__game.scene.getScene('InvestigationScene');
+      const i = sc.tabs.tabs.findIndex((t, idx) => idx !== sc.current && t.dot.visible);
+      if (i < 0) return null;
+      const t = sc.tabs.tabs[i];
+      return { x: sc.tabs.x + t.x + 40, y: sc.tabs.y + 8 };
+    });
+    if (tab) {
+      await move(page, tab.x, tab.y, 25);
+      await click(page, tab.x, tab.y);
+      await sleep(1800);
+    }
+    await page.keyboard.press('Escape');
+    await waitScene(page, 'ReportScene');
+    await sleep(1500);
+    await stopRecording(page, 'second-look');
   },
   async handbook(page) {
     await boot(page, VETERAN);

@@ -12,8 +12,8 @@ glass, pin the suspicious bits, stamp a verdict (**RUG** or **LEGIT**), and read
 
 > All cases, tokens, people and projects are fictional. This is a game, not financial advice.
 
-| The lens | The report | Blue hour |
-| --- | --- | --- |
+| The lens                                                                          | The report                                                | Blue hour                                                                                   |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | ![Reading fine print through the lens](assets/marketing/v0.8-lens-fine-print.png) | ![The case report](assets/marketing/v0.8-case-report.png) | ![The same office in the Blue hour theme](assets/marketing/v0.8-theme-midnight-reading.png) |
 
 ![A file from folder to report](assets/marketing/v0.8-clip-solve-a-case.gif)
@@ -134,6 +134,9 @@ the coin page once a mint is set; it's read-only and cached for a minute.
   the rogues gallery; and the handbook explains how the whole office works, one page per
   subject ("How to play" on the title opens it).
   Flag and herring lines in a report are links straight to the page.
+- **The second look**: when a report has a missed flag or a false accusation, a line on it
+  reopens the file read-only with the run's pins where they were and every miss marked in
+  amber; click a mark and Lucien explains it. Esc brings the report back.
 - **The desk opens up gradually** (`src/systems/discovery.ts`): a fresh save sees the folder,
   the daily, the notebook and settings; the drawer, the rush, the pile and the weekly turn
   up after one, two, three and four closed files, each announced once by Lucien. Shared

@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { DEPTH } from '@/config/depth';
 import { DESK, GAME_HEIGHT, GAME_WIDTH, PAPER, STAMP } from '@/config/layout';
-import { FLAGS, isFlagClue, type CaseData, type Clue } from '@/data/schema';
+import { FLAGS, HERRINGS, isFlagClue, type CaseData, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { localDateKey, recordDailyPlay, weekKey } from '@/systems/dailyCase';
-import { gameState } from '@/systems/gameState';
+import { gameState, type ReviewState } from '@/systems/gameState';
 import { saveStore } from '@/systems/save';
 import { scoreCase, type ScoreBreakdown, type Verdict } from '@/systems/scoring';
 import { newlyUnlocked, stampInk } from '@/systems/unlocks';
@@ -59,6 +59,8 @@ export interface ReportPayload {
   caughtName: string | null;
   /** Seconds spent on the file, or null in relaxed mode. */
   elapsedSec: number | null;
+  /** Back from the second look: the report is already read, so it lands quietly. */
+  revisit?: boolean;
 }
 
 /** The main desk: read evidence through the lens, pin clues, stamp a verdict. */
@@ -91,6 +93,8 @@ export class InvestigationScene extends Phaser.Scene {
   /** Tab the last nudge was about; a second ask on it points at the line. */
   private nudgedDoc = -1;
   private idleMs = 0;
+  /** The second look after a report: the file opens read-only with every mark showing. */
+  private review: ReviewState | null = null;
 
   constructor() {
     super(InvestigationScene.KEY);
@@ -113,8 +117,10 @@ export class InvestigationScene extends Phaser.Scene {
     this.hoveringSpot = 0;
     this.examined = new Set();
     this.lastTickSecond = -1;
+    this.review = gameState.review;
+    gameState.review = null;
 
-    this.desk = new DeskBackground(this, { props: true, stamps: true });
+    this.desk = new DeskBackground(this, { props: true, stamps: !this.review });
     this.magnifier = new Magnifier(
       this,
       (x, y) =>
@@ -133,14 +139,14 @@ export class InvestigationScene extends Phaser.Scene {
       `${c.ticker}  ·  ${c.title}`,
       {
         size: 10,
-        color: 'paperShadow',
+        color: this.review ? 'amber' : 'paperShadow',
       },
     )
       .setOrigin(1, 0)
       .setDepth(DEPTH.hud);
     this.magnifier.ignore(header);
 
-    new FolderCard(this, c, () => this.openCase());
+    if (!this.review) new FolderCard(this, c, () => this.openCase());
     this.bindKeys();
     this.tabSwitched = false;
     this.browsing = false;
@@ -156,6 +162,7 @@ export class InvestigationScene extends Phaser.Scene {
         !this.browsing &&
         !this.dialogue?.isActive &&
         !saveStore.get().settings.relaxed &&
+        !this.review &&
         this.scene.isActive()
       )
         this.togglePause();
@@ -171,7 +178,9 @@ export class InvestigationScene extends Phaser.Scene {
     // Scene emitters survive restarts; drop last run's handlers before adding ours.
     this.events.off('browser:open');
     this.events.off('browser:close');
+    this.events.off('bubble:open');
     this.events.off(Phaser.Scenes.Events.RESUME);
+    this.events.on('bubble:open', (b: Phaser.GameObjects.GameObject) => this.magnifier.ignore(b));
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -182,8 +191,62 @@ export class InvestigationScene extends Phaser.Scene {
       this.browsing = false;
       if (!this.paused && this.phase === 'investigating') this.clock?.pause(false);
     });
-    this.introDialogue();
+    if (this.review) this.secondLook();
+    else this.introDialogue();
     this.events.on(Phaser.Scenes.Events.RESUME, () => this.onResume());
+  }
+
+  /** The paper comes straight out with the run's pins on it and the misses marked. */
+  private secondLook(): void {
+    const review = this.review;
+    if (!review) return;
+    this.startInvestigation();
+    const pinned = new Set(review.pinnedIds);
+    const marks = this.docs.map((d) => d.reveal(pinned));
+    marks.forEach((n, i) => n > 0 && this.tabs?.setDot(i, 'amber'));
+    this.suspicions = this.caseData.documents
+      .flatMap((d) => d.clues)
+      .filter((cl) => pinned.has(cl.id))
+      .map((cl) => ({ id: cl.id, label: cl.label }));
+    this.refreshNotebook();
+    const missed = marks.reduce((a, b) => a + b, 0);
+    this.notebook?.setStatus(
+      missed > 0 ? `second look: ${missed} missed` : 'second look: nothing missed',
+      missed > 0 ? 'stampRed' : 'stampGreen',
+    );
+    // Open on the first page that has something to show.
+    const first = marks.findIndex((n) => n > 0);
+    if (first > 0) this.showDocument(first, false);
+    this.time.delayedCall(500, () =>
+      LucienBubble.say(
+        this,
+        missed > 0
+          ? "Amber is what walked past you. Click a mark and I'll say why it mattered."
+          : 'Nothing slipped past you here. Click any mark for the story.',
+        6000,
+      ),
+    );
+  }
+
+  /** A click on a spot during the second look: the flag or the herring, in a sentence. */
+  private inspect(clue: Clue): void {
+    audio.play('tick');
+    if (isFlagClue(clue)) {
+      const flag = FLAGS[clue.flagId as keyof typeof FLAGS];
+      const spot = this.currentDoc()
+        ?.allSpots()
+        .find((s) => s.clue.id === clue.id);
+      const head = spot?.missed ? 'Missed' : 'Pinned';
+      LucienBubble.say(this, `${head}: ${flag.title}. ${flag.explanation}`, 7000);
+    } else {
+      const h = HERRINGS[clue.herringId as keyof typeof HERRINGS];
+      LucienBubble.say(this, `Herring: ${h.title}. ${h.reassurance}`, 7000);
+    }
+  }
+
+  private backToReport(): void {
+    if (!this.review) return;
+    goTo(this, 'ReportScene', { ...this.review.report, revisit: true });
   }
 
   /** Lucien's once-only guidance: daily explainer, then the intake hint. */
@@ -228,6 +291,7 @@ export class InvestigationScene extends Phaser.Scene {
   }
 
   private tutorial(): void {
+    if (this.review) return;
     if (this.dialogue?.isActive) return; // the intake box chains into this via onDone
     this.setDialogue(
       lucienSays(this, 'first-investigation', {
@@ -258,6 +322,8 @@ export class InvestigationScene extends Phaser.Scene {
 
     const ctx = {
       noMagnifier: s.noMagnifier,
+      review: !!this.review,
+      onInspect: (clue: Clue) => this.inspect(clue),
       registerFinePrint: (obj: Phaser.GameObjects.GameObject) =>
         this.magnifier.registerFinePrint(obj),
       onPinToggle: (clue: Clue, pinned: boolean) => this.onPinToggle(clue, pinned),
@@ -269,7 +335,7 @@ export class InvestigationScene extends Phaser.Scene {
       onHoverSpot: (over: boolean, clueId: string) => {
         this.hoveringSpot = Math.max(0, this.hoveringSpot + (over ? 1 : -1));
         this.magnifier.setGlow(this.hoveringSpot > 0);
-        if (over && !this.examined.has(clueId)) {
+        if (over && !this.examined.has(clueId) && !this.review) {
           this.examined.add(clueId);
           if (!s.hardMode) this.notebook?.setExamined(this.examined.size, this.totalSpots);
           if (this.examined.size === this.totalSpots) {
@@ -320,7 +386,8 @@ export class InvestigationScene extends Phaser.Scene {
         lines[Phaser.Math.Between(0, lines.length - 1)],
       );
     });
-    if (s.relaxed) this.clock.setRelaxed();
+    if (this.review) this.clock.setRealTime();
+    else if (s.relaxed) this.clock.setRelaxed();
     else this.clock.start(c.timeLimitSec);
 
     const ink = stampInk(saveStore.get().cosmetics);
@@ -331,31 +398,40 @@ export class InvestigationScene extends Phaser.Scene {
         onStamp: (v) => this.onStamp(v),
         overPaper: (px, py) => StampMark.within(px, py),
       }).setDepth(DEPTH.stamps);
-    this.stamps = [
-      mk('rug', DESK.stampRug.x + 25, DESK.stampRug.y + 30, ink.rug),
-      mk('legit', DESK.stampLegit.x + 25, DESK.stampLegit.y + 30, ink.legit),
-    ];
+    this.stamps = this.review
+      ? []
+      : [
+          mk('rug', DESK.stampRug.x + 25, DESK.stampRug.y + 30, ink.rug),
+          mk('legit', DESK.stampLegit.x + 25, DESK.stampLegit.y + 30, ink.legit),
+        ];
 
-    this.hint = addText(
-      this,
-      GAME_WIDTH - 96,
-      GAME_HEIGHT - 12,
-      'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
-      { size: 10, color: 'paperShadow' },
-    )
-      .setOrigin(1, 0)
-      .setDepth(DEPTH.hud);
     const menu = new PixelButton(
       this,
       0,
       GAME_HEIGHT - 22,
-      'Menu [Esc]',
-      () => this.togglePause(),
+      this.review ? 'Back to report [Esc]' : 'Menu [Esc]',
+      () => (this.review ? this.backToReport() : this.togglePause()),
       {
         variant: 'ink',
       },
     );
     menu.setDepth(DEPTH.hud).setX(GAME_WIDTH - menu.bw - 6);
+    this.hint = addText(
+      this,
+      GAME_WIDTH - menu.bw - 16,
+      GAME_HEIGHT - 12,
+      this.review
+        ? 'amber: missed  ·  red: pinned  ·  click a mark'
+        : 'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
+      { size: 10, color: 'paperShadow' },
+    )
+      .setOrigin(1, 0)
+      .setDepth(DEPTH.hud);
+    if (this.review) {
+      this.magnifier.ignore([this.hint, this.notebook, this.tabs, this.clock, menu]);
+      audio.play('paper');
+      return;
+    }
     // Lucien's face in the corner: click to buy a nudge.
     const face = this.add
       .image(6, GAME_HEIGHT - 4, LUCIEN_FACE_TEX)
@@ -397,7 +473,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.magnifier.setGlow(false);
     // First time a kind of document lands on the desk, a reading tip.
     const kind = this.caseData.documents[i]?.type;
-    if (kind && !hintSeen(`tip-doc-${kind}`))
+    if (kind && !this.review && !hintSeen(`tip-doc-${kind}`))
       this.time.delayedCall(animate ? 400 : 1600, () => {
         // Claimed only when it actually shows, so a tutorial box doesn't eat it.
         if (
@@ -482,7 +558,7 @@ export class InvestigationScene extends Phaser.Scene {
   /** A one-time quip per case, shown in Lucien's corner bubble. */
   /** `rookie` lines are onboarding: they stop after the first few closed files. */
   private mutter(key: string, text: string, rookie = false): void {
-    if (this.said.has(key) || this.dialogue?.isActive || this.paused) return;
+    if (this.said.has(key) || this.dialogue?.isActive || this.paused || this.review) return;
     if (rookie && saveStore.get().stats.runs >= 3) return;
     this.said.add(key);
     LucienBubble.say(this, text);
@@ -738,7 +814,7 @@ export class InvestigationScene extends Phaser.Scene {
   // ---- pause / keys ---------------------------------------------------------------
 
   private togglePause(): void {
-    if (this.phase === 'stamped') return;
+    if (this.phase === 'stamped' || this.review) return;
     if (this.paused) {
       this.pauseMenu?.destroy();
       this.pauseMenu = undefined;
@@ -784,7 +860,14 @@ export class InvestigationScene extends Phaser.Scene {
     if (!kb) return;
     kb.addCapture(['TAB', 'UP', 'DOWN', 'LEFT', 'RIGHT', 'SPACE', 'PAGE_UP', 'PAGE_DOWN']);
     const on = (key: string, fn: () => void) => kb.on(`keydown-${key}`, fn);
-    on('ESC', () => noDialogue() && !this.browsing && !escTaken() && this.togglePause());
+    on(
+      'ESC',
+      () =>
+        noDialogue() &&
+        !this.browsing &&
+        !escTaken() &&
+        (this.review ? this.backToReport() : this.togglePause()),
+    );
     const inPlay = () => this.phase === 'investigating' && !this.paused && !this.browsing;
     const noDialogue = () => !this.dialogue?.isActive;
     on(

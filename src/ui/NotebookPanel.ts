@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { FONT, NOTEBOOK } from '@/config/layout';
-import { HEX, PALETTE } from '@/config/palette';
+import { HEX, PALETTE, type PaletteKey } from '@/config/palette';
 import { makeText } from './text';
 import { rect } from '@/ui/shapes';
 
@@ -98,14 +98,19 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
   /** How many clue spots the lens has passed over, out of all spots in the case. */
   setExamined(n: number, total: number): void {
     if (n < 0) {
-      this.examinedText.setText("detective's honour");
-      this.examinedText.setColor(PALETTE.stampRed);
+      this.setStatus("detective's honour", 'stampRed');
       return;
     }
-    this.examinedText.setText(
+    this.setStatus(
       `examined ${n}/${total}${n >= total && total > 0 ? '  all seen' : ''}`,
+      n >= total && total > 0 ? 'stampGreen' : 'woodMid',
     );
-    this.examinedText.setColor(n >= total && total > 0 ? PALETTE.stampGreen : PALETTE.woodMid);
+  }
+
+  /** The small line at the foot of the page. */
+  setStatus(text: string, color: PaletteKey): void {
+    this.examinedText.setText(text);
+    this.examinedText.setColor(PALETTE[color]);
   }
 
   setEntries(entries: SuspicionEntry[]): void {

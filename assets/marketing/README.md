@@ -19,37 +19,39 @@ Regenerate after a change with the dev server running:
 
 ## v0.8 set
 
-| file | what to say |
-| --- | --- |
-| title-first-night | The first night: Lucien introduces himself. |
-| title-the-desk | The desk once it has opened up: every button, the wallet chip, the weather. |
-| case-folder-intake | A file lands: ticker, pitch, difficulty, timer. |
-| lens-fine-print | The magnifier: fine print only shows through it. |
-| pins-and-suspicions | Pinning clues; the suspicions list fills in. |
-| case-report | The report: every flag, caught or missed, with score and grade. |
-| share-card | The share card. |
-| notebook-red-flags | The notebook: red flags learned, with your own record. |
-| handbook-how-to-play | The handbook chapter: how the office works. |
-| rogues-gallery | Wanted posters for every rug you called. |
-| case-files-drawer | The drawer: sixteen files, the pile, the weekly. |
-| red-flag-rush | Red Flag Rush mid-run. |
-| rush-results | The results card. |
-| netscope-phone | NetScope, the in-game browser. |
-| coin-page-phantom-connected | The coin page with Phantom connected, read-only. |
-| badges | Badges. |
-| hall-of-detectives | The board. |
-| the-wall-making-of | The wall: how the game was built, photo by photo. |
-| cold-case-printed-file | A cold case straight off the printer. |
-| weather-snow / weather-clear / weather-fog | Snow, a clear night with the moon, fog. |
-| theme-sepia / theme-midnight / theme-newsprint / theme-speakeasy | Office colours: the same desk in four other palettes. |
-| theme-midnight-reading | Reading a contract in the Blue hour theme. |
-| settings | Settings. |
-| notebook-herring-hunt-button / herring-hunt | Herring hunts: the notebook page's button, and a hunt page (click what only looks bad). |
-| clip-title-intro | The first night: the lamp comes on and the case file slides in. |
-| clip-solve-a-case | Title to report in twenty seconds. |
-| clip-herring-hunt | Five pages of herring hunting. |
-| clip-office-colours | Cycling the office colours in Settings, Lucien commenting, then the desk in the last one. |
-| clip-weather | Clicking the window through the five weathers. |
-| clip-red-flag-rush | Six pages of rush. |
-| clip-desk-toys | Coffee, lamp, cat, radio, a typed word. |
-| clip-handbook | Flipping through the handbook. |
+| file                                                             | what to say                                                                                         |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| title-first-night                                                | The first night: Lucien introduces himself.                                                         |
+| title-the-desk                                                   | The desk once it has opened up: every button, the wallet chip, the weather.                         |
+| case-folder-intake                                               | A file lands: ticker, pitch, difficulty, timer.                                                     |
+| lens-fine-print                                                  | The magnifier: fine print only shows through it.                                                    |
+| pins-and-suspicions                                              | Pinning clues; the suspicions list fills in.                                                        |
+| case-report                                                      | The report: every flag, caught or missed, with score and grade.                                     |
+| share-card                                                       | The share card.                                                                                     |
+| second-look                                                      | The second look: the file reopened after the report, misses marked in amber, Lucien explaining one. |
+| notebook-red-flags                                               | The notebook: red flags learned, with your own record.                                              |
+| handbook-how-to-play                                             | The handbook chapter: how the office works.                                                         |
+| rogues-gallery                                                   | Wanted posters for every rug you called.                                                            |
+| case-files-drawer                                                | The drawer: sixteen files, the pile, the weekly.                                                    |
+| red-flag-rush                                                    | Red Flag Rush mid-run.                                                                              |
+| rush-results                                                     | The results card.                                                                                   |
+| netscope-phone                                                   | NetScope, the in-game browser.                                                                      |
+| coin-page-phantom-connected                                      | The coin page with Phantom connected, read-only.                                                    |
+| badges                                                           | Badges.                                                                                             |
+| hall-of-detectives                                               | The board.                                                                                          |
+| the-wall-making-of                                               | The wall: how the game was built, photo by photo.                                                   |
+| cold-case-printed-file                                           | A cold case straight off the printer.                                                               |
+| weather-snow / weather-clear / weather-fog                       | Snow, a clear night with the moon, fog.                                                             |
+| theme-sepia / theme-midnight / theme-newsprint / theme-speakeasy | Office colours: the same desk in four other palettes.                                               |
+| theme-midnight-reading                                           | Reading a contract in the Blue hour theme.                                                          |
+| settings                                                         | Settings.                                                                                           |
+| notebook-herring-hunt-button / herring-hunt                      | Herring hunts: the notebook page's button, and a hunt page (click what only looks bad).             |
+| clip-title-intro                                                 | The first night: the lamp comes on and the case file slides in.                                     |
+| clip-solve-a-case                                                | Title to report in twenty seconds.                                                                  |
+| clip-herring-hunt                                                | Five pages of herring hunting.                                                                      |
+| clip-office-colours                                              | Cycling the office colours in Settings, Lucien commenting, then the desk in the last one.           |
+| clip-weather                                                     | Clicking the window through the five weathers.                                                      |
+| clip-red-flag-rush                                               | Six pages of rush.                                                                                  |
+| clip-desk-toys                                                   | Coffee, lamp, cat, radio, a typed word.                                                             |
+| clip-handbook                                                    | Flipping through the handbook.                                                                      |
+| clip-second-look                                                 | Pin one flag, stamp, then take the report's second look and click a miss.                           |

@@ -131,7 +131,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
   ],
   'first-report': [
-    { text: 'The report shows every red flag, the ones you caught and the ones you missed.' },
+    {
+      text: 'The report shows every red flag, the ones you caught and the ones you missed. Miss one and it offers a second look at the paper.',
+    },
     {
       text: "Each flag you meet gets a page in your Notebook. That's the real prize: next time you'll see it coming.",
     },

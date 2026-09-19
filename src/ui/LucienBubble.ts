@@ -69,6 +69,8 @@ export class LucienBubble extends Phaser.GameObjects.Container {
     if (face) this.add(face);
     this.setDepth(DEPTH.toast);
     scene.add.existing(this);
+    // The desk keeps its lens off the bubble (it sits under the paper's corner).
+    scene.events.emit('bubble:open', this);
     // Don't linger over a pause overlay, and don't talk over the dialogue box.
     const drop = () => this.active && this.destroy();
     scene.events.once(Phaser.Scenes.Events.PAUSE, drop);

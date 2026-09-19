@@ -64,6 +64,8 @@ export const HANDBOOK: HandbookTopic[] = [
     body: [
       'When you have read enough, stamp the file: RUG (R) or LEGIT (L). The stamps sit on the ink pad at the bottom right of the desk.',
       `A correct verdict is ${SCORING.correctVerdict} points, a wrong one ${SCORING.wrongVerdict}. The report that follows lists every red flag, found or missed, and each line links to its notebook page.`,
+      { h: 'The second look' },
+      'When something got past you, the report offers a second look: the file opens again, read-only, with your pins where they were and every missed flag marked in amber. Click a mark and Lucien says why it mattered. Esc brings the report back.',
       { h: 'The clock' },
       `Files run on a timer; what is left when you stamp is worth up to ${SCORING.timeBonusMax}. Time running out costs nothing but the bonus. Relaxed mode in Settings removes timers altogether.`,
     ],

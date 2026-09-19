@@ -1,6 +1,13 @@
 import type { CaseData } from '@/data/schema';
+import type { ReportPayload } from '@/scenes/InvestigationScene';
 
 export type PlayMode = 'campaign' | 'daily' | 'cold';
+
+/** A second look at a closed file: the run's pins, and the report to go back to. */
+export interface ReviewState {
+  pinnedIds: string[];
+  report: ReportPayload;
+}
 
 /** Volatile cross-scene state (not persisted). */
 export const gameState: {
@@ -11,12 +18,15 @@ export const gameState: {
   currentIndex: number;
   /** Seed of the generated file when mode is 'cold'. */
   coldSeed: string | null;
+  /** Set by the report for the desk to open the file read-only; consumed on the way in. */
+  review: ReviewState | null;
 } = {
   cases: [],
   mode: 'campaign',
   currentCase: null,
   currentIndex: 0,
   coldSeed: null,
+  review: null,
 };
 
 /**

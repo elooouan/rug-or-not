@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { FONT, LENS, PAPER, RENDER_SCALE } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
-import type { CaseDocument, Clue } from '@/data/schema';
+import { isFlagClue, type CaseDocument, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { makeRng } from '@/systems/rng';
 import { ClueSpot, type SpotRect } from './ClueSpot';
@@ -16,6 +16,9 @@ export interface DocContext {
   onPinToggle(clue: Clue, pinned: boolean): void;
   onStrayChange(count: number): void;
   onHoverSpot(over: boolean, clueId: string): void;
+  /** Second look after the report: nothing can be pinned, a click on a spot asks about it. */
+  review?: boolean;
+  onInspect?(clue: Clue): void;
 }
 
 export interface Row {
@@ -78,7 +81,7 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     paper.on('pointerup', (p: Phaser.Input.Pointer, lx: number, ly: number) => {
       const ok = pressedHere;
       pressedHere = false;
-      if (!ok || p.rightButtonReleased() || p.getDistance() > 8) return;
+      if (!ok || p.rightButtonReleased() || p.getDistance() > 8 || ctx.review) return;
       this.addStrayPin(Math.round(lx), Math.round(ly));
     });
     this.add([shadow, paper]);
@@ -345,6 +348,10 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
   // ---- pins ------------------------------------------------------------------
 
   private togglePin(spot: ClueSpot): void {
+    if (this.ctx.review) {
+      this.ctx.onInspect?.(spot.clue);
+      return;
+    }
     spot.setPinned(!spot.pinned);
     audio.play(spot.pinned ? 'pin' : 'unpin');
     this.ctx.onPinToggle(spot.clue, spot.pinned);
@@ -393,6 +400,22 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
     return this.allSpots()
       .filter((s) => s.pinned)
       .map((s) => s.clue.id);
+  }
+
+  /**
+   * The second look: the run's pins go back where they were and every red flag that
+   * went unpinned gets an amber mark. Returns how many marks this page carries.
+   */
+  reveal(pinned: Set<string>): number {
+    let marks = 0;
+    for (const s of this.allSpots()) {
+      if (pinned.has(s.clue.id)) s.setPinned(true, false);
+      else if (isFlagClue(s.clue)) {
+        s.setMissed();
+        marks++;
+      }
+    }
+    return marks;
   }
 
   // ---- keyboard focus --------------------------------------------------------
