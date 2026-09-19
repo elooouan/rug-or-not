@@ -32,6 +32,27 @@ test('the production build boots to a canvas without errors', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
+test('the production build opens the market from a deep link without errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && !/favicon|serviceWorker|ServiceWorker/.test(m.text()))
+      errors.push(m.text());
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'rug-or-not:save:v1',
+      JSON.stringify({ version: 1, settings: { hints: false, music: false, reducedMotion: true } }),
+    );
+  });
+  await page.goto('/#market');
+  await expect(page.locator('canvas')).toHaveCount(1, { timeout: 45_000 });
+  // The phone opens on the market shortly after the title; the snag strip must stay hidden.
+  await page.waitForTimeout(4000);
+  await expect(page.locator('#snag')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
 test('the editor page is served by the build', async ({ page }) => {
   await page.goto('/editor.html');
   await expect(page.locator('#json')).toBeVisible();
