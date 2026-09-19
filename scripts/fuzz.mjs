@@ -266,7 +266,15 @@ while (Date.now() < end) {
           .flatMap((sc) => sc.input.list ?? [])
           .filter((o) => o.active && o.input?.enabled && o.willRender?.(o.scene.cameras.main));
         if (objs.length === 0) return null;
-        const o = objs[Math.floor(r * objs.length)];
+        // With the phone open, lean on its buttons: the pages (and the market's texture
+        // swaps) are several clicks deep and a fair pick would rarely get there.
+        const inPanel = objs.filter((o) => {
+          for (let p = o.parentContainer; p; p = p.parentContainer)
+            if (p.constructor.name === 'BrowserPanel') return true;
+          return false;
+        });
+        const pool = inPanel.length && r < 0.7 ? inPanel : objs;
+        const o = pool[Math.floor(((r * 997) % 1) * pool.length)];
         const b = o.getBounds ? o.getBounds() : null;
         if (!b || b.width <= 0 || b.height <= 0) return null;
         return { x: b.centerX, y: b.centerY, what: o.constructor.name };
