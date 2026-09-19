@@ -1,6 +1,6 @@
 /**
  * Renders assets/marketing/QUEUE.md from queue.json and checks the queue: every media file
- * exists, no tweet runs past 280 characters (links count as 23), polls carry no media.
+ * exists, no tweet runs past 280 characters (links count as 23).
  *
  *   node scripts/queue.mjs            # write QUEUE.md, print problems
  *   node scripts/queue.mjs --check    # problems only (exit 1 if any)
@@ -36,11 +36,9 @@ const lines = [
 function render(item, when) {
   lines.push(`## ${when}  ·  \`${item.id}\`${item.pin ? '  ·  pin' : ''}`);
   if (item.note) lines.push('', `_${item.note}_`);
-  if (item.poll) lines.push('', `Poll: ${item.poll.join(' / ')}`);
   item.tweets.forEach((t, i) => {
     const n = tweetLength(t.text);
     if (n > 280) problems.push(`${item.id}[${i}]: ${n} characters`);
-    if (item.poll && t.media) problems.push(`${item.id}: a poll can't carry media`);
     const media = Array.isArray(t.media) ? t.media : t.media ? [t.media] : [];
     for (const m of media)
       if (!existsSync(resolve(DIR, m))) problems.push(`${item.id}: missing media ${m}`);

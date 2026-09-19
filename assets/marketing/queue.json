@@ -1,5 +1,5 @@
 {
-  "_readme": "Two weeks of tweets for Typefully. Times are Europe/Paris. `tweets` with more than one entry are a thread; `media` paths are relative to assets/marketing; `poll` makes an X poll (no media allowed on polls). QUEUE.md is rendered from this file (node scripts/queue.mjs).",
+  "_readme": "Two weeks of tweets for Typefully (X account @0xRugOrNot). Times are Europe/Paris. `tweets` with more than one entry are a thread; `media` paths are relative to assets/marketing. Quizzes are answered in the replies (the Typefully API has no polls). QUEUE.md is rendered from this file (node scripts/queue.mjs); the drafts were pushed to Typefully through its MCP connector from a Claude Code session.",
   "play_url": "https://elooouan.github.io/rug-or-not/",
   "items": [
     {
@@ -80,10 +80,9 @@
     {
       "id": "quiz-1",
       "when": "2026-09-22T15:30",
-      "poll": ["Rug", "Legit"],
       "tweets": [
         {
-          "text": "Rug or Not? #1\n\nFrom the contract:\n\nfunction setSellTax(uint256 t) public onlyOwner {\n  sellTax = t;\n}\n\nThe pitch says \"1% tax, fixed\".\n\nStamp it. Answer tomorrow morning.",
+          "text": "Rug or Not? #1\n\nFrom the contract:\n\nfunction setSellTax(uint256 t) public onlyOwner {\n  sellTax = t;\n}\n\nThe pitch says \"1% tax, fixed\".\n\nStamp it in the replies: RUG or LEGIT. Answer tomorrow morning.",
           "media": null,
           "alt": null
         }
@@ -180,10 +179,9 @@
     {
       "id": "quiz-2",
       "when": "2026-09-25T15:30",
-      "poll": ["Rug", "Legit"],
       "tweets": [
         {
-          "text": "Rug or Not? #2\n\nFrom the liquidity report:\n\nPool: TOKEN / USDC\nLiquidity: $614,000\nLocked 100% via LockBox until Sep 2028\nTop holder: the liquidity pool (34%)\n\nStamp it. Answer tomorrow.",
+          "text": "Rug or Not? #2\n\nFrom the liquidity report:\n\nPool: TOKEN / USDC\nLiquidity: $614,000\nLocked 100% via LockBox until Sep 2028\nTop holder: the liquidity pool (34%)\n\nStamp it in the replies: RUG or LEGIT. Answer tomorrow.",
           "media": null,
           "alt": null
         }
@@ -296,10 +294,9 @@
     {
       "id": "quiz-3",
       "when": "2026-09-29T15:30",
-      "poll": ["Rug", "Legit"],
       "tweets": [
         {
-          "text": "Rug or Not? #3\n\nFrom the team page:\n\n\"Ownership renounced.\"\nRoles in the contract: OPERATOR (can pause transfers). Held by: 0x4b1...e2.\n\nStamp it. Answer tomorrow.",
+          "text": "Rug or Not? #3\n\nFrom the team page:\n\n\"Ownership renounced.\"\nRoles in the contract: OPERATOR (can pause transfers). Held by: 0x4b1...e2.\n\nStamp it in the replies: RUG or LEGIT. Answer tomorrow.",
           "media": null,
           "alt": null
         }
@@ -396,10 +393,9 @@
     {
       "id": "quiz-4",
       "when": "2026-10-02T15:30",
-      "poll": ["Rug", "Legit"],
       "tweets": [
         {
-          "text": "Rug or Not? #4\n\nFrom the chat log:\n\n@degen_paul: \"when marketing wallet unlock?\"\n@team: \"2% marketing wallet, 12-month vesting, contract linked in the pinned message.\"\n@degen_paul: \"ok boring\"\n\nStamp the chat. Answer tomorrow.",
+          "text": "Rug or Not? #4\n\nFrom the chat log:\n\n@degen_paul: \"when marketing wallet unlock?\"\n@team: \"2% marketing wallet, 12-month vesting, contract linked in the pinned message.\"\n@degen_paul: \"ok boring\"\n\nStamp the chat in the replies: RUG or LEGIT. Answer tomorrow.",
           "media": null,
           "alt": null
         }
@@ -446,12 +442,11 @@
     {
       "id": "coat-poll",
       "when": "2026-10-04T12:00",
-      "poll": ["Navy trench", "Oxblood trench", "Forest trench", "Cream trench"],
       "tweets": [
         {
-          "text": "Lucien's coat for next week's screenshots. He'll wear whatever wins and complain about it.",
-          "media": null,
-          "alt": null
+          "text": "Lucien's coat for next week's screenshots: navy, oxblood, forest or cream. Reply with one. He'll wear whatever wins and complain about it.",
+          "media": "v0.9-market-page.png",
+          "alt": "The market page with Lucien's coats on sale."
         }
       ]
     },
