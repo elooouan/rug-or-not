@@ -4,6 +4,7 @@ import { HEX } from '@/config/palette';
 import { shortAddress, TOKEN } from '@/config/token';
 import { GAME_VERSION } from '@/config/gameConfig';
 import { LATE_NEWS, NEWS } from '@/data/news';
+import { touchScreen } from '@/ui/lensLift';
 import { audio } from '@/systems/audio';
 import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
@@ -730,11 +731,24 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       },
       { variant: 'paper' },
     );
-    ctx.line('Hover evidence with the lens. Fine print only shows through it.');
-    ctx.line('Click a suspicious line to pin it. Click again to unpin.');
-    ctx.line('Stamp RUG (R) or LEGIT (L). Herring pins cost points.');
-    ctx.line('Tab / arrows cycle clue spots, Enter pins, 1-6 switch tabs, wheel scrolls.');
-    ctx.line('Esc pauses. F toggles fullscreen. M mutes.');
+    if (touchScreen()) {
+      ctx.line(
+        'Press the paper and slide: the lens floats above your finger. Fine print only shows through it.',
+      );
+      ctx.line(
+        'Tap a suspicious line to pin it. Tap again to unpin. Drag a stamp onto the paper for the verdict.',
+      );
+      ctx.line('Herring pins cost points. Long pages scroll with a drag.');
+    } else {
+      ctx.line('Hover evidence with the lens. Fine print only shows through it.');
+      ctx.line('Click a suspicious line to pin it. Click again to unpin.');
+      ctx.line('Stamp RUG (R) or LEGIT (L). Herring pins cost points.');
+      ctx.line('Tab / arrows cycle clue spots, Enter pins, 1-6 switch tabs, wheel scrolls.');
+      ctx.line('Esc pauses. F toggles fullscreen. M mutes.');
+    }
+    ctx.line(
+      "Missed something? The report offers a second look: the file again, read-only, misses in amber. The grade sticker in the drawer reopens a file's last report.",
+    );
     ctx.line(
       'Red Flag Rush: sixty seconds, one page at a time. Click the red flag to clear the page; herrings and blank paper cost seconds.',
     );
