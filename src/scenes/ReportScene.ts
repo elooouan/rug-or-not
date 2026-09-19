@@ -90,6 +90,7 @@ export class ReportScene extends Phaser.Scene {
     attachScroll(this, { step: 26, onScroll: (d) => this.scrollBy(d) });
     this.input.keyboard?.on('keydown-PAGE_DOWN', () => this.scrollBy(60));
     this.input.keyboard?.on('keydown-PAGE_UP', () => this.scrollBy(-60));
+    this.input.keyboard?.on('keydown-S', () => this.secondLook());
     // A tap target and a hint that there's more report below the fold.
     this.moreHint = addText(this, x + w - pad, y + pad + viewH - 2, 'v  more', {
       size: 8,
@@ -292,9 +293,9 @@ export class ReportScene extends Phaser.Scene {
       }
     }
 
-    if (b.flagsMissed.length > 0 || b.falseAccusations.length > 0)
+    if (this.secondLookOffered())
       L.push({
-        text: '> SECOND LOOK  ·  open the file again with every mark on the paper',
+        text: '> SECOND LOOK [S]  ·  open the file again with every mark on the paper',
         color: 'ink',
         gap: 4,
         onClick: () => this.secondLook(),
@@ -449,8 +450,15 @@ export class ReportScene extends Phaser.Scene {
 
   /** A quick verdict on your verdict, every time. */
   /** Flag and herring lines are links into the notebook (overlay, comes back here). */
+  /** Worth a second look: something got past the player, or something innocent got pinned. */
+  private secondLookOffered(): boolean {
+    const b = this.payload.breakdown;
+    return b.flagsMissed.length > 0 || b.falseAccusations.length > 0;
+  }
+
   /** The file again, read-only: the run's pins where they were, the misses in amber. */
   private secondLook(): void {
+    if (!this.secondLookOffered()) return;
     const b = this.payload.breakdown;
     gameState.review = {
       pinnedIds: [...b.flagsFound, ...b.falseAccusations].map((f) => f.clue.id),
