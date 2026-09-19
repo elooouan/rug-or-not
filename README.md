@@ -282,7 +282,8 @@ to tweak.
   `waitFor` need a matching condition in the scene; a `touch` variant replaces the line on
   touch screens, so nothing there says click, hover or a key). Title quips:
   `LUCIEN_QUIPS`. Per-case intro lines: the optional `intro` field in each case file.
-- Corkboard tips: `src/data/tips.ts`. Headlines: `src/data/news.ts`. Badges: `src/data/badges.ts`
+- Corkboard tips: `src/data/tips.ts` (a tip with a `flag` leans the board toward that flag
+  while a file carrying it is open). Headlines: `src/data/news.ts`. Badges: `src/data/badges.ts`
   (award with `awardBadge(scene, id)`; counters live in `save.stats`).
 
 ## Adding a red flag or unlockable
