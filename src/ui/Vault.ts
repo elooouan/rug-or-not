@@ -179,7 +179,7 @@ export class Vault extends Phaser.GameObjects.Container {
     this.add(
       makeText(scene, x + w - pad, y + pad, 'wheel to scroll  ·  Esc to close', {
         size: FONT.size.tiny,
-        color: 'paperShadow',
+        color: 'woodMid',
       }).setOrigin(1, 0),
     );
 

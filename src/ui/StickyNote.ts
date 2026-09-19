@@ -41,7 +41,7 @@ export class StickyNote extends Phaser.GameObjects.Container {
     this.add(
       makeText(scene, nx + width - pad, ny + h - pad - 2, 'click to close', {
         size: FONT.size.tiny,
-        color: 'paperShadow',
+        color: 'woodMid',
       }).setOrigin(1, 1),
     );
     paper.setInteractive({ useHandCursor: false });

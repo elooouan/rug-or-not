@@ -580,7 +580,7 @@ export class RushScene extends Phaser.Scene {
           this.hunt ? 'looked fine, was not:' : 'looked scary, was fine:',
           {
             size: FONT.size.tiny,
-            color: 'paperShadow',
+            color: 'woodMid',
           },
         ),
       );
@@ -658,7 +658,7 @@ export class RushScene extends Phaser.Scene {
     c.add(
       makeText(this, x + w / 2, y + h - 10, 'Enter: again  ·  Esc: menu', {
         size: FONT.size.tiny,
-        color: 'paperShadow',
+        color: 'woodMid',
       }).setOrigin(0.5, 1),
     );
     if (!saveStore.get().settings.reducedMotion) {
