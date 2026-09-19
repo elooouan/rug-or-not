@@ -38,6 +38,7 @@ import { isNameAllowed } from '@/systems/names';
 import { renderIdCard, shareOrDownloadCanvas } from '@/systems/shareCard';
 import { toast } from '../Toast';
 import { StickyNote } from '../StickyNote';
+import { squish } from '../squish';
 import { makeText } from '../text';
 import type { PageCtx } from './PageCtx';
 import { ALL_PAGES, type PageId } from './PageCtx';
@@ -110,6 +111,8 @@ function checkGilded(scene: Phaser.Scene): void {
 
 /** The market's open drawer; remembered across renders so buying doesn't jump the page. */
 let marketSlot: ShopSlot = 'coat';
+/** The strip item that just changed hands: it hops once on the next render. */
+let stripHop: ShopSlot | null = null;
 const SLOT_TAB: Record<ShopSlot, string> = {
   coat: 'Coat',
   hat: 'Hat',
@@ -920,6 +923,11 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     };
     const wornCurtain = worn('curtains').style;
     drawWindow(wornCurtain.slot === 'curtains' ? wornCurtain.color : null);
+    if (stripHop) {
+      const hop = stripImg[stripHop];
+      if (hop?.active && hop.visible) squish(scene, hop, 1.12, 0.84, 280);
+      stripHop = null;
+    }
     ctx.y = strip + 6;
     /** Put `item` on the strip, or (with null) whatever the desk really wears. */
     const tryOn = (item: ShopItem | null, slot: ShopSlot) => {
@@ -995,6 +1003,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             redress(scene, item.style.slot);
             audio.play('click');
             checkGilded(scene);
+            stripHop = item.style.slot;
             ctx.panel.render();
           },
           { sameLine: true, width: 64 },
@@ -1026,6 +1035,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
             LucienBubble.say(scene, quips[Phaser.Math.Between(0, quips.length - 1)]);
             if (boughtCount() >= 5) awardBadge(scene, 'collector');
             checkGilded(scene);
+            stripHop = item.style.slot;
             ctx.panel.render();
           },
           // Short of clips: still pressable, so the press can say how many are missing.
