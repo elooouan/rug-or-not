@@ -315,7 +315,8 @@ type ContractFlag =
   | 'blacklist'
   | 'fake-renounce'
   | 'unverified-contract'
-  | 'proxy-admin';
+  | 'proxy-admin'
+  | 'trading-pause';
 type ContractHerring =
   'small-fixed-tax' | 'renounced-cleanly' | 'immutable-supply-note' | 'timelocked-admin';
 const CONTRACT_FLAGS: ContractFlag[] = [
@@ -326,6 +327,7 @@ const CONTRACT_FLAGS: ContractFlag[] = [
   'fake-renounce',
   'unverified-contract',
   'proxy-admin',
+  'trading-pause',
 ];
 const CONTRACT_HERRINGS: ContractHerring[] = [
   'small-fixed-tax',
@@ -549,6 +551,26 @@ function contractDoc(
     push('  address public pool;');
     push('  mapping(address => bool) public canSell;');
   }
+  const pausable = flags.includes('trading-pause');
+  if (pausable) {
+    push('  bool public tradingOpen = true;');
+    const l = push('  function setTrading(bool on)');
+    push(`    external ${fakeRenounce ? '' : 'onlyOwner '}{`);
+    if (fakeRenounce) push("    require(msg.sender == operator, 'operator');");
+    push('    tradingOpen = on;');
+    push('  }');
+    clues.push(
+      flagClue(
+        'g-pause',
+        'Trading kill switch',
+        'trading-pause',
+        { kind: 'line', line: l },
+        fine('trading-pause')
+          ? '// nothing reopens it but this. a closed market is a closed exit.'
+          : undefined,
+      ),
+    );
+  }
   if (fakeRenounce) {
     push('  address public operator;');
     if (!flags.includes('mint-unlimited')) push('  uint256 public buy; uint256 public sell;');
@@ -610,10 +632,14 @@ function contractDoc(
   }
   // The transfer hook: where fees, freezes and the honeypot actually bite.
   const taxed = flags.includes('sell-tax-adjustable') || herrings.includes('small-fixed-tax');
-  if (taxed || honeypot || flags.includes('blacklist')) {
+  if (taxed || honeypot || pausable || flags.includes('blacklist')) {
     push('');
     push('  function _update(address from, address to, uint256 v)');
     push('    internal override {');
+    if (pausable)
+      push(
+        `    require(tradingOpen || from == ${fakeRenounce ? 'operator' : 'owner()'}, 'closed');`,
+      );
     if (flags.includes('blacklist')) push("    require(!flagged[from], 'compliance hold');");
     if (honeypot) {
       const l = push("    if (to == pool) require(canSell[from], 'not yet');");
@@ -1231,6 +1257,7 @@ const FLAG_POOL = [
   'fake-audit',
   'proxy-admin',
   'wash-trading',
+  'trading-pause',
 ] as const;
 const HERRING_POOL = [
   'small-fixed-tax',
@@ -1258,6 +1285,7 @@ const FLAG_BLURB: Record<string, string> = {
   'unverified-contract': 'the source was never verified',
   'team-allocation-unvested': 'the team allocation was liquid on day one',
   'copied-whitepaper': 'the whitepaper was lifted from another token',
+  'trading-pause': 'one wallet could switch trading off for everyone else',
   'anon-team-stock-photos': 'the team photos were stock',
   'bot-chat': 'the chat was three bots and an admin',
   'urgency-pressure': 'the countdown never stopped',
@@ -1330,6 +1358,14 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   if (flags.has('sell-tax-adjustable')) {
     if (keepH('small-fixed-tax')) flags.delete('sell-tax-adjustable');
     else herrings.delete('small-fixed-tax');
+  }
+  // A trading switch needs a hand on it: no clean renounce, no timelock next to it.
+  if (flags.has('trading-pause')) {
+    if (keepH('renounced-cleanly') || keepH('timelocked-admin')) flags.delete('trading-pause');
+    else {
+      herrings.delete('renounced-cleanly');
+      herrings.delete('timelocked-admin');
+    }
   }
   if (p.verdict === 'rug' && flags.size === 0) flags.add('mint-unlimited');
   const fineFor = new Map<string, boolean>();

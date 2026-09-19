@@ -5,7 +5,12 @@
  * Back hotkeys ask here before acting.
  */
 let consumedAt = 0;
-let overlays = 0;
+/**
+ * The overlays that are up. Each is the game object that owns the claim, so one that gets
+ * destroyed without releasing (a scene torn down mid-tween, say) stops counting on its own
+ * instead of eating every Esc from then on.
+ */
+const overlays = new Set<{ active: boolean }>();
 
 export function markEscConsumed(): void {
   consumedAt = performance.now();
@@ -15,13 +20,22 @@ export function escConsumedRecently(windowMs = 80): boolean {
   return performance.now() - consumedAt < windowMs;
 }
 
-/** Call when an Esc-closable overlay opens; pair with popOverlay(). */
-export function pushOverlay(): void {
-  overlays++;
+/** Call when an Esc-closable overlay opens; pair with popOverlay(owner). */
+export function pushOverlay(owner: { active: boolean }): void {
+  overlays.add(owner);
 }
 
-export function popOverlay(): void {
-  overlays = Math.max(0, overlays - 1);
+export function popOverlay(owner: { active: boolean }): void {
+  overlays.delete(owner);
+}
+
+function liveOverlays(): number {
+  let n = 0;
+  for (const o of overlays) {
+    if (o.active) n++;
+    else overlays.delete(o);
+  }
+  return n;
 }
 
 let modals = 0;
@@ -41,10 +55,10 @@ export function modalOpen(): boolean {
 
 /** True while any overlay is up, or right after one consumed Esc. */
 export function escTaken(): boolean {
-  return overlays > 0 || escConsumedRecently();
+  return liveOverlays() > 0 || escConsumedRecently();
 }
 
 /** Dev peek for debugging overlay bookkeeping. */
 export function overlayDepth(): number {
-  return overlays;
+  return liveOverlays();
 }

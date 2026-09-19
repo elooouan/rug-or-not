@@ -166,6 +166,15 @@ export const FLAGS = {
       'Transfers alternating between the same pair of addresses every few minutes, in similar amounts, on a token with almost no holders.',
     severity: 'major',
   },
+  'trading-pause': {
+    id: 'trading-pause',
+    title: 'Trading switch in one hand',
+    explanation:
+      'A flag the owner can flip to stop every transfer at once, with nothing that reopens it. The market closes the moment the owner wants out, and only the owner still moves.',
+    howToSpot:
+      'A tradingOpen / paused boolean checked in the transfer hook, set by a single owner or operator with no timelock and no expiry.',
+    severity: 'critical',
+  },
 } as const satisfies Record<string, RedFlag>;
 
 export type FlagId = keyof typeof FLAGS;

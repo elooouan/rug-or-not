@@ -117,6 +117,7 @@ await page.waitForFunction(() => typeof window.__game !== 'undefined', null, { t
 await page.waitForTimeout(3000);
 
 const visited = new Map();
+let leakSeen = false;
 let lastHeap = 0;
 const end = Date.now() + seconds * 1000;
 let lastAction = '';
@@ -288,6 +289,28 @@ while (Date.now() < end) {
       .catch(() => -1);
     if (heap > lastHeap + 25) console.log(`heap ${heap} MB after ${actions} actions in ${s}`);
     lastHeap = Math.max(lastHeap, heap);
+    // More overlays counted than overlay objects alive: something released nothing.
+    const live = await page
+      .evaluate(() => {
+        let n = 0;
+        for (const sc of window.__game.scene.getScenes(true))
+          for (const o of sc.children.list) {
+            const c = o.constructor.name;
+            if (
+              (c === 'DialogueBox' && o.isActive) ||
+              c === 'BrowserPanel' ||
+              c === 'Vault' ||
+              c === 'NamePicker'
+            )
+              n++;
+          }
+        return { n, overlays: window.__debug.overlays() };
+      })
+      .catch(() => null);
+    if (live && live.overlays > live.n && !leakSeen) {
+      leakSeen = true;
+      console.log(`overlay count ${live.overlays} > ${live.n} alive after ${actions} in ${s}`);
+    }
     // Don't get stuck: if nothing but the cursor overlay is running, go home.
     if (s === '' || s === '?') {
       await page.evaluate(() => window.__game.scene.start('TitleScene')).catch(() => {});

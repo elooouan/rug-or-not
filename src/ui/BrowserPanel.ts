@@ -124,7 +124,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
 
     this.setDepth(DEPTH.overlay);
     scene.add.existing(this);
-    pushOverlay();
+    pushOverlay(this);
     this.once(Phaser.GameObjects.Events.DESTROY, () => this.releaseOverlay());
     scene.events.emit('browser:open');
     audio.play('click');
@@ -231,7 +231,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
   private releaseOverlay(): void {
     if (!this.overlayHeld) return;
     this.overlayHeld = false;
-    popOverlay();
+    popOverlay(this);
   }
 
   close(): void {

@@ -104,7 +104,7 @@ export class Vault extends Phaser.GameObjects.Container {
       key.on('down', fn);
       this.escBinding = { key, fn };
     }
-    pushOverlay();
+    pushOverlay(this);
     this.once(Phaser.GameObjects.Events.DESTROY, () => this.release());
     this.setDepth(DEPTH.overlay);
     scene.add.existing(this);
@@ -114,7 +114,7 @@ export class Vault extends Phaser.GameObjects.Container {
   private release(): void {
     if (!this.overlayHeld) return;
     this.overlayHeld = false;
-    popOverlay();
+    popOverlay(this);
     this.escBinding?.key.off('down', this.escBinding.fn);
   }
 

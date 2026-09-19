@@ -165,7 +165,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       this.setY(40).setAlpha(0);
       scene.tweens.add({ targets: this, y: 0, alpha: 1, duration: 260, ease: 'Back.easeOut' });
     }
-    pushOverlay();
+    pushOverlay(this);
     this.overlayHeld = true;
     // A scene shutdown can destroy us without finish(): keep the overlay count honest, and
     // don't let the next run of this scene "finish" a dead box and fire its onDone.
@@ -279,7 +279,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   private releaseOverlay(): void {
     if (!this.overlayHeld) return;
     this.overlayHeld = false;
-    popOverlay();
+    popOverlay(this);
   }
 
   /** Close the box; `now` skips the slide-out (another box is taking the spot). */

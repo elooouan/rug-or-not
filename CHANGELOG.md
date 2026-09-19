@@ -33,6 +33,10 @@
   flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the
   herring explained in Lucien's bubble; the fine print still needs the lens. Esc or "Back
   to report" returns to the report, which lands quietly the second time.
+- A new red flag in the library and the printer: "Trading switch in one hand", a
+  tradingOpen flag the owner (or the operator behind a fake renounce) can flip with nothing
+  that reopens it. The notebook, the drills, the rush decks and the safe's combination all
+  count it. A corkboard tip to match.
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
 - A faint crawl of film grain over the office (Office page of Settings; off with reduced
@@ -69,6 +73,9 @@
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
   wrapped to a second line ran into the row below it; rows now make room. The desk's key
   hint no longer mentions the lens when there isn't one.
+- Fixed: the Esc bookkeeping counted overlays; one torn down without releasing its claim
+  (the monkey test caught a rare case) would have eaten every Esc afterwards. Claims are now
+  owned by the box, panel or safe that made them and lapse when it dies.
 - Fixed: a desk quip (the coffee, the cat, the radio) landing while one of Lucien's chained
   lessons was up (the report's, on a wrong verdict) crashed the screen with a half-built
   dialogue box. The lesson's follow-up wins now, and the quip keeps its turn for later.

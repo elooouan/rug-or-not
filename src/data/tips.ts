@@ -15,4 +15,5 @@ export const TIPS: string[] = [
   'A copied whitepaper usually forgets to change the old token name. Ctrl+F is a detective tool.',
   'Yellow herrings: fixed 1-2% taxes, doxxed founders with silly handles, and pools as top holders.',
   'When an admin dodges a question about liquidity, the answer is the dodge.',
+  'A trading switch with no timelock is a rug waiting for a reason. Ask who flips it and what reopens it.',
 ];

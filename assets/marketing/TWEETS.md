@@ -27,7 +27,7 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
    where they were and every miss marked in amber. Click a mark and Lucien tells you why.
 
 6. **[v0.8-notebook-red-flags.png]**
-   The Detective's Notebook: 17 red flags and 14 yellow herrings (things that look bad and
+   The Detective's Notebook: 18 red flags and 14 yellow herrings (things that look bad and
    are fine). It fills in as you play. Every page has a drill.
 
 ## Feature tweets

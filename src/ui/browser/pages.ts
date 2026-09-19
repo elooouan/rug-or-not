@@ -924,11 +924,11 @@ export class NamePicker extends Phaser.GameObjects.Container {
       this.refresh();
     };
     kb?.on('keydown', onKey);
-    pushOverlay();
+    pushOverlay(this);
     pushModal();
     this.once(Phaser.GameObjects.Events.DESTROY, () => {
       kb?.off('keydown', onKey);
-      popOverlay();
+      popOverlay(this);
       popModal();
     });
     this.refresh();
