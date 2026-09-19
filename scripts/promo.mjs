@@ -69,12 +69,12 @@ const VETERAN = {
   unlockedHerrings: ['small-fixed-tax', 'doxxed-meme-name', 'community-jokes'],
   badges: ['first-case', 'clean-sweep', 'rush-hour', 'historian'],
   daily: { lastPlayed: null, streak: 3, bestStreak: 5, played: [], freezes: 1 },
-  settings: { hints: false, quips: true, music: false, volume: 0, weather: 'rain' },
+  settings: { hints: false, quips: true, music: false, weather: 'rain' },
   discovered: ['drawer', 'rush', 'cold', 'weekly'],
   detectiveName: 'LUCIEN',
   stats: { runs: 9, correct: 8, rushRuns: 3, rushBest: 1450, rushBestStreak: 6, coldRuns: 2 },
 };
-const FRESH = { version: 1, settings: { music: false, volume: 0 } };
+const FRESH = { version: 1, settings: { music: false } };
 
 /** Phantom's injected provider, faked, plus an RPC that answers locally. */
 const FAKE_WALLET = `
@@ -98,7 +98,6 @@ async function boot(page, save, hash = '', extraInit = '') {
   await page.addInitScript(
     ({ save, extraInit }) => {
       localStorage.setItem('rug-or-not:save:v1', JSON.stringify(save));
-      localStorage.setItem('rug-or-not:dev-mute', '1');
       if (extraInit) new Function(extraInit)();
     },
     { save, extraInit },
