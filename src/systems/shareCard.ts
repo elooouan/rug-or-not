@@ -1,3 +1,4 @@
+import { touchScreen } from '@/ui/lensLift';
 import { FONT } from '@/config/layout';
 import { PALETTE } from '@/config/palette';
 
@@ -268,6 +269,36 @@ export function renderIdCard(data: IdCardData, canvas?: HTMLCanvasElement): HTML
 }
 
 /** Trigger a PNG download of the card. Returns false when the browser can't. */
+/**
+ * On a phone, hand the picture to the system share sheet (straight into X, Telegram, the
+ * camera roll); elsewhere, or when the sheet isn't available, download it. Must run inside
+ * a user gesture. Resolves with what happened, so the caller can word its toast.
+ */
+export async function shareOrDownloadCanvas(
+  canvas: HTMLCanvasElement,
+  filename: string,
+  text: string,
+): Promise<'shared' | 'cancelled' | 'downloaded' | 'failed'> {
+  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+  if (touchScreen() && typeof nav.share === 'function' && typeof nav.canShare === 'function') {
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png'));
+    if (blob) {
+      const file = new File([blob], filename, { type: 'image/png' });
+      if (nav.canShare({ files: [file] })) {
+        try {
+          await nav.share({ files: [file], text });
+          return 'shared';
+        } catch (e) {
+          // Dismissed: nothing to apologise for. Anything else (no gesture left, an odd
+          // browser): the download below still works.
+          if ((e as { name?: string }).name === 'AbortError') return 'cancelled';
+        }
+      }
+    }
+  }
+  return downloadCanvas(canvas, filename) ? 'downloaded' : 'failed';
+}
+
 export function downloadCanvas(canvas: HTMLCanvasElement, filename: string): boolean {
   try {
     const url = canvas.toDataURL('image/png');

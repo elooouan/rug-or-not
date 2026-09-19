@@ -35,7 +35,7 @@ import { PixelButton } from '../PixelButton';
 import { markEscConsumed, popModal, popOverlay, pushModal, pushOverlay } from '../escGuard';
 import { rect } from '../shapes';
 import { isNameAllowed } from '@/systems/names';
-import { downloadCanvas, renderIdCard } from '@/systems/shareCard';
+import { renderIdCard, shareOrDownloadCanvas } from '@/systems/shareCard';
 import { toast } from '../Toast';
 import { StickyNote } from '../StickyNote';
 import { makeText } from '../text';
@@ -513,16 +513,20 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           mascot,
           tierTitle: hasEntitlement('board-title') ? currentTier()?.name : undefined,
         });
-        const ok = downloadCanvas(
+        void shareOrDownloadCanvas(
           canvas,
           `rug-or-not-detective-${save.detectiveName.toLowerCase()}.png`,
-        );
-        audio.play(ok ? 'stamp' : 'wrong');
-        toast(
-          ctx.scene,
-          ok ? 'CARD SAVED' : 'NO LUCK',
-          ok ? 'your detective ID' : 'this browser blocks downloads',
-        );
+          `${save.detectiveName}, ${rankForScore(save.totalScore)}. Rug or Not?${TOKEN.xHandle ? ` @${TOKEN.xHandle}` : ''}`,
+        ).then((res) => {
+          if (res === 'cancelled' || !ctx.scene.scene.isActive()) return;
+          const ok = res !== 'failed';
+          audio.play(ok ? 'stamp' : 'wrong');
+          toast(
+            ctx.scene,
+            res === 'shared' ? 'CARD SHARED' : ok ? 'CARD SAVED' : 'NO LUCK',
+            ok ? 'your detective ID' : 'this browser blocks downloads',
+          );
+        });
       },
       { x: 110, variant: 'paper' },
     );

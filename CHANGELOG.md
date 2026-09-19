@@ -17,6 +17,9 @@
 - One item a day is a third off at the market (the same one for everyone; half off for
   coin holders of any tier), and hovering a row tries it on: the strip at the top shows
   Lucien in that coat, the cat in that fur.
+- On a phone, "Save card" (the report, the ID card, a wall photo) opens the system share
+  sheet with the picture, so it goes straight to X or Telegram; elsewhere it downloads as
+  before.
 - `#market`, `#board` and `#coin` links open the title with the phone on that page. Shares
   from the report say "via @0xRugOrNot" and the About page links the account
   (`VITE_X_HANDLE`); `VITE_GOATCOUNTER` adds a cookie-free visit counter to production

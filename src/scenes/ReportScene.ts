@@ -6,7 +6,7 @@ import { FONT, GAME_HEIGHT, GAME_WIDTH, REPORT } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { FLAGS, HERRINGS, isFlagClue } from '@/data/schema';
 import { audio } from '@/systems/audio';
-import { downloadCanvas, renderShareCard } from '@/systems/shareCard';
+import { renderShareCard, shareOrDownloadCanvas } from '@/systems/shareCard';
 import { gameState, newColdSeed } from '@/systems/gameState';
 import { coldDifficulty, startColdCase } from '@/systems/coldCase';
 import { rankForScore } from '@/systems/ranks';
@@ -439,13 +439,20 @@ export class ReportScene extends Phaser.Scene {
       url: `${location.host}${location.pathname}`.replace(/\/$/, ''),
       mascot: mascotTex,
     });
-    const ok = downloadCanvas(canvas, `rug-or-not-${isDaily ? localDateKey() : c.id}.png`);
-    audio.play(ok ? 'stamp' : 'wrong');
-    toast(
-      this,
-      ok ? 'CARD SAVED' : 'NO LUCK',
-      ok ? 'a picture of this report' : 'this browser blocks downloads',
-    );
+    void shareOrDownloadCanvas(
+      canvas,
+      `rug-or-not-${isDaily ? localDateKey() : c.id}.png`,
+      this.shareLines().join('\n'),
+    ).then((res) => {
+      if (res === 'cancelled' || !this.scene.isActive()) return;
+      const ok = res !== 'failed';
+      audio.play(ok ? 'stamp' : 'wrong');
+      toast(
+        this,
+        res === 'shared' ? 'CARD SHARED' : ok ? 'CARD SAVED' : 'NO LUCK',
+        ok ? 'a picture of this report' : 'this browser blocks downloads',
+      );
+    });
   }
 
   /** Wordle-style result text for the clipboard (falls back to a note you can read). */

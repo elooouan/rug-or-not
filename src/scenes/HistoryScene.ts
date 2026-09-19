@@ -15,7 +15,7 @@ import { LIVE_PHOTO_KEY } from '@/ui/DeskBackground';
 import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { downloadCanvas } from '@/systems/shareCard';
+import { shareOrDownloadCanvas } from '@/systems/shareCard';
 import { toast } from '@/ui/Toast';
 import { backChip, setupScene } from './sceneUtil';
 import { touchScreen } from '@/ui/lensLift';
@@ -296,13 +296,20 @@ export class HistoryScene extends Phaser.Scene {
         canvas.width = src.width;
         canvas.height = src.height;
         canvas.getContext('2d')?.drawImage(src, 0, 0);
-        const ok = downloadCanvas(canvas, `rug-or-not-desk-${frame.date}.png`);
-        audio.play(ok ? 'stamp' : 'wrong');
-        toast(
-          this,
-          ok ? 'PHOTO SAVED' : 'NO LUCK',
-          ok ? 'your desk, tonight' : 'this browser blocks downloads',
-        );
+        void shareOrDownloadCanvas(
+          canvas,
+          `rug-or-not-desk-${frame.date}.png`,
+          'My desk tonight. Rug or Not?',
+        ).then((res) => {
+          if (res === 'cancelled' || !this.scene.isActive()) return;
+          const ok = res !== 'failed';
+          audio.play(ok ? 'stamp' : 'wrong');
+          toast(
+            this,
+            res === 'shared' ? 'PHOTO SHARED' : ok ? 'PHOTO SAVED' : 'NO LUCK',
+            ok ? 'your desk, tonight' : 'this browser blocks downloads',
+          );
+        });
       });
       save.on(
         'pointerdown',
