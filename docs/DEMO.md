@@ -19,31 +19,34 @@ code (Settings → Office → Import) or close a couple of files first.
    near the bottom of the contract (scroll with the wheel) only reads through it.
 5. Pin two red flags, switch tabs with the number keys, then stamp **RUG** (R). Watch the
    report: what you caught, what you missed, every line is a link into the notebook.
-6. On the report, **Share → Save card** for the PNG, or **Post on X**.
+6. Click **SECOND LOOK** (or press S): the file comes back read-only with your pins where
+   they were and every miss marked in amber. Click a mark; Lucien says why it mattered.
+   Esc returns to the report.
+7. On the report, **Share → Save card** for the PNG, or **Post on X**.
 
 ## 2:00 — The phone
 
-7. Tap the phone. **RugScan** is the explorer page for the current file. **Board** is the Hall
+8. Tap the phone. **RugScan** is the explorer page for the current file. **Board** is the Hall
    of Detectives (pick a handle, save a Detective ID card). **$LUCIEN** is the coin page
    (wallet is read-only, it never signs anything). **About → Case editor** opens the editor.
 
 ## 2:45 — Arcade and endless
 
-8. **Red Flag Rush**: sixty seconds, one page at a time, click the red flag.
-9. **Cold case** on the title, or "the pile" in Case files: a generated file that never
-   existed before. The WEEKLY folder is the same generated file for everyone this week.
-10. Notebook → any red flag → **Drill this flag**: five pages that all hide it. Any yellow
+9. **Red Flag Rush**: sixty seconds, one page at a time, click the red flag.
+10. **Cold case** on the title, or "the pile" in Case files: a generated file that never
+    existed before. The WEEKLY folder is the same generated file for everyone this week.
+11. Notebook → any red flag → **Drill this flag**: five pages that all hide it. Any yellow
     herring → **Hunt this herring**: five pages where you click the thing that only looks bad.
     The notebook's last chapter is the handbook ("How to play" on the title).
 
 ## 4:00 — The story
 
-11. Case files: the drawer is the campaign. After cases 2, 5, 10 and 13 Lucien connects the
+12. Case files: the drawer is the campaign. After cases 2, 5, 7, 10 and 13 Lucien connects the
     files ("someone is running a template"). Stamp all fifteen right and a folder with no
     name appears: the Tailor.
-12. The polaroid on the corkboard opens the wall: photos of how the game was built, joined by
+13. The polaroid on the corkboard opens the wall: photos of how the game was built, joined by
     red string, ending with a live photo of your own desk.
-13. The safe under the desk: three digits. The static on the radio taps them in morse; the
+14. The safe under the desk: three digits. The static on the radio taps them in morse; the
     notebook's counter is the other hint.
 
 ## Handy links
