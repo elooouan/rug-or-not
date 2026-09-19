@@ -30,7 +30,7 @@ export class ClueSpot extends Phaser.GameObjects.Container {
   missed = false;
   private highlight: Phaser.GameObjects.Rectangle;
   private pin: Phaser.GameObjects.Image;
-  private tag?: Phaser.GameObjects.Rectangle;
+  private tag?: Phaser.GameObjects.Image;
   private focusRing: Phaser.GameObjects.Rectangle;
   private hovered = false;
   private focused = false;
@@ -116,7 +116,8 @@ export class ClueSpot extends Phaser.GameObjects.Container {
     this.missed = true;
     if (!this.tag) {
       const { x, y } = this.rect;
-      this.tag = mkRect(this.scene, x - 3, y - 4, 7, 7, HEX.amber).setStrokeStyle(1, HEX.shadow);
+      // Centred, so the pop grows out of the tag rather than its corner.
+      this.tag = this.scene.make.image({ x: x + 2, y: y + 1, key: TEX.tagMissed }, false);
       this.add(this.tag);
       if (!saveStore.get().settings.reducedMotion) {
         this.tag.setScale(2.2).setAlpha(0);

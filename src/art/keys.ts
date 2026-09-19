@@ -30,6 +30,8 @@ export const TEX = {
   coffeeRing: 'paper-coffee-ring',
   pin: 'paper-pin',
   pinStray: 'paper-pin-stray',
+  /** The second look's mark for a red flag that went unpinned: an amber tag on a string. */
+  tagMissed: 'paper-tag-missed',
   tab: 'paper-tab',
   tabActive: 'paper-tab-active',
   cursor: 'mag-cursor',

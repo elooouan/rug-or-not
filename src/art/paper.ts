@@ -116,6 +116,28 @@ export function makePaper(scene: Phaser.Scene): void {
     );
   });
 
+  // The second look's amber tag: a small label on a string, where a pin should have gone.
+  makeGraphicsTexture(scene, TEX.tagMissed, 9, 12, (g) => {
+    drawPixels(
+      g,
+      [
+        '....s....',
+        '....s....',
+        '..kkkkk..',
+        '.kaaaaak.',
+        '.kapaaak.',
+        '.kaaaaak.',
+        '.kakaaak.',
+        '.kaaaaak.',
+        '..kkkkk..',
+        '.........',
+        '.........',
+        '.........',
+      ],
+      { a: 'amber', p: 'paper', s: 'paperShadow', k: 'shadow' },
+    );
+  });
+
   const tab = (key: string, active: boolean) =>
     makeGraphicsTexture(scene, key, TABS.w, TABS.h, (g) => {
       g.fillStyle(HEX[active ? 'paper' : 'paperShadow'], 1);
