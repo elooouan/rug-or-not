@@ -1363,6 +1363,13 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
   const keepH = (h: string) => forcedHerrings.includes(h);
   // The self-lifting pause is pulled through the timelock, so it brings one along.
   if (herrings.has('expiring-pause')) herrings.add('timelocked-admin');
+  // "No owner, no operator" and "admin behind a timelock" can't both be true of one file.
+  if (herrings.has('timelocked-admin') && herrings.has('renounced-cleanly')) {
+    if (keepH('renounced-cleanly')) {
+      herrings.delete('timelocked-admin');
+      herrings.delete('expiring-pause');
+    } else herrings.delete('renounced-cleanly');
+  }
   if (flags.has('fake-renounce')) {
     if (keepH('renounced-cleanly') || keepH('timelocked-admin') || keepH('expiring-pause'))
       flags.delete('fake-renounce');
