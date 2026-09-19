@@ -108,6 +108,20 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Production only: an uncaught error shouldn't leave a silent, frozen desk. One strip, once.
+if (import.meta.env.PROD) {
+  let shown = false;
+  const snag = () => {
+    if (shown) return;
+    shown = true;
+    const el = document.getElementById('snag');
+    if (!el) return;
+    el.style.display = 'block';
+    document.getElementById('snag-reload')?.addEventListener('click', () => location.reload());
+  };
+  window.addEventListener('error', snag);
+}
+
 // Visit counting, only when a GoatCounter site code is configured at build time. Page
 // views only: no cookies, nothing about the player, nothing from the save.
 const goat = (import.meta.env.VITE_GOATCOUNTER ?? '').trim();

@@ -84,6 +84,32 @@
           display: block;
         }
       }
+      /* An uncaught error in production: a plain strip with a reload, never a dead canvas. */
+      #snag {
+        display: none;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 11;
+        background: #d8c9a8;
+        color: #1b1a1f;
+        font-family: 'VT323', monospace;
+        font-size: 18px;
+        padding: 10px 16px;
+        text-align: center;
+      }
+      #snag a,
+      #snag button {
+        font: inherit;
+        color: #1b1a1f;
+        background: none;
+        border: 0;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 12px;
+      }
       /* Something to read while the engine downloads; BootScene removes it. */
       #boot {
         position: fixed;
@@ -120,6 +146,12 @@
     <div id="boot" aria-hidden="true">RUG OR NOT?<small>opening the office...</small></div>
     <div id="rotate">
       Rotate your phone.<br /><small>The detective's desk needs the width.</small>
+    </div>
+    <div id="snag" role="alert">
+      The desk hit a snag.<button type="button" id="snag-reload">Reload</button
+      ><a href="https://github.com/elooouan/rug-or-not/issues" target="_blank" rel="noopener"
+        >Report it</a
+      >
     </div>
     <div class="font-preload" aria-hidden="true">
       <span style="font-family: 'Pixelify Sans'">.</span>

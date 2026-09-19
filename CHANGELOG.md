@@ -19,6 +19,8 @@
 - One item a day is a third off at the market (the same one for everyone; half off for
   coin holders of any tier), and hovering a row tries it on: the strip at the top shows
   Lucien in that coat, the cat in that fur.
+- An uncaught error in a production build shows a plain strip with Reload and Report
+  instead of a silently frozen desk.
 - On a phone, "Save card" (the report, the ID card, a wall photo) opens the system share
   sheet with the picture, so it goes straight to X or Telegram; elsewhere it downloads as
   before.
