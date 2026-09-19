@@ -164,9 +164,10 @@ export class CaseSelectScene extends Phaser.Scene {
       img.setAlpha(0.7);
     }
     if (grade) {
-      // Top-right corner, clear of long tickers like $MOONPUP.
+      // Top-right corner, clear of long tickers like $MOONPUP; a locked folder that was
+      // played as the daily keeps its padlock there, so its grade sits bottom-right.
       const gx = 70;
-      const gy = 7;
+      const gy = unlocked ? 7 : 47;
       const box = rect(this, gx, gy, 14, 14).setStrokeStyle(1, HEX.stampGreen).setOrigin(0.5);
       const t = makeText(this, gx, gy, grade, {
         size: FONT.size.small,
