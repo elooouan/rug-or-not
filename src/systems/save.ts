@@ -98,6 +98,21 @@ export const DEFAULT_COSMETICS: CosmeticSelection = {
   ink: 'ink-classic',
 };
 
+/**
+ * A brand-new save honours the system's reduced-motion preference; after that it's the
+ * player's setting, whatever the OS says.
+ */
+function firstSave(): SaveData {
+  const d = defaultSave();
+  try {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)
+      d.settings.reducedMotion = true;
+  } catch {
+    /* no media queries here */
+  }
+  return d;
+}
+
 export function defaultSave(): SaveData {
   return {
     version: SAVE_VERSION,
@@ -296,10 +311,16 @@ export class SaveStore {
     this.listeners.forEach((l) => l(this.data));
   }
 
+  /** True when nothing was stored yet: a first visit on this device. */
+  fresh = false;
+
   private load(): SaveData {
     try {
       const raw = this.storage?.getItem(SAVE_KEY);
-      if (!raw) return defaultSave();
+      if (!raw) {
+        this.fresh = true;
+        return firstSave();
+      }
       return sanitizeSave(JSON.parse(raw));
     } catch {
       return defaultSave();
