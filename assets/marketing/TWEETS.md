@@ -41,6 +41,10 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
 - **[v0.9-dressed-desk.png]** Oxblood trench, black fedora, velvet curtains, a red mug and a
   globe. Same detective, better wardrobe. 33 things at the market, all cosmetic.
 
+- **[v0.9-hall-of-detectives.png]** The Hall of Detectives now has a detectives board: one
+  row per desk, career score, rank, clips earned, files solved. Sort it by score or by
+  clips. One worker on Cloudflare's free tier makes it public.
+
 - **[v0.9-market-page.png]** Paper clips as currency because it's a desk. 3 per file, +2 for
   a first solve, +2 for an S, 1 per thousand rush points. Coin holders get an allowance on
   top. The Hall of Detectives now lists every desk by career score or by clips.

@@ -118,6 +118,28 @@ const FAKE_WALLET = `
     return realFetch(url, init);
   };`;
 
+/** A few other desks and runs on the (local) boards, so the Hall has company. */
+const BOARDS = `
+  const day = (n) => new Date(Date.now() - n * 864e5).toISOString();
+  const runs = [
+    ['MARLOWE', 260, 'safeyield', 'S', 1], ['SPADE', 245, 'harbor', 'A', 2],
+    ['LUCIEN', 230, 'moonpup', 'A', 0], ['NOIR', 210, 'bean', 'B', 3],
+    ['VESPER', 190, 'oracle', 'B', 4], ['BISCUIT', 120, 'grandma', 'C', 5],
+  ].map(([name, score, caseId, grade, d]) => ({ name, score, caseId, grade, date: day(d), holder: name === 'MARLOWE' || undefined }));
+  const rush = [['SPADE', 2310, 2], ['LUCIEN', 1450, 0], ['NOIR', 980, 1]]
+    .map(([name, score, d]) => ({ name, score, caseId: 'rush', grade: 'A', date: day(d), mode: 'rush' }));
+  localStorage.setItem('rug-or-not:board:v1', JSON.stringify([...runs, ...rush]));
+  const desks = [
+    ['0000000000000001', 'MARLOWE', 2140, 'Inspector', 610, 14, 19, 5, true],
+    ['0000000000000002', 'SPADE', 1720, 'Inspector', 240, 12, 15, 1],
+    ['0000000000000003', 'LUCIEN', 1063, 'Gumshoe', 95, 7, 6, 0],
+    ['0000000000000004', 'NOIR', 880, 'Gumshoe', 360, 6, 8, 2, true],
+    ['0000000000000005', 'VESPER', 640, 'Gumshoe', 40, 5, 4, 3],
+    ['0000000000000006', 'BISCUIT', 120, 'Rookie', 12, 1, 1, 6],
+  ].map(([id, name, total, rank, clips, solved, badges, d, holder]) =>
+    ({ id, name, total, rank, clips, solved, badges, date: day(d), holder: holder || undefined }));
+  localStorage.setItem('rug-or-not:desks:v1', JSON.stringify(desks));`;
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function boot(page, save, hash = '', extraInit = '') {
@@ -539,7 +561,7 @@ const SHOTS = {
     await shot(page, 'herring-hunt');
   },
   async phone(page) {
-    await boot(page, VETERAN, '', FAKE_WALLET);
+    await boot(page, { ...VETERAN, id: '0000000000000003' }, '', FAKE_WALLET + BOARDS);
     await skipTalk(page);
     await click(page, 124, 306);
     await sleep(1200);
