@@ -30,6 +30,10 @@ export const NEWS: Headline[] = [
     body: 'Admins clarified that the countdown is "spiritual" and asked members to stop asking about liquidity.',
   },
   {
+    title: 'Detective reopens closed file, finds the fee cap was never there',
+    body: 'The second look, colleagues call it. "Same paper, amber marks, and suddenly you can read." The file had no comment.',
+  },
+  {
     title: 'Renounced token turns out to have three admins and a proxy',
     body: 'The team says renouncing "was more of a vibe" and that the admin keys are "in a safe place."',
   },
