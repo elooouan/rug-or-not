@@ -948,8 +948,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           () =>
             toast(
               scene,
-              'Holders only',
-              `${item.name} takes holder tier ${item.tier}. The ${TOKEN.symbol} page has the numbers.`,
+              'HOLDERS ONLY',
+              `${item.name} takes holder tier ${item.tier} · the ${TOKEN.symbol} page has the numbers`,
             ),
           { sameLine: true, width: 64, variant: 'paper' },
         );
@@ -959,12 +959,12 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           () => {
             if (!buy(item.id)) {
               audio.play('wrong');
-              toast(scene, 'Not yet', buyBlocker(item) ?? 'Something got in the way.');
+              toast(scene, 'NOT YET', buyBlocker(item) ?? 'something got in the way');
               return;
             }
             redress(scene);
             audio.play('stamp');
-            toast(scene, 'Bought', `${item.name}. ${clipBalance()} clips left.`);
+            toast(scene, 'BOUGHT', `${item.name} · ${clipBalance()} clips left`);
             const quips = BOUGHT_QUIPS[item.style.slot];
             LucienBubble.say(scene, quips[Phaser.Math.Between(0, quips.length - 1)]);
             if (boughtCount() >= 5) awardBadge(scene, 'collector');
