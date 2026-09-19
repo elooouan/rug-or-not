@@ -29,8 +29,9 @@ gh release create v0.8 --title "v0.8 — the handbook" --notes-file <(sed -n '/^
 ## Deploy
 
 GitHub Pages: repository Settings → Pages → Source: _GitHub Actions_. The workflow in
-`.github/workflows/deploy.yml` builds and publishes `main` on every push after that; run it
-once by hand from the Actions tab the first time.
+`.github/workflows/deploy.yml` builds and publishes `main` when run from the Actions tab
+("Deploy to GitHub Pages" → Run workflow). It is manual on purpose: switch its trigger to
+`push` once Pages is enabled if every commit should deploy.
 
 Launch-day environment (repository Settings → Secrets and variables → Actions, as
 variables, or a local `.env`): `VITE_TOKEN_MINT`, `VITE_TOKEN_BUY_URL`, `VITE_SOLANA_RPC`,
