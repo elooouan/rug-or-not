@@ -246,7 +246,35 @@ const CAT_FRAMES = [
     '.bbbbbbbbbbbb.',
     '..bb..bb.bbb..',
   ],
+  // Two walking frames: the legs swing past each other, the tail lifts.
+  [
+    '.b.b..........',
+    'bbbbb.........',
+    'bebeb.........',
+    'bbbbb.........',
+    '.bbbbbbbb...b.',
+    '.bbbbbbbbb..b.',
+    '.bbbbbbbbbb.b.',
+    '.bbbbbbbbbbbb.',
+    '.bbbbbbbbbbb..',
+    '.bb....bb..bb.',
+  ],
+  [
+    '.b.b..........',
+    'bbbbb.........',
+    'bebeb.........',
+    'bbbbb.........',
+    '.bbbbbbbb.....',
+    '.bbbbbbbbb..b.',
+    '.bbbbbbbbbb.b.',
+    '.bbbbbbbbbbbb.',
+    '.bbbbbbbbbbb..',
+    '...bb.bb.bb...',
+  ],
 ];
+
+/** Frames per cat texture set: 0 sitting, 1 tail swish, 2 blink, 3 head up, 4-5 walking. */
+export const CAT_FRAME_COUNT = CAT_FRAMES.length;
 
 export interface CatStyle {
   fur: PaletteKey;

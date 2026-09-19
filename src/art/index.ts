@@ -35,7 +35,7 @@ export {
   type MugStyle,
   DEFAULT_WOOD,
 } from './desk';
-export { makeCat, type CatStyle } from './window';
+export { CAT_FRAME_COUNT, makeCat, type CatStyle } from './window';
 export { makeRadio, type RadioStyle } from './radio';
 export { makeMagnifier, type RimStyle, DEFAULT_RIM } from './magnifier';
 

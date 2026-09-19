@@ -127,6 +127,8 @@ export class DeskBackground {
   private flickerOn = true;
   private motion = true;
   private lampOn = true;
+  /** Biscuit is walking the sill; the idle frames wait for her to sit down. */
+  private catStrolling = false;
   /** Biscuit is following something outside (the train); idle frames wait. */
   private catWatching = false;
   private dark!: Phaser.GameObjects.Rectangle;
@@ -629,7 +631,8 @@ export class DeskBackground {
       .setDepth(DEPTH.windowRain)
       .setVisible(false);
 
-    this.curtains = scene.add.graphics().setDepth(DEPTH.windowRain);
+    // Above everything the glass shows (rain, the train, a plane) and under the cat.
+    this.curtains = scene.add.graphics().setDepth(DEPTH.windowRain + 1);
     this.curtainDraw = curtainsDrawn ? 1 : 0;
     this.drawCurtains();
     // The cloth at either end draws the curtains; bare window edges leave the glass to it.
@@ -707,17 +710,18 @@ export class DeskBackground {
           loop: true,
           callback: () =>
             !this.catWatching &&
+            !this.catStrolling &&
             this.cat.setTexture(`${TEX.cat}-${this.cat.texture.key.endsWith('-1') ? 0 : 1}`),
         }),
         scene.time.addEvent({
           delay: Phaser.Math.Between(2500, 5000),
           loop: true,
           callback: () => {
-            if (this.catWatching) return;
+            if (this.catWatching || this.catStrolling) return;
             this.cat.setTexture(`${TEX.cat}-2`);
             scene.time.delayedCall(
               140,
-              () => this.cat.active && this.cat.setTexture(`${TEX.cat}-0`),
+              () => this.cat.active && !this.catStrolling && this.cat.setTexture(`${TEX.cat}-0`),
             );
           },
         }),
@@ -725,30 +729,7 @@ export class DeskBackground {
         scene.time.addEvent({
           delay: Phaser.Math.Between(25000, 50000),
           loop: true,
-          callback: () => {
-            if (this.catAsleep || !this.cat.active) return;
-            const home = DESK.cat.x;
-            // The brass bell from the market gives her away on every stroll.
-            const bell = () => worn('collar').id === 'col-bell' && audio.play('tally');
-            this.cat.setFlipX(true);
-            bell();
-            scene.tweens.chain({
-              targets: this.cat,
-              tweens: [
-                { x: home - 70, duration: 2200, ease: 'Sine.easeInOut' },
-                { x: home - 70, duration: 3000, onStart: () => this.cat.setFlipX(false) },
-                {
-                  x: home,
-                  duration: 2200,
-                  ease: 'Sine.easeInOut',
-                  onStart: () => {
-                    this.cat.setFlipX(false);
-                    bell();
-                  },
-                },
-              ],
-            });
-          },
+          callback: () => this.stroll(),
         }),
         // Distant windows twinkle.
         scene.time.addEvent({
@@ -787,6 +768,69 @@ export class DeskBackground {
       this.scheduleSiren();
       this.scheduleShootingStar();
     }
+  }
+
+  /**
+   * Biscuit walks the sill: left along it (she faces left), a sit at the far end, and back.
+   * Steps, not a glide: the walk frames alternate and she bobs a pixel on every other one.
+   */
+  stroll(): void {
+    if (this.catAsleep || this.catStrolling || this.catWatching || !this.cat?.active) return;
+    const scene = this.scene;
+    const cat = this.cat;
+    const home = { x: DESK.cat.x, y: DESK.cat.y };
+    const far = home.x - 70;
+    // The brass bell from the market gives her away on every stroll.
+    const bell = () => worn('collar').id === 'col-bell' && audio.play('tally');
+    this.catStrolling = true;
+    let step = 0;
+    const steps = scene.time.addEvent({
+      delay: 160,
+      loop: true,
+      paused: true,
+      callback: () => {
+        if (!cat.active) return;
+        step++;
+        cat.setTexture(`${TEX.cat}-${4 + (step % 2)}`);
+        cat.setY(home.y - (step % 2));
+      },
+    });
+    this.timers.push(steps);
+    const sit = () => {
+      steps.paused = true;
+      if (!cat.active) return;
+      cat.setTexture(`${TEX.cat}-0`);
+      cat.setY(home.y);
+    };
+    const walk = (toX: number, facingRight: boolean) => ({
+      targets: cat,
+      x: toX,
+      duration: 2400,
+      ease: 'Linear',
+      onStart: () => {
+        cat.setFlipX(facingRight);
+        steps.paused = false;
+        bell();
+      },
+      onComplete: sit,
+    });
+    scene.tweens.chain({
+      targets: cat,
+      tweens: [
+        walk(far, false),
+        { x: far, duration: 3000, onStart: () => cat.setFlipX(true) },
+        walk(home.x, true),
+      ],
+      onComplete: () => {
+        this.catStrolling = false;
+        steps.remove();
+        if (cat.active) {
+          cat.setFlipX(false);
+          cat.setPosition(home.x, home.y);
+          cat.setTexture(`${TEX.cat}-0`);
+        }
+      },
+    });
   }
 
   /** A lit night train crosses the horizon every few minutes. */
@@ -892,7 +936,7 @@ export class DeskBackground {
     const { x, y, w } = DESK.window;
     const sx = x + Phaser.Math.Between(40, w - 120);
     const sy = y + Phaser.Math.Between(6, 18);
-    const star = scene.add.container(sx, sy).setDepth(DEPTH.windowRain + 1);
+    const star = scene.add.container(sx, sy).setDepth(DEPTH.windowRain);
     // A bright head with a fading tail behind it.
     star.add(scene.add.rectangle(-8, 0, 8, 1, HEX.paper, 0.35).setOrigin(1, 0.5));
     star.add(scene.add.rectangle(-3, 0, 3, 1, HEX.paper, 0.7).setOrigin(1, 0.5));

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { makeCat, makeMug, makeOrnament, makeRadio, TEX } from '@/art';
+import { CAT_FRAME_COUNT, makeCat, makeMug, makeOrnament, makeRadio, TEX } from '@/art';
 import { crisp } from '@/art/pixelUtil';
 import type { ShopItem, ShopSlot, Tint } from '@/data/shop';
 import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
@@ -24,6 +24,9 @@ export const LUCIEN_FACE_BASE = `${LUCIEN_FACE_TEX}-base`;
  * it, the coat's collar never reaches it).
  */
 const HAT_SPLIT: Record<string, number> = { [LUCIEN_BASE]: 0.29, [LUCIEN_FACE_BASE]: 0.515 };
+/** Every cat frame index, for dropping and re-pointing the set. */
+const CAT_FRAMES = Array.from({ length: CAT_FRAME_COUNT }, (_, i) => i);
+
 /** Shade-coloured parts that are not cloth and touch it: the trousers under the hem. */
 const KEEP: Record<string, Keep[]> = { [LUCIEN_BASE]: [[52, 178, 92, 216]] };
 
@@ -108,7 +111,7 @@ export function applyLook(scene: Phaser.Scene): void {
   const collar = worn('collar').style;
   if (cat.slot === 'cat') {
     // The cat is four still frames swapped by hand (no animation to rebuild).
-    drop([0, 1, 2, 3].map((i) => `${TEX.cat}-${i}`));
+    drop(CAT_FRAMES.map((i) => `${TEX.cat}-${i}`));
     makeCat(scene, {
       fur: cat.fur,
       dark: cat.dark,
@@ -152,7 +155,7 @@ export function previewTexture(scene: Phaser.Scene, item: ShopItem): string | nu
       makeMug(scene, { body: st.body, band: st.band }, key);
       return key;
     case 'cat': {
-      [0, 1, 2, 3].forEach((i) => drop(`${key}-${i}`));
+      CAT_FRAMES.forEach((i) => drop(`${key}-${i}`));
       const collar = worn('collar').style;
       makeCat(
         scene,
@@ -167,7 +170,7 @@ export function previewTexture(scene: Phaser.Scene, item: ShopItem): string | nu
       return `${key}-0`;
     }
     case 'collar': {
-      [0, 1, 2, 3].forEach((i) => drop(`${key}-${i}`));
+      CAT_FRAMES.forEach((i) => drop(`${key}-${i}`));
       const cat = worn('cat').style;
       if (cat.slot !== 'cat') return null;
       makeCat(
@@ -201,7 +204,7 @@ function lookKeys(): string[] {
     TEX.radio,
     TEX.ornament,
     `${TEX.ornament}-1`,
-    ...[0, 1, 2, 3].map((i) => `${TEX.cat}-${i}`),
+    ...CAT_FRAMES.map((i) => `${TEX.cat}-${i}`),
   ];
 }
 
