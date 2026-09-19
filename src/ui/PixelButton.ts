@@ -113,6 +113,8 @@ export class PixelButton extends Phaser.GameObjects.Container {
     this.on('pointerup', (p: Phaser.Input.Pointer) => {
       const ok = fingerDown;
       fingerDown = false;
+      // A lifted finger isn't hovering any more.
+      if (p.wasTouch) this.setHover(false);
       if (ok && p.getDistance() <= 8) press();
     });
     if (opts.hotkey) {
