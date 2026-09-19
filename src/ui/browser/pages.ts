@@ -864,7 +864,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const deal = dealToday();
     if (!owns(deal.item.id))
       ctx.line(
-        `Today's deal: ${deal.item.name}, ${deal.price} clips instead of ${deal.item.price} (${SLOT_TAB[deal.item.style.slot]} drawer${deal.holder ? ", holders' price" : ''}).`,
+        `Today's deal: ${deal.item.name}, ${deal.price} clips instead of ${deal.item.price} (${SLOT_TAB[deal.item.style.slot]} drawer${deal.holder ? ", holders' price" : ''}). Until midnight.`,
         { color: 'stampRed' },
       );
     ctx.gap(4);
