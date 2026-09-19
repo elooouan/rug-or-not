@@ -54,8 +54,9 @@ code (Settings → Office → Import) or close a couple of files first.
 
 ## Handy links
 
-- `#daily` today's file · `#rush` · `#cold=<seed>` a specific cold case · `#custom=<id>` a file
-  from the editor · `/editor.html` the editor.
+- `#market` / `#board` / `#coin` the phone open on that page · `#daily` today's file · `#rush` ·
+  `#cold=<seed>` a specific cold case · `#custom=<id>` a file from the editor · `/editor.html`
+  the editor.
 - Settings, Game page: relaxed mode (no timers), no-magnifier mode, reduced motion, pointer
   size, Detective's honour (hard mode, ×1.25), radio. Office page: office colours (five
   palettes, repainted on the spot), weather, film grain, cosmetics, export/import a save code.

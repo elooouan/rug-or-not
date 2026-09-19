@@ -140,6 +140,20 @@ test('deep links open the rush and a cold case', async ({ page }) => {
   errors = await boot(page, '#cold=e2e-seed');
   await waitForScene(page, 'InvestigationScene');
   expect(errors).toEqual([]);
+  // #market: the title with the phone already on the market.
+  errors = await boot(page, '#market');
+  await waitForScene(page, 'TitleScene');
+  await page.waitForFunction(
+    () =>
+      (
+        window.__game.scene.getScene('TitleScene') as unknown as {
+          children: { list: { constructor: { name: string }; page?: string }[] };
+        }
+      ).children.list.some((o) => o.constructor.name === 'BrowserPanel' && o.page === 'market'),
+    null,
+    { timeout: SLOW },
+  );
+  expect(errors).toEqual([]);
 });
 
 test('the editor validates a generated case', async ({ page }) => {

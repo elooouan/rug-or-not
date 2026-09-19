@@ -17,6 +17,7 @@
 - One item a day is a third off at the market (the same one for everyone; half off for
   coin holders of any tier), and hovering a row tries it on: the strip at the top shows
   Lucien in that coat, the cat in that fur.
+- `#market`, `#board` and `#coin` links open the title with the phone on that page.
 - The clip count sits on the title card, and a handbook page covers the market. Five
   purchases earn the Collector badge; the market page follows the wallet, so an allowance
   shows the moment a holder connects.

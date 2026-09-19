@@ -203,7 +203,8 @@ perfectly and reports anything that doesn't grade S (`SWEEP_INLINE=1` with the l
 `SWEEP_LOOK=1` to take the second look on every file too).
 
 Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case, `#cold=<seed>` prints
-that cold case, `#custom=<id>` opens a file saved from the editor and `#rush` starts a rush.
+that cold case, `#custom=<id>` opens a file saved from the editor, `#rush` starts a rush, and
+`#market`, `#board` or `#coin` open the title with the phone on that page.
 The Share menu on a report or a rush result copies the text (or opens the phone's share
 sheet), posts to X or Telegram with a prefilled message, and on reports saves a 1280x720 PNG
 card. Dev builds expose `__debug.startCase('kelp')` and `__debug.audioLevels()` in the console.

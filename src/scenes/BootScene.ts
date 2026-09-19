@@ -118,6 +118,12 @@ export class BootScene extends Phaser.Scene {
       this.scene.start('RushScene');
       return;
     }
+    // #market, #board, #coin: the title with the phone already open on that page.
+    if (/^(market|board|coin)$/.test(hash)) {
+      history.replaceState(null, '', location.pathname + location.search);
+      this.scene.start(TitleScene.KEY, { phone: hash });
+      return;
+    }
     this.scene.start(TitleScene.KEY);
   }
 

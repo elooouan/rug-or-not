@@ -40,6 +40,7 @@ import { syncTheme } from '@/systems/theme';
 import { modalOpen } from '@/ui/escGuard';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
+import type { PageId } from '@/ui/browser/PageCtx';
 
 /** Whole hours until the next daily case (local midnight), never less than one. */
 function hoursToMidnight(): number {
@@ -65,8 +66,15 @@ export class TitleScene extends Phaser.Scene {
   static readonly KEY = 'TitleScene';
   private static seenIntro = false;
 
+  /** A NetScope page to open once the desk is up (deep links: #market, #board, #coin). */
+  private phonePage?: PageId;
+
   constructor() {
     super(TitleScene.KEY);
+  }
+
+  init(data?: { phone?: PageId }): void {
+    this.phonePage = data?.phone;
   }
 
   /** Typed words, the Konami code, and other nonsense. */
@@ -559,6 +567,13 @@ export class TitleScene extends Phaser.Scene {
     } else {
       TitleScene.seenIntro = true;
       this.greet(streak, dailyDone);
+    }
+    if (this.phonePage) {
+      const page = this.phonePage;
+      this.phonePage = undefined;
+      this.time.delayedCall(reduced ? 200 : 1600, () => {
+        if (this.scene.isActive() && !BrowserPanel.current) BrowserPanel.toggle(this, page);
+      });
     }
   }
 
