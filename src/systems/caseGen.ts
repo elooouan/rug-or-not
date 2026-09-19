@@ -86,6 +86,16 @@ const PROMISES = [
   'micro-tips for street musicians',
   'receipts you can actually read',
   'the token behind the corner shop',
+  'the coin your barber told you about',
+  'a launchpad with a bedtime',
+  'yield from parking meters',
+  'the neighbourhood swap, no suits',
+  'rewards that arrive before the rent does',
+  'the tab at the bar, tokenised',
+  'staking for people who hate the word staking',
+  'a treasury with a public diary',
+  'the ferry pass, but it pays you',
+  'points for the night bus',
 ];
 const TRAITS = [
   'Audited.',
@@ -100,6 +110,14 @@ const TRAITS = [
   'Real partners.',
   'Boring on purpose.',
   'Ships weekly.',
+  'Timelocked.',
+  'Multisig treasury.',
+  'No admin keys.',
+  'Open books.',
+  'Two years old.',
+  'Slow by design.',
+  'Small team, real names.',
+  'Nothing to sell you.',
 ];
 const FIRST = [
   'Mara',
@@ -118,6 +136,14 @@ const FIRST = [
   'Mateo',
   'Hana',
   'Olu',
+  'Bruno',
+  'Aiko',
+  'Tomasz',
+  'Farah',
+  'Milo',
+  'Zanele',
+  'Ingrid',
+  'Dario',
 ];
 const LAST = [
   'Okafor',
@@ -136,6 +162,14 @@ const LAST = [
   'Vidal',
   'Sato',
   'Kowalski',
+  'Petrov',
+  'Oyelaran',
+  'Marchetti',
+  'Nakamura',
+  'Haddad',
+  'Halloran',
+  'Quispe',
+  'Fitzgerald',
 ];
 const HANDLES = [
   'salty_pete',
@@ -152,8 +186,25 @@ const HANDLES = [
   'nightshift',
   'teapot',
   'graph_paper',
+  'wet_socks',
+  'archivist',
+  'late_fee',
+  'harbour_fog',
+  'tuesday',
+  'no_refunds',
+  'gm_gn_gm',
+  'paper_hands_pat',
 ];
-const MEME_HANDLES = ['Captain Noodle', 'Sir Pancake', 'Duchess Waffle', 'Admiral Toast'];
+const MEME_HANDLES = [
+  'Captain Noodle',
+  'Sir Pancake',
+  'Duchess Waffle',
+  'Admiral Toast',
+  'Baron Crumpet',
+  'Professor Dumpling',
+  'Lady Marmalade',
+  'Corporal Biscuit',
+];
 const JOKES = [
   'if this token is a harbour, I am the harbourmaster of my bathtub',
   'I only hold this so I can say I am invested in {noun}s',
@@ -163,6 +214,14 @@ const JOKES = [
   'told my landlord about {noun}. he raised the rent anyway',
   'the chart looks like my heart rate reading the contract',
   'bought some for my cat. she is a long-term holder now',
+  'my grandmother asked if {noun} was a soup. I said yes',
+  'sold my bike for this. walking is underrated anyway',
+  'the dev said "soon" and I felt that in my knees',
+  'checked the chart at 3am. the chart checked me back',
+  'I have never read a contract and I am not starting with this one',
+  'wife says it is either {noun} or her. long-term holder here',
+  'this is my retirement plan and my lunch plan',
+  'if it goes to zero at least the memes were free',
 ];
 const QUESTIONS = [
   'who can change the fee and what is the cap?',
@@ -173,9 +232,29 @@ const QUESTIONS = [
   'what happens to the treasury if the team disappears?',
   'can someone link the tx where the lock was created?',
   'is the marketing wallet a multisig or one person?',
+  'the audit says "medium risk" on the fee function. what changed since?',
+  'why does the deployer wallet still hold twelve percent?',
+  'is the pause function behind a timelock or a hotkey?',
+  'who signed the partnership announcement on their side?',
+  "the whitepaper has a section that reads like another project's. which one?",
+  'what is the actual sell tax right now, not the roadmap one?',
+  'can we get the lock contract address, not a screenshot?',
+  'why does the team wallet vest faster than the presale?',
 ];
-const AUDITORS_REAL = ['Kestrel Security', 'Ashgrove Audits', 'Lantern & Vale'];
-const AUDITORS_FAKE = ['ChainSure Labs', 'SafuScan', 'BlockCert 24/7'];
+const AUDITORS_REAL = [
+  'Kestrel Security',
+  'Ashgrove Audits',
+  'Lantern & Vale',
+  'Harrow Point',
+  'Quiet Ledger',
+];
+const AUDITORS_FAKE = [
+  'ChainSure Labs',
+  'SafuScan',
+  'BlockCert 24/7',
+  'TrustMe Audits',
+  'Verifyd.io',
+];
 
 export type GenVerdict = 'rug' | 'legit';
 
