@@ -28,6 +28,7 @@ import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
 import type { ReportPayload } from './InvestigationScene';
 import { goTo, setupScene } from './sceneUtil';
+import { touchScreen } from '@/ui/lensLift';
 
 /** The typed-out case report: truth, flags found/missed, false accusations, score, grade. */
 export class ReportScene extends Phaser.Scene {
@@ -305,8 +306,8 @@ export class ReportScene extends Phaser.Scene {
       L.push({
         text:
           b.flagsMissed.length + b.falseAccusations.length > 0
-            ? '> SECOND LOOK [S]  ·  the file again, every mark on the paper'
-            : '> SECOND LOOK [S]  ·  the file again; ask about what looked bad',
+            ? `> SECOND LOOK${touchScreen() ? '' : ' [S]'}  ·  the file again, every mark on the paper`
+            : `> SECOND LOOK${touchScreen() ? '' : ' [S]'}  ·  the file again; ask about what looked bad`,
         color: 'ink',
         gap: 4,
         onClick: () => this.secondLook(),
