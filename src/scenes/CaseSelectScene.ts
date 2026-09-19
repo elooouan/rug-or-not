@@ -191,12 +191,16 @@ export class CaseSelectScene extends Phaser.Scene {
     const w = 220;
     const cw = charWidth(this, 'body', FONT.size.body);
     const maxChars = Math.floor((w - 12) / cw);
+    const pitch = unlocked ? wrapMono(`"${c.pitch}"`, maxChars) : [];
     const lines = unlocked
       ? [
-          ...wrapMono(`"${c.pitch}"`, maxChars),
-          best
-            ? `best: ${best.bestScore} pts (${best.bestGrade})${best.bestTimeSec !== undefined ? `  ·  fastest ${Math.floor(best.bestTimeSec / 60)}:${String(best.bestTimeSec % 60).padStart(2, '0')}` : ''}  ·  ${best.completions}x`
-            : 'not played yet',
+          ...pitch,
+          ...wrapMono(
+            best
+              ? `best: ${best.bestScore} pts (${best.bestGrade})${best.bestTimeSec !== undefined ? `  ·  fastest ${Math.floor(best.bestTimeSec / 60)}:${String(best.bestTimeSec % 60).padStart(2, '0')}` : ''}  ·  ${best.completions}x`
+              : 'not played yet',
+            maxChars,
+          ),
         ]
       : wrapMono(
           c.secret
@@ -215,7 +219,7 @@ export class CaseSelectScene extends Phaser.Scene {
         makeText(this, tx + 6, ty + 5 + li * 12, l, {
           font: 'body',
           size: FONT.size.body,
-          color: unlocked && li === lines.length - 1 ? 'ink' : 'shadow',
+          color: unlocked && li >= pitch.length ? 'ink' : 'shadow',
         }),
       ),
     );
