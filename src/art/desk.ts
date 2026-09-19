@@ -78,6 +78,25 @@ export function makeLampLight(scene: Phaser.Scene): void {
   });
 }
 
+/** A 96px tile of film grain: sparse light and dark specks, tiled and jittered each frame. */
+export function makeGrain(scene: Phaser.Scene): void {
+  makeCanvasTexture(scene, TEX.grain, 96, 96, (ctx, w, h) => {
+    const rng = makeRng('grain');
+    const img = ctx.createImageData(w, h);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const r = rng.next();
+      // Most pixels stay clear; a few go light, a few go dark.
+      const v = r < 0.06 ? 255 : r > 0.94 ? 0 : -1;
+      if (v < 0) continue;
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  });
+}
+
 export function makeVignette(scene: Phaser.Scene): void {
   makeCanvasTexture(scene, TEX.vignette, GAME_WIDTH, GAME_HEIGHT, (ctx, w, h) => {
     paintRadial(

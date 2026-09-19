@@ -22,6 +22,8 @@
   Hunter. The generator can be asked for a herring the way drills ask for a flag.
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
+- A faint crawl of film grain over the office (Office page of Settings; off with reduced
+  motion).
 - Settings is two pages now: Game (sound, modes, Lucien, pointer size) and Office (colours,
   weather, lamp, cosmetics, save export/import/reset). A "Pointer size" row makes the
   pointer half again as big.

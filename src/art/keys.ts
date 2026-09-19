@@ -4,6 +4,7 @@ export const TEX = {
   lamp: 'desk-lamp',
   lampLight: 'desk-lamp-light',
   vignette: 'desk-vignette',
+  grain: 'desk-grain',
   mug: 'desk-mug',
   steam: 'desk-steam', // + frame index
   folderStack: 'desk-folder-stack',

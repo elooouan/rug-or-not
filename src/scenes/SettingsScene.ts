@@ -239,6 +239,13 @@ export class SettingsScene extends Phaser.Scene {
         this.overlay && s().theme !== currentTheme() ? 'repainted once this file is closed' : '',
     });
     this.rows.push({
+      label: 'Film grain',
+      tab: 'office',
+      value: () => onOff(s().grain),
+      change: () => set((st) => (st.grain = !st.grain)),
+      hint: () => 'a faint crawl of specks over the office; takes effect on the next screen',
+    });
+    this.rows.push({
       label: 'Weather outside',
       tab: 'office',
       value: () => WEATHER_LABEL[s().weather],
@@ -351,7 +358,7 @@ export class SettingsScene extends Phaser.Scene {
     this.rows = this.rows.filter((r) => (r.tab ?? 'game') === this.tab);
     if (this.tab === 'office') {
       // Looks first, the save's own rows last.
-      const order = ['Office colours', 'Weather outside', 'Lamp flicker'];
+      const order = ['Office colours', 'Weather outside', 'Lamp flicker', 'Film grain'];
       const rank = (r: RowDef) => {
         const i = order.indexOf(r.label);
         return i >= 0 ? i : r.label.endsWith('progress') ? 20 : 10;

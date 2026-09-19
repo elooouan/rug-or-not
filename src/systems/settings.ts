@@ -28,6 +28,8 @@ export interface Settings {
   theme: ThemeId;
   /** A pointer half again as big, for small screens and tired eyes. */
   bigPointer: boolean;
+  /** A faint animated film grain over the office. */
+  grain: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -44,6 +46,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hardMode: false,
   theme: 'noir',
   bigPointer: false,
+  grain: true,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -76,5 +79,6 @@ export function sanitizeSettings(raw: unknown): Settings {
       ? (r.theme as ThemeId)
       : DEFAULT_SETTINGS.theme,
     bigPointer: bool(r.bigPointer, DEFAULT_SETTINGS.bigPointer),
+    grain: bool(r.grain, DEFAULT_SETTINGS.grain),
   };
 }

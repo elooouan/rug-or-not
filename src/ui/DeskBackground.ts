@@ -5,6 +5,7 @@ import { DESK, FONT, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
 import { HEX, type PaletteKey } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { saveStore } from '@/systems/save';
+import { makeRng } from '@/systems/rng';
 import { WEATHER_LABEL, type Weather } from '@/systems/settings';
 import { cycleWeather } from '@/systems/weather';
 import { TIPS } from '@/data/tips';
@@ -219,6 +220,25 @@ export class DeskBackground {
       .setDepth(DEPTH.light)
       .setVisible(false);
     this.overlays = [this.light, this.vignette, this.flash, this.dark];
+    // Film grain: a tiled speck texture, faint, jumping to a new offset every frame so it
+    // crawls the way projected film does. Off with reduced motion or the setting.
+    if (this.motion && saveStore.get().settings.grain) {
+      const grain = scene.add
+        .tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, TEX.grain)
+        .setOrigin(0)
+        .setDepth(DEPTH.vignette + 1)
+        .setAlpha(0.11);
+      const rng = makeRng(`grain-${Date.now()}`);
+      const step = () => {
+        grain.tilePositionX = rng.int(0, 95);
+        grain.tilePositionY = rng.int(0, 95);
+      };
+      scene.events.on(Phaser.Scenes.Events.UPDATE, step);
+      scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
+        scene.events.off(Phaser.Scenes.Events.UPDATE, step),
+      );
+      this.overlays.push(grain);
+    }
     // Dust in the lamplight: a handful of faint motes drifting through the beam.
     if (this.motion) {
       this.dust = scene.add.particles(0, 0, TEX.pixel, {

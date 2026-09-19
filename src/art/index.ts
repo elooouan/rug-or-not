@@ -4,6 +4,7 @@ import {
   makeClock,
   makeCork,
   makeCorkboard,
+  makeGrain,
   makeDrawer,
   makeFolders,
   makeLamp,
@@ -49,6 +50,7 @@ export function generateAllTextures(scene: Phaser.Scene): void {
   makeLamp(scene);
   makeLampLight(scene);
   makeVignette(scene);
+  makeGrain(scene);
   makeMug(scene);
   makeFolders(scene);
   makeStamps(scene);
