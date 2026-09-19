@@ -454,7 +454,21 @@ export class InvestigationScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
     face.setDisplaySize(Math.round(face.width * (40 / face.height)), 40);
     face.setInteractive({ useHandCursor: false });
-    face.on('pointerover', () => audio.play('hover'));
+    // He's alive down there: a slow breath, and a small lift under the pointer.
+    if (!s.reducedMotion)
+      this.tweens.add({
+        targets: face,
+        y: face.y - 1,
+        duration: 1600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    face.on('pointerover', () => {
+      audio.play('hover');
+      face.setX(8);
+    });
+    face.on('pointerout', () => face.setX(6));
     face.on('pointerdown', () => this.askLucien());
     this.askLabel = addText(
       this,
