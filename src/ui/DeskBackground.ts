@@ -334,7 +334,20 @@ export class DeskBackground {
       const lines = (style.slot === 'ornament' && LINES[style.kind]) || ['hm'];
       audio.play('click');
       floatText(scene, x + 14, y - 4, lines[Phaser.Math.Between(0, lines.length - 1)]);
-      if (this.motion && orn.active) squish(scene, orn, 1.1, 0.9, 180);
+      if (!this.motion || !orn.active) return;
+      squish(scene, orn, 1.1, 0.9, 180);
+      // Two-frame ornaments spin (the globe) or splash (the fish) when poked.
+      if (scene.textures.exists(`${TEX.ornament}-1`))
+        scene.time.addEvent({
+          delay: 70,
+          repeat: 7,
+          callback: () => {
+            if (!orn.active) return;
+            const alt = `${TEX.ornament}-1`;
+            const next = orn.texture.key === alt ? TEX.ornament : alt;
+            if (scene.textures.exists(next)) orn.setTexture(next);
+          },
+        });
     });
     // A little life: the bobblehead nods now and then, the plant leans with a draught.
     const style = worn('ornament').style;
