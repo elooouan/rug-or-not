@@ -39,7 +39,7 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
   Nothing bought moves a score. It's a desk. Dress it.
 
 - **[v0.9-dressed-desk.png]** Oxblood trench, black fedora, velvet curtains, a red mug and a
-  globe. Same detective, better wardrobe. 35 things at the market, all cosmetic.
+  globe. Same detective, better wardrobe. 39 things at the market, all cosmetic.
 
 - **[v0.9-hall-of-detectives.png]** The Hall of Detectives now has a detectives board: one
   row per desk, career score, rank, clips earned, files solved. Sort it by score or by

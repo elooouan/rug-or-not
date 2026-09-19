@@ -248,7 +248,7 @@ media: v0.8-title-first-night.png
 
 (277)
 
-> Shipped last week (v0.9): paper clips as currency, a market with 35 things, a try-on strip, a daily deal, a detectives board, deep links, a secret badge for an all-gold look, and a bug where asking Lucien for help cost points and said nothing if you'd muted his remarks. Fixed.
+> Shipped last week (v0.9): paper clips as currency, a market with 39 things, a try-on strip, a daily deal, a detectives board, deep links, a secret badge for an all-gold look, and a bug where asking Lucien for help cost points and said nothing if you'd muted his remarks. Fixed.
 
 media: v0.9-market-page.png
 

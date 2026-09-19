@@ -252,12 +252,24 @@ export interface CatStyle {
   fur: PaletteKey;
   dark: PaletteKey;
   eye: PaletteKey;
+  /** A band under the head (a bow, a bell, a collar); none by default. */
+  collar?: PaletteKey;
 }
+
+/** The row where the head meets the body, columns 1-4: where a collar sits on every frame. */
+const COLLAR_ROW = 4;
 
 /** `prefix` other than the desk's own draws a copy for the market's try-on (frames `<prefix>-N`). */
 export function makeCat(scene: Phaser.Scene, style?: CatStyle, prefix: string = TEX.cat): void {
-  const map = style ? { ...CAT_MAP, b: style.fur, d: style.dark, e: style.eye } : CAT_MAP;
-  CAT_FRAMES.forEach((rows, i) => {
+  const map = style
+    ? { ...CAT_MAP, b: style.fur, d: style.dark, e: style.eye, c: style.collar ?? style.fur }
+    : { ...CAT_MAP, c: CAT_MAP.b };
+  const frames = style?.collar
+    ? CAT_FRAMES.map((rows) =>
+        rows.map((r, y) => (y === COLLAR_ROW ? r[0] + 'cccc' + r.slice(5) : r)),
+      )
+    : CAT_FRAMES;
+  frames.forEach((rows, i) => {
     makeGraphicsTexture(scene, `${prefix}-${i}`, 28, 20, (g) => {
       drawPixels(g, rows, map, 0, 0, 2);
       // Rim light along the back so the silhouette reads against the night sky.

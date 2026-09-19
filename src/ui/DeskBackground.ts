@@ -300,6 +300,7 @@ export class DeskBackground {
       mug: this.mug,
       radio: this.radio,
       cat: this.cat,
+      collar: this.cat,
       ornament: this.ornament,
     };
     const prop = changed ? bounce[changed] : undefined;

@@ -7,9 +7,9 @@
   times pays 1), a rush pays 1 per thousand points, and the report says so. Holding the coin adds an
   allowance that follows the balance the wallet reports (25 clips per 1,000 coins, capped
   at 1,000) — read-only, nothing is ever spent from the wallet.
-- The market, a new NetScope page (also under Settings > Office > Desk & wardrobe): 35
+- The market, a new NetScope page (also under Settings > Office > Desk & wardrobe): 39
   things to dress the desk with. Coats and hats for Lucien (his sprites are recoloured in
-  place, hat and coat separately), four furs for Biscuit, mugs, radios, curtains for the
+  place, hat and coat separately), four furs and three collars for Biscuit, mugs, radios, curtains for the
   window and an ornament for the desk's corner (plant, trophy, globe, fish bowl, skull, a
   Lucien bobblehead for partners). Three items ask for a holder tier as well as the price.
   Buying or wearing something redresses every screen that is up, including a file paused

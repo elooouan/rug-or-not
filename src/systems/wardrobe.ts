@@ -141,10 +141,16 @@ export function applyLook(scene: Phaser.Scene): void {
     makeMug(scene, { body: mug.body, band: mug.band });
   }
   const cat = worn('cat').style;
+  const collar = worn('collar').style;
   if (cat.slot === 'cat') {
     // The cat is four still frames swapped by hand (no animation to rebuild).
     drop([0, 1, 2, 3].map((i) => `${TEX.cat}-${i}`));
-    makeCat(scene, { fur: cat.fur, dark: cat.dark, eye: cat.eye });
+    makeCat(scene, {
+      fur: cat.fur,
+      dark: cat.dark,
+      eye: cat.eye,
+      collar: collar.slot === 'collar' ? (collar.color ?? undefined) : undefined,
+    });
   }
   const radio = worn('radio').style;
   if (radio.slot === 'radio') {
@@ -181,10 +187,32 @@ export function previewTexture(scene: Phaser.Scene, item: ShopItem): string | nu
       drop(key);
       makeMug(scene, { body: st.body, band: st.band }, key);
       return key;
-    case 'cat':
+    case 'cat': {
       [0, 1, 2, 3].forEach((i) => drop(`${key}-${i}`));
-      makeCat(scene, { fur: st.fur, dark: st.dark, eye: st.eye }, key);
+      const collar = worn('collar').style;
+      makeCat(
+        scene,
+        {
+          fur: st.fur,
+          dark: st.dark,
+          eye: st.eye,
+          collar: collar.slot === 'collar' ? (collar.color ?? undefined) : undefined,
+        },
+        key,
+      );
       return `${key}-0`;
+    }
+    case 'collar': {
+      [0, 1, 2, 3].forEach((i) => drop(`${key}-${i}`));
+      const cat = worn('cat').style;
+      if (cat.slot !== 'cat') return null;
+      makeCat(
+        scene,
+        { fur: cat.fur, dark: cat.dark, eye: cat.eye, collar: st.color ?? undefined },
+        key,
+      );
+      return `${key}-0`;
+    }
     case 'radio':
       drop(key);
       makeRadio(scene, { body: st.body, dark: st.dark }, key);
@@ -248,7 +276,7 @@ export function redress(scene: Phaser.Scene, changed?: ShopSlot): void {
 
 /** The look as one string, so screens can tell when it changed underneath them. */
 export function lookKey(): string {
-  return (['coat', 'hat', 'mug', 'cat', 'ornament', 'curtains', 'radio'] as const)
+  return (['coat', 'hat', 'mug', 'cat', 'collar', 'ornament', 'curtains', 'radio'] as const)
     .map((s) => worn(s).id)
     .join('|');
 }

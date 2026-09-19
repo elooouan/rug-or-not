@@ -7,7 +7,8 @@ import type { PaletteKey } from '@/config/palette';
  * opens content, and nothing costs real money: clips come from closing files, and holding
  * the coin adds an allowance on top (read-only balance, never a transaction).
  */
-export type ShopSlot = 'coat' | 'hat' | 'mug' | 'cat' | 'ornament' | 'curtains' | 'radio';
+export type ShopSlot =
+  'coat' | 'hat' | 'mug' | 'cat' | 'collar' | 'ornament' | 'curtains' | 'radio';
 
 /** Recolour target for Lucien's trench and hat: hue in degrees, saturation and lightness multipliers. */
 export interface Tint {
@@ -23,6 +24,7 @@ export type ShopStyle =
   | { slot: 'hat'; tint: Tint | null }
   | { slot: 'mug'; body: PaletteKey; band: PaletteKey }
   | { slot: 'cat'; fur: PaletteKey; dark: PaletteKey; eye: PaletteKey }
+  | { slot: 'collar'; color: PaletteKey | null }
   | { slot: 'ornament'; kind: OrnamentKind }
   | { slot: 'curtains'; color: PaletteKey | null }
   | { slot: 'radio'; body: PaletteKey; dark: PaletteKey };
@@ -196,6 +198,35 @@ export const SHOP: ShopItem[] = [
     price: 80,
     style: { slot: 'cat', fur: 'paper', dark: 'paperShadow', eye: 'ink' },
   },
+  // Biscuit's collar
+  {
+    id: 'col-none',
+    name: 'No collar',
+    blurb: 'She answers to nobody anyway.',
+    price: 0,
+    style: { slot: 'collar', color: null },
+  },
+  {
+    id: 'col-bow',
+    name: 'Red bow',
+    blurb: 'Stamp red. She tolerates it.',
+    price: 35,
+    style: { slot: 'collar', color: 'stampRed' },
+  },
+  {
+    id: 'col-ink',
+    name: 'Ink collar',
+    blurb: 'Blue, with a tag that says "no".',
+    price: 30,
+    style: { slot: 'collar', color: 'ink' },
+  },
+  {
+    id: 'col-bell',
+    name: 'Brass bell',
+    blurb: 'You will hear her coming. She hates that.',
+    price: 40,
+    style: { slot: 'collar', color: 'amber' },
+  },
   // Desk ornaments
   {
     id: 'orn-none',
@@ -304,6 +335,7 @@ export const SHOP_SLOTS: { id: ShopSlot; name: string }[] = [
   { id: 'coat', name: "Lucien's coat" },
   { id: 'hat', name: "Lucien's hat" },
   { id: 'cat', name: "Biscuit's coat" },
+  { id: 'collar', name: "Biscuit's collar" },
   { id: 'ornament', name: 'Desk ornament' },
   { id: 'mug', name: 'Mug' },
   { id: 'curtains', name: 'Curtains' },
@@ -318,6 +350,7 @@ export const DEFAULT_LOOK: Record<ShopSlot, string> = {
   hat: 'hat-brown',
   mug: 'mug-office',
   cat: 'cat-biscuit',
+  collar: 'col-none',
   ornament: 'orn-none',
   curtains: 'cur-none',
   radio: 'radio-bakelite',

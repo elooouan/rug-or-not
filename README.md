@@ -120,7 +120,7 @@ The phone on the desk opens an in-game browser:
   points, and holding the coin adds an allowance that follows the balance the wallet reports
   (25 clips per `VITE_TOKEN_HOLDER_MIN` coins, capped at 1,000; read-only, nothing is spent
   from the wallet). The catalogue (`src/data/shop.ts`) has coats and hats for Lucien
-  (recoloured from the original sprites in `src/systems/wardrobe.ts`), furs for the cat,
+  (recoloured from the original sprites in `src/systems/wardrobe.ts`), furs and collars for the cat,
   mugs, radios, curtains and desk ornaments; three items also ask for a holder tier, and
   the day's deal (one item a third off, the same for everyone) is half off for holders.
   Buying redresses every screen that is up. Nothing bought changes a score.

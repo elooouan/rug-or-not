@@ -93,6 +93,7 @@ const BOUGHT_QUIPS: Record<ShopSlot, string[]> = {
   coat: ['New coat. The old one had opinions.', 'Same detective. Better silhouette.'],
   hat: ['A hat is a commitment.', 'The hat does the thinking. I take the credit.'],
   cat: ['Biscuit will pretend not to notice.', 'She approves. Silently. Judgingly.'],
+  collar: ['She kept it on for a full minute. A record.', 'The bell is a lie. She still sneaks.'],
   ornament: ['Something to look at between files.', 'The corner needed a witness.'],
   mug: ['Same coffee. Better mug.', 'The mug holds more. Allegedly.'],
   curtains: ["Curtains. The city can't watch me work now.", 'Very cinema. Very late.'],
@@ -113,6 +114,7 @@ const SLOT_TAB: Record<ShopSlot, string> = {
   coat: 'Coat',
   hat: 'Hat',
   cat: 'Cat',
+  collar: 'Collar',
   ornament: 'Ornament',
   mug: 'Mug',
   curtains: 'Curtains',
@@ -887,6 +889,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     show(LUCIEN_TEX, 'coat', 60);
     stripImg.hat = stripImg.coat;
     show(`${TEX.cat}-0`, 'cat');
+    stripImg.collar = stripImg.cat;
     show(TEX.mug, 'mug');
     show(TEX.radio, 'radio');
     show(TEX.ornament, 'ornament');
@@ -898,7 +901,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       const realKey =
         slot === 'coat' || slot === 'hat'
           ? LUCIEN_TEX
-          : slot === 'cat'
+          : slot === 'cat' || slot === 'collar'
             ? `${TEX.cat}-0`
             : slot === 'ornament'
               ? TEX.ornament
