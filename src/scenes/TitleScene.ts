@@ -181,6 +181,10 @@ export class TitleScene extends Phaser.Scene {
         desk.petCat();
         LucienBubble.tell(this, 'She knows her name. She just does not care.', 3000);
         typed = '';
+      } else if (typed.endsWith('curtains')) {
+        if (!desk.toggleCurtains())
+          LucienBubble.tell(this, 'Bare glass. The market hangs curtains, forty-five clips.', 3600);
+        typed = '';
       } else if (typed.endsWith('train')) {
         desk.train();
         audio.play('slide');

@@ -420,8 +420,10 @@ export class DeskBackground {
     g.fillRect(x, y + 4, w, 1);
   }
 
-  /** Pull the curtains across the glass, or open them again. */
-  private toggleCurtains(): void {
+  /** Pull the curtains across the glass, or open them again; false when none are hung. */
+  toggleCurtains(): boolean {
+    const style = worn('curtains').style;
+    if (style.slot !== 'curtains' || !style.color) return false;
     const to = this.curtainDraw > 0.5 ? 0 : 1;
     curtainsDrawn = to === 1;
     this.curtainTween?.stop();
@@ -429,7 +431,7 @@ export class DeskBackground {
     if (!this.motion) {
       this.curtainDraw = to;
       this.drawCurtains();
-      return;
+      return true;
     }
     this.curtainTween = this.scene.tweens.addCounter({
       from: this.curtainDraw,
@@ -441,6 +443,7 @@ export class DeskBackground {
         this.drawCurtains();
       },
     });
+    return true;
   }
 
   /** Clickable props lift a pixel under the pointer so the desk reads as touchable. */
@@ -639,9 +642,7 @@ export class DeskBackground {
       cloth.on(
         'pointerdown',
         (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
-          if (worn('curtains').style.slot !== 'curtains') return;
-          ev.stopPropagation();
-          this.toggleCurtains();
+          if (this.toggleCurtains()) ev.stopPropagation();
         },
       );
     }
