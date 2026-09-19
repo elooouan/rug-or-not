@@ -18,6 +18,7 @@ import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { downloadCanvas } from '@/systems/shareCard';
 import { toast } from '@/ui/Toast';
 import { setupScene } from './sceneUtil';
+import { touchScreen } from '@/ui/lensLift';
 
 const KEY = (f: HistoryFrame): string => (f.file === 'live' ? LIVE_PHOTO_KEY : `history-${f.file}`);
 
@@ -149,7 +150,7 @@ export class HistoryScene extends Phaser.Scene {
       this,
       8,
       GAME_HEIGHT - 12,
-      `${frames.length} photos  ·  click one to look closer${rows > WALL.visibleRows ? '  ·  wheel to scroll' : ''}`,
+      `${frames.length} photos  ·  ${touchScreen() ? 'tap' : 'click'} one to look closer${rows > WALL.visibleRows ? (touchScreen() ? '  ·  drag to scroll' : '  ·  wheel to scroll') : ''}`,
       { size: FONT.size.tiny, color: 'paper' },
     ).setDepth(DEPTH.hud);
 
