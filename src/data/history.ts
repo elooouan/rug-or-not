@@ -209,4 +209,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'The mirror of a drill: five printed pages, and the target is the thing that only looks bad. The chart joke is the answer; the countdown above it is the trap.',
   },
+  {
+    file: '27-v08-secondlook',
+    version: 'v0.8',
+    date: '2026-09-19',
+    title: 'The second look',
+    caption:
+      'A report used to say "missed: in Tokenomics" and leave you to guess the row. Now it reopens the file with the pins where they were and the misses in amber; a click gets the why.',
+  },
 ];
