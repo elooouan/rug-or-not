@@ -47,9 +47,22 @@ export class Typewriter {
       const t = makeText(scene, line.indent ?? 0, y, '', opts);
       if (line.onClick) {
         t.setInteractive({ useHandCursor: false });
+        // Fires on the release, and only for a tap: a drag that starts on a line is a scroll.
+        let pressed = false;
         t.on(
           'pointerdown',
           (_p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+            pressed = true;
+            ev.stopPropagation();
+          },
+        );
+        t.on('pointerout', () => (pressed = false));
+        t.on(
+          'pointerup',
+          (p: Phaser.Input.Pointer, _x: number, _y: number, ev: Phaser.Types.Input.EventData) => {
+            const ok = pressed;
+            pressed = false;
+            if (!ok || p.getDistance() > 8) return;
             ev.stopPropagation();
             line.onClick?.();
           },

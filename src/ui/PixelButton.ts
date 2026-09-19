@@ -85,9 +85,7 @@ export class PixelButton extends Phaser.GameObjects.Container {
       ),
       Phaser.Geom.Rectangle.Contains,
     );
-    this.on('pointerover', () => this.setHover(true));
-    this.on('pointerout', () => this.setHover(false));
-    this.on('pointerdown', () => {
+    const press = () => {
       if (this.disabled) return;
       audio.play('ui');
       // A one-pixel press so the click reads even when the handler is instant.
@@ -95,6 +93,26 @@ export class PixelButton extends Phaser.GameObjects.Container {
       this.setY(y0 + 1);
       scene.time.delayedCall(90, () => this.active && this.y === y0 + 1 && this.setY(y0));
       onClick();
+    };
+    // A mouse fires on the press. A finger fires on the lift, and only if it stayed put:
+    // a drag that starts on a button (scrolling a page) must not trigger it.
+    let fingerDown = false;
+    this.on('pointerover', () => this.setHover(true));
+    this.on('pointerout', () => {
+      fingerDown = false;
+      this.setHover(false);
+    });
+    this.on('pointerdown', (p?: Phaser.Input.Pointer) => {
+      if (p?.wasTouch) {
+        fingerDown = true;
+        return;
+      }
+      press();
+    });
+    this.on('pointerup', (p: Phaser.Input.Pointer) => {
+      const ok = fingerDown;
+      fingerDown = false;
+      if (ok && p.getDistance() <= 8) press();
     });
     if (opts.hotkey) {
       const k = scene.input.keyboard?.addKey(opts.hotkey);

@@ -59,6 +59,9 @@
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
   mark at the corner); the small section headings are darker and read at a glance.
+- Fixed (touch): a finger dragging to scroll the report, a phone page or a notebook page
+  fired whatever button or link it started on. Buttons and report lines now fire when a
+  finger lifts where it landed; a mouse still fires on the press.
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
   wrapped to a second line ran into the row below it; rows now make room. The desk's key
   hint no longer mentions the lens when there isn't one.

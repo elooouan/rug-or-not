@@ -479,7 +479,9 @@ test('the second look reopens a closed file with the misses marked', async ({ pa
     };
     rs.typewriter.skip();
     const line = rs.content.list.find((o) => /SECOND LOOK/.test(o.text ?? ''));
-    line?.emit('pointerdown', {}, 0, 0, { stopPropagation: () => undefined });
+    const ev = { stopPropagation: () => undefined };
+    line?.emit('pointerdown', { getDistance: () => 0 }, 0, 0, ev);
+    line?.emit('pointerup', { getDistance: () => 0 }, 0, 0, ev);
     return !!line;
   });
   expect(offered).toBe(true);
