@@ -4,6 +4,7 @@ import { crisp } from '@/art/pixelUtil';
 import type { ShopItem, ShopSlot, Tint } from '@/data/shop';
 import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
 import { worn } from './clips';
+import { Cloth, clamp01, clothParts, hslToRgb, type Keep, rgbToHsl } from './cloth';
 
 /**
  * Dressing the desk: Lucien's coat and hat, the mug, the cat, the radio and the corner
@@ -17,52 +18,18 @@ export const LUCIEN_BASE = `${LUCIEN_TEX}-base`;
 export const LUCIEN_FACE_BASE = `${LUCIEN_FACE_TEX}-base`;
 
 /**
- * Where the hat ends and the coat begins, as a fraction of each image's height. The trench
- * and the fedora share their colours, so the split is by position (measured on the art).
+ * The line between the hat and the coat, as a fraction of each image's height (measured on
+ * the art). The trench and the fedora share their colours, so cloth is told apart by
+ * position: a piece of cloth that starts above this line is the hat (the brim dips below
+ * it, the coat's collar never reaches it).
  */
 const HAT_SPLIT: Record<string, number> = { [LUCIEN_BASE]: 0.29, [LUCIEN_FACE_BASE]: 0.515 };
-
-/** Lucien's trench-coat cloth: the orange family, mid tones; skin and the brass are lighter or yellower. */
-function isCloth(h: number, s: number, l: number): boolean {
-  return h >= 18 && h <= 38 && s > 0.45 && l >= 0.22 && l <= 0.62;
-}
-
-function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return [0, 0, l];
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  let h: number;
-  if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-  else if (max === g) h = (b - r) / d + 2;
-  else h = (r - g) / d + 4;
-  return [h * 60, s, l];
-}
-
-function hslToRgb(h: number, s: number, l: number): [number, number, number] {
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const hp = (((h % 360) + 360) % 360) / 60;
-  const x = c * (1 - Math.abs((hp % 2) - 1));
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  if (hp < 1) [r, g, b] = [c, x, 0];
-  else if (hp < 2) [r, g, b] = [x, c, 0];
-  else if (hp < 3) [r, g, b] = [0, c, x];
-  else if (hp < 4) [r, g, b] = [0, x, c];
-  else if (hp < 5) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
-  const m = l - c / 2;
-  return [r + m, g + m, b + m];
-}
-
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+/** Shade-coloured parts that are not cloth and touch it: the trousers under the hem. */
+const KEEP: Record<string, Keep[]> = { [LUCIEN_BASE]: [[52, 178, 92, 216]] };
 
 /**
- * Recolour one of Lucien's sprites: every cloth pixel above the split takes the hat tint,
- * every one below the coat tint. A null tint keeps the original cloth.
+ * Recolour one of Lucien's sprites: the hat's cloth takes the hat tint, the coat's the
+ * coat tint (see `clothParts`). A null tint keeps the original cloth.
  */
 function dressSprite(
   scene: Phaser.Scene,
@@ -83,18 +50,15 @@ function dressSprite(
   if (coat || hat) {
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
-    const split = (HAT_SPLIT[baseKey] ?? 0.3) * h;
-    for (let i = 0; i < d.length; i += 4) {
-      if (d[i + 3] < 128) continue;
-      const [hue, s, l] = rgbToHsl(d[i] / 255, d[i + 1] / 255, d[i + 2] / 255);
-      if (!isCloth(hue, s, l)) continue;
-      const y = Math.floor(i / 4 / w);
-      const tint = y < split ? hat : coat;
+    const parts = clothParts(d, w, h, (HAT_SPLIT[baseKey] ?? 0.3) * h, KEEP[baseKey]);
+    for (let i = 0, p = 0; i < parts.length; i++, p += 4) {
+      const tint = parts[i] === Cloth.hat ? hat : parts[i] === Cloth.coat ? coat : null;
       if (!tint) continue;
+      const [, s, l] = rgbToHsl(d[p] / 255, d[p + 1] / 255, d[p + 2] / 255);
       const [r, g, b] = hslToRgb(tint.hue, clamp01(s * tint.sat), clamp01(l * tint.light));
-      d[i] = Math.round(r * 255);
-      d[i + 1] = Math.round(g * 255);
-      d[i + 2] = Math.round(b * 255);
+      d[p] = Math.round(r * 255);
+      d[p + 1] = Math.round(g * 255);
+      d[p + 2] = Math.round(b * 255);
     }
     ctx.putImageData(img, 0, 0);
   }
