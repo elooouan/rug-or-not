@@ -218,7 +218,7 @@ export class InvestigationScene extends Phaser.Scene {
     const first = marks.findIndex((n) => n > 0);
     if (first > 0) this.showDocument(first, false);
     this.time.delayedCall(500, () =>
-      LucienBubble.say(
+      LucienBubble.tell(
         this,
         missed > 0
           ? "Amber is what walked past you. Click a mark and I'll say why it mattered."
@@ -237,10 +237,10 @@ export class InvestigationScene extends Phaser.Scene {
         ?.allSpots()
         .find((s) => s.clue.id === clue.id);
       const head = spot?.missed ? 'Missed' : 'Pinned';
-      LucienBubble.say(this, `${head}: ${flag.title}. ${flag.explanation}`, 7000);
+      LucienBubble.tell(this, `${head}: ${flag.title}. ${flag.explanation}`, 7000);
     } else {
       const h = HERRINGS[clue.herringId as keyof typeof HERRINGS];
-      LucienBubble.say(this, `Herring: ${h.title}. ${h.reassurance}`, 7000);
+      LucienBubble.tell(this, `Herring: ${h.title}. ${h.reassurance}`, 7000);
     }
   }
 

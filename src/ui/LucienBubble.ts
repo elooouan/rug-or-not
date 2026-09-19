@@ -32,6 +32,12 @@ export class LucienBubble extends Phaser.GameObjects.Container {
     LucienBubble.current = new LucienBubble(scene, text, ms, lift);
   }
 
+  /** An answer the player asked for (a mark on the second look): shown even with quips off. */
+  static tell(scene: Phaser.Scene, text: string, ms = 3200): void {
+    LucienBubble.current?.destroy();
+    LucienBubble.current = new LucienBubble(scene, text, ms, 0);
+  }
+
   constructor(scene: Phaser.Scene, text: string, ms: number, lift = 0) {
     super(scene, 0, -lift);
     // Scenes with the whole detective on the desk (the title) get the bubble beside him;
