@@ -91,6 +91,7 @@ export class InvestigationScene extends Phaser.Scene {
   private said = new Set<string>();
   private hintsUsed = 0;
   private askLabel?: Phaser.GameObjects.Text;
+  private askFace?: Phaser.GameObjects.Image;
   /** Tab the last nudge was about; a second ask on it points at the line. */
   private nudgedDoc = -1;
   private idleMs = 0;
@@ -112,6 +113,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.phase = 'intake';
     this.paused = false;
     this.docs = [];
+    this.askFace = undefined;
     this.stamps = [];
     this.suspicions = [];
     this.current = 0;
@@ -186,7 +188,15 @@ export class InvestigationScene extends Phaser.Scene {
     this.events.off('browser:close');
     this.events.off('bubble:open');
     this.events.off(Phaser.Scenes.Events.RESUME);
-    this.events.on('bubble:open', (b: Phaser.GameObjects.GameObject) => this.magnifier.ignore(b));
+    this.events.on('bubble:open', (b: Phaser.GameObjects.GameObject) => {
+      this.magnifier.ignore(b);
+      // The bubble brings its own face; the breathing one underneath would show an edge.
+      const face = this.askFace;
+      if (face?.active) {
+        face.setVisible(false);
+        b.once(Phaser.GameObjects.Events.DESTROY, () => face.active && face.setVisible(true));
+      }
+    });
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -452,6 +462,7 @@ export class InvestigationScene extends Phaser.Scene {
       .image(6, GAME_HEIGHT - 4, LUCIEN_FACE_TEX)
       .setOrigin(0, 1)
       .setDepth(DEPTH.hud);
+    this.askFace = face;
     face.setDisplaySize(Math.round(face.width * (40 / face.height)), 40);
     face.setInteractive({ useHandCursor: false });
     // He's alive down there: a slow breath, and a small lift under the pointer.
