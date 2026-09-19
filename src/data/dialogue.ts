@@ -92,7 +92,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     { text: "Evening. Name's Lucien. Detective, coin sniffer, coffee enjoyer." },
     { text: 'Every night a new token lands on this desk. Some are honest. Most... are not.' },
     { text: 'Your job: read the evidence, pin what smells, and stamp the verdict. RUG or LEGIT.' },
-    { text: "Grab a coffee. It's going to be a long night. Hit Play when you're ready." },
+    {
+      text: "Grab a coffee. It's going to be a long night. Hit Play when you're ready; How to play is my handbook, if you'd rather read first.",
+    },
   ],
   'first-intake': [
     { text: 'First file of the night. Small fry, but they all start small.' },
