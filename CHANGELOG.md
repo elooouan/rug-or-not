@@ -32,7 +32,7 @@
   that run's report again, second look included. (The fastest-call record also survives a
   slower replay now; it used to be dropped.)
 - The second look: when a report has a missed flag or a false accusation, a line on it
-  opens the file again read-only, with the run's pins where they were and every missed
+  (or the S key) opens the file again read-only, with the run's pins where they were and every missed
   flag marked in amber (tabs with marks keep a dot). Clicking a mark gets the flag or the
   herring explained in Lucien's bubble; the fine print still needs the lens. Esc or "Back
   to report" returns to the report, which lands quietly the second time.
@@ -63,6 +63,12 @@
   account this site isn't approved for clears the stale address and says so; RPC, price
   and board calls give up after a few seconds instead of hanging the page; the help page
   and the coin page point phone users at Phantom's in-app browser.
+- Small readability pass: the notebook's section headings, the phone's placeholder lines,
+  the rush card's hints and the sticky notes use the darker ink instead of the faint one.
+  Every settings row now has a line under it saying what it does.
+- The pile folder shows tonight's printer difficulty; the weekly folder counts the days
+  until the next one. A story beat after the seventh file, between the template and the
+  name.
 - Drawer folders wrap their title onto a second line instead of cutting it mid-word, and
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
