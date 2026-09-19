@@ -53,8 +53,19 @@ export class PageCtx {
   }
 
   small(text: string, color: PaletteKey = 'woodMid'): void {
-    this.content.add(makeText(this.scene, 0, this.y, text, { size: FONT.size.tiny, color }));
-    this.y += 10;
+    // The tiny face isn't monospaced: measure, then wrap on the measured average.
+    const probe = makeText(this.scene, 0, this.y, text, { size: FONT.size.tiny, color });
+    if (probe.width <= this.width) {
+      this.content.add(probe);
+      this.y += 10;
+      return;
+    }
+    const cw = probe.width / Math.max(1, text.length);
+    probe.destroy();
+    for (const l of wrapMono(text, Math.floor(this.width / cw))) {
+      this.content.add(makeText(this.scene, 0, this.y, l, { size: FONT.size.tiny, color }));
+      this.y += 10;
+    }
   }
 
   gap(n = 6): void {
