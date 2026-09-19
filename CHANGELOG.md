@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.8 — the handbook (unreleased)
+## v0.8 — the handbook
 
 - The desk opens up a piece at a time: a fresh save sees the folder, the daily, the notebook
   and settings. The drawer turns up after the first closed file (Lucien's tour covers it),

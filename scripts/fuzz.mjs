@@ -35,6 +35,7 @@ const SAVE = {
     ]),
   ),
   unlockedFlags: ['mint-unlimited', 'sell-tax-adjustable', 'honeypot'],
+  unlockedHerrings: ['community-jokes', 'small-fixed-tax', 'doxxed-meme-name'],
   settings: { hints: true, quips: true, music: false, volume: 0, reducedMotion: false },
   discovered: ['drawer', 'rush', 'cold', 'weekly'],
   stats: { runs: 6, coldRuns: 1 },
