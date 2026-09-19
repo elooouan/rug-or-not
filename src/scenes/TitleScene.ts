@@ -478,6 +478,12 @@ export class TitleScene extends Phaser.Scene {
       LucienBubble.tell(this, quips[quip], 3600);
       if (!reduced) squish(this, idle);
     });
+    // A new coat or hat from the market lands with a bounce (the textures swap underneath).
+    const dressed = (slot?: string) => {
+      if ((slot === 'coat' || slot === 'hat') && idle.active && !reduced) squish(this, idle);
+    };
+    this.events.on('look:changed', dressed);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('look:changed', dressed));
     if (!reduced)
       this.tweens.add({
         targets: idle,

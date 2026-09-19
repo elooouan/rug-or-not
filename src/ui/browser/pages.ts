@@ -953,7 +953,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           'Wear',
           () => {
             if (!wear(item.id)) return;
-            redress(scene);
+            redress(scene, item.style.slot);
             audio.play('click');
             checkGilded(scene);
             ctx.panel.render();
@@ -980,8 +980,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
               toast(scene, 'NOT YET', buyBlocker(item) ?? 'something got in the way');
               return;
             }
-            redress(scene);
-            audio.play('stamp');
+            redress(scene, item.style.slot);
+            audio.play('buy');
             toast(scene, 'BOUGHT', `${item.name} · ${clipBalance()} clips left`);
             const quips = BOUGHT_QUIPS[item.style.slot];
             LucienBubble.say(scene, quips[Phaser.Math.Between(0, quips.length - 1)]);

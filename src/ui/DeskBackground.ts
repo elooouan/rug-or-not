@@ -114,6 +114,7 @@ export class DeskBackground {
   private cat!: Phaser.GameObjects.Image;
   private mug?: Phaser.GameObjects.Image;
   private ornament?: Phaser.GameObjects.Image;
+  private radio?: Phaser.GameObjects.Image;
   private curtains!: Phaser.GameObjects.Graphics;
   private props = true;
   private timers: Phaser.Time.TimerEvent[] = [];
@@ -284,7 +285,7 @@ export class DeskBackground {
     });
   }
 
-  private onLookChanged(): void {
+  private onLookChanged(changed?: string): void {
     this.drawCurtains();
     if (!this.props) return;
     const has = this.scene.textures.exists(TEX.ornament);
@@ -293,6 +294,16 @@ export class DeskBackground {
       this.ornament.destroy();
       this.ornament = undefined;
     } else if (!this.ornament && has) this.buildOrnament();
+    // The thing just bought lands with a little bounce, so the eye finds it.
+    if (!this.motion) return;
+    const bounce: Record<string, Phaser.GameObjects.Image | undefined> = {
+      mug: this.mug,
+      radio: this.radio,
+      cat: this.cat,
+      ornament: this.ornament,
+    };
+    const prop = changed ? bounce[changed] : undefined;
+    if (prop?.active) squish(this.scene, prop, 1.12, 0.88, 260);
   }
 
   // ---- the ornament -----------------------------------------------------------
@@ -1138,6 +1149,7 @@ export class DeskBackground {
     const scene = this.scene;
     const { x, y } = DESK.radio;
     const radio = scene.add.image(x, y, TEX.radio).setOrigin(0).setDepth(DEPTH.deskProps);
+    this.radio = radio;
     const light = scene.add
       .rectangle(x + 30, y + 22, 2, 2, HEX.amber)
       .setOrigin(0)

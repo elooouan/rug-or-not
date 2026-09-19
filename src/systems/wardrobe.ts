@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { makeCat, makeMug, makeOrnament, makeRadio, TEX } from '@/art';
 import { crisp } from '@/art/pixelUtil';
-import type { ShopItem, Tint } from '@/data/shop';
+import type { ShopItem, ShopSlot, Tint } from '@/data/shop';
 import { LUCIEN_FACE_TEX, LUCIEN_TEX } from '@/ui/DialogueBox';
 import { worn } from './clips';
 
@@ -216,7 +216,7 @@ function lookKeys(): string[] {
  * the textures, then point every image that was showing one of them at the new copy in
  * the same tick, so nothing renders against a texture that no longer exists.
  */
-export function redress(scene: Phaser.Scene): void {
+export function redress(scene: Phaser.Scene, changed?: ShopSlot): void {
   const keys = new Set(lookKeys());
   // Sizes are read before the old textures go: a destroyed frame has none to read.
   const showing: { img: Phaser.GameObjects.Image; w: number; h: number }[] = [];
@@ -240,8 +240,8 @@ export function redress(scene: Phaser.Scene): void {
       img.setDisplaySize(w, h);
     } else img.destroy(); // an ornament taken off the desk
   }
-  // Desks add their ornament and redraw curtains on this.
-  for (const sc of scenes) sc.events.emit('look:changed');
+  // Desks add their ornament and redraw curtains on this; the slot says what to bounce.
+  for (const sc of scenes) sc.events.emit('look:changed', changed);
 }
 
 /** The look as one string, so screens can tell when it changed underneath them. */

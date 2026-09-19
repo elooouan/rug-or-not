@@ -499,6 +499,13 @@ export class InvestigationScene extends Phaser.Scene {
       .setDepth(DEPTH.hud);
     face.setDisplaySize(Math.round(face.width * (40 / face.height)), 40);
     face.setInteractive({ useHandCursor: false });
+    // Bought a coat or hat from the phone: the corner face nods in the new one.
+    const dressed = (slot?: string) => {
+      if ((slot === 'coat' || slot === 'hat') && face.active && !s.reducedMotion)
+        squish(this, face, 1.08, 0.92, 260);
+    };
+    this.events.on('look:changed', dressed);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.events.off('look:changed', dressed));
     // He's alive down there: a slow breath, and a small lift under the pointer.
     if (!s.reducedMotion)
       this.tweens.add({
