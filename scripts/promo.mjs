@@ -67,7 +67,8 @@ const VETERAN = {
     'fake-renounce',
   ],
   unlockedHerrings: ['small-fixed-tax', 'doxxed-meme-name', 'community-jokes'],
-  badges: ['first-case', 'clean-sweep', 'rush-hour', 'historian'],
+  // Every badge the rest of this save already qualifies for, or a toast lands mid-clip.
+  badges: ['first-case', 'clean-sweep', 'rush-hour', 'historian', 'streak-3', 's-grade'],
   daily: { lastPlayed: null, streak: 3, bestStreak: 5, played: [], freezes: 1 },
   // No film grain: it changes every pixel every frame, which makes the GIFs huge.
   settings: { hints: false, quips: true, music: false, weather: 'rain', grain: false },
