@@ -23,6 +23,7 @@ import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { WEATHERS } from '@/systems/settings';
 import { LUCIEN_TEX, lucienSays } from '../DialogueBox';
 import { PixelButton } from '../PixelButton';
+import { markEscConsumed, popModal, popOverlay, pushModal, pushOverlay } from '../escGuard';
 import { rect } from '../shapes';
 import { isNameAllowed } from '@/systems/names';
 import { downloadCanvas, renderIdCard } from '@/systems/shareCard';
@@ -814,11 +815,17 @@ export class NamePicker extends Phaser.GameObjects.Container {
   private static readonly CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
   private slots: number[];
   private letters: Phaser.GameObjects.Text[] = [];
+  /** The slot the keyboard writes into; shown as an underline. */
+  private cursor = 0;
+  private fresh = true;
+  private caret!: Phaser.GameObjects.Rectangle;
+  private slotX: number[] = [];
 
   constructor(scene: Phaser.Scene, onDone: () => void) {
     super(scene, 0, 0);
     const current = saveStore.get().detectiveName.toUpperCase().padEnd(6, '_').slice(0, 6);
     this.slots = [...current].map((ch) => Math.max(0, NamePicker.CHARS.indexOf(ch)));
+    this.cursor = Math.min(5, current.replace(/_+$/, '').length);
     const w = 220;
     const h = 96;
     const x = (GAME_WIDTH - w) / 2;
@@ -839,6 +846,7 @@ export class NamePicker extends Phaser.GameObjects.Container {
     const sx = x + (w - slotW * 6) / 2;
     this.slots.forEach((_, i) => {
       const cx = sx + i * slotW + slotW / 2;
+      this.slotX.push(cx);
       const up = new PixelButton(scene, cx - 9, y + 20, '+', () => this.bump(i, 1), {
         variant: 'paper',
       });
@@ -854,37 +862,77 @@ export class NamePicker extends Phaser.GameObjects.Container {
       this.letters.push(letter);
       this.add([up, down, letter]);
     });
-    const ok = new PixelButton(
-      scene,
-      x + w / 2 - 24,
-      y + h - 20,
-      'OK',
-      () => {
-        const name =
-          this.slots
-            .map((s) => NamePicker.CHARS[s])
-            .join('')
-            .replace(/_+$/, '') || 'ANON';
-        if (!isNameAllowed(name)) {
-          audio.play('wrong');
-          toast(scene, 'NOT THAT ONE', 'pick a handle fit for the board');
-          return;
-        }
-        saveStore.update((d) => (d.detectiveName = name));
-        audio.play('correct');
-        this.destroy();
-        onDone();
-      },
-      { width: 48 },
+    this.caret = rect(scene, sx, y + 56, slotW - 8, 1, HEX.ink);
+    this.add(this.caret);
+    this.add(
+      makeText(scene, x + w / 2, y + h - 30, 'type it, or use the arrows  ·  Enter saves', {
+        size: FONT.size.tiny,
+        color: 'paperShadow',
+      }).setOrigin(0.5, 0),
     );
+    const confirm = () => {
+      const name =
+        this.slots
+          .map((s) => NamePicker.CHARS[s])
+          .join('')
+          .replace(/_+$/, '') || 'ANON';
+      if (!isNameAllowed(name)) {
+        audio.play('wrong');
+        toast(scene, 'NOT THAT ONE', 'pick a handle fit for the board');
+        return;
+      }
+      saveStore.update((d) => (d.detectiveName = name));
+      audio.play('correct');
+      this.destroy();
+      onDone();
+    };
+    const ok = new PixelButton(scene, x + w / 2 - 24, y + h - 20, 'OK', confirm, { width: 48 });
     scene.children.remove(ok);
     this.add(ok);
+    // Typing beats clicking plus and minus eighteen times.
+    const kb = scene.input.keyboard;
+    const onKey = (e: KeyboardEvent) => {
+      const n = NamePicker.CHARS.length;
+      if (e.key === 'Enter') confirm();
+      else if (e.key === 'Escape') {
+        markEscConsumed();
+        this.destroy();
+      } else if (e.key === 'Backspace') {
+        this.cursor = Math.max(0, this.cursor - 1);
+        this.slots[this.cursor] = n - 1;
+        audio.play('tick');
+      } else if (e.key === 'ArrowLeft') this.cursor = Math.max(0, this.cursor - 1);
+      else if (e.key === 'ArrowRight') this.cursor = Math.min(5, this.cursor + 1);
+      else if (e.key === 'ArrowUp') this.bump(this.cursor, 1);
+      else if (e.key === 'ArrowDown') this.bump(this.cursor, -1);
+      else if (e.key.length === 1 && NamePicker.CHARS.includes(e.key.toUpperCase())) {
+        // The first letter typed starts a new name; the old one was only a suggestion.
+        if (this.fresh) {
+          this.slots = this.slots.map(() => n - 1);
+          this.cursor = 0;
+        }
+        this.slots[this.cursor] = NamePicker.CHARS.indexOf(e.key.toUpperCase());
+        this.cursor = Math.min(5, this.cursor + 1);
+        audio.play('tick');
+      } else return;
+      this.fresh = false;
+      this.refresh();
+    };
+    kb?.on('keydown', onKey);
+    pushOverlay();
+    pushModal();
+    this.once(Phaser.GameObjects.Events.DESTROY, () => {
+      kb?.off('keydown', onKey);
+      popOverlay();
+      popModal();
+    });
     this.refresh();
     this.setDepth(DEPTH.toast);
     scene.add.existing(this);
   }
 
   private bump(i: number, d: number): void {
+    this.fresh = false;
     const n = NamePicker.CHARS.length;
     this.slots[i] = (this.slots[i] + d + n) % n;
     audio.play('tick');
@@ -893,5 +941,6 @@ export class NamePicker extends Phaser.GameObjects.Container {
 
   private refresh(): void {
     this.letters.forEach((t, i) => t.setText(NamePicker.CHARS[this.slots[i]]));
+    this.caret.setX(this.slotX[this.cursor] - 9);
   }
 }

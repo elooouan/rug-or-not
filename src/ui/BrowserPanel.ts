@@ -14,7 +14,7 @@ import { PixelButton } from './PixelButton';
 import { rect } from './shapes';
 import { attachScroll } from './dragScroll';
 import { makeText } from './text';
-import { markEscConsumed, popOverlay, pushOverlay } from './escGuard';
+import { markEscConsumed, modalOpen, popOverlay, pushOverlay } from './escGuard';
 import { ALL_PAGES, PageCtx, type PageId } from './browser/PageCtx';
 import { PAGES, URLS } from './browser/pages';
 
@@ -134,6 +134,7 @@ export class BrowserPanel extends Phaser.GameObjects.Container {
     if (kb) {
       const key = kb.addKey(Phaser.Input.Keyboard.KeyCodes.ESC, false);
       const fn = () => {
+        if (modalOpen()) return; // a dialog on top (the name picker) takes this one
         markEscConsumed();
         this.close();
       };

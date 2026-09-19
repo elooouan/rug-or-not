@@ -34,6 +34,7 @@ import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
 import { markDiscovered, pendingDiscovery, unlocked, type Feature } from '@/systems/discovery';
 import { syncTheme } from '@/systems/theme';
+import { modalOpen } from '@/ui/escGuard';
 import { shortAddress, TOKEN } from '@/config/token';
 import { BrowserPanel } from '@/ui/BrowserPanel';
 
@@ -90,6 +91,8 @@ export class TitleScene extends Phaser.Scene {
     ];
     let konamiAt = 0;
     kb.on('keydown', (e: KeyboardEvent) => {
+      // Typing into a dialog (the name picker) is not typing at the desk.
+      if (modalOpen()) return;
       // Konami.
       const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       konamiAt = k === konami[konamiAt] ? konamiAt + 1 : k === konami[0] ? 1 : 0;

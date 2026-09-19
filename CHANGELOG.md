@@ -14,6 +14,9 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- The detective name picker takes typing: letters and digits fill the slots, Backspace
+  clears, arrows move and spin, Enter saves, Esc cancels. Typed letters there no longer
+  reach the desk's easter eggs or the M/F hotkeys.
 - The board page opens with the desk's own log: the last six files, newest first, whatever
   the board is set to.
 - Two new badges: Herring Hunter (every hunt done) and Decorator (all five office colours

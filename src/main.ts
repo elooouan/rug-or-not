@@ -14,7 +14,7 @@ import { RushScene } from '@/scenes/RushScene';
 import { audio } from '@/systems/audio';
 import { wallet } from '@/systems/wallet';
 import { toast } from '@/ui/Toast';
-import { overlayDepth } from '@/ui/escGuard';
+import { modalOpen, overlayDepth } from '@/ui/escGuard';
 import { caseById, gameState } from '@/systems/gameState';
 
 const game = new Phaser.Game({
@@ -67,11 +67,12 @@ export function toggleFullscreen(): void {
 }
 window.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  if ((e.key === 'f' || e.key === 'F') && !modalOpen()) toggleFullscreen();
   // M mutes everything without touching the volume setting; a toast in whichever scene is up.
   // The title's typed easter eggs use letters too ("gm", "moon"): if another letter follows
   // within a beat, this was typing, not a mute.
   if (e.key === 'm' || e.key === 'M') {
+    if (modalOpen()) return; // an M typed into the name picker
     const at = Date.now();
     // Part of a word already being typed ("gm"): not a mute.
     if (at - ((game.registry.get('typedAt') as number | undefined) ?? 0) < 600) return;

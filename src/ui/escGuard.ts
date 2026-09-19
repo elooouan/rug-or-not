@@ -24,6 +24,21 @@ export function popOverlay(): void {
   overlays = Math.max(0, overlays - 1);
 }
 
+let modals = 0;
+
+/** A small dialog on top of an overlay (the name picker): the overlay's own Esc waits. */
+export function pushModal(): void {
+  modals++;
+}
+
+export function popModal(): void {
+  modals = Math.max(0, modals - 1);
+}
+
+export function modalOpen(): boolean {
+  return modals > 0;
+}
+
 /** True while any overlay is up, or right after one consumed Esc. */
 export function escTaken(): boolean {
   return overlays > 0 || escConsumedRecently();
