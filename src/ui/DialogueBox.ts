@@ -167,8 +167,13 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     }
     pushOverlay();
     this.overlayHeld = true;
-    // A scene shutdown can destroy us without finish(); keep the overlay count honest.
-    this.once(Phaser.GameObjects.Events.DESTROY, () => this.releaseOverlay());
+    // A scene shutdown can destroy us without finish(): keep the overlay count honest, and
+    // don't let the next run of this scene "finish" a dead box and fire its onDone.
+    this.once(Phaser.GameObjects.Events.DESTROY, () => {
+      this.releaseOverlay();
+      this.finished = true;
+      if (OPEN.get(scene) === this) OPEN.delete(scene);
+    });
     audio.play('slide');
     scene.events.emit('dialogue:open');
     this.nextLine();
