@@ -452,7 +452,8 @@ export function makeDrawer(scene: Phaser.Scene): void {
 
 // ---- market ornaments ----------------------------------------------------------------
 
-const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
+/** `alt` is a second frame (the fish on the other side, the globe turned); the desk swaps them. */
+const ORNAMENTS: Record<string, { rows: string[]; alt?: string[]; map: PixelMap }> = {
   plant: {
     rows: [
       '.....gg.......',
@@ -504,6 +505,20 @@ const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
       '.....kkkk.....',
       '....kkkkkk....',
     ],
+    alt: [
+      '....bbbbbb....',
+      '...bbbbggbb...',
+      '..bbbbbgggbb..',
+      '..bbgbbbggbb..',
+      '..bggbbbbbbb..',
+      '..bbbbbbggbb..',
+      '..bbbbbbggbb..',
+      '...bbbbbbbb...',
+      '....bbbbbb....',
+      '......kk......',
+      '.....kkkk.....',
+      '....kkkkkk....',
+    ],
     map: { b: 'ink', g: 'lampGreen', k: 'woodDark' },
   },
   fishbowl: {
@@ -517,6 +532,20 @@ const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
       '..p.bbbbbbbp..',
       '..p..bbbbb.p..',
       '..p....a...p..',
+      '...p......p...',
+      '....pppppp....',
+      '...kkkkkkkk...',
+    ],
+    alt: [
+      '....pppppp....',
+      '...p......p...',
+      '..p........p..',
+      '..p..bbbbb.p..',
+      '..p.bbbbbbbp..',
+      '..p.bbbaabbp..',
+      '..p.bbbbbbbp..',
+      '..p..bbbbb.p..',
+      '..p..a.....p..',
       '...p......p...',
       '....pppppp....',
       '...kkkkkkkk...',
@@ -562,8 +591,13 @@ const ORNAMENTS: Record<string, { rows: string[]; map: PixelMap }> = {
 };
 
 /** The ornament on the desk corner, or nothing when the corner is clear. */
+/** Draws `key`, and `<key>-1` when the ornament has a second frame. */
 export function makeOrnament(scene: Phaser.Scene, kind: string, key: string = TEX.ornament): void {
   const art = ORNAMENTS[kind];
   if (!art) return;
   makeGraphicsTexture(scene, key, 28, 28, (g) => drawPixels(g, art.rows, art.map, 0, 0, 2));
+  if (art.alt) {
+    const alt = art.alt;
+    makeGraphicsTexture(scene, `${key}-1`, 28, 28, (g) => drawPixels(g, alt, art.map, 0, 0, 2));
+  }
 }

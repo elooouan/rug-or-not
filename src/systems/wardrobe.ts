@@ -152,7 +152,7 @@ export function applyLook(scene: Phaser.Scene): void {
     makeRadio(scene, { body: radio.body, dark: radio.dark });
   }
   const orn = worn('ornament').style;
-  drop([TEX.ornament]);
+  drop([TEX.ornament, `${TEX.ornament}-1`]);
   if (orn.slot === 'ornament' && orn.kind !== 'none') makeOrnament(scene, orn.kind);
 }
 
@@ -192,6 +192,7 @@ export function previewTexture(scene: Phaser.Scene, item: ShopItem): string | nu
     case 'ornament':
       if (st.kind === 'none') return null;
       drop(key);
+      drop(`${key}-1`);
       makeOrnament(scene, st.kind, key);
       return key;
     default:
@@ -207,6 +208,7 @@ function lookKeys(): string[] {
     TEX.mug,
     TEX.radio,
     TEX.ornament,
+    `${TEX.ornament}-1`,
     ...[0, 1, 2, 3].map((i) => `${TEX.cat}-${i}`),
   ];
 }

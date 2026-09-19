@@ -355,6 +355,20 @@ export class DeskBackground {
         ease: 'Sine.easeInOut',
       });
     }
+    // Two-frame ornaments (the fish crosses its bowl, the globe turns) swap now and then.
+    if (this.motion && scene.textures.exists(`${TEX.ornament}-1`)) {
+      const flip = scene.time.addEvent({
+        delay: Phaser.Math.Between(1800, 3200),
+        loop: true,
+        callback: () => {
+          if (!orn.active) return;
+          const alt = `${TEX.ornament}-1`;
+          const next = orn.texture.key === alt ? TEX.ornament : alt;
+          if (scene.textures.exists(next)) orn.setTexture(next);
+        },
+      });
+      orn.once(Phaser.GameObjects.Events.DESTROY, () => flip.remove(false));
+    }
   }
 
   /** Curtains at both ends of the window, in the market's colour; nothing when bare. */
