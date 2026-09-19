@@ -281,7 +281,7 @@ export class TitleScene extends Phaser.Scene {
           ? 'Play again'
           : save.campaignUnlocked > 1
             ? cases[nextIndex]?.secret
-              ? 'Continue  ·  the file with no name'
+              ? 'Continue  ·  no name'
               : `Continue  ·  #${nextIndex + 1} ${cases[nextIndex]?.ticker ?? ''}`
             : 'Play',
         () => (allDone ? goTo(this, 'CaseSelectScene') : play()),
