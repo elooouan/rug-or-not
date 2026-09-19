@@ -196,7 +196,8 @@ export class TitleScene extends Phaser.Scene {
         LucienBubble.tell(this, 'Three digits. The radio knows them. So does the notebook.', 4000);
         typed = '';
       } else if (typed.endsWith('shop') || typed.endsWith('market')) {
-        if (!BrowserPanel.current) BrowserPanel.toggle(this, 'market');
+        if (BrowserPanel.current?.scene === this) BrowserPanel.current.go('market');
+        else BrowserPanel.toggle(this, 'market');
         typed = '';
       } else if (typed.endsWith('clips')) {
         const n = clipBalance();
