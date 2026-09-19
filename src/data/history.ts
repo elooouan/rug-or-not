@@ -217,4 +217,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'A report used to say "missed: in Tokenomics" and leave you to guess the row. Now it reopens the file with the pins where they were and the misses in amber; a click gets the why.',
   },
+  {
+    file: '28-v08-drawer',
+    version: 'v0.8',
+    date: '2026-09-19',
+    title: 'The drawer remembers',
+    caption:
+      'Every closed folder keeps its last run: the sticker in the corner opens that report again, second look and all. The pile shows what the printer is set to; the weekly counts its days.',
+  },
 ];
