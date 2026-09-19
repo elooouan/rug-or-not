@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { TEX } from '@/art/keys';
 import { DEPTH } from '@/config/depth';
 import { DESK, GAME_HEIGHT, GAME_WIDTH } from '@/config/layout';
-import { GAME_VERSION } from '@/config/gameConfig';
+import { GAME_VERSION, RANKS } from '@/config/gameConfig';
 import { HEX } from '@/config/palette';
 import { audio } from '@/systems/audio';
 import { dailyCaseFor, localDateKey, currentStreak } from '@/systems/dailyCase';
@@ -30,6 +30,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { confetti } from '@/ui/confetti';
 import { addText } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
+import { rect } from '@/ui/shapes';
 import { touchScreen } from '@/ui/lensLift';
 import { toggleFullscreen } from '@/main';
 import { wallet, walletName } from '@/systems/wallet';
@@ -325,9 +326,20 @@ export class TitleScene extends Phaser.Scene {
       `${rank}  ·  ${save.totalScore} pts${next ? `  ·  ${next.remaining} to ${next.rank}` : ''}`,
       { size: 12, color: 'woodMid', font: 'body' },
     ).setOrigin(0.5, 0);
+    // A thin bar of progress to the next rank, under the rank line.
+    if (next) {
+      const floor = RANKS.find((r) => r.rank === rank)?.minScore ?? 0;
+      const span = save.totalScore + next.remaining - floor; // next rank's floor minus ours
+      const frac = span > 0 ? Phaser.Math.Clamp((save.totalScore - floor) / span, 0, 1) : 1;
+      const bw = 120;
+      const bx = GAME_WIDTH / 2 - bw / 2;
+      const by = cy + cardH - 27;
+      card.add(rect(this, bx, by, bw, 2, HEX.paperShadow));
+      if (frac > 0) card.add(rect(this, bx, by, Math.max(1, Math.round(bw * frac)), 2, HEX.ink));
+    }
     t(
       GAME_WIDTH / 2,
-      cy + cardH - 26,
+      cy + cardH - 24,
       `${Object.keys(save.caseResults).length}/${cases.length} cases  ·  ${badges.earned}/${badges.total} badges  ·  ${save.stats.coldRuns} cold`,
       { size: 12, color: 'woodMid', font: 'body' },
     ).setOrigin(0.5, 0);
