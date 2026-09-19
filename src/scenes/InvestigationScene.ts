@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { DEPTH } from '@/config/depth';
-import { DESK, GAME_HEIGHT, GAME_WIDTH, PAPER, STAMP } from '@/config/layout';
+import { DESK, GAME_HEIGHT, GAME_WIDTH, PAPER, STAMP, TABS } from '@/config/layout';
 import { FLAGS, HERRINGS, isFlagClue, type CaseData, type Clue } from '@/data/schema';
 import { audio } from '@/systems/audio';
 import { localDateKey, recordDailyPlay, weekKey } from '@/systems/dailyCase';
@@ -146,6 +146,11 @@ export class InvestigationScene extends Phaser.Scene {
       .setOrigin(1, 0)
       .setDepth(DEPTH.hud);
     this.magnifier.ignore(header);
+    // A long title on a file with many tabs would run into the tab bar: keep the ticker.
+    const n = c.documents.length;
+    const tabW = Math.min(TABS.w, Math.floor((PAPER.w - TABS.margin * 2 - TABS.gap * (n - 1)) / n));
+    const tabsRight = TABS.x + n * tabW + (n - 1) * TABS.gap;
+    if (header.x - header.width < tabsRight + 6) header.setText(c.ticker);
 
     if (!this.review) new FolderCard(this, c, () => this.openCase());
     this.bindKeys();
