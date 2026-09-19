@@ -43,30 +43,20 @@ export class PauseMenu extends Phaser.GameObjects.Container {
           color: 'woodMid',
         }).setOrigin(0.5, 0),
       );
-    const buttons = [
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 48, 'Resume', actions.onResume, {
-        width: 100,
-      }),
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 70, 'Notebook', actions.onNotebook, {
-        width: 100,
-      }),
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 92, 'Settings', actions.onSettings, {
-        width: 100,
-      }),
-      new PixelButton(
-        scene,
-        GAME_WIDTH / 2 - 50,
-        y + 114,
-        'Fullscreen [F]',
-        () => toggleFullscreen(),
-        {
-          width: 100,
-        },
-      ),
-      new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 136, 'Quit to title', actions.onQuit, {
-        width: 100,
-      }),
+    // Fullscreen only where the browser allows it (not on an iPhone).
+    const rows: [string, () => void][] = [
+      ['Resume', actions.onResume],
+      ['Notebook', actions.onNotebook],
+      ['Settings', actions.onSettings],
+      ...(document.fullscreenEnabled
+        ? [['Fullscreen [F]', () => toggleFullscreen()] as [string, () => void]]
+        : []),
+      ['Quit to title', actions.onQuit],
     ];
+    const buttons = rows.map(
+      ([label, fn], i) =>
+        new PixelButton(scene, GAME_WIDTH / 2 - 50, y + 48 + i * 22, label, fn, { width: 100 }),
+    );
     buttons.forEach((b) => {
       scene.children.remove(b);
       this.add(b);
