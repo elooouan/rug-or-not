@@ -74,8 +74,8 @@
 - Settings has a "Printer difficulty" row: auto (grows with the campaign, as before) or a
   pinned 1 to 5 for every cold case the pile, the title button and "Next cold one" print.
 - The pile folder shows tonight's printer difficulty; the weekly folder counts the days
-  until the next one. A story beat after the seventh file, between the template and the
-  name.
+  until the next one. Story beats after the seventh file (between the template and the
+  name) and the fifteenth (the drawer that looks empty).
 - Drawer folders wrap their title onto a second line instead of cutting it mid-word, and
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"

@@ -41,7 +41,7 @@ code (Settings → Office → Import) or close a couple of files first.
 
 ## 4:00 — The story
 
-12. Case files: the drawer is the campaign. After cases 2, 5, 7, 10 and 13 Lucien connects the
+12. Case files: the drawer is the campaign. After cases 2, 5, 7, 10, 13 and 15 Lucien connects the
     files ("someone is running a template"). Stamp all fifteen right and a folder with no
     name appears: the Tailor.
 13. The polaroid on the corkboard opens the wall: photos of how the game was built, joined by

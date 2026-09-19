@@ -44,6 +44,7 @@ export type ScriptId =
   | 'story-3'
   | 'story-4'
   | 'story-5'
+  | 'story-6'
   | 'second-look'
   | 'secret-unlocked'
   | 'secret-solved'
@@ -56,6 +57,7 @@ export const STORY_BEATS: Record<number, ScriptId> = {
   6: 'story-5',
   9: 'story-3',
   12: 'story-4',
+  14: 'story-6',
 };
 
 /** One-off reading tips, the first time each kind of document lands on the desk. */
@@ -304,6 +306,14 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     },
     {
       text: 'Two files left on the desk tonight. Read them twice. Nothing about them is what it looks like.',
+    },
+  ],
+  'story-6': [
+    {
+      text: "Fifteen files. The tram was honest work with a trapdoor under it. That's the Tailor's signature: nothing fake but the seams.",
+    },
+    {
+      text: 'The drawer looks empty from here. Drawers lie too. Stamp every file right and see what turns up.',
     },
   ],
   'secret-unlocked': [
