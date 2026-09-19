@@ -922,7 +922,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       const b = ctx.button(
         SLOT_TAB[slot.id],
         () => {
+          if (marketSlot === slot.id) return;
           marketSlot = slot.id;
+          audio.play('paper');
           ctx.panel.render();
         },
         { x: tx, sameLine: true, variant: open ? 'ink' : 'paper' },
