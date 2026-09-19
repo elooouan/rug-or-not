@@ -12,6 +12,10 @@ glass, pin the suspicious bits, stamp a verdict (**RUG** or **LEGIT**), and read
 
 > All cases, tokens, people and projects are fictional. This is a game, not financial advice.
 
+| The lens | The report | Blue hour |
+| --- | --- | --- |
+| ![Reading fine print through the lens](assets/marketing/v0.8-lens-fine-print.png) | ![The case report](assets/marketing/v0.8-case-report.png) | ![The same office in the Blue hour theme](assets/marketing/v0.8-theme-midnight-reading.png) |
+
 ## Run it
 
 Requires Node 20.9+ (Vite 6 / Vitest 3 are pinned for Node 20; Vite 8 needs Node 20.19+).
