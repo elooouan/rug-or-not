@@ -8,8 +8,8 @@ import { worn } from './clips';
 /**
  * Dressing the desk: Lucien's coat and hat, the mug, the cat, the radio and the corner
  * ornament, drawn from whatever the market says is worn. Textures are regenerated in
- * place, so, like themes and cosmetics, this only runs at moments when no live scene
- * holds the old ones (boot, and a screen about to be rebuilt).
+ * place: `applyLook` at moments when no live scene holds the old ones (boot, a theme
+ * repaint), `redress` while screens are up (it re-points every image first).
  */
 
 /** The loaded sprites, kept untouched so a new coat is cut from the original cloth. */
