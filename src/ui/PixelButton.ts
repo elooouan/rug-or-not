@@ -24,6 +24,10 @@ const ICON_GAP = 5;
 /** A chunky pixel button with hover/focus states and optional hotkey. */
 const COARSE_POINTER = touchScreen();
 
+/** "Back  [Esc]" is "Back" under a finger: a key hint is noise where there are no keys. */
+const forPointer = (text: string): string =>
+  COARSE_POINTER ? text.replace(/\s*[[(](Esc|F)[\])]$/, '') : text;
+
 export class PixelButton extends Phaser.GameObjects.Container {
   private face: Phaser.GameObjects.Rectangle;
   private bottom: Phaser.GameObjects.Rectangle;
@@ -47,7 +51,7 @@ export class PixelButton extends Phaser.GameObjects.Container {
     super(scene, Math.round(x), Math.round(y));
     this.variant = opts.variant ?? 'paper';
     const textColor: PaletteKey = opts.color ?? (this.variant === 'paper' ? 'shadow' : 'paper');
-    this.label = makeText(scene, 0, 0, text, { size: 12, color: textColor });
+    this.label = makeText(scene, 0, 0, forPointer(text), { size: 12, color: textColor });
     this.iconW = opts.icon ? ICON_W + ICON_GAP : 0;
     // Never narrower than the label: a fixed width is a minimum, not a clamp.
     this.bw = Math.max(
@@ -161,7 +165,7 @@ export class PixelButton extends Phaser.GameObjects.Container {
   }
 
   setLabel(t: string): this {
-    this.label.setText(t);
+    this.label.setText(forPointer(t));
     this.placeLabel();
     this.placeIcon();
     return this;
