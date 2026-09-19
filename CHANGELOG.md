@@ -55,6 +55,8 @@
   account this site isn't approved for clears the stale address and says so; RPC, price
   and board calls give up after a few seconds instead of hanging the page; the help page
   and the coin page point phone users at Phantom's in-app browser.
+- Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
+  mark at the corner); the small section headings are darker and read at a glance.
 - Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
   wrapped to a second line ran into the row below it; rows now make room. The desk's key
   hint no longer mentions the lens when there isn't one.

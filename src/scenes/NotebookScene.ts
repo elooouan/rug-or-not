@@ -24,6 +24,8 @@ import { LUCIEN_FACE_TEX, lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
+import { attachScroll } from '@/ui/dragScroll';
+import { modalOpen } from '@/ui/escGuard';
 import { HANDBOOK } from '@/data/handbook';
 import { closedFiles, FEATURES, unlocked } from '@/systems/discovery';
 import { PALETTE } from '@/config/palette';
@@ -87,6 +89,10 @@ export class NotebookScene extends Phaser.Scene {
   private openAt: { chapter: Chapter; id: string } | null = null;
   /** Where the next line on the right-hand page goes. */
   private detailY = 0;
+  private pageTop = 0;
+  private pageOffset = 0;
+  private pageMax = 0;
+  private moreHint?: Phaser.GameObjects.Text;
 
   private detailGap(px: number): void {
     this.detailY += px;
@@ -175,9 +181,31 @@ export class NotebookScene extends Phaser.Scene {
     ];
 
     this.listPage = this.add.container(x + BOOK.pad, y + BOOK.pad).setDepth(DEPTH.pins);
+    this.pageTop = y + BOOK.pad;
+    this.pageOffset = 0;
+    this.pageMax = 0;
     this.detail = this.add
-      .container(x + pageW + BOOK.gutter * 2 + BOOK.pad, y + BOOK.pad)
+      .container(x + pageW + BOOK.gutter * 2 + BOOK.pad, this.pageTop)
       .setDepth(DEPTH.pins);
+    // Long pages scroll under the page's edges.
+    const pageMask = this.make.graphics({ x: 0, y: 0 }, false);
+    pageMask.fillStyle(0xffffff, 1);
+    pageMask.fillRect(x + pageW + BOOK.gutter * 2, y + BOOK.pad - 2, pageW, h - BOOK.pad * 2 + 4);
+    this.detail.setMask(new Phaser.Display.Masks.GeometryMask(this, pageMask));
+    this.moreHint = addText(this, x + w - BOOK.pad, y + h - BOOK.pad + 2, 'v  more', {
+      size: 8,
+      color: 'woodMid',
+    })
+      .setOrigin(1, 0)
+      .setDepth(DEPTH.pins)
+      .setVisible(false);
+    const pageLeft = x + pageW + BOOK.gutter * 2;
+    attachScroll(this, {
+      step: 28,
+      onScroll: (d) => this.scrollPage(d),
+      enabled: () =>
+        this.pageMax > 0 && !modalOpen() && this.input.activePointer.worldX >= pageLeft,
+    });
     const back = new PixelButton(
       this,
       GAME_WIDTH - 100,
@@ -226,7 +254,7 @@ export class NotebookScene extends Phaser.Scene {
         ch === 'handbook' ? 'how the office works' : `${learned}/${this.ids.length} ${verb}`,
         {
           size: FONT.size.tiny,
-          color: 'paperShadow',
+          color: 'woodMid',
         },
       ).setOrigin(1, 0),
     );
@@ -307,6 +335,24 @@ export class NotebookScene extends Phaser.Scene {
   }
 
   private select(i: number): void {
+    this.buildPage(i);
+    this.fitPage();
+  }
+
+  /** A page taller than the book scrolls (wheel, drag); a "v more" mark says so. */
+  private fitPage(): void {
+    const pageH = BOOK.h - BOOK.pad * 2;
+    this.pageMax = Math.max(0, this.detailY - pageH + 4);
+    this.scrollPage(-1e9);
+  }
+
+  private scrollPage(dy: number): void {
+    this.pageOffset = Phaser.Math.Clamp(this.pageOffset + dy, 0, this.pageMax);
+    this.detail.setY(this.pageTop - this.pageOffset);
+    this.moreHint?.setVisible(this.pageOffset < this.pageMax - 1);
+  }
+
+  private buildPage(i: number): void {
     this.selected = i;
     this.entries.forEach((t, idx) =>
       t.setColor(
@@ -357,12 +403,12 @@ export class NotebookScene extends Phaser.Scene {
         color: SEV_COLOR[flag.severity],
       });
       this.detailY += 6;
-      add('What it is', { size: FONT.size.tiny, color: 'paperShadow' });
+      add('What it is', { size: FONT.size.tiny, color: 'woodMid' });
       wrapMono(flag.explanation, maxChars).forEach((l) =>
         add(l, { font: 'body', color: 'shadow' }),
       );
       this.detailY += 6;
-      add('How to spot it', { size: FONT.size.tiny, color: 'paperShadow' });
+      add('How to spot it', { size: FONT.size.tiny, color: 'woodMid' });
       wrapMono(flag.howToSpot, maxChars).forEach((l) => add(l, { font: 'body', color: 'ink' }));
       const misses = saveStore.get().stats.flagMisses[id] ?? 0;
       const hits = saveStore.get().stats.flagHits[id] ?? 0;
@@ -409,7 +455,7 @@ export class NotebookScene extends Phaser.Scene {
       );
       add('yellow herring: looks scary, is fine', { size: FONT.size.tiny, color: 'stampGreen' });
       this.detailY += 6;
-      add('Why it is fine', { size: FONT.size.tiny, color: 'paperShadow' });
+      add('Why it is fine', { size: FONT.size.tiny, color: 'woodMid' });
       wrapMono(h.reassurance, maxChars).forEach((l) => add(l, { font: 'body', color: 'shadow' }));
       // Hunt: five generated pages that each carry this herring; click the harmless thing.
       // Same rule as drills: not from a live investigation.
@@ -450,16 +496,6 @@ export class NotebookScene extends Phaser.Scene {
   ): void {
     const topic = HANDBOOK.find((t) => t.id === id);
     if (!topic) return;
-    // A prop from the desk in the bottom corner of the page, drawn from the same textures.
-    const iconKey = HANDBOOK_ICONS[id];
-    if (iconKey && this.textures.exists(iconKey)) {
-      const pageW = BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2;
-      const pageH = BOOK.h - BOOK.pad * 2;
-      const img = this.add.image(pageW, pageH - 6, iconKey).setOrigin(1, 1);
-      const scale = Math.min(40 / img.width, 40 / img.height, 3);
-      img.setScale(scale).setAlpha(0.85);
-      this.detail.add(img);
-    }
     wrapMono(topic.title.toUpperCase(), 26).forEach((l) =>
       add(l, { size: FONT.size.body, color: 'woodDark' }),
     );
@@ -477,8 +513,21 @@ export class NotebookScene extends Phaser.Scene {
         this.detailGap(4);
       } else {
         this.detailGap(2);
-        add(part.h, { size: FONT.size.tiny, color: 'paperShadow' });
+        add(part.h, { size: FONT.size.tiny, color: 'woodMid' });
       }
+    }
+    // A prop from the desk in the bottom corner of the page, drawn from the same textures;
+    // under the text on a long page, where scrolling brings it into view.
+    const iconKey = HANDBOOK_ICONS[id];
+    if (iconKey && this.textures.exists(iconKey)) {
+      const pageW = BOOK.w / 2 - BOOK.gutter - BOOK.pad * 2;
+      const pageH = BOOK.h - BOOK.pad * 2;
+      const iconY = Math.max(pageH - 6, this.detailY + 40);
+      const img = this.add.image(pageW, iconY, iconKey).setOrigin(1, 1);
+      const scale = Math.min(40 / img.width, 40 / img.height, 3);
+      img.setScale(scale).setAlpha(0.85);
+      this.detail.add(img);
+      this.detailY = Math.max(this.detailY, iconY);
     }
   }
 
@@ -559,7 +608,7 @@ export class NotebookScene extends Phaser.Scene {
       ),
     ];
     let y = 134;
-    d.add(makeText(this, 6, y, 'charges', { size: FONT.size.tiny, color: 'paperShadow' }));
+    d.add(makeText(this, 6, y, 'charges', { size: FONT.size.tiny, color: 'woodMid' }));
     y += 11;
     for (const ch of charges.slice(0, 5)) {
       d.add(makeText(this, 6, y, `- ${ch}`.slice(0, maxChars), { font: 'body', color: 'shadow' }));
