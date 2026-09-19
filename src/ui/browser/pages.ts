@@ -402,7 +402,8 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         { color: got ? 'lampGreen' : 'shadow' },
       );
     }
-    // The allowance follows the balance rather than a tier: every coin counts a little.
+    // The allowance follows the balance rather than a tier: every coin counts a little;
+    // any tier halves the market's daily deal.
     const allowance = holderClips();
     ctx.line(
       allowance > 0
@@ -410,6 +411,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         : `[ ] Market allowance · ${Math.round(CLIPS.perToken * TOKEN.holderMin)} clips per ${TOKEN.holderMin.toLocaleString()} held, up to ${CLIPS.holderCap.toLocaleString()}`,
       { color: allowance > 0 ? 'lampGreen' : 'shadow' },
     );
+    ctx.line(`${currentTier() ? '[x]' : '[ ]'} Any tier · the market's daily deal at half price`, {
+      color: currentTier() ? 'lampGreen' : 'shadow',
+    });
     // The weekly holders' file: extra content, never a scoring edge.
     ctx.gap(4);
     const wk = weekKey();
@@ -843,7 +847,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     const deal = dealToday();
     if (!owns(deal.item.id))
       ctx.line(
-        `Today's deal: ${deal.item.name}, ${deal.price} clips instead of ${deal.item.price} (${SLOT_TAB[deal.item.style.slot]} drawer).`,
+        `Today's deal: ${deal.item.name}, ${deal.price} clips instead of ${deal.item.price} (${SLOT_TAB[deal.item.style.slot]} drawer${deal.holder ? ", holders' price" : ''}).`,
         { color: 'stampRed' },
       );
     ctx.gap(4);

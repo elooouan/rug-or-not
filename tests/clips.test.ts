@@ -90,6 +90,15 @@ describe('clips', () => {
     expect(a.item.tier).toBeUndefined();
     expect(a.price).toBeLessThan(a.item.price);
     expect(a.price % 5).toBe(0);
+    expect(a.holder).toBe(false);
+    // Holders pay half.
+    setBalance(TOKEN.holderMin);
+    const h = dealToday(d1);
+    expect(h.holder).toBe(true);
+    expect(h.item.id).toBe(a.item.id);
+    expect(h.price).toBeLessThanOrEqual(a.price);
+    expect(h.price).toBe(Math.max(5, Math.round((a.item.price * 0.5) / 5) * 5));
+    setBalance(null);
     // Over a month the deal moves around.
     const ids = new Set<string>();
     for (let day = 1; day <= 30; day++) ids.add(dealToday(new Date(2026, 9, day)).item.id);

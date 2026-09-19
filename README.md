@@ -116,8 +116,9 @@ The phone on the desk opens an in-game browser:
   (25 clips per `VITE_TOKEN_HOLDER_MIN` coins, capped at 1,000; read-only, nothing is spent
   from the wallet). The catalogue (`src/data/shop.ts`) has coats and hats for Lucien
   (recoloured from the original sprites in `src/systems/wardrobe.ts`), furs for the cat,
-  mugs, radios, curtains and desk ornaments; three items also ask for a holder tier. Buying
-  redresses every screen that is up. Nothing bought changes a score.
+  mugs, radios, curtains and desk ornaments; three items also ask for a holder tier, and
+  the day's deal (one item a third off, the same for everyone) is half off for holders.
+  Buying redresses every screen that is up. Nothing bought changes a score.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
 Configure the coin through env vars (see `.env.example`); nothing is hard-coded. An optional

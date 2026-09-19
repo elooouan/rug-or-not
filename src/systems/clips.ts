@@ -93,11 +93,16 @@ export function clipsForRush(score: number): number {
   return Math.floor(Math.max(0, score) / 1000) * CLIPS.rushPerThousand;
 }
 
-/** Today's deal: one priced, untiered item a third off, the same for everyone that day. */
-export function dealToday(date = new Date()): { item: ShopItem; price: number } {
+/**
+ * Today's deal: one priced, untiered item, the same for everyone that day. A third off,
+ * half off for coin holders (any tier); rounded to fives.
+ */
+export function dealToday(date = new Date()): { item: ShopItem; price: number; holder: boolean } {
   const pool = SHOP.filter((i) => i.price > 0 && !i.tier);
   const item = makeRng(`deal-${localDateKey(date)}`).pick(pool);
-  return { item, price: Math.max(1, Math.round((item.price * 2) / 3 / 5) * 5) };
+  const holder = currentTier() !== null;
+  const cut = holder ? 0.5 : 2 / 3;
+  return { item, price: Math.max(5, Math.round((item.price * cut) / 5) * 5), holder };
 }
 
 /** What `item` costs right now: its price, or today's deal. */
