@@ -48,6 +48,10 @@ game is hosted. Attach the file named in brackets. The thread order is a suggest
   from the same red flags and herrings as the campaign. Endless. A seed in the share link
   brings the exact same file back for a friend.
 
+- **[v0.8-red-flag-trading-switch.png]** New in the red flag library: the trading switch.
+  One bool the owner flips and nobody else moves. No timelock, nothing that reopens it.
+  The printer now hides it in cold cases, and the notebook has its page.
+
 - **[v0.8-clip-office-colours.gif]** Five office colours: Noir, Old file, Blue hour,
   Newsprint, Speakeasy. The whole desk is drawn from twelve named colours, so a theme is
   twelve new values and a repaint.

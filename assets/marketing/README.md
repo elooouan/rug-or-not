@@ -43,6 +43,7 @@ Tweet copy for each asset is in `TWEETS.md`.
 | hall-of-detectives                                               | The board.                                                                                          |
 | the-wall-making-of                                               | The wall: how the game was built, photo by photo.                                                   |
 | cold-case-printed-file                                           | A cold case straight off the printer.                                                               |
+| red-flag-trading-switch                                          | The newest red flag on a printed contract: a trading switch in one hand, fine print under the lens. |
 | weather-snow / weather-clear / weather-fog                       | Snow, a clear night with the moon, fog.                                                             |
 | theme-sepia / theme-midnight / theme-newsprint / theme-speakeasy | Office colours: the same desk in four other palettes.                                               |
 | theme-midnight-reading                                           | Reading a contract in the Blue hour theme.                                                          |
