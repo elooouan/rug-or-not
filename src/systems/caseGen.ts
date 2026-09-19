@@ -1536,12 +1536,17 @@ export function generateCase(seed: string, opts: GenOptions = {}): CaseData {
             'Cold one, and a thick one. Whatever is wrong with it is written small.',
             'Fresh off the printer and it already smells expensive. Take the lens everywhere.',
             'A file from the pile with a five-star headache inside. Read twice, stamp once.',
+            'The printer took its time on this one. So should you.',
+            'Thick file, thin story. The gap between the two is where they hide it.',
           ]
         : [
             'Cold one. No name I recognise. Read it like the others.',
             'Fresh off the printer. Nobody has looked at this yet.',
             'A file from the pile. Same rules: read, pin, stamp.',
             'Somebody dropped this on the desk and left. Let us see why.',
+            'The ink is still wet on this one. Mind your sleeves.',
+            'New coin, old tricks, probably. Prove me wrong.',
+            'The pile never ends. Neither, apparently, do we.',
           ],
     ),
     difficulty: p.difficulty,
