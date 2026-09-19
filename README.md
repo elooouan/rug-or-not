@@ -16,6 +16,8 @@ glass, pin the suspicious bits, stamp a verdict (**RUG** or **LEGIT**), and read
 | --- | --- | --- |
 | ![Reading fine print through the lens](assets/marketing/v0.8-lens-fine-print.png) | ![The case report](assets/marketing/v0.8-case-report.png) | ![The same office in the Blue hour theme](assets/marketing/v0.8-theme-midnight-reading.png) |
 
+![A file from folder to report](assets/marketing/v0.8-clip-solve-a-case.gif)
+
 ## Run it
 
 Requires Node 20.9+ (Vite 6 / Vitest 3 are pinned for Node 20; Vite 8 needs Node 20.19+).
