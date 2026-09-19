@@ -24,7 +24,7 @@ account, cut it.
 
 ## 2. Profile setup (day 0)
 
-- **Name:** `Rug or Not?` · **handle:** short (`@rugornotgame` / `@rugornot_`) · **bio:**
+- **Name:** `Detective Lucien` · **handle:** `@0xRugOrNot` (done) · **bio:**
   "A detective game about spotting rug pulls. Pin the red flags, stamp the verdict. Lucien is
   the boss. Browser, free. All cases fictional, not financial advice." · **link:** the game
   (GitHub Pages), later a linktree with game / Telegram / DexScreener.
