@@ -176,7 +176,8 @@ Marketing stills and GIF clips live in `assets/marketing/` and are regenerated w
 `node scripts/promo.mjs` (dev server up); `node scripts/fuzz.mjs [seconds] [seed]` is a
 monkey test that clicks (at random, and at real buttons and lines) and types across the game
 and reports page errors and leaked overlays; `node scripts/sweep.mjs` plays every file
-perfectly and reports anything that doesn't grade S (`SWEEP_INLINE=1` with the lens off).
+perfectly and reports anything that doesn't grade S (`SWEEP_INLINE=1` with the lens off,
+`SWEEP_LOOK=1` to take the second look on every file too).
 
 Deep links: `#case=<id>` opens a file directly, `#daily` opens today's case, `#cold=<seed>` prints
 that cold case, `#custom=<id>` opens a file saved from the editor and `#rush` starts a rush.
