@@ -739,6 +739,9 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         'Tap a suspicious line to pin it. Tap again to unpin. Drag a stamp onto the paper for the verdict.',
       );
       ctx.line('Herring pins cost points. Long pages scroll with a drag.');
+      ctx.line(
+        'On a phone, add this page to the home screen: the desk then opens without the browser around it.',
+      );
     } else {
       ctx.line('Hover evidence with the lens. Fine print only shows through it.');
       ctx.line('Click a suspicious line to pin it. Click again to unpin.');

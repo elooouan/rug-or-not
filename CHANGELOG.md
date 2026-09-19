@@ -75,6 +75,9 @@
   the grade sticker sits in the corner, clear of long tickers.
 - Notebook pages taller than the book scroll (wheel or drag over the page, a "v more"
   mark at the corner); the small section headings are darker and read at a glance.
+- Added to a phone's home screen, the game opens without the browser around it (the
+  manifest already asked for fullscreen; iPhones needed their own meta tags) and draws
+  under the notch. The help page says so on touch screens.
 - The title's Fullscreen button stays hidden where the browser can't do fullscreen (iPhone
   Safari); the wallet chip takes its corner.
 - On a touch screen the desk's hints say tap and hold instead of click, hover and type
