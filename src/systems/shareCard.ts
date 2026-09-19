@@ -160,6 +160,8 @@ export interface IdCardData {
   streak: number;
   rushBest: number;
   coldBest: number;
+  /** Paper clips earned over the career (see clips.ts); left out when there are none. */
+  clips?: number;
   /** Badge names to print, already trimmed to a handful. */
   badgeNames: string[];
   /** Holder tier title, when the tier grants it (board-title). */
@@ -236,7 +238,10 @@ export function renderIdCard(data: IdCardData, canvas?: HTMLCanvasElement): HTML
     'Record',
     `${data.casesSolved}/${data.casesTotal} files  ·  ${data.badges}/${data.badgesTotal} badges  ·  streak ${data.streak}`,
   );
-  field('Arcade', `rush ${data.rushBest}  ·  cold ${data.coldBest}`);
+  field(
+    'Arcade',
+    `rush ${data.rushBest}  ·  cold ${data.coldBest}${data.clips ? `  ·  ${data.clips} clips` : ''}`,
+  );
   if (data.badgeNames.length) {
     ctx.fillStyle = PALETTE.woodMid;
     ctx.font = ui(18);

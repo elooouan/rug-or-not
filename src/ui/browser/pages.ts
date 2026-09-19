@@ -487,6 +487,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           streak: currentStreak(save.daily, localDateKey()),
           rushBest: st.rushBest,
           coldBest: st.coldBest,
+          clips: save.clips.earned + holderClips(),
           badgeNames: save.badges
             .map((id) => BADGE_BY_ID[id]?.name)
             .filter((n): n is string => !!n)
