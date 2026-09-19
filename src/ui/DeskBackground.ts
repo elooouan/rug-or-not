@@ -25,6 +25,8 @@ export interface DeskOptions {
   /** Draw mug, folder stack, ink pad (title/select scenes want a tidier desk). */
   props?: boolean;
   stamps?: boolean;
+  /** Red flags on the desk right now; the corkboard's tips lean toward them. */
+  tipFlags?: string[];
 }
 
 /** A little word that drifts up and fades ("ahh", "click", "mrrp"). */
@@ -185,7 +187,13 @@ export class DeskBackground {
     cork.setInteractive({ useHandCursor: false });
     cork.on('pointerdown', () => {
       this.note?.destroy();
-      const tip = TIPS[Phaser.Math.Between(0, TIPS.length - 1)];
+      // While a file is open, the board leans toward what's in it (a nudge, not an answer).
+      const s = saveStore.get().settings;
+      const about = opts.tipFlags ?? [];
+      const relevant = TIPS.filter((t) => t.flag && about.includes(t.flag));
+      const pool =
+        relevant.length > 0 && s.hints && !s.hardMode && Math.random() < 0.6 ? relevant : TIPS;
+      const tip = pool[Phaser.Math.Between(0, pool.length - 1)].text;
       this.note = new StickyNote(
         scene,
         DESK.corkboard.x - 120,

@@ -42,6 +42,9 @@
   that reopens it. The notebook, the drills, the rush decks and the safe's combination all
   count it. A corkboard tip to match. Its yellow twin joins the herrings: an emergency
   pause that only the public timelock can pull and that lifts itself within 48 hours.
+- The corkboard's tips lean toward the file on the desk: with hints on and honour off, a
+  click on the board mostly turns up a tip about a red flag that is actually in the file.
+  Four new tips cover the flags that had none (mint, honeypot, proxy, wash trading).
 - Asking Lucien twice about the same page makes him point at the line (the focus ring lands
   on an unread spot); the first nudge still only names the page.
 - A faint crawl of film grain over the office (Office page of Settings; off with reduced

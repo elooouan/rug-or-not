@@ -86,6 +86,7 @@ export const HANDBOOK: HandbookTopic[] = [
     body: [
       `Stuck? Click Lucien's face in the corner of the desk. He points at a document; ask again about the same page and he points at the line, though whether it is a flag or a herring stays your call. Each nudge costs ${-SCORING.hintCost} points, ${SCORING.maxHints} per file.`,
       'He also mutters on his own: a tip the first time a kind of document turns up, a word when the clock gets short. Both can be switched off in Settings.',
+      'The corkboard behind the desk holds reading tips. While a file is open they lean toward what is in it: a nudge, never an answer.',
     ],
   },
   {

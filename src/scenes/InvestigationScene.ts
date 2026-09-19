@@ -123,7 +123,13 @@ export class InvestigationScene extends Phaser.Scene {
     this.review = gameState.review;
     gameState.review = null;
 
-    this.desk = new DeskBackground(this, { props: true, stamps: !this.review });
+    this.desk = new DeskBackground(this, {
+      props: true,
+      stamps: !this.review,
+      tipFlags: c.documents
+        .flatMap((d) => d.clues)
+        .flatMap((cl) => (isFlagClue(cl) ? [cl.flagId] : [])),
+    });
     this.magnifier = new Magnifier(
       this,
       (x, y) =>
