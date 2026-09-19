@@ -10,8 +10,11 @@
  *   PROMO_BASE=http://localhost:5173  PROMO_OUT=assets/marketing  PROMO_TAG=v0.9
  *
  * GIFs are encoded in the page with gifenc (dev dependency); there is no ffmpeg here.
- * Twitter turns GIFs into video on upload. For proper MP4s, run the clips through
- * ffmpeg: `ffmpeg -i clip.gif -movflags faststart -pix_fmt yuv420p clip.mp4`.
+ * With Google Chrome installed the clips are also written as H.264 MP4s (WebCodecs plus
+ * mp4-muxer, in the page; the bundled Chromium has no H.264 encoder). The MP4s are the
+ * ones to post (X re-encodes GIFs badly); they are not committed, so run `clips` before a
+ * tweet. PROMO_MP4=0 skips them; PROMO_GIF=0 skips the GIFs (an MP4-only pass leaves the
+ * committed GIFs alone).
  */
 import { chromium } from '@playwright/test';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -37,6 +40,8 @@ const gifencMap = exportsLine
   .map(([local, pub]) => `${pub}: ${local}`)
   .join(', ');
 const gifenc = `${gifencSrc}\nwindow.__gifenc = { ${gifencMap} };`;
+const muxerSrc = readFileSync(resolve('node_modules/mp4-muxer/build/mp4-muxer.mjs'), 'utf8');
+const muxer = `${muxerSrc}\nwindow.__mp4muxer = { Muxer, ArrayBufferTarget };`;
 
 /** A save with a few weeks of play in it: full menu, learned flags, a streak, some badges. */
 const VETERAN = {
@@ -244,7 +249,63 @@ async function shot(page, name) {
 async function record(page, fps = 12) {
   await page.addScriptTag({ type: 'module', content: gifenc });
   await page.waitForFunction(() => typeof window.__gifenc !== 'undefined', null, { timeout: SLOW });
-  await page.evaluate((fps) => {
+  // The same take as an MP4: canvas frames at a steady 30 fps through an H.264 encoder,
+  // when this browser has one (Google Chrome does, the bundled Chromium doesn't).
+  if (process.env.PROMO_MP4 !== '0') {
+    await page.addScriptTag({ type: 'module', content: muxer });
+    await page.waitForFunction(() => typeof window.__mp4muxer !== 'undefined', null, {
+      timeout: SLOW,
+    });
+  }
+  await page.evaluate(async (want) => {
+    window.__mp4 = null;
+    const codec = 'avc1.4D401F'; // Main profile, level 3.1: 720p30 plays everywhere.
+    if (!want || typeof VideoEncoder === 'undefined') return;
+    const src = document.querySelector('canvas');
+    const w = src.width;
+    const h = src.height;
+    const config = { codec, width: w, height: h, bitrate: 3_500_000, framerate: 30 };
+    if (!(await VideoEncoder.isConfigSupported(config)).supported) return;
+    const { Muxer, ArrayBufferTarget } = window.__mp4muxer;
+    const mux = new Muxer({
+      target: new ArrayBufferTarget(),
+      video: { codec: 'avc', width: w, height: h },
+      fastStart: 'in-memory',
+    });
+    const enc = new VideoEncoder({
+      output: (chunk, meta) => mux.addVideoChunk(chunk, meta),
+      error: (e) => console.error('mp4 encoder', e),
+    });
+    enc.configure({ ...config, avc: { format: 'avc' } });
+    const step = 1000 / 30;
+    let n = 0;
+    let last = 0;
+    const onRender = () => {
+      const now = performance.now();
+      if (now - last < step) return;
+      last = now;
+      // Constant frame timing: what the encoder sees is a clean 30 fps take.
+      const frame = new VideoFrame(src, { timestamp: Math.round(n * step * 1000) });
+      enc.encode(frame, { keyFrame: n % 60 === 0 });
+      frame.close();
+      n++;
+    };
+    window.__game.events.on('postrender', onRender);
+    window.__mp4 = {
+      async stop() {
+        window.__game.events.off('postrender', onRender);
+        await enc.flush();
+        enc.close();
+        mux.finalize();
+        const bytes = new Uint8Array(mux.target.buffer);
+        let s = '';
+        for (let i = 0; i < bytes.length; i += 0x8000)
+          s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+        return { b64: btoa(s), frames: n };
+      },
+    };
+  }, process.env.PROMO_MP4 !== '0');
+  await page.evaluate(([fps, wantGif]) => {
     const { GIFEncoder, quantize, applyPalette } = window.__gifenc;
     const src = document.querySelector('canvas');
     const w = 640;
@@ -291,9 +352,10 @@ async function record(page, fps = 12) {
       prev = new Uint8ClampedArray(data);
       frames++;
     };
-    window.__game.events.on('postrender', onRender);
+    if (wantGif) window.__game.events.on('postrender', onRender);
     window.__rec = {
       stop() {
+        if (!wantGif) return null;
         window.__game.events.off('postrender', onRender);
         gif.finish();
         const bytes = gif.bytes();
@@ -303,15 +365,23 @@ async function record(page, fps = 12) {
         return { b64: btoa(s), frames };
       },
     };
-  }, fps);
+  }, [fps, process.env.PROMO_GIF !== '0']);
 }
 
 async function stopRecording(page, name) {
-  const { b64, frames } = await page.evaluate(() => window.__rec.stop());
-  const file = `${OUT}/${TAG}-clip-${name}.gif`;
-  const buf = Buffer.from(b64, 'base64');
-  writeFileSync(file, buf);
-  console.log('clip', file, frames, 'frames', Math.round(buf.length / 1024), 'KB');
+  const gif = await page.evaluate(() => window.__rec.stop());
+  if (gif) {
+    const file = `${OUT}/${TAG}-clip-${name}.gif`;
+    const buf = Buffer.from(gif.b64, 'base64');
+    writeFileSync(file, buf);
+    console.log('clip', file, gif.frames, 'frames', Math.round(buf.length / 1024), 'KB');
+  } else console.log('clip', name);
+  const mp4 = await page.evaluate(() => window.__mp4?.stop() ?? null);
+  if (mp4) {
+    const vbuf = Buffer.from(mp4.b64, 'base64');
+    writeFileSync(`${OUT}/${TAG}-clip-${name}.mp4`, vbuf);
+    console.log('     mp4', mp4.frames, 'frames', Math.round(vbuf.length / 1024), 'KB');
+  }
 }
 
 /** Open a case to the investigating phase, Lucien quiet. */
@@ -636,6 +706,26 @@ const SHOTS = {
     await skipTalk(page);
     await shot(page, 'settings');
   },
+  async 'trading-switch'(page) {
+    // A printed file whose contract carries the newest red flag, read through the lens.
+    await boot(page, VETERAN, '#cold=d2-switch18');
+    await sleep(1500);
+    await skipTalk(page);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      () => window.__game.scene.getScene('InvestigationScene').phase === 'investigating',
+      null,
+      { timeout: SLOW },
+    );
+    await sleep(600);
+    await skipTalk(page);
+    const spots = await clueSpots(page);
+    const s = spots.find((x) => x.flag) ?? spots[0];
+    // The lens on the right end of the line: the fine print shows, the function name too.
+    await move(page, s.x + 105, s.y + 8, 20);
+    await sleep(800);
+    await shot(page, 'red-flag-trading-switch');
+  },
 };
 
 const CLIPS = {
@@ -828,26 +918,6 @@ const CLIPS = {
     await sleep(2200);
     await stopRecording(page, 'office-colours');
   },
-  async 'trading-switch'(page) {
-    // A printed file whose contract carries the newest red flag, read through the lens.
-    await boot(page, VETERAN, '#cold=d2-switch18');
-    await sleep(1500);
-    await skipTalk(page);
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(
-      () => window.__game.scene.getScene('InvestigationScene').phase === 'investigating',
-      null,
-      { timeout: SLOW },
-    );
-    await sleep(600);
-    await skipTalk(page);
-    const spots = await clueSpots(page);
-    const s = spots.find((x) => x.flag) ?? spots[0];
-    // The lens on the right end of the line: the fine print shows, the function name too.
-    await move(page, s.x + 105, s.y + 8, 20);
-    await sleep(800);
-    await shot(page, 'red-flag-trading-switch');
-  },
   async weather(page) {
     await boot(page, VETERAN);
     await skipTalk(page);
@@ -941,7 +1011,8 @@ const CLIPS = {
   },
 };
 
-const browser = await chromium.launch();
+// Google Chrome when it is installed (it can write MP4s); the bundled Chromium otherwise.
+const browser = await chromium.launch({ channel: 'chrome' }).catch(() => chromium.launch());
 const context = await browser.newContext({
   viewport: { width: W, height: H },
   deviceScaleFactor: 1,

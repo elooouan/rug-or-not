@@ -72,11 +72,11 @@ Also follow back every real person who replies in the first month.
 
 - **First line is the tweet.** Under ~90 characters, a fact or a hook. The rest can be cut
   without losing it.
-- **One piece of media per tweet**, always. Video > GIF > still. Clips are 16:9 at 640×360
-  (X converts GIFs to video); stills are 1280×720. Convert the GIFs to MP4 once ffmpeg is
-  installed (`brew install ffmpeg`, then
-  `ffmpeg -i in.gif -movflags faststart -pix_fmt yuv420p -vf scale=1280:-2 out.mp4`) —
-  sharper, better watch-time.
+- **One piece of media per tweet**, always. Video > GIF > still. Every clip exists twice:
+  a 640×360 GIF (committed, for the README) and a 1280×720 H.264 MP4 written next to it by
+  `node scripts/promo.mjs clips` (Google Chrome does the encoding; the MP4s are not
+  committed). Post the MP4: X keeps it sharp, counts views and doesn't loop it as a "GIF".
+  Stills are 1280×720.
 - **No link in the body of a main tweet.** Links go in the second tweet of a two-tweet
   thread or in the first reply. External links get less reach.
 - **Hashtags:** none on weekdays. Saturdays: `#screenshotsaturday #pixelart #indiedev` at the

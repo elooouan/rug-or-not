@@ -112,7 +112,8 @@ true })` (see the touch block in `e2e/smoke.spec.ts`). Fingers fire buttons on l
 - `node scripts/promo.mjs` (dev server up) regenerates the marketing stills and GIF clips in
   `assets/marketing/`; add an entry there when a feature deserves a tweet. Regenerate only
   what changed (`node scripts/promo.mjs <name>`): every GIF committed again is a few more
-  MB of history.
+  MB of history. Clips are also written as 1280×720 MP4s (WebCodecs in Google Chrome,
+  gitignored); `PROMO_GIF=0` makes an MP4-only pass that leaves the committed GIFs alone.
 - `node scripts/sweep.mjs [cold=24]` (dev server up) plays every campaign file and a batch of
   printed ones perfectly and reports page errors and anything that doesn't grade S: run it
   after touching documents, the generator, scoring or the report. `SWEEP_INLINE=1` plays
