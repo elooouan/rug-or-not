@@ -378,9 +378,11 @@ export class InvestigationScene extends Phaser.Scene {
     this.clock.on('pointerdown', () => {
       audio.play('tick');
       const relaxed = saveStore.get().settings.relaxed;
-      const lines = relaxed
-        ? ['time is a construct', 'no rush', 'take your time']
-        : ['tick tock', 'no pressure', 'clocks cannot be bribed', 'it is later than you think'];
+      const lines = this.review
+        ? ['the file is closed', 'no clock on a second look', 'read it twice']
+        : relaxed
+          ? ['time is a construct', 'no rush', 'take your time']
+          : ['tick tock', 'no pressure', 'clocks cannot be bribed', 'it is later than you think'];
       floatText(
         this,
         DESK.clock.x + 15,
