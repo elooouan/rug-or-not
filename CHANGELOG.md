@@ -14,6 +14,18 @@
   Buying or wearing something redresses every screen that is up, including a file paused
   under the settings page; nothing bought changes a score.
 - The clip count sits on the title card, and a handbook page covers the market.
+- The detectives board on the Hall of Detectives page: one row per desk with the career
+  score, rank, clips earned, files solved and the coin balance the wallet reported, sorted
+  by score or by clips. Rows are upserted after every file, so the board follows the save
+  instead of piling up runs; the reference worker (`server/leaderboard`) serves it under
+  `?board=desks`. Local-only until `VITE_LEADERBOARD_URL` points at a deployed worker.
+- A small "<" chip in the top-left corner of every screen: the way out without a
+  keyboard. On a file it opens the pause menu (or leaves straight away while the folder is
+  still closed); on a second look it goes back to the report; in the rush it asks once,
+  like Esc; elsewhere it is Back.
+- Lucien's corner face stays one face: his bubbles now speak beside the clickable head on
+  the desk instead of drawing a second one over it, so a press on the head always lands
+  (and he nods to every press, even mid-lesson when he can't answer).
 
 ## v0.8 — the handbook
 

@@ -21,7 +21,7 @@ import { escTaken } from '@/ui/escGuard';
 import { LUCIEN_FACE_TEX } from '@/ui/DialogueBox';
 import { SCORING } from '@/config/gameConfig';
 import { FONT } from '@/config/layout';
-import { leaderboard } from '@/systems/leaderboard';
+import { leaderboard, postDesk } from '@/systems/leaderboard';
 import { holderPerks, wallet } from '@/systems/wallet';
 import { awardBadge, bumpStat, checkAggregateBadges } from '@/systems/badges';
 import { FLAG_IDS } from '@/data/flags';
@@ -839,6 +839,7 @@ export class InvestigationScene extends Phaser.Scene {
       holder: holderPerks() || undefined,
       mode: gameState.mode === 'cold' ? 'cold' : undefined,
     });
+    void postDesk();
 
     saveStore.update((d) => {
       d.stats.runs++;

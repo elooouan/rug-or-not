@@ -104,7 +104,12 @@ The phone on the desk opens an in-game browser:
   shared board. A ready-made Cloudflare Worker lives in
   [`server/leaderboard`](server/leaderboard/README.md) (one KV namespace, free tier, three
   commands to deploy). Pick your arcade-style handle on the page, and save a Detective ID card
-  (a PNG with your rank, record and badges) from there.
+  (a PNG with your rank, record and badges) from there. The same page carries the
+  detectives board: one row per desk (career score, rank, clips earned, files solved, the
+  coin balance the wallet reported), sorted by score or by clips, refreshed after every file
+  (`GET ?board=desks&sort=total|clips`, `POST ?board=desks`, keyed by a random id the save
+  mints; nothing personal leaves the device beyond the name, the numbers and, if connected,
+  the public address).
 - **Market** - dressing for the desk, paid in paper clips (`src/systems/clips.ts`): closing a
   file pays 3 (+2 for a first solve, +2 for an S, +1 cold, +2 daily), a rush 1 per thousand
   points, and holding the coin adds an allowance that follows the balance the wallet reports

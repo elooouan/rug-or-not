@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
+  currentDesk,
+  deskId,
   LocalLeaderboard,
+  rankDesks,
   rankEntries,
+  sanitizeDesks,
   sanitizeEntries,
+  upsertDesks,
+  type DeskEntry,
   type ScoreEntry,
 } from '@/systems/leaderboard';
+import { saveStore } from '@/systems/save';
 
 class MemoryStorage {
   private m = new Map<string, string>();
@@ -109,5 +116,58 @@ describe('recent runs', () => {
     await board.submit(entry('rush', '2026-09-18T10:00:00Z', 'rush'));
     await board.submit(entry('cold-x', '2026-09-19T10:00:00Z', 'cold'));
     expect(board.recent(2).map((e) => e.caseId)).toEqual(['cold-x', 'rush']);
+  });
+
+  it('keeps one row per desk, sorted by score or by clips', () => {
+    const d = (id: string, total: number, clips: number, date = '2026-09-19'): DeskEntry => ({
+      id,
+      name: id.slice(0, 4).toUpperCase(),
+      total,
+      rank: 'Rookie',
+      clips,
+      solved: 1,
+      badges: 0,
+      date,
+    });
+    const a = d('aaaaaaaaaaaaaaaa', 100, 500);
+    const b = d('bbbbbbbbbbbbbbbb', 300, 20);
+    let board = upsertDesks([], a);
+    board = upsertDesks(board, b);
+    board = upsertDesks(board, { ...a, total: 350 }); // the same desk, later
+    expect(board.map((x) => x.id)).toEqual([a.id, b.id]);
+    expect(board).toHaveLength(2);
+    expect(rankDesks(board, 10, 'clips').map((x) => x.id)).toEqual([a.id, b.id]);
+    expect(rankDesks(board, 1, 'total')).toHaveLength(1);
+    // Junk is dropped, numbers are clamped, extras are trimmed.
+    const clean = sanitizeDesks([
+      { ...a, total: 1e9, hacker: true },
+      { ...b, id: 'short' },
+      'nope',
+      { ...b, clips: -1 },
+    ]);
+    expect(clean).toHaveLength(1);
+    expect(clean[0].total).toBe(1_000_000);
+    expect(clean[0]).not.toHaveProperty('hacker');
+  });
+
+  it('mints a desk id once and describes the save', () => {
+    saveStore.reset();
+    const id = deskId();
+    expect(id).toMatch(/^[a-f0-9]{16}$/);
+    expect(deskId()).toBe(id);
+    expect(saveStore.get().id).toBe(id);
+    saveStore.update((s) => {
+      s.totalScore = 420;
+      s.clips.earned = 12;
+      s.badges.push('first-case');
+    });
+    const desk = currentDesk();
+    expect(desk).toMatchObject({ id, name: 'ANON', total: 420, clips: 12, badges: 1, solved: 0 });
+    expect(desk.token).toBeUndefined();
+    const local = new LocalLeaderboard(new MemoryStorage());
+    return local
+      .upsertDesk(desk)
+      .then(() => local.desks())
+      .then((rows) => expect(rows.map((r) => r.id)).toEqual([id]));
   });
 });

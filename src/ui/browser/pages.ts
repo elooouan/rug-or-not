@@ -10,7 +10,14 @@ import { gameState } from '@/systems/gameState';
 import { secretUnlocked } from '@/systems/secretCase';
 import { readCustomCases } from '@/systems/customCases';
 import { startColdCase, startCustomCase } from '@/systems/coldCase';
-import { leaderboard, recentRuns, type ScoreEntry } from '@/systems/leaderboard';
+import {
+  leaderboard,
+  postDesk,
+  recentRuns,
+  type DeskEntry,
+  type DeskSort,
+  type ScoreEntry,
+} from '@/systems/leaderboard';
 import { rankForScore } from '@/systems/ranks';
 import { FLAG_IDS, FLAGS } from '@/data/flags';
 import { makeRng } from '@/systems/rng';
@@ -73,6 +80,9 @@ export const URLS: Record<PageId, string> = {
 
 /** How many rows each board list held when last fetched (see the board page). */
 const boardRows = new Map<string, number>();
+
+/** Which column the detectives board is sorted by; remembered while the phone is open. */
+let deskSort: DeskSort = 'total';
 
 /** The market's open drawer; remembered across renders so buying doesn't jump the page. */
 let marketSlot: ShopSlot = 'coat';
@@ -507,6 +517,50 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
         `Most missed flag: ${FLAGS[missed[0] as keyof typeof FLAGS]?.title ?? missed[0]} (${missed[1]}x)`,
         { color: 'stampRed' },
       );
+    // The detectives board: one row per desk, the career rather than a run. Yours goes up
+    // (or is refreshed) whenever the page opens.
+    void postDesk(60_000);
+    ctx.rule();
+    const sort = deskSort;
+    ctx.line(
+      `Detectives (${leaderboard.kind === 'remote' ? 'precinct server' : 'this device'}), by ${sort === 'total' ? 'career score' : 'clips earned'}:`,
+      { color: 'woodMid' },
+    );
+    ctx.button(
+      sort === 'total' ? 'Sort by clips' : 'Sort by score',
+      () => {
+        deskSort = sort === 'total' ? 'clips' : 'total';
+        ctx.panel.render();
+      },
+      { variant: 'paper' },
+    );
+    const deskY = ctx.y;
+    void leaderboard.desks(10, sort).then((desks: DeskEntry[]) => {
+      if (!ctx.content.active) return;
+      if (settle(`desks:${sort}`, desks.length, 10)) return;
+      if (desks.length === 0) {
+        ctx.content.add(
+          makeText(ctx.scene, 0, deskY, 'No desks on record yet. Close a file and yours goes up.', {
+            font: 'body',
+            size: FONT.size.body,
+            color: 'woodMid',
+          }),
+        );
+        return;
+      }
+      const mine = saveStore.get().id;
+      desks.forEach((d, i) => {
+        const line = `${String(i + 1).padStart(2, ' ')}. ${(d.name + (d.holder ? '$' : '')).padEnd(13)} ${String(d.total).padStart(5)} pts  ${d.rank.padEnd(9).slice(0, 9)} ${String(d.clips).padStart(5)} clips  ${d.solved} solved`;
+        ctx.content.add(
+          makeText(ctx.scene, 0, deskY + i * BROWSER.lineH, line, {
+            font: 'body',
+            size: FONT.size.body,
+            color: i === 0 ? 'amber' : d.id === mine ? 'ink' : 'shadow',
+          }),
+        );
+      });
+    });
+    ctx.y += BROWSER.lineH * rows(`desks:${sort}`, 10);
     // The desk's own log: the last few files, newest first, whatever the board is.
     const recent = recentRuns(6);
     if (recent.length) {

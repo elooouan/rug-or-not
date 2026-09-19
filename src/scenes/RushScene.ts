@@ -11,7 +11,7 @@ import { gameState } from '@/systems/gameState';
 import { playableCases } from '@/systems/secretCase';
 import { generateCase } from '@/systems/caseGen';
 import { localDateKey } from '@/systems/dailyCase';
-import { leaderboard } from '@/systems/leaderboard';
+import { leaderboard, postDesk } from '@/systems/leaderboard';
 import {
   applyFlag,
   applyHerring,
@@ -517,6 +517,7 @@ export class RushScene extends Phaser.Scene {
       mode: 'rush',
       holder: holderPerks() || undefined,
     });
+    void postDesk();
     awardBadge(this, 'rush-hour');
     if (s.score >= 2000) awardBadge(this, 'speed-reader');
     this.hud.best.setText(`best    ${saveStore.get().stats.rushBest}`);

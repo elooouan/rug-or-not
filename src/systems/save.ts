@@ -60,6 +60,8 @@ export interface SaveData {
   discovered: string[];
   /** Arcade-style handle shown on the leaderboard. */
   detectiveName: string;
+  /** This desk's handle on the shared board, made the first time it posts (leaderboard.ts). */
+  id: string;
   /** The desk's own currency (see src/systems/clips.ts): earned by closing files, spent at the market. */
   clips: { earned: number; spent: number };
   /** Market items bought (the free ones don't need listing). */
@@ -149,6 +151,7 @@ export function defaultSave(): SaveData {
     seenHints: [],
     discovered: [],
     detectiveName: 'ANON',
+    id: '',
     clips: { earned: 0, spent: 0 },
     owned: [],
     look: { ...DEFAULT_LOOK },
@@ -244,6 +247,7 @@ export function sanitizeSave(raw: unknown): SaveData {
     d.unlockedFlags = r.unlockedFlags.filter((x): x is string => typeof x === 'string');
   if (typeof r.detectiveName === 'string' && r.detectiveName.trim())
     d.detectiveName = isNameAllowed(r.detectiveName) ? r.detectiveName.slice(0, 12) : 'ANON';
+  if (typeof r.id === 'string' && /^[a-f0-9]{16}$/.test(r.id)) d.id = r.id;
   if (typeof r.lastSeenVersion === 'string') d.lastSeenVersion = r.lastSeenVersion.slice(0, 16);
   if (r.clips && typeof r.clips === 'object') {
     const c = r.clips as Record<string, unknown>;

@@ -22,6 +22,10 @@ VITE_LEADERBOARD_URL=https://rug-or-not-board.<you>.workers.dev
   `&caseId=<id>` narrows it to one file (the game uses this for the weekly cold case).
 - `POST /` accepts one `ScoreEntry` (the shape in `src/systems/leaderboard.ts`), sanitises it,
   inserts it, and keeps the top 200 per board.
+- `GET /?board=desks&limit=10&sort=total|clips` is the detectives board: one row per desk
+  (career score, rank, clips earned, files solved, badges, the coin balance the wallet
+  reported), richest first. `POST /?board=desks` takes one `DeskEntry` and replaces that
+  desk's row (keyed by the random id the save mints); 500 desks are kept.
 - Twelve posts per IP per minute; names are trimmed to 12 printable characters and pass the
   same light word filter as the game; scores are capped; unknown fields are dropped. Set `ALLOWED_ORIGIN` in `wrangler.toml` to the game's
   origin once it's live.
