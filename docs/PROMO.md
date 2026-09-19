@@ -178,7 +178,7 @@ the tweets say so once a week. Team wallets: stated, small, vested, or none.
 
 ## 10. Numbers to watch (Sunday, 15 minutes)
 
-Followers, replies per tweet, link clicks (Typefully/X analytics), game sessions (Pages
-has no analytics — add Plausible or GoatCounter, both free tiers, one script tag), rows on
-the Hall of Detectives, ID cards posted, Telegram members. The one that matters before
+Followers, replies per tweet, link clicks (Typefully/X analytics), game visits (set the
+`VITE_GOATCOUNTER` repository variable to a free GoatCounter site code and redeploy: page
+views only, no cookies), rows on the Hall of Detectives, ID cards posted, Telegram members. The one that matters before
 launch: people posting their own screenshots.

@@ -38,6 +38,7 @@ jobs:
           VITE_TOKEN_BUY_URL: ${{ vars.VITE_TOKEN_BUY_URL }}
           VITE_LEADERBOARD_URL: ${{ vars.VITE_LEADERBOARD_URL }}
           VITE_TOKEN_PRICE_URL: ${{ vars.VITE_TOKEN_PRICE_URL }}
+          VITE_GOATCOUNTER: ${{ vars.VITE_GOATCOUNTER }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

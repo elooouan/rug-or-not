@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_TOKEN_PRICE_URL?: string;
   readonly VITE_SOLANA_CLUSTER?: string;
   readonly VITE_TOKEN_MOCK_BALANCE?: string;
+  readonly VITE_GOATCOUNTER?: string;
 }
 
 interface ImportMeta {

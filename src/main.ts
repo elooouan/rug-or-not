@@ -108,6 +108,17 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Visit counting, only when a GoatCounter site code is configured at build time. Page
+// views only: no cookies, nothing about the player, nothing from the save.
+const goat = (import.meta.env.VITE_GOATCOUNTER ?? '').trim();
+if (import.meta.env.PROD && /^[a-z0-9-]+$/i.test(goat)) {
+  const s = document.createElement('script');
+  s.async = true;
+  s.dataset.goatcounter = `https://${goat}.goatcounter.com/count`;
+  s.src = 'https://gc.zgo.at/count.js';
+  document.head.appendChild(s);
+}
+
 // Offline fallback (production only): see public/sw.js.
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

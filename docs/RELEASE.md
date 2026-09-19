@@ -36,8 +36,9 @@ GitHub Pages: repository Settings → Pages → Source: _GitHub Actions_. The wo
 Launch-day environment (repository Settings → Secrets and variables → Actions, as
 variables, or a local `.env`): `VITE_TOKEN_MINT`, `VITE_TOKEN_BUY_URL`, `VITE_SOLANA_RPC`,
 `VITE_SOLANA_CLUSTER`; optionally `VITE_TOKEN_PRICE_URL` and `VITE_LEADERBOARD_URL` (see
-`.env.example` and `server/leaderboard`). The Pages workflow reads these variables at build
-time; a blank one keeps the game's default.
+`.env.example` and `server/leaderboard`); `VITE_GOATCOUNTER` (a GoatCounter site code) turns
+on a cookie-free visit counter. The Pages workflow reads these variables at build time; a
+blank one keeps the game's default.
 
 The shared board (runs and the detectives board) needs the worker deployed once:
 `.github/workflows/deploy-board.yml` ("Deploy the board worker" → Run workflow) does it

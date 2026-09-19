@@ -124,7 +124,9 @@ The phone on the desk opens an in-game browser:
   Buying redresses every screen that is up. Nothing bought changes a score.
 - **News**, **Badges**, **Help**, and a 404 with a cat.
 
-Configure the coin through env vars (see `.env.example`); nothing is hard-coded. An optional
+Configure the coin through env vars (see `.env.example`); nothing is hard-coded. `VITE_GOATCOUNTER`
+(a GoatCounter site code) adds a cookie-free visit counter to production builds; without it
+the game phones nowhere. An optional
 `VITE_TOKEN_PRICE_URL` (plain `{price}`, Jupiter or DexScreener JSON shapes) shows a price on
 the coin page once a mint is set; it's read-only and cached for a minute.
 
