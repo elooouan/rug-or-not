@@ -17,6 +17,7 @@ import { lucienSays } from '@/ui/DialogueBox';
 import { resetHints } from '@/systems/hints';
 import { PixelButton } from '@/ui/PixelButton';
 import { LucienBubble } from '@/ui/LucienBubble';
+import { awardBadge, noteSeen } from '@/systems/badges';
 import { addText } from '@/ui/text';
 import { goTo, setupScene } from './sceneUtil';
 import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette';
@@ -231,6 +232,7 @@ export class SettingsScene extends Phaser.Scene {
         if (this.overlay) return;
         SettingsScene.reselect = this.selected;
         SettingsScene.justThemed = s().theme;
+        noteSeen('themesSeen', s().theme);
         this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo, tab: this.tab });
       },
       hint: () =>
@@ -420,6 +422,8 @@ export class SettingsScene extends Phaser.Scene {
     if (SettingsScene.justThemed) {
       LucienBubble.say(this, THEME_QUIPS[SettingsScene.justThemed], 3200);
       SettingsScene.justThemed = null;
+      if (saveStore.get().stats.themesSeen.length >= THEME_IDS.length)
+        awardBadge(this, 'decorator');
     }
     if (!this.overlay) lucienSays(this, 'settings');
 

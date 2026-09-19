@@ -41,6 +41,12 @@ export const BADGES: Badge[] = [
     secret: true,
   },
   {
+    id: 'decorator',
+    name: 'Decorator',
+    description: 'Try all five office colours.',
+    secret: true,
+  },
+  {
     id: 'power-user',
     name: 'Power User',
     description: 'Visit every page in NetScope.',

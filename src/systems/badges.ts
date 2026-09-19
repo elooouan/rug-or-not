@@ -1,3 +1,5 @@
+import { HERRINGS } from '@/data/flags';
+import { THEME_IDS } from '@/config/palette';
 import type Phaser from 'phaser';
 import { BADGE_BY_ID, BADGES } from '@/data/badges';
 import { saveStore, type SaveData } from './save';
@@ -42,7 +44,10 @@ export function bumpStat(key: keyof SaveData['stats'], by = 1): number {
   return v;
 }
 
-export function noteSeen(key: 'weathersSeen' | 'pagesSeen', value: string): string[] {
+export function noteSeen(
+  key: 'weathersSeen' | 'pagesSeen' | 'themesSeen',
+  value: string,
+): string[] {
   let out: string[] = [];
   saveStore.update((d) => {
     if (!d.stats[key].includes(value)) d.stats[key].push(value);
@@ -99,6 +104,10 @@ export function badgeProgress(
       return clamp(st.coldCorrect, 10);
     case 'drill-sergeant':
       return clamp(st.drilled.length, totals.flags);
+    case 'herring-hunter':
+      return clamp(st.hunted.length, Object.keys(HERRINGS).length);
+    case 'decorator':
+      return clamp(st.themesSeen.length, THEME_IDS.length);
     default:
       return null;
   }

@@ -59,6 +59,8 @@ export interface SaveData {
     legitCorrect: number;
     cleanStreak: number;
     weathersSeen: string[];
+    /** Office colours tried (see the Decorator badge). */
+    themesSeen: string[];
     pagesSeen: string[];
     runs: number;
     correct: number;
@@ -120,6 +122,7 @@ export function defaultSave(): SaveData {
       legitCorrect: 0,
       cleanStreak: 0,
       weathersSeen: [],
+      themesSeen: [],
       pagesSeen: [],
       runs: 0,
       correct: 0,
@@ -201,6 +204,7 @@ export function sanitizeSave(raw: unknown): SaveData {
       legitCorrect: num(st.legitCorrect),
       cleanStreak: num(st.cleanStreak),
       weathersSeen: strs(st.weathersSeen),
+      themesSeen: strs(st.themesSeen),
       pagesSeen: strs(st.pagesSeen),
       runs: num(st.runs),
       correct: num(st.correct),
