@@ -233,4 +233,12 @@ export const HISTORY: HistoryFrame[] = [
     caption:
       'Files pay paper clips; clips buy Lucien a coat and a hat, the cat a new fur, the desk a globe. Holding the coin adds an allowance, and nothing bought moves a score.',
   },
+  {
+    file: '30-v09-dressed',
+    version: 'v0.9',
+    date: '2026-09-19',
+    title: 'Dressed for the night',
+    caption:
+      'Oxblood trench, black fedora, velvet curtains, a red mug, a globe that turns, and Biscuit in a red bow she tolerates. Clear night. The moon is unrelated to any coin.',
+  },
 ];
