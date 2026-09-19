@@ -17,7 +17,7 @@ import { rect } from '@/ui/shapes';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { downloadCanvas } from '@/systems/shareCard';
 import { toast } from '@/ui/Toast';
-import { setupScene } from './sceneUtil';
+import { backChip, setupScene } from './sceneUtil';
 import { touchScreen } from '@/ui/lensLift';
 
 const KEY = (f: HistoryFrame): string => (f.file === 'live' ? LIVE_PHOTO_KEY : `history-${f.file}`);
@@ -146,6 +146,7 @@ export class HistoryScene extends Phaser.Scene {
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);
+    backChip(this, () => this.close());
     addText(
       this,
       8,

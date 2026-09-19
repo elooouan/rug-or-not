@@ -19,7 +19,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { LucienBubble } from '@/ui/LucienBubble';
 import { awardBadge, noteSeen } from '@/systems/badges';
 import { addText } from '@/ui/text';
-import { goTo, setupScene } from './sceneUtil';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { currentTheme, THEME_IDS, THEMES, type ThemeId } from '@/config/palette';
 import { syncTheme } from '@/systems/theme';
 
@@ -424,6 +424,7 @@ export class SettingsScene extends Phaser.Scene {
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);
+    backChip(this, () => this.close());
 
     const kb = this.input.keyboard;
     kb?.addCapture(['UP', 'DOWN', 'LEFT', 'RIGHT', 'TAB']);

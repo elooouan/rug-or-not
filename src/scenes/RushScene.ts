@@ -38,7 +38,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { rect } from '@/ui/shapes';
 import { SharePopover } from '@/ui/SharePopover';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { goTo, setupScene } from './sceneUtil';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { touchScreen } from '@/ui/lensLift';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'over';
@@ -147,10 +147,16 @@ export class RushScene extends Phaser.Scene {
     )
       .setOrigin(1, 0)
       .setDepth(DEPTH.hud);
-    const quit = new PixelButton(this, 0, GAME_HEIGHT - 22, 'Quit [Esc]', () => this.quit(), {
-      variant: 'ink',
-    });
+    const quit = new PixelButton(
+      this,
+      0,
+      GAME_HEIGHT - 22,
+      'Quit [Esc]',
+      () => this.askThenQuit('press again to leave'),
+      { variant: 'ink' },
+    );
     quit.setDepth(DEPTH.hud).setX(GAME_WIDTH - quit.bw - 6);
+    backChip(this, () => this.askThenQuit('press again to leave'), 'quit');
 
     this.bindKeys();
     audio.setTension(false);
@@ -685,6 +691,16 @@ export class RushScene extends Phaser.Scene {
     );
   }
 
+  /** Mid-run, one press is a question and the second is the answer. */
+  private askThenQuit(again: string): void {
+    if (this.phase === 'playing' && this.time.now - this.escAt > 2500) {
+      this.escAt = this.time.now;
+      toast(this, 'QUIT THE RUN?', again);
+      return;
+    }
+    this.quit();
+  }
+
   private quit(): void {
     goTo(
       this,
@@ -713,12 +729,7 @@ export class RushScene extends Phaser.Scene {
     // shouldn't throw away a good streak. Over or before the run, it just leaves.
     on('ESC', () => {
       if (this.dialogue?.isActive || escTaken()) return;
-      if (this.phase === 'playing' && this.time.now - this.escAt > 2500) {
-        this.escAt = this.time.now;
-        toast(this, 'QUIT THE RUN?', 'Esc again to leave');
-        return;
-      }
-      this.quit();
+      this.askThenQuit('Esc again to leave');
     });
     on('TAB', (e?: KeyboardEvent) => inPlay() && this.doc?.focusMove(e?.shiftKey ? -1 : 1));
     on('DOWN', () => inPlay() && this.doc?.focusMove(1));

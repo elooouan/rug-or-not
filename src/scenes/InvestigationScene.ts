@@ -38,7 +38,8 @@ import { TabBar } from '@/ui/TabBar';
 import { addText } from '@/ui/text';
 import { PixelButton } from '@/ui/PixelButton';
 import { floatText } from '@/ui/DeskBackground';
-import { goTo, setupScene } from './sceneUtil';
+import { squish } from '@/ui/squish';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { touchScreen } from '@/ui/lensLift';
 import type { PaletteKey } from '@/config/palette';
 
@@ -91,7 +92,6 @@ export class InvestigationScene extends Phaser.Scene {
   private said = new Set<string>();
   private hintsUsed = 0;
   private askLabel?: Phaser.GameObjects.Text;
-  private askFace?: Phaser.GameObjects.Image;
   private menuBtn?: PixelButton;
   private menuDimmed = false;
   /** Tab the last nudge was about; a second ask on it points at the line. */
@@ -115,7 +115,6 @@ export class InvestigationScene extends Phaser.Scene {
     this.phase = 'intake';
     this.paused = false;
     this.docs = [];
-    this.askFace = undefined;
     this.menuBtn = undefined;
     this.menuDimmed = false;
     this.stamps = [];
@@ -165,6 +164,18 @@ export class InvestigationScene extends Phaser.Scene {
     if (header.x - header.width < tabsRight + 6) header.setText(c.ticker);
 
     if (!this.review) new FolderCard(this, c, () => this.openCase());
+    // The corner chip is Esc for the mouse and the thumb: the pause menu mid-file, straight
+    // out before the folder is opened, back to the report on a second look.
+    const chip = backChip(
+      this,
+      () => {
+        if (this.review) this.backToReport();
+        else if (this.phase === 'intake' || this.phase === 'opening') this.leave();
+        else this.togglePause();
+      },
+      'menu',
+    );
+    this.magnifier.ignore(chip);
     this.bindKeys();
     this.tabSwitched = false;
     this.browsing = false;
@@ -198,15 +209,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.events.off('browser:close');
     this.events.off('bubble:open');
     this.events.off(Phaser.Scenes.Events.RESUME);
-    this.events.on('bubble:open', (b: Phaser.GameObjects.GameObject) => {
-      this.magnifier.ignore(b);
-      // The bubble brings its own face; the breathing one underneath would show an edge.
-      const face = this.askFace;
-      if (face?.active) {
-        face.setVisible(false);
-        b.once(Phaser.GameObjects.Events.DESTROY, () => face.active && face.setVisible(true));
-      }
-    });
+    this.events.on('bubble:open', (b: Phaser.GameObjects.GameObject) => this.magnifier.ignore(b));
     this.events.on('browser:open', () => {
       this.browsing = true;
       this.clock?.pause(true);
@@ -282,6 +285,13 @@ export class InvestigationScene extends Phaser.Scene {
       const h = HERRINGS[clue.herringId as keyof typeof HERRINGS];
       LucienBubble.tell(this, `Herring: ${h.title}. ${h.reassurance}`, 7000);
     }
+  }
+
+  /** Out of a file that hasn't been opened yet: nothing to lose, nothing to ask. */
+  private leave(): void {
+    if (gameState.mode === 'campaign')
+      goTo(this, 'CaseSelectScene', { focus: gameState.currentIndex });
+    else goTo(this, 'TitleScene');
   }
 
   private backToReport(): void {
@@ -484,7 +494,6 @@ export class InvestigationScene extends Phaser.Scene {
       .image(6, GAME_HEIGHT - 4, LUCIEN_FACE_TEX)
       .setOrigin(0, 1)
       .setDepth(DEPTH.hud);
-    this.askFace = face;
     face.setDisplaySize(Math.round(face.width * (40 / face.height)), 40);
     face.setInteractive({ useHandCursor: false });
     // He's alive down there: a slow breath, and a small lift under the pointer.
@@ -502,7 +511,11 @@ export class InvestigationScene extends Phaser.Scene {
       face.setX(8);
     });
     face.on('pointerout', () => face.setX(6));
-    face.on('pointerdown', () => this.askLucien());
+    face.on('pointerdown', () => {
+      // A press that can't be answered (he's mid-lesson, the desk is paused) still nods back.
+      if (!saveStore.get().settings.reducedMotion) squish(this, face, 1.08, 0.92, 200);
+      this.askLucien();
+    });
     this.askLabel = addText(
       this,
       6 + face.displayWidth + 2,

@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9 — the market
+
+- A small "<" chip in the top-left corner of every screen: the way out without a
+  keyboard. On a file it opens the pause menu (or leaves straight away while the folder is
+  still closed); on a second look it goes back to the report; in the rush it asks once,
+  like Esc; elsewhere it is Back.
+- Lucien's corner face stays one face: his bubbles now speak beside the clickable head on
+  the desk instead of drawing a second one over it, so a press on the head always lands
+  (and he nods to every press, even mid-lesson when he can't answer).
+
 ## v0.8 — the handbook
 
 - The desk opens up a piece at a time: a fresh save sees the folder, the daily, the notebook

@@ -23,7 +23,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { LUCIEN_FACE_TEX, lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { goTo, setupScene } from './sceneUtil';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { attachScroll } from '@/ui/dragScroll';
 import { modalOpen } from '@/ui/escGuard';
 import { HANDBOOK } from '@/data/handbook';
@@ -215,6 +215,7 @@ export class NotebookScene extends Phaser.Scene {
       { hotkey: 'ESC', width: 88 },
     );
     back.setDepth(DEPTH.hud);
+    backChip(this, () => this.close());
 
     this.hoverArmed = false;
     this.input.once('pointermove', () => (this.hoverArmed = true));

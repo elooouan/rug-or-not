@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '@/config/layout';
+import { FONT, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '@/config/layout';
+import { DEPTH } from '@/config/depth';
+import { PixelButton } from '@/ui/PixelButton';
+import { addText } from '@/ui/text';
 import { CursorScene } from './CursorScene';
 import { saveStore } from '@/systems/save';
 import { rgb } from '@/config/palette';
@@ -44,6 +47,25 @@ export function goTo(scene: Phaser.Scene, key: string, data?: object): void {
   const cam = scene.cameras.main;
   cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => scene.scene.start(key, data));
   cam.fadeOut(130, ...rgb('bg'));
+}
+
+/**
+ * A small "<" chip in the top-left corner: the same way out as Esc, for people who'd
+ * rather not reach for the keyboard (and for phones, where there is none). Sits above
+ * the lamp shade, out of the way of everything else. The caller decides what "back"
+ * means on its screen.
+ */
+export function backChip(scene: Phaser.Scene, onPress: () => void, tip = 'back'): PixelButton {
+  const chip = new PixelButton(scene, 4, 2, '<', onPress, { variant: 'ink', width: 22 });
+  chip.setDepth(DEPTH.hud);
+  chip.setName('backChip');
+  // A word on hover, so the glyph isn't a mystery.
+  const label = addText(scene, 4 + chip.bw + 4, 4, tip, { size: FONT.size.tiny, color: 'paper' })
+    .setDepth(DEPTH.hud)
+    .setAlpha(0);
+  chip.on('pointerover', () => label.setAlpha(0.9));
+  chip.on('pointerout', () => label.setAlpha(0));
+  return chip;
 }
 
 /** The scene this one was launched over, if any (overlay data carries returnTo). */

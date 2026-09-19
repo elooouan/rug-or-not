@@ -17,7 +17,7 @@ import { DeskBackground } from '@/ui/DeskBackground';
 import { lucienSays } from '@/ui/DialogueBox';
 import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
-import { goTo, setupScene } from './sceneUtil';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { unlocked } from '@/systems/discovery';
 import { difficultyPips, rect } from '@/ui/shapes';
 import { touchScreen } from '@/ui/lensLift';
@@ -113,6 +113,7 @@ export class CaseSelectScene extends Phaser.Scene {
       { hotkey: 'ESC' },
     );
     back.setDepth(DEPTH.hud);
+    backChip(this, () => goTo(this, 'TitleScene'));
 
     const kb = this.input.keyboard;
     kb?.addCapture(['LEFT', 'RIGHT', 'UP', 'DOWN', 'TAB']);

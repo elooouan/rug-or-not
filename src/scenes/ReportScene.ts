@@ -27,7 +27,7 @@ import { PixelButton } from '@/ui/PixelButton';
 import { addText, charWidth, makeText, wrapMono } from '@/ui/text';
 import { Typewriter, type TypedLine } from '@/ui/Typewriter';
 import type { ReportPayload } from './InvestigationScene';
-import { goTo, setupScene } from './sceneUtil';
+import { backChip, goTo, setupScene } from './sceneUtil';
 import { touchScreen } from '@/ui/lensLift';
 
 /** The typed-out case report: truth, flags found/missed, false accusations, score, grade. */
@@ -185,6 +185,14 @@ export class ReportScene extends Phaser.Scene {
       ),
     );
     buttons.forEach((b) => b.setDepth(DEPTH.hud));
+    backChip(
+      this,
+      () =>
+        isDaily || isCold
+          ? goTo(this, 'TitleScene')
+          : goTo(this, 'CaseSelectScene', { focus: gameState.currentIndex }),
+      isDaily || isCold ? 'title' : 'case files',
+    );
     const group = new ButtonGroup(this, buttons, (i) => buttons[i].emit('pointerdown'), {
       horizontal: true,
     });
