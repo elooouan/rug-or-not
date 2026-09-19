@@ -105,7 +105,8 @@ every squish returns to rest), make interactions respond immediately, check UI e
 - `node scripts/sweep.mjs [cold=24]` (dev server up) plays every campaign file and a batch of
   printed ones perfectly and reports page errors and anything that doesn't grade S: run it
   after touching documents, the generator, scoring or the report. `SWEEP_INLINE=1` plays
-  with the lens off (fine print laid out inline, as in the rush).
+  with the lens off (fine print laid out inline, as in the rush); `SWEEP_LOOK=1` also takes
+  the report's second look on every campaign file.
 - Wall photos: `SNAP_ROOT=$PWD npx vite --config scripts/snapshot.config.ts --port 5180`, then
   `__debug.snapshot('NN-vXX-name')` and a frame in `src/data/history.ts`.
 

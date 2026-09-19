@@ -6,6 +6,7 @@
  *
  *   node scripts/sweep.mjs [cold cases=24]
  *   SWEEP_INLINE=1 node scripts/sweep.mjs   # lens off: fine print laid out inline
+ *   SWEEP_LOOK=1 node scripts/sweep.mjs     # also take the second look on every campaign file
  */
 import { chromium } from '@playwright/test';
 
@@ -140,6 +141,70 @@ const note = (label, r, before) => {
   else clean++;
 };
 
+/**
+ * A sloppy run (one pin, then the stamp) and the report's second look: every page opened,
+ * every mark asked about, then Esc back to the report. Exercises reveal() on every document.
+ */
+async function secondLook() {
+  await skip();
+  await page.keyboard.press('Enter');
+  await waitPhase('investigating');
+  await page.waitForTimeout(400);
+  await skip();
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene');
+    const doc = inv.docs[0];
+    const first = doc.allSpots().find((s) => s.clue.flagId);
+    if (first) {
+      doc.focusClue(first.clue.id);
+      doc.activateFocused();
+    }
+    inv.stamps[inv.caseData.verdict === 'rug' ? 0 : 1].trigger((v) => inv.onStamp(v));
+  });
+  await page.waitForFunction(
+    () => window.__game.scene.getScenes(true).some((s) => s.scene.key === 'ReportScene'),
+    null,
+    { timeout: 20000 },
+  );
+  await page.waitForTimeout(900);
+  await skip();
+  const offered = await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene');
+    rs.typewriter.skip();
+    if (!rs.secondLookOffered()) return false;
+    rs.secondLook();
+    return true;
+  });
+  if (!offered) return { look: false };
+  await page.waitForFunction(
+    () => window.__game.scene.getScene('InvestigationScene').review !== null,
+    null,
+    { timeout: 20000 },
+  );
+  await page.waitForTimeout(600);
+  const info = await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene');
+    let marks = 0;
+    inv.docs.forEach((d, i) => {
+      inv.showDocument(i, false);
+      for (const s of d.allSpots()) {
+        if (s.missed) marks++;
+        inv.inspect(s.clue);
+      }
+    });
+    return { look: true, marks, pinned: inv.review.pinnedIds.length };
+  });
+  await page.waitForTimeout(300);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(
+    () => window.__game.scene.getScenes(true).some((s) => s.scene.key === 'ReportScene'),
+    null,
+    { timeout: 20000 },
+  );
+  await page.waitForTimeout(500);
+  return info;
+}
+
 await page.goto(`${BASE}/?sweep=${Date.now()}`);
 await page.waitForFunction(() => typeof window.__game !== 'undefined');
 await page.waitForTimeout(2500);
@@ -152,6 +217,26 @@ for (const id of CAMPAIGN) {
   await page.evaluate(() => window.__game.scene.getScene('ReportScene').scene.start('TitleScene'));
   await page.waitForTimeout(1000);
 }
+if (process.env.SWEEP_LOOK)
+  for (const id of CAMPAIGN) {
+    const before = errors.length;
+    await skip();
+    await page.evaluate((id) => window.__debug.startCase(id), id);
+    await page.waitForTimeout(1200);
+    const r = await secondLook();
+    total++;
+    if (errors.length > before || (r.look && r.marks === 0))
+      console.log(
+        `${id} (second look)`.padEnd(24),
+        JSON.stringify(r),
+        errors.slice(before).join(' | '),
+      );
+    else clean++;
+    await page.evaluate(() =>
+      window.__game.scene.getScene('ReportScene').scene.start('TitleScene'),
+    );
+    await page.waitForTimeout(1000);
+  }
 for (let i = 0; i < COLD; i++) {
   const seed = `d${1 + (i % 5)}-sweep-${i}`;
   const before = errors.length;
