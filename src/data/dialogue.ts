@@ -133,6 +133,9 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
     {
       text: "Each flag you meet gets a page in your Notebook. That's the real prize: next time you'll see it coming.",
     },
+    {
+      text: 'The board on the phone keeps your runs under a name. ANON is a bit sad; give it one when you get there.',
+    },
   ],
   'first-legit': [
     { text: 'See? Not every token is a rug. Looking suspicious is not the same as being guilty.' },
