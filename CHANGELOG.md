@@ -55,6 +55,9 @@
   account this site isn't approved for clears the stale address and says so; RPC, price
   and board calls give up after a few seconds instead of hanging the page; the help page
   and the coin page point phone users at Phantom's in-app browser.
+- Fixed: with the lens off (the no-magnifier setting, and every rush page) fine print that
+  wrapped to a second line ran into the row below it; rows now make room. The desk's key
+  hint no longer mentions the lens when there isn't one.
 - Fixed: a toast with a long line ("Silver rim · Settings, Office page") ran off the right
   edge of the screen; the card now grows to fit its text.
 - Fixed: closing the pause menu or the phone with a click over the paper dropped a stray

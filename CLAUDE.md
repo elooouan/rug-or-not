@@ -104,7 +104,8 @@ every squish returns to rest), make interactions respond immediately, check UI e
   `assets/marketing/`; add an entry there when a feature deserves a tweet.
 - `node scripts/sweep.mjs [cold=24]` (dev server up) plays every campaign file and a batch of
   printed ones perfectly and reports page errors and anything that doesn't grade S: run it
-  after touching documents, the generator, scoring or the report.
+  after touching documents, the generator, scoring or the report. `SWEEP_INLINE=1` plays
+  with the lens off (fine print laid out inline, as in the rush).
 - Wall photos: `SNAP_ROOT=$PWD npx vite --config scripts/snapshot.config.ts --port 5180`, then
   `__debug.snapshot('NN-vXX-name')` and a frame in `src/data/history.ts`.
 

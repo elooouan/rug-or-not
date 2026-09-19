@@ -238,6 +238,9 @@ export abstract class DocumentView extends Phaser.GameObjects.Container {
       const uy = y + t.height - 1;
       for (let dx = 0; dx < Math.min(t.width, maxW); dx += 4) underline.fillRect(x + dx, uy, 2, 1);
       row.container.add([t, underline]);
+      // Inline print can wrap where the tiny print wouldn't; the row makes room for it
+      // instead of running into the one below.
+      row.height = Math.max(row.height, Math.ceil(y + t.height) + 2);
       return { x, y, w: Math.ceil(t.width), h: Math.ceil(t.height) };
     }
     const t = makeText(this.scene, x, y, text, {

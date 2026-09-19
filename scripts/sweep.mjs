@@ -5,6 +5,7 @@
  * scorer can't find, a generator seed that breaks the desk. Run with the dev server up:
  *
  *   node scripts/sweep.mjs [cold cases=24]
+ *   SWEEP_INLINE=1 node scripts/sweep.mjs   # lens off: fine print laid out inline
  */
 import { chromium } from '@playwright/test';
 
@@ -39,13 +40,19 @@ page.on('console', (m) => {
 });
 // Everything unlocked, Lucien talking (his lines are part of what's being exercised).
 await page.addInitScript(
-  (ids) => {
+  ([ids, inline]) => {
     localStorage.setItem(
       'rug-or-not:save:v1',
       JSON.stringify({
         version: 1,
         campaignUnlocked: 16,
-        settings: { hints: true, quips: true, music: false, reducedMotion: false },
+        settings: {
+          hints: true,
+          quips: true,
+          music: false,
+          reducedMotion: false,
+          noMagnifier: inline,
+        },
         discovered: ['drawer', 'rush', 'cold', 'weekly'],
         caseResults: Object.fromEntries(
           ids.map((id) => [
@@ -62,7 +69,7 @@ await page.addInitScript(
       }),
     );
   },
-  CAMPAIGN.slice(0, 15),
+  [CAMPAIGN.slice(0, 15), !!process.env.SWEEP_INLINE],
 );
 
 const skip = () =>

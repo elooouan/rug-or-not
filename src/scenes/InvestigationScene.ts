@@ -422,7 +422,9 @@ export class InvestigationScene extends Phaser.Scene {
       GAME_HEIGHT - 12,
       this.review
         ? 'amber: missed  ·  red: pinned  ·  click a mark'
-        : 'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
+        : s.noMagnifier
+          ? 'click: pin  ·  R / L: stamp  ·  wheel: scroll'
+          : 'hover: lens  ·  click: pin  ·  R / L: stamp  ·  wheel: scroll',
       { size: 10, color: 'paperShadow' },
     )
       .setOrigin(1, 0)
