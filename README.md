@@ -89,9 +89,10 @@ for the corner (a bobblehead that nods, a fish named Liquidity). And to arrange:
 desk" on the title (or Settings > Office, or type `desk`) dims the lamp, slides the paperwork
 off and puts a handle on every prop. Drag the mug, radio, clock, phone, safe, folders, ink
 pad and ornament where you like, cross off what you never touch, put it back from the strip
-at the top; nothing can sit under the file, the notebook or the stamps. Ornaments can stand
-on extra spots bought with clips (30, 50, 80). The layout (`src/systems/deskLayout.ts`) is
-part of the save and every screen draws from it.
+at the top; nothing can sit under the file or the stamps. Ornaments can stand on extra spots
+bought with clips (30, 50, 80), Mirror swaps left for right, and Photo saves a picture of the
+desk (the share sheet on a phone). The layout (`src/systems/deskLayout.ts`) is part of the
+save and every screen draws from it.
 
 ## NetScope (the phone)
 
