@@ -228,7 +228,7 @@ media: v0.8-cold-case-printed-file.png
 
 (181)
 
-> Behind the corkboard is the making-of: a polaroid for every notable build since the first night, red string and all. 29 photos, 430-odd commits, ten days.
+> Behind the corkboard is the making-of: a polaroid for every notable build since the first night, red string and all. 31 photos, 430-odd commits, ten days.
 > 
 > Click one to look closer.
 

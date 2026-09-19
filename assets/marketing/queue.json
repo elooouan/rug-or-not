@@ -230,7 +230,7 @@
       "when": "2026-09-27T12:00",
       "tweets": [
         {
-          "text": "Behind the corkboard is the making-of: a polaroid for every notable build since the first night, red string and all. 29 photos, 430-odd commits, ten days.\n\nClick one to look closer.",
+          "text": "Behind the corkboard is the making-of: a polaroid for every notable build since the first night, red string and all. 31 photos, 430-odd commits, ten days.\n\nClick one to look closer.",
           "media": "v0.8-the-wall-making-of.png",
           "alt": "A wall of polaroids joined by red string, each a screenshot of an earlier build."
         }
