@@ -80,6 +80,9 @@ version number hides the credits. There is also a floor safe with a three-digit 
 (the notebook counts the answer) holding the developer's ledger, and a radio under the lamp
 that tunes between lo-fi, late jazz, static and off; sit with the static long enough and
 you'll hear a numbers station tapping the combination in morse. Badges track all of it (NetScope > Badges).
+The desk is yours to dress, too: files pay paper clips, and the market on the phone spends
+them on Lucien's coat and hat, the cat's fur, the mug, the radio, curtains and an ornament
+for the corner (a bobblehead that nods, a fish named Liquidity).
 
 ## NetScope (the phone)
 
