@@ -1118,6 +1118,11 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
       ctx.button(`@${TOKEN.xHandle} on X (opens a new tab)`, () => {
         window.open(`https://x.com/${TOKEN.xHandle}`, '_blank', 'noopener');
       });
+    if (TOKEN.communityUrl)
+      ctx.button(
+        `${/t\.me|telegram/i.test(TOKEN.communityUrl) ? 'Telegram' : /discord/i.test(TOKEN.communityUrl) ? 'Discord' : 'The community'} (opens a new tab)`,
+        () => window.open(TOKEN.communityUrl, '_blank', 'noopener'),
+      );
     ctx.button(
       'Source on GitHub (opens a new tab)',
       () => {

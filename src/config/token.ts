@@ -32,6 +32,8 @@ export const TOKEN = {
   priceUrl: env(import.meta.env.VITE_TOKEN_PRICE_URL, ''),
   /** The game's X account, without the @: shares carry it and the About page links it. */
   xHandle: env(import.meta.env.VITE_X_HANDLE, '0xRugOrNot').replace(/^@/, ''),
+  /** Optional community link (a Telegram group, a Discord invite) for the About page. */
+  communityUrl: env(import.meta.env.VITE_COMMUNITY_URL, ''),
 } as const;
 
 export type Cluster = 'mainnet-beta' | 'devnet' | 'testnet';

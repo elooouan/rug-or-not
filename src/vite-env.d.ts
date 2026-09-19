@@ -13,6 +13,7 @@ interface ImportMetaEnv {
   readonly VITE_TOKEN_MOCK_BALANCE?: string;
   readonly VITE_GOATCOUNTER?: string;
   readonly VITE_X_HANDLE?: string;
+  readonly VITE_COMMUNITY_URL?: string;
 }
 
 interface ImportMeta {

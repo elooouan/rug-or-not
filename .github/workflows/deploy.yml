@@ -40,6 +40,7 @@ jobs:
           VITE_TOKEN_PRICE_URL: ${{ vars.VITE_TOKEN_PRICE_URL }}
           VITE_GOATCOUNTER: ${{ vars.VITE_GOATCOUNTER }}
           VITE_X_HANDLE: ${{ vars.VITE_X_HANDLE }}
+          VITE_COMMUNITY_URL: ${{ vars.VITE_COMMUNITY_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
