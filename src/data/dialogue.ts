@@ -333,7 +333,7 @@ export const LUCIEN: Record<ScriptId, DialogueLine[]> = {
   'desk-tour': [
     { text: 'One file down. Since you are back at the desk: everything on it does something.' },
     {
-      text: 'The phone is NetScope, the browser: explorer, the coin, the board, the news. The radio picks the station. The lamp is a lamp, mostly.',
+      text: 'The phone is NetScope, the browser: explorer, the coin, the board, the news, and a market that takes the paper clips a file pays. The radio picks the station. The lamp is a lamp, mostly.',
     },
     {
       text: 'The cat is Biscuit. The polaroid on the corkboard is how this office got built. The safe under the desk is locked. For now.',
