@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { BROWSER, FONT, GAME_HEIGHT, GAME_WIDTH, UI } from '@/config/layout';
-import { HEX } from '@/config/palette';
+import { HEX, type PaletteKey } from '@/config/palette';
 import { shortAddress, TOKEN } from '@/config/token';
 import { GAME_VERSION } from '@/config/gameConfig';
 import { LATE_NEWS, NEWS } from '@/data/news';
@@ -893,9 +893,41 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
     show(TEX.mug, 'mug');
     show(TEX.radio, 'radio');
     show(TEX.ornament, 'ornament');
+    // The window, small: night sky, sill, and the curtains in the colour being tried.
+    const win = scene.make.graphics({ x: px, y: strip - 26 }, false);
+    ctx.content.add(win);
+    const drawWindow = (color: PaletteKey | null) => {
+      win.clear();
+      win.fillStyle(HEX.shadow, 1).fillRect(0, 0, 44, 26);
+      win.fillStyle(HEX.bg, 1).fillRect(2, 2, 40, 20);
+      win.fillStyle(HEX.paperShadow, 0.8);
+      for (const [wx, wy] of [
+        [8, 8],
+        [15, 12],
+        [24, 6],
+        [31, 14],
+        [36, 9],
+      ])
+        win.fillRect(wx, wy, 1, 1);
+      win.fillStyle(HEX.woodMid, 1).fillRect(0, 22, 44, 4);
+      if (!color) return;
+      win
+        .fillStyle(HEX[color], 1)
+        .fillRect(2, 2, 8, 20)
+        .fillRect(34, 2, 8, 20)
+        .fillRect(2, 2, 40, 3);
+      win.fillStyle(HEX.bg, 0.35).fillRect(5, 2, 2, 20).fillRect(37, 2, 2, 20);
+    };
+    const wornCurtain = worn('curtains').style;
+    drawWindow(wornCurtain.slot === 'curtains' ? wornCurtain.color : null);
     ctx.y = strip + 6;
     /** Put `item` on the strip, or (with null) whatever the desk really wears. */
     const tryOn = (item: ShopItem | null, slot: ShopSlot) => {
+      if (slot === 'curtains') {
+        const st = item?.style ?? wornCurtain;
+        drawWindow(st.slot === 'curtains' ? st.color : null);
+        return;
+      }
       const img = stripImg[slot];
       if (!img?.active) return;
       const realKey =
@@ -938,7 +970,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
 
     const slotName = SHOP_SLOTS.find((s) => s.id === marketSlot)?.name ?? '';
     ctx.line(
-      `${slotName}  ·  wearing ${worn(marketSlot).name}${touchScreen() || marketSlot === 'curtains' ? '' : '  ·  hover a row to try it on'}`,
+      `${slotName}  ·  wearing ${worn(marketSlot).name}${touchScreen() ? '' : '  ·  hover a row to try it on'}`,
       { color: 'woodMid' },
     );
     ctx.gap(2);
@@ -998,7 +1030,7 @@ export const PAGES: Record<PageId, (ctx: PageCtx) => void> = {
           { sameLine: true, width: 64, variant: blocker ? 'paper' : 'ink' },
         );
       }
-      if (rowButton && !inUse && item.style.slot !== 'curtains') {
+      if (rowButton && !inUse) {
         rowButton.on('pointerover', () => tryOn(item, item.style.slot));
         rowButton.on('pointerout', () => tryOn(null, item.style.slot));
       }
