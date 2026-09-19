@@ -202,7 +202,7 @@ export class ReportScene extends Phaser.Scene {
     this.time.delayedCall(this.payload.rankUp ? 1400 : 1200, () => {
       if (this.payload.caughtName) toast(this, 'WANTED POSTER', this.payload.caughtName);
       this.payload.newUnlockNames.forEach((name) =>
-        toast(this, 'UNLOCKED', `${name} · in Settings`),
+        toast(this, 'UNLOCKED', `${name} · Settings, Office page`),
       );
       this.payload.newBadges.forEach((id) =>
         toast(this, 'BADGE EARNED', BADGE_BY_ID[id]?.name ?? id),

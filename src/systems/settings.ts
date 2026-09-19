@@ -26,6 +26,8 @@ export interface Settings {
   hardMode: boolean;
   /** Office colours (see config/palette THEMES). */
   theme: ThemeId;
+  /** A pointer half again as big, for small screens and tired eyes. */
+  bigPointer: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -41,6 +43,7 @@ export const DEFAULT_SETTINGS: Settings = {
   quips: true,
   hardMode: false,
   theme: 'noir',
+  bigPointer: false,
 };
 
 export function sanitizeSettings(raw: unknown): Settings {
@@ -72,5 +75,6 @@ export function sanitizeSettings(raw: unknown): Settings {
     theme: (THEME_IDS as readonly string[]).includes(r.theme as string)
       ? (r.theme as ThemeId)
       : DEFAULT_SETTINGS.theme,
+    bigPointer: bool(r.bigPointer, DEFAULT_SETTINGS.bigPointer),
   };
 }

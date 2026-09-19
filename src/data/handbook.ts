@@ -165,9 +165,9 @@ export const HANDBOOK: HandbookTopic[] = [
     title: 'Badges and unlocks',
     body: [
       'Badges mark things done: first file, a clean streak, every herring met, a rush over 2000, the safe opened. The ID card on the phone shows them.',
-      'Cosmetics (desk wood, lamp shade, magnifier rim, stamp ink) unlock with rank, grades, streaks and learned flags, and are equipped in Settings.',
+      'Cosmetics (desk wood, lamp shade, magnifier rim, stamp ink) unlock with rank, grades, streaks and learned flags, and are equipped on the Office page of Settings.',
       { h: 'Office colours' },
-      'Settings also repaints the whole office: noir, an old sepia file, a blue hour, newsprint, a speakeasy. Free, any time.',
+      'The same page repaints the whole office: noir, an old sepia file, a blue hour, newsprint, a speakeasy. Free, any time.',
     ],
   },
   {

@@ -38,6 +38,7 @@ export class CursorScene extends Phaser.Scene {
     this.cursor = this.add
       .image(0, 0, TEX.cursor)
       .setOrigin(LENS.cursorHotspot.x / CURSOR_SIZE, LENS.cursorHotspot.y / CURSOR_SIZE);
+    this.refreshPointer();
     this.input.setDefaultCursor('none');
     this.input.on(Phaser.Input.Events.GAME_OUT, () => (this.inside = false));
     this.input.on(Phaser.Input.Events.GAME_OVER, () => (this.inside = true));
@@ -50,6 +51,11 @@ export class CursorScene extends Phaser.Scene {
 
   setMode(mode: CursorMode): void {
     this.mode = mode;
+  }
+
+  /** Pointer size from settings (the hotspot stays put: the origin scales with it). */
+  refreshPointer(): void {
+    this.cursor.setScale(saveStore.get().settings.bigPointer ? 1.5 : 1);
   }
 
   /** The lens and pointer textures were redrawn (theme, cosmetics): point at the new ones. */

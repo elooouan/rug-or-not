@@ -24,6 +24,7 @@ import { syncTheme } from '@/systems/theme';
 interface SettingsInit {
   overlay?: boolean;
   returnTo?: string;
+  tab?: SettingsTab;
 }
 
 interface RowDef {
@@ -31,7 +32,15 @@ interface RowDef {
   value: () => string;
   change: (dir: number) => void;
   hint?: () => string;
+  /** Which page of the settings the row sits on (default: game). */
+  tab?: SettingsTab;
 }
+
+type SettingsTab = 'game' | 'office';
+const TABS: { id: SettingsTab; label: string }[] = [
+  { id: 'game', label: 'Game' },
+  { id: 'office', label: 'Office' },
+];
 
 const CARD = { x: 150, y: 6, w: 340, h: 348, pad: 10, rowH: 14 } as const;
 
@@ -57,9 +66,12 @@ export class SettingsScene extends Phaser.Scene {
     super(SettingsScene.KEY);
   }
 
+  private tab: SettingsTab = 'game';
+
   init(data: SettingsInit): void {
     this.overlay = !!data?.overlay;
     this.returnTo = data?.returnTo ?? 'TitleScene';
+    this.tab = data?.tab ?? 'game';
   }
 
   create(): void {
@@ -83,9 +95,25 @@ export class SettingsScene extends Phaser.Scene {
       .setAlpha(0.55)
       .setDepth(DEPTH.documents);
     this.add.image(x, y, TEX.paper).setOrigin(0).setDisplaySize(w, h).setDepth(DEPTH.documents);
-    addText(this, x + w / 2, y + pad - 4, 'SETTINGS', { size: FONT.size.heading, color: 'shadow' })
-      .setOrigin(0.5, 0)
+    addText(this, x + pad, y + pad - 4, 'SETTINGS', { size: FONT.size.heading, color: 'shadow' })
+      .setOrigin(0, 0)
       .setDepth(DEPTH.pins);
+    // Two pages: how the game plays, and how the office looks (plus the save's own rows).
+    TABS.forEach((t, i) => {
+      const b = new PixelButton(
+        this,
+        x + w - pad - (TABS.length - i) * 62,
+        y + pad - 6,
+        t.label,
+        () => {
+          if (t.id === this.tab) return;
+          audio.play('paper');
+          this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo, tab: t.id });
+        },
+        { width: 58, variant: t.id === this.tab ? 'ink' : 'paper' },
+      );
+      b.setDepth(DEPTH.hud);
+    });
 
     const set = (fn: (s: Settings) => void) => {
       saveStore.update((d) => fn(d.settings));
@@ -122,6 +150,7 @@ export class SettingsScene extends Phaser.Scene {
     });
     this.rows.push({
       label: 'Lamp flicker',
+      tab: 'office',
       value: () => onOff(s().lampFlicker),
       change: () => set((st) => (st.lampFlicker = !st.lampFlicker)),
     });
@@ -167,7 +196,16 @@ export class SettingsScene extends Phaser.Scene {
         ),
     });
     this.rows.push({
+      label: 'Pointer size',
+      value: () => (s().bigPointer ? 'large' : 'normal'),
+      change: () => {
+        set((st) => (st.bigPointer = !st.bigPointer));
+        (this.scene.get('CursorScene') as { refreshPointer?: () => void }).refreshPointer?.();
+      },
+    });
+    this.rows.push({
       label: 'Office colours',
+      tab: 'office',
       value: () => THEMES[s().theme].name,
       change: (d) => {
         set(
@@ -180,13 +218,14 @@ export class SettingsScene extends Phaser.Scene {
         // holds the old textures, so that case waits for the title.
         if (this.overlay) return;
         SettingsScene.reselect = this.selected;
-        this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo });
+        this.scene.restart({ overlay: this.overlay, returnTo: this.returnTo, tab: this.tab });
       },
       hint: () =>
         this.overlay && s().theme !== currentTheme() ? 'repainted once this file is closed' : '',
     });
     this.rows.push({
       label: 'Weather outside',
+      tab: 'office',
       value: () => WEATHER_LABEL[s().weather],
       change: (d) =>
         set(
@@ -207,6 +246,7 @@ export class SettingsScene extends Phaser.Scene {
         const list = byCategory(category);
         this.rows.push({
           label,
+          tab: 'office',
           value: () =>
             list.find((u) => u.id === saveStore.get().cosmetics[key])?.name ?? list[0].name,
           change: (d) => {
@@ -239,6 +279,7 @@ export class SettingsScene extends Phaser.Scene {
     if (!this.overlay) {
       this.rows.push({
         label: 'Export progress',
+        tab: 'office',
         value: () => 'copy',
         change: () => {
           const blob = exportSave(saveStore);
@@ -255,6 +296,7 @@ export class SettingsScene extends Phaser.Scene {
       });
       this.rows.push({
         label: 'Import progress',
+        tab: 'office',
         value: () => 'paste',
         change: () => {
           const blob = window.prompt('Paste a save code:');
@@ -274,6 +316,7 @@ export class SettingsScene extends Phaser.Scene {
     }
     this.rows.push({
       label: 'Reset progress',
+      tab: 'office',
       value: () => (this.confirmReset ? 'click again to confirm' : '...'),
       change: () => {
         if (!this.confirmReset) {
@@ -290,6 +333,16 @@ export class SettingsScene extends Phaser.Scene {
       hint: () => 'erases scores, notebook, streak and unlocks',
     });
 
+    this.rows = this.rows.filter((r) => (r.tab ?? 'game') === this.tab);
+    if (this.tab === 'office') {
+      // Looks first, the save's own rows last.
+      const order = ['Office colours', 'Weather outside', 'Lamp flicker'];
+      const rank = (r: RowDef) => {
+        const i = order.indexOf(r.label);
+        return i >= 0 ? i : r.label.endsWith('progress') ? 20 : 10;
+      };
+      this.rows.sort((a, b) => rank(a) - rank(b));
+    }
     this.rows.forEach((row, i) => {
       const ry = y + pad + 30 + i * CARD.rowH;
       const ring = this.add

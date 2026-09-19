@@ -14,6 +14,9 @@
 - Screens dip to dark on the way out as well as fading up on arrival (a double-click on a
   button can't start two screens any more). The wall's last polaroid, tonight's desk, has a
   "Save this photo" button so it can leave the office as a PNG.
+- Settings is two pages now: Game (sound, modes, Lucien, pointer size) and Office (colours,
+  weather, lamp, cosmetics, save export/import/reset). A "Pointer size" row makes the
+  pointer half again as big.
 - Office colours: five looks for the whole place (Noir, Old file, Blue hour, Newsprint,
   Speakeasy) under Settings. Everything is redrawn in the new palette on the spot; a change
   made from a paused file waits for the title.
