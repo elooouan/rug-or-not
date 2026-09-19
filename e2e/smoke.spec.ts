@@ -669,3 +669,75 @@ test('Esc works in an overlay opened over a lesson', async ({ page }) => {
   expect(after).toEqual({ box: true, overlays: 1 });
   expect(errors).toEqual([]);
 });
+
+test('the drawer reopens the last report of a closed file', async ({ page }) => {
+  const errors = await boot(page);
+  await skipTalk(page);
+  await page.evaluate(() => window.__debug.startCase('moonpup'));
+  await waitForScene(page, 'InvestigationScene');
+  await waitForPhase(page, 'intake');
+  await skipTalk(page);
+  await page.keyboard.press('Enter');
+  await waitForPhase(page, 'investigating');
+  await skipTalk(page);
+  await page.evaluate(() => {
+    const inv = window.__game.scene.getScene('InvestigationScene') as unknown as {
+      docs: {
+        allSpots(): { clue: { id: string; flagId?: string } }[];
+        focusClue(id: string): boolean;
+        activateFocused(): void;
+      }[];
+      stamps: { trigger(fn: (v: string) => void): void }[];
+      onStamp(v: string): void;
+    };
+    const doc = inv.docs[0];
+    const first = doc.allSpots().find((s) => s.clue.flagId);
+    if (first) {
+      doc.focusClue(first.clue.id);
+      doc.activateFocused();
+    }
+    inv.stamps[0].trigger((v) => inv.onStamp(v));
+  });
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(600);
+  const scored = await page.evaluate(
+    () =>
+      (
+        window.__game.scene.getScene('ReportScene') as unknown as {
+          payload: { breakdown: { total: number } };
+        }
+      ).payload.breakdown.total,
+  );
+  // Into the drawer, then the grade sticker on the first folder (a mouse press).
+  await page.evaluate(() =>
+    (
+      window.__game.scene.getScene('ReportScene') as unknown as {
+        scene: { start(k: string): void };
+      }
+    ).scene.start('CaseSelectScene'),
+  );
+  await waitForScene(page, 'CaseSelectScene');
+  await skipTalk(page);
+  await page.waitForTimeout(300);
+  const pressed = await page.evaluate(() => {
+    const cs = window.__game.scene.getScene('CaseSelectScene') as unknown as {
+      folders: {
+        list: { type: string; input?: unknown; emit(ev: string, ...a: unknown[]): void }[];
+      }[];
+    };
+    const sticker = cs.folders[0].list.find((o) => o.type === 'Rectangle' && o.input);
+    sticker?.emit('pointerdown', {}, 0, 0, { stopPropagation: () => undefined });
+    return !!sticker;
+  });
+  expect(pressed).toBe(true);
+  await waitForScene(page, 'ReportScene');
+  await page.waitForTimeout(400);
+  const again = await page.evaluate(() => {
+    const rs = window.__game.scene.getScene('ReportScene') as unknown as {
+      payload: { revisit?: boolean; breakdown: { total: number } };
+    };
+    return { revisit: rs.payload.revisit, total: rs.payload.breakdown.total };
+  });
+  expect(again).toEqual({ revisit: true, total: scored });
+  expect(errors).toEqual([]);
+});
