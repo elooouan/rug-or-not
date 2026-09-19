@@ -112,6 +112,11 @@ export class NotebookPanel extends Phaser.GameObjects.Container {
     this.title.setText(text).setColor(PALETTE[color]);
   }
 
+  /** What the page says while it has no entries. */
+  setEmptyLine(text: string): void {
+    this.emptyText.setText(text);
+  }
+
   /** The small line at the foot of the page. */
   setStatus(text: string, color: PaletteKey): void {
     this.examinedText.setText(text);

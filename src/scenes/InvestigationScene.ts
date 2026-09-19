@@ -217,6 +217,7 @@ export class InvestigationScene extends Phaser.Scene {
     this.refreshNotebook();
     const missed = marks.reduce((a, b) => a + b, 0);
     this.notebook?.setTitle('SECOND LOOK', 'stampRed');
+    this.notebook?.setEmptyLine('nothing was pinned\non this run');
     this.notebook?.setStatus(
       missed > 0 ? `${missed} missed, in amber` : 'nothing missed',
       missed > 0 ? 'stampRed' : 'stampGreen',
